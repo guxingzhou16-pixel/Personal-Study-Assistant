@@ -1,0 +1,42 @@
+{
+  "name": "personal-study-assistant",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "main": "dist-electron/main.cjs",
+  "scripts": {
+    "dev": "vite --host 127.0.0.1",
+    "typecheck": "tsc --noEmit && tsc -p tsconfig.electron.json --noEmit",
+    "build": "npm run typecheck && vite build",
+    "preview": "vite preview --host 127.0.0.1",
+    "test": "vitest run",
+    "build:electron": "node scripts/build-electron.mjs",
+    "desktop:dev": "npm run build:electron && node scripts/dev.mjs",
+    "desktop:build": "npm run build && npm run build:electron",
+    "desktop:start": "electron .",
+    "test:e2e": "npm run desktop:build && playwright test",
+    "format": "prettier --write src electron scripts tests *.json *.ts .github index.html",
+    "format:check": "prettier --check src electron scripts tests *.json *.ts .github index.html"
+  },
+  "dependencies": {
+    "lucide-react": "^0.577.0",
+    "react": "19.3.0",
+    "react-dom": "19.3.0"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.63.0",
+    "@types/node": "^24.12.0",
+    "electron": "44.5.1",
+    "esbuild": "0.28.2",
+    "prettier": "^3.8.1",
+    "@types/react": "^19.2.0",
+    "@types/react-dom": "^19.2.0",
+    "@vitejs/plugin-react": "6.1.1",
+    "typescript": "^5.9.3",
+    "vite": "8.3.1",
+    "vitest": "^4.1.0"
+  },
+  "engines": {
+    "node": ">=24.16.0"
+  }
+}

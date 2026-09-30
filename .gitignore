@@ -26,6 +26,11 @@ dist/
 build/
 target/
 *.log
+/dist-electron/
+credentials.enc.json*
+/test-results/
+/playwright-report/
+/artifacts/
 
 # 系统文件
 .DS_Store
