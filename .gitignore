@@ -1,0 +1,32 @@
+# 本地人格设定，仅供个人使用
+/邻家大姐姐型_AI_陪伴人格_v6.md
+
+# 私人学习资料、模型与备份
+/data/
+/user-data/
+/models/
+/backups/
+*.db
+*.db-*
+*.sqlite
+*.sqlite-*
+*.sqlite3
+*.sqlite3-*
+
+# 密钥与本机配置
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+# 依赖、构建产物与日志
+node_modules/
+dist/
+build/
+target/
+*.log
+
+# 系统文件
+.DS_Store
+Thumbs.db
