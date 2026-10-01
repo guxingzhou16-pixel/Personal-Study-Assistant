@@ -1,4 +1,13 @@
-import { app, BrowserWindow, clipboard, dialog, ipcMain, Menu, safeStorage } from 'electron';
+import {
+  app,
+  BrowserWindow,
+  clipboard,
+  dialog,
+  ipcMain,
+  Menu,
+  safeStorage,
+  utilityProcess,
+} from 'electron';
 import { mkdirSync } from 'node:fs';
 import { join, resolve } from 'node:path';
 import { pathToFileURL } from 'node:url';
@@ -38,6 +47,12 @@ function registerHandlers(database: Storage, credentials: Credentials) {
     database,
     join(dataDir, 'sources'),
     join(__dirname, 'document-worker.mjs'),
+    (modulePath, args) =>
+      utilityProcess.fork(modulePath, args, {
+        stdio: 'ignore',
+        serviceName: 'Study document parser',
+        execArgv: ['--max-old-space-size=256'],
+      }),
   );
   documents = files;
   function handle(channel: string, work: (...args: unknown[]) => unknown) {

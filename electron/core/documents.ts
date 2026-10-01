@@ -1,10 +1,10 @@
 import { createHash, randomUUID } from 'node:crypto';
+import { fork } from 'node:child_process';
 import { createReadStream, createWriteStream } from 'node:fs';
 import { mkdir, readFile, rename, rm, stat } from 'node:fs/promises';
 import { basename, extname, join } from 'node:path';
 import { Transform } from 'node:stream';
 import { pipeline } from 'node:stream/promises';
-import { Worker } from 'node:worker_threads';
 import type {
   ImportProgress,
   ImportReport,
@@ -21,6 +21,17 @@ export const DOCUMENT_LIMITS = {
   files: 20,
   pages: 1000,
 };
+type ParserMessage =
+  | { type: 'progress'; message: string }
+  | { type: 'result'; result: ParsedDocument }
+  | { type: 'error'; code: string; message: string };
+export interface ParserProcess {
+  on(event: 'message', listener: (message: ParserMessage) => void): unknown;
+  on(event: 'error', listener: () => void): unknown;
+  on(event: 'exit', listener: (code: number | null) => void): unknown;
+  kill(): boolean;
+}
+export type ParserLauncher = (modulePath: string, args: string[]) => ParserProcess;
 export function sourceId(input: unknown): string {
   if (typeof input !== 'string' || !/^[a-f0-9]{64}$/.test(input))
     throw new AppError('sourceId', '资料标识无效。');
@@ -38,6 +49,11 @@ export class Documents {
     private readonly storage: Storage,
     private readonly directory: string,
     private readonly workerPath: string,
+    private readonly launchParser: ParserLauncher = (path, args) =>
+      fork(path, args, {
+        stdio: ['ignore', 'ignore', 'ignore', 'ipc'],
+        execArgv: ['--max-old-space-size=256'],
+      }),
   ) {}
   cancel(): void {
     this.active?.abort();
@@ -141,17 +157,19 @@ export class Documents {
     progress: (message: string) => void,
   ): Promise<ParsedDocument> {
     return new Promise((resolve, reject) => {
-      const worker = new Worker(this.workerPath, {
-        workerData: { path, kind, maxPages: DOCUMENT_LIMITS.pages },
-        resourceLimits: { maxOldGenerationSizeMb: 256 },
-      });
+      // PDF/native decompression stays in another process: cancelling it cannot terminate the main process.
+      const worker = this.launchParser(this.workerPath, [
+        path,
+        kind,
+        String(DOCUMENT_LIMITS.pages),
+      ]);
       let finished = false;
       const finish = (error?: unknown, result?: ParsedDocument) => {
         if (finished) return;
         finished = true;
         clearTimeout(timer);
         signal.removeEventListener('abort', aborted);
-        void worker.terminate();
+        worker.kill();
         if (error) reject(error);
         else resolve(result!);
       };

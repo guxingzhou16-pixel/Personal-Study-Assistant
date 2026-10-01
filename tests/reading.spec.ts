@@ -19,7 +19,9 @@ test('imports local files, reads Markdown and PDF, and restores positions after 
       env: { ...taskEnv, STUDY_COMPANION_DATA_DIR: join(directory, 'data') },
     });
     const page = await application.firstWindow();
-    page.on('request', request => { if (/^https?:/.test(request.url())) networkRequests.push(request.url()); });
+    page.on('request', (request) => {
+      if (/^https?:/.test(request.url())) networkRequests.push(request.url());
+    });
     return page;
   }
   async function choose(paths: string[]) {
@@ -61,16 +63,23 @@ test('imports local files, reads Markdown and PDF, and restores positions after 
     await expect(page.getByTestId('pdf-text-layer')).toContainText('Active recall');
     await page.getByRole('button', { name: '下一页' }).click();
     await expect(page.getByTestId('pdf-text-layer')).toContainText('Evidence matters');
-    await page.getByTestId('pdf-text-layer').evaluate(layer => {
-      const span = Array.from(layer.querySelectorAll('span')).find(item => item.textContent?.startsWith('Evidence matters.'))!;
+    await page.getByTestId('pdf-text-layer').evaluate((layer) => {
+      const span = Array.from(layer.querySelectorAll('span')).find((item) =>
+        item.textContent?.startsWith('Evidence matters.'),
+      )!;
       const range = document.createRange();
-      range.setStart(span.firstChild!, 0); range.setEnd(span.firstChild!, 16);
-      const selection = window.getSelection()!; selection.removeAllRanges(); selection.addRange(range);
+      range.setStart(span.firstChild!, 0);
+      range.setEnd(span.firstChild!, 16);
+      const selection = window.getSelection()!;
+      selection.removeAllRanges();
+      selection.addRange(range);
       span.dispatchEvent(new MouseEvent('mouseup', { bubbles: true }));
     });
     await page.getByRole('button', { name: '复制引用', exact: true }).click();
     await expect(page.getByText('引用已复制，包含资料位置。')).toBeVisible();
-    expect(await application!.evaluate(({ clipboard }) => clipboard.readText())).toContain('《Learning Notes》第 2 页');
+    expect(await application!.evaluate(({ clipboard }) => clipboard.readText())).toContain(
+      '《Learning Notes》第 2 页',
+    );
     await page.getByRole('combobox', { name: 'PDF 缩放' }).selectOption('1.25');
     await page.getByRole('button', { name: '护眼', exact: true }).click();
     await expect(page.getByText('阅读位置已保存', { exact: true })).toBeVisible();
