@@ -99,6 +99,9 @@ test('desktop navigation, persistent preferences, encrypted keys and model check
       'storeApiKey',
       'removeApiKey',
       'hasApiKey',
+      'studyOverview',
+      'checkIn',
+      'setStudyRunning',
       'checkConnection',
     ]);
     await page.getByRole('button', { name: '删除密钥' }).click();

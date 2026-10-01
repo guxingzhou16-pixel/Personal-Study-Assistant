@@ -1,4 +1,4 @@
-import { app, BrowserWindow, dialog, ipcMain, Menu, safeStorage } from 'electron';
+import { app, BrowserWindow, dialog, ipcMain, Menu, powerMonitor, safeStorage } from 'electron';
 import { mkdirSync } from 'node:fs';
 import { join, resolve } from 'node:path';
 import { pathToFileURL } from 'node:url';
@@ -7,6 +7,8 @@ import { AppError, failure } from './core/errors';
 import { checkConnection } from './core/models';
 import { Storage } from './core/storage';
 import { string, validateProfile, validateProvider } from './core/settings';
+import { StudyTracker } from './core/study';
+import { StudyStorage } from './core/study-storage';
 
 app.setName('StudyCompanion');
 const testDataDir = !app.isPackaged ? process.env.STUDY_COMPANION_DATA_DIR : undefined;
@@ -26,12 +28,14 @@ const rendererPath = join(__dirname, '../dist/index.html');
 const rendererUrl = devUrl ? new URL(devUrl).href : pathToFileURL(rendererPath).href;
 let window: BrowserWindow | null = null;
 let storage: Storage | undefined;
+let study: StudyTracker | undefined;
+let studyHeartbeat: ReturnType<typeof setInterval> | undefined;
 
 function isRendererUrl(url: string | undefined): boolean {
   return url?.split('#', 1)[0] === rendererUrl;
 }
 
-function registerHandlers(database: Storage, credentials: Credentials) {
+function registerHandlers(database: Storage, credentials: Credentials, tracker: StudyTracker) {
   function handle(channel: string, work: (...args: unknown[]) => unknown) {
     ipcMain.handle(channel, async (event, ...args: unknown[]) => {
       const frameUrl = event.senderFrame?.url;
@@ -66,6 +70,9 @@ function registerHandlers(database: Storage, credentials: Credentials) {
   handle('study:store-key', (endpoint, key) => credentials.store(endpoint, key));
   handle('study:remove-key', (endpoint) => credentials.remove(endpoint));
   handle('study:has-key', (endpoint) => credentials.has(endpoint));
+  handle('study:overview', (year, month) => tracker.overview(year, month));
+  handle('study:check-in', (year, month) => tracker.checkIn(year, month));
+  handle('study:set-running', (running, year, month) => tracker.setRunning(running, year, month));
   handle('study:check-connection', async (providerInput, profileInput, keyInput) => {
     const provider = validateProvider(providerInput);
     const profile = validateProfile(profileInput);
@@ -125,8 +132,24 @@ else {
       storage = new Storage(join(dataDir, 'study-companion.sqlite3'));
       mkdirSync(join(dataDir, 'sources'), { recursive: true });
       const credentials = new Credentials(join(dataDir, 'credentials.enc.json'), safeStorage);
+      study = new StudyTracker(new StudyStorage(join(dataDir, 'study-activity.sqlite3')));
+      const tracker = study;
+      studyHeartbeat = setInterval(() => {
+        try {
+          tracker.checkpoint();
+        } catch (error) {
+          tracker.interrupt(error);
+        }
+      }, 1000);
+      powerMonitor.on('suspend', () => {
+        try {
+          tracker.pause();
+        } catch (error) {
+          tracker.interrupt(error);
+        }
+      });
       Menu.setApplicationMenu(null);
-      registerHandlers(storage, credentials);
+      registerHandlers(storage, credentials, tracker);
       createWindow();
     })
     .catch((error) => {
@@ -141,5 +164,16 @@ else {
       app.quit();
     });
   app.on('window-all-closed', () => app.quit());
-  app.on('will-quit', () => storage?.close());
+  app.on('will-quit', () => {
+    clearInterval(studyHeartbeat);
+    try {
+      study?.close();
+    } catch {
+      dialog.showErrorBox(
+        '学习时间未能保存',
+        '最后一段学习时间保存失败，请检查磁盘空间和数据目录权限。',
+      );
+    }
+    storage?.close();
+  });
 }
