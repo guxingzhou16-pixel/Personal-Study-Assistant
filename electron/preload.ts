@@ -11,6 +11,7 @@ import type {
   ImportReport,
   ImportProgress,
   OpenDocument,
+  StudyOverview,
 } from '../src/lib/types';
 
 async function call<T>(channel: string, ...args: unknown[]): Promise<T> {
@@ -25,6 +26,10 @@ const api: DesktopApi = {
   storeApiKey: (baseUrl: string, key: string) => call<void>('study:store-key', baseUrl, key),
   removeApiKey: (baseUrl: string) => call<void>('study:remove-key', baseUrl),
   hasApiKey: (baseUrl: string) => call<boolean>('study:has-key', baseUrl),
+  studyOverview: (year, month) => call<StudyOverview>('study:overview', year, month),
+  checkIn: (year, month) => call<StudyOverview>('study:check-in', year, month),
+  setStudyRunning: (running, year, month) =>
+    call<StudyOverview>('study:set-running', running, year, month),
   checkConnection: (provider: Provider, profile: ModelProfile, key?: string) =>
     call<ConnectionReport>('study:check-connection', provider, profile, key),
   listSources: () => call<Source[]>('study:list-sources'),

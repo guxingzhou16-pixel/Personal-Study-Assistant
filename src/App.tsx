@@ -20,6 +20,7 @@ import { SettingsPage } from './components/SettingsPage';
 import { LibraryPage } from './components/LibraryPage';
 import { ReadingPage } from './components/ReadingPage';
 import { RecentReadings } from './components/RecentReadings';
+import { StudyCalendar } from './components/StudyCalendar';
 import { desktop, errorMessage, isDesktop } from './lib/desktop';
 import { defaultSettings, type Bootstrap, type Settings } from './lib/types';
 
@@ -245,28 +246,10 @@ export default function App() {
                   </div>
                   <RecentReadings onOpen={openSource} />
                 </section>
-                <section className="daily-section">
-                  <div className="section-heading">
-                    <h2>今天的节奏</h2>
-                    <Leaf size={17} />
-                  </div>
-                  <div className="daily-goal">
-                    <span>每日学习目标</span>
-                    <strong>
-                      {settings.dailyGoalMinutes}
-                      <small>分钟</small>
-                    </strong>
-                    <p>先从你能坚持的节奏开始</p>
-                    <button className="text-button" onClick={() => setPage('settings')}>
-                      调整目标
-                      <ArrowRight size={14} />
-                    </button>
-                  </div>
-                  <div className="encouragement">
-                    <span>给今天的你</span>
-                    <p>{encouragement}</p>
-                  </div>
-                </section>
+                <StudyCalendar
+                  dailyGoalMinutes={settings.dailyGoalMinutes}
+                  encouragement={encouragement}
+                />
               </div>
               <div className="journey">
                 <span className="small-label">让学习留下痕迹</span>

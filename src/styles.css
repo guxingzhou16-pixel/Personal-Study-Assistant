@@ -883,7 +883,7 @@ h1 {
 }
 .home-columns {
   display: grid;
-  grid-template-columns: 1.55fr 1fr;
+  grid-template-columns: minmax(0, 4fr) minmax(0, 5fr);
   gap: 29px;
   margin-top: 31px;
 }
@@ -942,36 +942,238 @@ h2 {
   color: #909a89;
   margin-top: 6px;
 }
-.daily-goal {
-  padding: 19px 22px;
-  background: white;
+.daily-section {
+  min-width: 0;
+}
+.calendar-panel {
+  padding: 17px 19px 13px;
+  background: var(--surface);
   border: 1px solid var(--line);
   border-radius: 8px;
 }
-.daily-goal > span {
-  display: block;
-  font-size: 12px;
-  color: #74816d;
+.calendar-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 12px;
 }
-.daily-goal strong {
-  font-family: Georgia, 'Times New Roman', serif;
-  font-size: 37px;
-  font-weight: 400;
-  display: block;
-  color: #3a5140;
-  margin: 7px 0;
+.calendar-toolbar h3 {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  white-space: nowrap;
 }
-.daily-goal strong small {
-  font-family: 'Microsoft YaHei', sans-serif;
+.calendar-toolbar h3 svg {
+  color: #68815b;
+}
+.calendar-navigation {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+}
+.calendar-arrow {
+  width: 28px;
+  height: 28px;
+  display: grid;
+  place-items: center;
+  background: transparent;
+  color: #607355;
+  border-radius: 5px;
+}
+.calendar-arrow:hover:not(:disabled),
+.calendar-today:hover:not(:disabled) {
+  background: #eef3e8;
+}
+.calendar-today {
+  padding: 5px 8px;
+  background: transparent;
+  color: #526b47;
+  font-size: 11px;
+  border-radius: 5px;
+}
+.month-calendar {
+  width: 100%;
+  table-layout: fixed;
+  border-collapse: collapse;
+}
+.month-calendar th {
+  height: 29px;
   font-size: 11px;
   font-weight: 400;
-  margin-left: 8px;
-  color: #7b8973;
+  color: #6c7c62;
 }
-.daily-goal p {
+.month-calendar th.weekend {
+  color: #8b7256;
+}
+.month-calendar td {
+  height: 40px;
+  text-align: center;
+  vertical-align: middle;
+}
+.calendar-day {
+  width: 32px;
+  height: 32px;
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  border-radius: 50%;
+  font-size: 13px;
+  color: #485a3d;
+}
+.outside-month .calendar-day {
+  color: #a6ad9e;
+}
+.calendar-day.is-today {
+  background: #ecf2e5;
+  box-shadow: inset 0 0 0 1px #b9c8aa;
+  color: #38542a;
+  font-weight: 600;
+}
+.calendar-day.is-signed {
+  background: #3c624b;
+  box-shadow: none;
+  color: #fff;
+}
+.check-in-dot {
+  position: absolute;
+  bottom: 3px;
+  width: 3px;
+  height: 3px;
+  background: currentColor;
+  border-radius: 50%;
+}
+.calendar-legend {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  font-size: 10px;
+  color: #687660;
+  padding-top: 12px;
+  margin-top: 8px;
+  border-top: 1px solid #eef1e9;
+}
+.calendar-legend > span {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+.calendar-legend i {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+}
+.today-dot {
+  background: #e1eacf;
+  box-shadow: 0 0 0 1px #a4b494;
+}
+.signed-dot {
+  background: #3c624b;
+}
+.calendar-legend .month-check-ins {
+  margin-left: auto;
+}
+.daily-actions {
+  display: grid;
+  grid-template-columns: minmax(0, 4fr) minmax(0, 5fr);
+  gap: 12px;
+  margin-top: 12px;
+}
+.check-in-panel,
+.study-time-panel {
+  padding: 15px 16px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+.daily-label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  color: #677660;
+}
+.daily-hint {
+  font-size: 10px;
+  color: #6b7963;
+}
+.check-in-button {
+  min-height: 36px;
+  padding: 7px 11px;
+  border-radius: 5px;
+  background: #edf3e7;
+  border: 1px solid #d3dfc7;
+  color: #405e34;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  font-size: 13px;
+  white-space: nowrap;
+  margin: 11px 0 8px;
+}
+.check-in-button:hover:not(:disabled) {
+  background: #e1ecd6;
+}
+.check-in-button.checked-in {
+  opacity: 1;
+  background: #3c624b;
+  border-color: #3c624b;
+  color: #fff;
+}
+.study-duration {
+  font-size: 26px;
+  font-weight: 500;
+  letter-spacing: 1px;
+  font-variant-numeric: tabular-nums;
+  line-height: 1.4;
+  margin: 8px 0;
+  color: #3b5434;
+}
+.study-time-controls {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: auto;
+}
+.study-time-controls .text-button {
+  font-size: 11px;
+}
+.timer-running {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: #4c7555;
+}
+.study-error {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
   font-size: 12px;
-  color: #7a8575;
-  margin-bottom: 10px;
+  line-height: 1.8;
+  color: #944f3b;
+  padding: 12px 0 0;
+}
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
 }
 .encouragement {
   padding: 16px 2px 0;
@@ -1377,6 +1579,11 @@ select:hover {
   .home-columns {
     gap: 20px;
   }
+  .check-in-button {
+    gap: 5px;
+    padding-inline: 8px;
+    font-size: 12px;
+  }
   .welcome-panel {
     padding: 27px;
   }
@@ -1437,18 +1644,6 @@ select:hover {
   .home-columns {
     grid-template-columns: 1fr;
   }
-  .daily-section {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 15px;
-  }
-  .daily-section > .section-heading {
-    grid-column: 1/-1;
-    margin-bottom: 0;
-  }
-  .daily-goal {
-    grid-column: 1;
-  }
   .journey ol {
     grid-template-columns: 1fr 1fr;
     row-gap: 13px;
@@ -1506,11 +1701,15 @@ select:hover {
   .library-empty {
     padding: 38px 18px;
   }
-  .daily-section {
-    grid-template-columns: 1fr;
+  .calendar-panel {
+    padding: 15px 12px 12px;
   }
-  .daily-goal {
-    grid-column: auto;
+  .check-in-panel,
+  .study-time-panel {
+    padding: 13px 12px;
+  }
+  .study-duration {
+    font-size: 22px;
   }
   .app-footer > span:last-child {
     display: none;

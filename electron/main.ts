@@ -5,6 +5,7 @@ import {
   dialog,
   ipcMain,
   Menu,
+  powerMonitor,
   safeStorage,
   utilityProcess,
 } from 'electron';
@@ -17,6 +18,8 @@ import { checkConnection } from './core/models';
 import { Storage } from './core/storage';
 import { Documents } from './core/documents';
 import { string, validateProfile, validateProvider } from './core/settings';
+import { StudyTracker } from './core/study';
+import { StudyStorage } from './core/study-storage';
 
 app.setName('StudyCompanion');
 const testDataDir = !app.isPackaged ? process.env.STUDY_COMPANION_DATA_DIR : undefined;
@@ -37,12 +40,14 @@ const rendererUrl = devUrl ? new URL(devUrl).href : pathToFileURL(rendererPath).
 let window: BrowserWindow | null = null;
 let storage: Storage | undefined;
 let documents: Documents | undefined;
+let study: StudyTracker | undefined;
+let studyHeartbeat: ReturnType<typeof setInterval> | undefined;
 
 function isRendererUrl(url: string | undefined): boolean {
   return url?.split('#', 1)[0] === rendererUrl;
 }
 
-function registerHandlers(database: Storage, credentials: Credentials) {
+function registerHandlers(database: Storage, credentials: Credentials, tracker: StudyTracker) {
   const files = new Documents(
     database,
     join(dataDir, 'sources'),
@@ -89,6 +94,9 @@ function registerHandlers(database: Storage, credentials: Credentials) {
   handle('study:store-key', (endpoint, key) => credentials.store(endpoint, key));
   handle('study:remove-key', (endpoint) => credentials.remove(endpoint));
   handle('study:has-key', (endpoint) => credentials.has(endpoint));
+  handle('study:overview', (year, month) => tracker.overview(year, month));
+  handle('study:check-in', (year, month) => tracker.checkIn(year, month));
+  handle('study:set-running', (running, year, month) => tracker.setRunning(running, year, month));
   handle('study:check-connection', async (providerInput, profileInput, keyInput) => {
     const provider = validateProvider(providerInput);
     const profile = validateProfile(profileInput);
@@ -170,8 +178,24 @@ else {
       storage = new Storage(join(dataDir, 'study-companion.sqlite3'));
       mkdirSync(join(dataDir, 'sources'), { recursive: true });
       const credentials = new Credentials(join(dataDir, 'credentials.enc.json'), safeStorage);
+      study = new StudyTracker(new StudyStorage(join(dataDir, 'study-activity.sqlite3')));
+      const tracker = study;
+      studyHeartbeat = setInterval(() => {
+        try {
+          tracker.checkpoint();
+        } catch (error) {
+          tracker.interrupt(error);
+        }
+      }, 1000);
+      powerMonitor.on('suspend', () => {
+        try {
+          tracker.pause();
+        } catch (error) {
+          tracker.interrupt(error);
+        }
+      });
       Menu.setApplicationMenu(null);
-      registerHandlers(storage, credentials);
+      registerHandlers(storage, credentials, tracker);
       createWindow();
     })
     .catch((error) => {
@@ -188,6 +212,15 @@ else {
   app.on('window-all-closed', () => app.quit());
   app.on('will-quit', () => {
     documents?.cancel();
+    clearInterval(studyHeartbeat);
+    try {
+      study?.close();
+    } catch {
+      dialog.showErrorBox(
+        '学习时间未能保存',
+        '最后一段学习时间保存失败，请检查磁盘空间和数据目录权限。',
+      );
+    }
     storage?.close();
   });
 }
