@@ -1,4 +1,5 @@
 import { build } from 'esbuild';
+import { PDFDocument, PDFName, PDFString, StandardFonts } from 'pdf-lib';
 import { createHash } from 'node:crypto';
 import {
   mkdirSync,
@@ -91,6 +92,46 @@ describe('document parsing and stable evidence locations', () => {
     expect((await parsePdf(files.scan, 1000, () => {})).textStatus).toBe('none');
     await expect(parsePdf(files.corrupt, 1000, () => {})).rejects.toThrow('无法解析');
     await expect(parsePdf(files.pdf, 1, () => {})).rejects.toThrow('1000 页');
+  });
+  it('resolves PDF bookmarks to stable pages and identifies partially scanned documents', async () => {
+    const { directory, storage } = context();
+    const pdf = await PDFDocument.create();
+    const font = await pdf.embedFont(StandardFonts.Helvetica);
+    pdf.addPage().drawText('First page evidence.', { x: 40, y: 700, font });
+    const scanned = pdf.addPage();
+    const outlineRef = pdf.context.nextRef();
+    const itemRef = pdf.context.nextRef();
+    pdf.context.assign(
+      itemRef,
+      pdf.context.obj({
+        Title: PDFString.of('Scanned appendix'),
+        Parent: outlineRef,
+        Dest: [scanned.ref, PDFName.of('Fit')],
+      }),
+    );
+    pdf.context.assign(
+      outlineRef,
+      pdf.context.obj({ Type: PDFName.of('Outlines'), First: itemRef, Last: itemRef, Count: 1 }),
+    );
+    pdf.catalog.set(PDFName.of('Outlines'), outlineRef);
+    const path = join(directory, 'bookmarks.pdf');
+    writeFileSync(path, await pdf.save());
+    const parsed = await parsePdf(path, 1000, () => {});
+    expect(parsed.textStatus).toBe('partial');
+    expect(parsed.outline).toEqual([
+      { anchor: 'page-2', title: 'Scanned appendix', depth: 1, page: 2 },
+    ]);
+    expect(parsed.segments[0].text).toContain('First page evidence');
+    expect(parsed.segments[1].text).toBe('');
+    const id = createHash('sha256').update(readFileSync(path)).digest('hex');
+    storage.addSource({
+      id,
+      name: 'Appendix',
+      kind: 'pdf',
+      bytes: readFileSync(path).length,
+      ...parsed,
+    });
+    expect(storage.getSource(id)?.position).toMatchObject({ page: 1, anchor: 'page-1' });
   });
 });
 
