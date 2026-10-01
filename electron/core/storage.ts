@@ -126,7 +126,7 @@ export class Storage {
     const id = sourceId(input.id);
     const position: ReadingPosition = {
       page: 1,
-      anchor: input.outline[0]?.anchor ?? '',
+      anchor: input.kind === 'pdf' ? 'page-1' : input.outline[0]?.anchor ?? '',
       offset: 0,
       zoom: 1,
       tone: 'paper',
