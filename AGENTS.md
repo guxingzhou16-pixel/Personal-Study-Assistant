@@ -58,7 +58,7 @@
 - `0ed6eea` 实现导入与阅读；后续改为独立解析进程，`a3dee7d` 修复 Electron utility 进程的 PDF.js Node 环境识别，`3d5036a` 修复首个书签不在第一页时的初始锚点。RED/GREEN 检查点保留，最终验证以 README 为准。
 - 原生文件选择、本机副本、SHA-256 去重、逐文件失败、后台进度与取消、搜索/格式过滤、首页真实最近阅读已接入。
 - PDF 原页、可选文字、书签/页码目录、翻页、缩放；Markdown 标题、表格和代码；护眼及独立阅读位置重启恢复已接入。
-- 选中同页/同章节原文可复制含资料名、页码/标题行号和来源标识的引用。主库版本 2 保存资料与文字段落；尚无聊天、FTS/向量索引或 RAG。
+- 选中同页/同章节原文可复制含资料名、页码/标题行号和来源标识的引用。该阶段主库版本 2 保存资料与文字段落；当时尚无聊天、FTS/向量索引或 RAG。当前聊天与主库版本见 3.4。
 - 本阶段核心测试 34 项及定向 PDF 锚点修复验证通过；合并后的 5 条真实 Electron 流程通过，覆盖设置、日历、阅读、引用及取消。资料由测试生成，不使用私人文件、真实模型或收费 API；用户真实复杂中文 PDF 与安装包待验证。
 
 先读 `documents.test.ts`、`document-storage.test.ts` 与 `reading.spec.ts`，维护已有行为，不删测试或降低断言来冒充修复。`a541eed` 的中间提交说明曾提前写入桌面通过，实际 PDF 环境修复后才通过；不要引用中间描述代替验收记录。
@@ -75,9 +75,17 @@
 
 日历提交 `069600a` 与资料阅读已在独立工作区合并验收，保留双方 IPC、共享类型、首页入口、独立活动库与样式。用户已确认其他文档任务结束，完成版合回原目录；第三方下载保持原状，不属于应用。阶段验收通过不代表将来每次改动都自动通过，开始新任务仍需检查分支与未提交改动。
 
-### 3.4 仍待开发的主要能力
+### 3.4 已交付的流式聊天基础
 
-聊天生成、流式输出、AI 可点击引用、全文与向量检索、RAG 评测、结构化笔记、学习 Agent、长期记忆、完整计划与任务、番茄钟、主题切换、完整备份恢复、OCR、更多文件格式、安装包及展示网站。
+- 2026-10-01：普通多轮聊天、Ollama NDJSON / 兼容 OpenAI SSE、逐段输出、停止、新建/切换会话、模型/风格接入与重启恢复。聊天不读取资料库。
+- 主库版本 3 新增 `conversations`、`chat_turns`，升级前备份，保留旧设置、资料、锚点与阅读位置。生成中每 500 毫秒保存，正常退出标记中断；异常退出恢复未完成轮次，不自动重发。
+- 远程发送确认绑定地址/模型/接口，主进程复核服务地址；仅兼容接口读取对应密钥。模型文本不执行 HTML、不加载图片或外链。
+- 26 项相关核心测试、生产构建与类型检查、3 条真实 Electron 流程（聊天、原有设置/密钥/导航、开发模式）通过；追加聊天流程确认退出保留部分回答与地址变化后重新确认。修复迟到更新复活已完成回答的状态问题，保留复现测试。
+- 此为模拟服务与假密钥的协议验收；默认本机 Ollama 当时不可达，真实模型质量与云服务仍待验证。阅读/日历完整桌面流程未在此次重跑。详细覆盖范围见 README。
+
+### 3.5 仍待开发的主要能力
+
+AI 可点击引用、全文与向量检索、RAG 评测、会话删除/重命名/导出、结构化笔记、学习 Agent、长期记忆、完整计划与任务、番茄钟、主题切换、完整备份恢复、OCR、更多文件格式、安装包及展示网站。
 
 ## 4. 产品范围与功能要求
 
@@ -119,7 +127,7 @@
 - 累计学习计时、签到、任务完成、番茄钟是不同的数据与行为，不要混用状态。
 - 应用中断、睡眠或长时间无心跳不能被误计为完成的专注时段。
 - 默认清爽现代界面；安静书房、活泼游戏化主题属于后续计划。
-- 回应风格为 `gentle`（温柔陪伴）、`game`（游戏化成长）、`coach`（高效教练），默认 `gentle`。目前能保存偏好，AI 实际使用仍待接入。
+- 回应风格为 `gentle`（温柔陪伴）、`game`（游戏化成长）、`coach`（高效教练），默认 `gentle`。保存后用于新聊天请求的系统提示；实际效果需由真实模型验证。
 
 ## 5. 技术栈与选型约束
 
@@ -154,6 +162,7 @@
 | `src/components/ReadingPage.tsx`、`PdfPage.tsx` | 目录、排版/原页、文字选择、引用复制及位置/缩放/护眼保存 |
 | `src/components/RecentReadings.tsx` | 首页从主库读取实际最近阅读，不用示例数据 |
 | `src/components/StudyCalendar.tsx` | 已验收的日历、签到及学习计时界面 |
+| `src/components/ChatPage.tsx` | 会话列表、Markdown 回答、生成状态、停止与绑定模型配置的远程发送确认；用 revision 拒绝迟到更新 |
 | `src/lib/types.ts` | 共享数据类型、`DesktopApi`、`Reply<T>`、默认设置 |
 | `src/lib/desktop.ts` | 界面调用桌面桥接的唯一入口、错误文本与地址比较 |
 | `src/lib/calendar.ts` | 本地日期键、月历网格、相邻月份计算 |
@@ -161,7 +170,10 @@
 | `electron/main.ts` | 应用与窗口生命周期、IPC 注册、调用方校验、数据目录；当前也有学习心跳及睡眠暂停接入 |
 | `electron/preload.ts` | 沙箱内通过 `contextBridge` 暴露明确的桌面方法 |
 | `electron/core/settings.ts` | 运行时设置、地址、服务类型与模型配置校验 |
-| `electron/core/storage.ts` | 主库版本 2、迁移前备份、设置/资料/段落/阅读位置；不改活动库版本 |
+| `electron/core/storage.ts` | 主库版本 3、迁移前备份、设置/资料/段落/阅读位置与聊天迁移；不改活动库版本 |
+| `electron/core/chat-storage.ts` | 会话与问答轮次持久化、异常中断恢复；通过 `Storage.chat` 共用主数据库 |
+| `electron/core/chat-stream.ts` | Ollama NDJSON / 兼容 OpenAI SSE、UTF-8 拆包、大小/超时边界与错误映射 |
+| `electron/core/chat.ts` | 单活动请求、设置/密钥快照、上下文、远程确认、停止、定期保存与退出处理 |
 | `electron/core/documents.ts` | 文件复制/去重/限额、解析进程、完整性检查、引用验证；原生对话框路径不由 renderer 提供 |
 | `electron/core/document-parser.ts` | PDF 每页文字、书签定位与 Markdown 标题/文字结构提取 |
 | `electron/document-worker.ts` | 固定独立解析入口，只读本次副本，不访问密钥与数据库 |
@@ -174,6 +186,7 @@
 | `tests/desktop.spec.ts` | 已有桌面流程与开发模式验证 |
 | `tests/calendar.spec.ts` | 已验收的月历、4:5 布局、签到、计时和重启恢复流程 |
 | `tests/reading.spec.ts` | 已验收的导入、阅读、原文引用、重启恢复与独立解析取消 |
+| `tests/chat.spec.ts` | 双协议流式回答、停止/断流、迟到事件、退出恢复、密钥使用及目标地址确认 |
 | `tests/fixtures/reading-files.ts` | 自动生成测试资料，不使用私人学习文件 |
 | `scripts/build-electron.mjs` | 构建主进程、预加载与独立解析入口到 `dist-electron/` |
 | `scripts/prepare-pdf-assets.mjs` | 开发/构建时复制 PDF.js CMap、字库与 WASM 到生成资源目录 |
@@ -203,16 +216,19 @@
 
 资料方法：`listSources`、`importSources`、`cancelImport`、`onImportProgress`、`openSource`、`saveReadingPosition`、`copyCitation`。界面只能提供校验过的 SHA-256 资料 ID 和受限位置，导入路径由主进程原生对话框选择；不暴露任意路径、任意频道或剪贴板读取。preload 将进度事件只转换为数据，返回取消监听函数。
 
+聊天方法：`listConversations`、`createConversation`、`getConversation`、`sendChat`、`stopChat`、`activeChat`、`onChatUpdate`。请求只接受会话 UUID、问题、目标确认地址和当前模型配置签名；实际服务设置与密钥在主进程读取，界面不能传任意消息角色、系统提示或密钥来覆盖。`onChatUpdate` 只传轮次数据并提供取消监听；每轮 `revision` 单调增加，初始调用结果或旧事件不得覆盖新文本或终止状态。页面切换时聊天组件保持挂载，生成可继续；全应用只有一个活动请求。
+
 ## 8. 本地数据、迁移与密钥
 
 默认数据目录：`%APPDATA%\StudyCompanion\`。
 
 | 文件或目录 | 内容与约束 |
 | --- | --- |
-| `study-companion.sqlite3` | 主库版本 2：`app_settings`、`sources`、`source_segments`；保存文字来源与阅读位置 |
+| `study-companion.sqlite3` | 主库版本 3：`app_settings`、`sources`、`source_segments`、`conversations`、`chat_turns`；保存文字来源、阅读位置和会话 |
 | `study-activity.sqlite3` | 已验收的独立学习活动数据库，版本 1、`study_days` 表；备份须与主库一同导出 |
 | `sources/` | 内容 SHA-256 命名的 `.pdf`/`.md` 副本；不修改原件；打开前核对内容哈希 |
 | `study-companion.sqlite3.before-v2-*.sqlite3` | 版本 1 升级前的 SQLite 一致性备份；备份失败不继续迁移，不自动删除 |
+| `study-companion.sqlite3.before-v3-*.sqlite3` | 版本 2 升级前的 SQLite 一致性备份，包含资料/段落/位置与设置；不自动删除 |
 | `credentials.enc.json` | 独立密钥密文文件，按规范化地址的 SHA-256 键索引，不是学习备份内容 |
 
 数据库规则：
@@ -221,8 +237,9 @@
 - 迁移使用事务，保持已存数据，不删除个人数据库来解决版本问题。
 - 拒绝用旧版本应用打开更新的数据格式；损坏设置应报错，不能悄悄重置成默认值。
 - 当前启动会探测 FTS5；这只确认能力可用，并不代表已建立资料全文索引。
-- 未来迁移先读 `document-storage.test.ts` 中保留旧设置、恢复备份和版本升级的预期，不能把现有版本 2 当作空库重建。
-- 当前已有 `Source`、`SourceSegment`、`ReadingPosition`；`Chunk`、项目、任务、会话、笔记和记忆仍是规划对象。
+- 未来迁移先读 `document-storage.test.ts` 和 `chat.test.ts` 中保留旧设置/资料锚点、恢复备份和版本升级的预期，不能把现有版本 3 当作空库重建。
+- 当前已有 `Source`、`SourceSegment`、`ReadingPosition`、`Conversation`、`ChatTurn`；`Chunk`、项目、任务、笔记和记忆仍是规划对象。
+- 聊天轮次状态为 `streaming/completed/stopped/error/interrupted`，保存部分回答与错误提示。主进程退出先取消聊天并保存，再关库；重启将残留的 streaming 标记为 interrupted。保存失败须向界面报告，不能冒充成功。单会话限 100 轮、会话总数限 500，未来会话管理/清理需保留恢复边界。
 - 来源锚点为 `page-N` 或 `md-line-N`，已绑定内容哈希；新文件内容成为新来源，不把旧引用悄悄指向变更后的文件。复制引用前校验原文来自同一段落/页；复制的 URI 尚未注册系统协议，不代表可点击 AI 引用已交付。
 - 导入上限：20 文件/批；PDF 50 MB、1000 页、500 万提取字符；Markdown 5 MB、UTF-8；60 秒/文件。Markdown 原始 HTML/脚本和全部图片不加载，外链不自动打开。扫描件仅原页；密码 PDF 先解锁。新格式与更高限额先评估体验和内存。
 - PDF.js 对 utility 类型的 Node 识别需要 `document-worker.ts` 的进程内兼容提示；只影响解析子进程。升级 PDF.js/Electron 时实测此入口、资源路径、取消与正常打开，不能只运行 Node 单元测试。
@@ -244,7 +261,10 @@
 - 云端默认地址 `https://api.openai.com/v1` 只是可修改的初始值，不是开发者承担费用的内置服务。
 - Ollama 检测请求基础地址加 `/api/tags`；兼容 OpenAI 检测请求基础地址加 `/models`，保留用户基础路径，如 `/v1`。
 - 仅兼容 OpenAI 的请求携带其对应密钥；不要把云端密钥发给 Ollama。
-- 当前只检测模型列表，默认超时 15 秒，响应大小上限 2 MiB，禁止跟随重定向。
+- 模型列表检测超时 15 秒、响应上限 2 MiB。聊天使用 Ollama `/api/chat` 或兼容接口 `/chat/completions`；两类请求均禁止重定向。
+- 聊天连续 120 秒无网络数据、总时长 10 分钟、总响应 8 MiB、单行/事件数据缓冲 1048576 字符、答案 64000 字符设有边界。未收到正常结束标记就断流时保留文本并报错；空回答报错；长度截断须明确提示。停止后拒收迟到文本，但不能保证远端服务立即停止计算/计费。
+- 普通聊天单问题限 4000 字符，最多最近 6 轮已完成问答且历史合计不超过 12000 字符；失败、停止、中断轮次不进入上下文。这是字符预算，不是精确 token 预算；服务可能拒绝超过实际上下文窗口的请求，不自动重试或切换服务。
+- 远程聊天需确认发送当前问题和近期会话；界面确认绑定地址/模型/接口，主进程校验规范化目标地址和界面配置签名。当前不检索资料、不生成受验证的引用；接 RAG 时扩展资料范围预览与确认，不能默认上传整个资料库。
 - 远程服务使用 HTTPS；`localhost`、`127.0.0.1`、`[::1]` 的本机服务允许 HTTP。
 - 基础地址拒绝嵌入账号密码、查询参数和片段，避免混入密钥。
 - 保留鉴权、地址、限流/额度、服务错误、不可达、超时、格式错误的区别；模型不在列表时明确说明，不报生成成功。
@@ -302,9 +322,11 @@ npx vitest run electron/core/credentials.test.ts
 npx vitest run electron/core/document-storage.test.ts
 npx vitest run electron/core/documents.test.ts
 npx vitest run src/lib/calendar.test.ts electron/core/study.test.ts
+npx vitest run electron/core/chat.test.ts electron/core/chat-stream.test.ts
 npm run desktop:build
 npx playwright test tests/reading.spec.ts
 npx playwright test tests/calendar.spec.ts
+npx playwright test tests/chat.spec.ts
 ```
 
 按改动选择执行，不把上面全部命令当成每次提交的强制清单。阶段验收、发布前或用户明确要求时，再执行格式检查、核心测试、完整桌面流程与对应异常路径。
@@ -343,7 +365,7 @@ npx playwright test tests/calendar.spec.ts
 
 README 的主线下一步为阶段 2，日历与基础阅读已集成；具体任务以用户最新指示为准，不为机械遵循阶段编号撤销已授权的并行工作。
 
-接手下一阶段先读 `source_segments` 和锚点契约；实现可停止的流式聊天，再接 FTS5 检索、证据不足反馈和原文跳转，然后引入嵌入与评测集。保留已交付阅读、设置和日历行为。先完成当前请求的可用功能，再报告并更新记录，不跳到官网、云同步或无限自主 Agent。
+接手下一阶段先读 `source_segments` 和锚点契约，以及现有聊天的停止、保存、远程确认边界；实现带中文查询验证的 FTS5 检索、证据不足反馈和原文跳转，再引入嵌入与评测集。流式聊天已交付，不重建第二套接口。保留阅读、设置和日历行为。先完成当前请求的可用功能，再报告并更新记录，不跳到官网、云同步或无限自主 Agent。
 
 ## 14. Git、隐私与协作流程
 

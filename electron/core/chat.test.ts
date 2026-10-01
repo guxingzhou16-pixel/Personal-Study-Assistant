@@ -6,6 +6,7 @@ import { afterEach, expect, it, vi } from 'vitest';
 import { defaultSettings, type ChatTurn } from '../../src/lib/types';
 import { Storage } from './storage';
 import { ChatService } from './chat';
+import { AppError } from './errors';
 
 const stores: Storage[] = [];
 const directories: string[] = [];
@@ -173,5 +174,73 @@ it('rejects invalid input, an absent model, and unknown conversations before net
   storage.saveSettings(defaultSettings);
   expect(() => chat.send({ conversationId: conversation.id, question: '问' })).toThrow('模型');
   expect(transport).not.toHaveBeenCalled();
+  chat.close();
+});
+
+it('uses the exact consented endpoint key and selected style, and rejects stale model settings', async () => {
+  const { storage } = setup();
+  const baseUrl = 'https://models.example/v1';
+  storage.saveSettings({
+    ...defaultSettings,
+    responseStyle: 'coach',
+    provider: 'openai',
+    openai: { baseUrl, model: 'remote' },
+  });
+  const load = vi.fn(() => 'fake-key');
+  const transport = vi.fn(async (_input, onText) => {
+    onText('回答');
+    return { truncated: true };
+  });
+  const chat = new ChatService(storage, { load }, () => {}, transport);
+  const conversation = storage.chat.create();
+  expect(() =>
+    chat.send({
+      conversationId: conversation.id,
+      question: '问题',
+      consentEndpoint: baseUrl,
+      expectedProfile: 'stale',
+    }),
+  ).toThrow('变化');
+  expect(load).not.toHaveBeenCalled();
+  chat.send({
+    conversationId: conversation.id,
+    question: '问题',
+    consentEndpoint: baseUrl,
+    expectedProfile: `openai|${baseUrl}|remote`,
+  });
+  await expect.poll(() => storage.chat.get(conversation.id).turns[0]?.status).toBe('completed');
+  expect(load).toHaveBeenCalledWith(baseUrl);
+  expect(transport.mock.calls[0][0].key).toBe('fake-key');
+  expect(transport.mock.calls[0][0].messages[0].content).toContain('直接、清楚');
+  expect(storage.chat.get(conversation.id).turns[0].notice).toContain('长度上限');
+  chat.close();
+});
+
+it('keeps a partial answer and surfaces generation and save failures instead of reporting success', async () => {
+  const { storage } = setup();
+  const updates: ChatTurn[] = [];
+  const chat = new ChatService(
+    storage,
+    { load: () => undefined },
+    (turn) => updates.push(turn),
+    async (_input, onText) => {
+      onText('部分内容');
+      throw new AppError('streamIncomplete', '连接中断');
+    },
+  );
+  const conversation = storage.chat.create();
+  chat.send({ conversationId: conversation.id, question: '问题' });
+  await expect.poll(() => storage.chat.get(conversation.id).turns[0]?.status).toBe('error');
+  expect(storage.chat.get(conversation.id).turns[0]).toMatchObject({
+    answer: '部分内容',
+    notice: '连接中断',
+  });
+  const save = vi.spyOn(storage.chat, 'saveTurn').mockImplementation(() => {
+    throw new Error('disk full');
+  });
+  chat.send({ conversationId: conversation.id, question: '保存失败测试' });
+  await expect.poll(() => updates.at(-1)?.notice).toContain('保存失败');
+  expect(chat.current()).toBeNull();
+  save.mockRestore();
   chat.close();
 });

@@ -30,7 +30,7 @@ test('real desktop streams both protocols, stops, handles broken streams and res
           done: false,
         }) + '\n',
       );
-      if (question === '停止测试') {
+      if (question === '停止测试' || question === '退出测试') {
         response.on('close', () => {
           stoppedConnection = true;
         });
@@ -108,9 +108,14 @@ test('real desktop streams both protocols, stops, handles broken streams and res
     );
     await page.getByRole('button', { name: '新会话', exact: true }).click();
     await expect(page.getByText('从一个具体的问题开始')).toBeVisible();
+    await page.getByRole('textbox', { name: '输入学习问题' }).fill('退出测试');
+    await page.getByRole('button', { name: '发送问题', exact: true }).click();
+    await expect(page.getByTestId('chat-answer').last()).toHaveText('中文回答第一段');
     await app!.close();
     page = await launch();
     await page.getByRole('button', { name: '学习助手', exact: true }).click();
+    await expect(page.getByText('上次生成已中断', { exact: true })).toBeVisible();
+    await expect(page.getByTestId('chat-answer').last()).toHaveText('中文回答第一段');
     await page.getByRole('button', { name: '会话：解释闭包', exact: true }).click();
     await expect(page.getByText('正在逐步解释', { exact: true })).toBeVisible();
     await expect(page.getByText('已停止生成，保留已收到的内容。')).toBeVisible();
@@ -141,6 +146,24 @@ test('real desktop streams both protocols, stops, handles broken streams and res
     await page.setViewportSize({ width: 900, height: 640 });
     await expect(page.getByRole('textbox', { name: '输入学习问题' })).toBeInViewport();
     await page.screenshot({ path: 'artifacts/chat-desktop.png', fullPage: true });
+    const requestCount = received.length;
+    await page.getByRole('button', { name: '模型设置', exact: true }).click();
+    await page.getByRole('textbox', { name: '服务基础地址' }).fill('https://first.example/v1');
+    await page.getByRole('button', { name: '保存设置', exact: true }).click();
+    await expect(page.getByText('已保存。下次打开应用时会恢复这些设置。')).toBeVisible();
+    await page.getByRole('button', { name: '学习助手', exact: true }).click();
+    await page.getByRole('textbox', { name: '输入学习问题' }).fill('远程确认测试');
+    await expect(page.getByRole('button', { name: '发送问题', exact: true })).toBeDisabled();
+    await page.getByRole('checkbox', { name: /允许将问题/ }).check();
+    await expect(page.getByRole('button', { name: '发送问题', exact: true })).toBeEnabled();
+    await page.getByRole('button', { name: '模型设置', exact: true }).click();
+    await page.getByRole('textbox', { name: '服务基础地址' }).fill('https://second.example/v1');
+    await page.getByRole('button', { name: '保存设置', exact: true }).click();
+    await expect(page.getByText('已保存。下次打开应用时会恢复这些设置。')).toBeVisible();
+    await page.getByRole('button', { name: '学习助手', exact: true }).click();
+    await expect(page.getByRole('checkbox', { name: /允许将问题/ })).not.toBeChecked();
+    await expect(page.getByRole('button', { name: '发送问题', exact: true })).toBeDisabled();
+    expect(received).toHaveLength(requestCount);
   } finally {
     await app?.close();
     server.closeAllConnections();
