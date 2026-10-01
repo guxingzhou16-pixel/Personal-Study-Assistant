@@ -53,15 +53,15 @@
 
 上述测试是**历史基线**。后续新增代码和测试后，不能直接沿用数量或声称当前所有测试通过；GitHub Actions 的执行结果也需另行核对。
 
-### 3.2 已有测试规格，尚未验收的资料阅读功能
+### 3.2 已交付的资料导入与基础阅读
 
-- `dabbeb3` 的提交说明为 `test: specify document migration and reading flow (RED verified)`。
-- 已有 `electron/core/document-storage.test.ts`、`tests/reading.spec.ts` 和 `tests/fixtures/reading-files.ts`。
-- 已加入 PDF.js、Markdown 解析与渲染依赖，以及用于测试 PDF 的 `pdf-lib`。
-- 阅读测试描述导入、去重、损坏文件、扫描件、原文件移除后仍可阅读、阅读位置恢复等目标。
-- 核对时 `Storage` 仍只实现设置数据库的版本 1；资料导入接口和完整阅读器尚未接入。
+- `0ed6eea` 实现导入与阅读；后续改为独立解析进程，`a3dee7d` 修复 Electron utility 进程的 PDF.js Node 环境识别，`3d5036a` 修复首个书签不在第一页时的初始锚点。RED/GREEN 检查点保留，最终验证以 README 为准。
+- 原生文件选择、本机副本、SHA-256 去重、逐文件失败、后台进度与取消、搜索/格式过滤、首页真实最近阅读已接入。
+- PDF 原页、可选文字、书签/页码目录、翻页、缩放；Markdown 标题、表格和代码；护眼及独立阅读位置重启恢复已接入。
+- 选中同页/同章节原文可复制含资料名、页码/标题行号和来源标识的引用。主库版本 2 保存资料与文字段落；尚无聊天、FTS/向量索引或 RAG。
+- 本阶段核心测试 34 项及定向 PDF 锚点修复验证通过；合并后的 5 条真实 Electron 流程通过，覆盖设置、日历、阅读、引用及取消。资料由测试生成，不使用私人文件、真实模型或收费 API；用户真实复杂中文 PDF 与安装包待验证。
 
-这是正在采用的测试先行规格，不能通过删测试、跳过测试或降低断言来冒充完成。修改实现前先读这些测试，理解预期迁移与交互。
+先读 `documents.test.ts`、`document-storage.test.ts` 与 `reading.spec.ts`，维护已有行为，不删测试或降低断言来冒充修复。`a541eed` 的中间提交说明曾提前写入桌面通过，实际 PDF 环境修复后才通过；不要引用中间描述代替验收记录。
 
 ### 3.3 日历功能与并行工作区
 
@@ -73,11 +73,11 @@
 - README 约定包含只提交本地、文档同步维护及普通功能采用基础验证。
 - 根目录存在未追踪的 `markitdown-0.1.8/`。目前不是已确认的应用架构或依赖，不要自动纳入提交、运行其中安装脚本或宣称已集成。
 
-日历验收结果与命令已写入 README。资料阅读在独立工作区开发，合并时保留双方 IPC、共享类型、首页入口和样式。当前有阅读 RED 测试，日历的专项通过不表示全仓库回归通过。开始新任务时仍需重新检查分支和未提交改动。
+日历提交 `069600a` 与资料阅读已在独立工作区合并验收，保留双方 IPC、共享类型、首页入口、独立活动库与样式。用户已确认其他文档任务结束，完成版合回原目录；第三方下载保持原状，不属于应用。阶段验收通过不代表将来每次改动都自动通过，开始新任务仍需检查分支与未提交改动。
 
 ### 3.4 仍待开发的主要能力
 
-资料导入与阅读的完整实现、聊天生成、流式输出、可点击引用、全文与向量检索、RAG 评测、结构化笔记、学习 Agent、长期记忆、完整计划与任务、番茄钟、主题切换、备份恢复、安装包及展示网站。
+聊天生成、流式输出、AI 可点击引用、全文与向量检索、RAG 评测、结构化笔记、学习 Agent、长期记忆、完整计划与任务、番茄钟、主题切换、完整备份恢复、OCR、更多文件格式、安装包及展示网站。
 
 ## 4. 产品范围与功能要求
 
@@ -129,10 +129,11 @@
 | 界面 | React / React DOM 19.3.0、TypeScript、Vite 8.3.1 |
 | 图标与样式 | `lucide-react`、普通 CSS；全局样式在 `src/styles.css` |
 | 桌面构建 | esbuild，主进程与预加载脚本输出 CommonJS |
+| 后台解析 | Electron `utilityProcess` 独立 Node 进程，解析入口输出 ESM；256 MB V8 堆限制、60 秒超时、进度与取消 |
 | 本地数据库 | Electron 内置 Node.js 的 `node:sqlite` / `DatabaseSync` |
 | 密钥 | Electron `safeStorage`，Windows DPAPI 系统加密 |
 | 模型请求 | 主进程 `fetch`、运行时参数校验、结构化错误 |
-| 阅读依赖 | `pdfjs-dist`、`react-markdown`、`remark-gfm`、`remark-parse`、`unified`、`mdast-util-to-string`，功能尚在开发 |
+| 阅读依赖 | PDF.js 6.3.289、`react-markdown`、`remark-gfm`、`remark-parse`、`unified`、`mdast-util-to-string`；资源本机加载，无 CDN |
 | 测试 | Vitest 核心测试；Playwright `_electron` 真实窗口测试 |
 | 格式化 | Prettier，单引号，尾逗号，行宽 100 |
 | 版本与 CI | Git、GitHub；Windows Actions 配置在 `.github/workflows/check.yml` |
@@ -149,6 +150,9 @@
 | `AGENTS.md` | 面向 AI 开发者的项目约定、模块边界、工作流程与接手信息 |
 | `src/App.tsx` | 工作台、导航、启动加载、页面切换和学习首页 |
 | `src/components/SettingsPage.tsx` | 偏好及模型表单、连接检测、密钥操作；输入密钥只作必要的临时传递 |
+| `src/components/LibraryPage.tsx` | 文件选择、导入状态、失败、搜索/格式筛选与真实资料列表 |
+| `src/components/ReadingPage.tsx`、`PdfPage.tsx` | 目录、排版/原页、文字选择、引用复制及位置/缩放/护眼保存 |
+| `src/components/RecentReadings.tsx` | 首页从主库读取实际最近阅读，不用示例数据 |
 | `src/components/StudyCalendar.tsx` | 已验收的日历、签到及学习计时界面 |
 | `src/lib/types.ts` | 共享数据类型、`DesktopApi`、`Reply<T>`、默认设置 |
 | `src/lib/desktop.ts` | 界面调用桌面桥接的唯一入口、错误文本与地址比较 |
@@ -157,7 +161,10 @@
 | `electron/main.ts` | 应用与窗口生命周期、IPC 注册、调用方校验、数据目录；当前也有学习心跳及睡眠暂停接入 |
 | `electron/preload.ts` | 沙箱内通过 `contextBridge` 暴露明确的桌面方法 |
 | `electron/core/settings.ts` | 运行时设置、地址、服务类型与模型配置校验 |
-| `electron/core/storage.ts` | 学习主数据库、设置迁移与保存；当前实现版本 1 |
+| `electron/core/storage.ts` | 主库版本 2、迁移前备份、设置/资料/段落/阅读位置；不改活动库版本 |
+| `electron/core/documents.ts` | 文件复制/去重/限额、解析进程、完整性检查、引用验证；原生对话框路径不由 renderer 提供 |
+| `electron/core/document-parser.ts` | PDF 每页文字、书签定位与 Markdown 标题/文字结构提取 |
+| `electron/document-worker.ts` | 固定独立解析入口，只读本次副本，不访问密钥与数据库 |
 | `electron/core/credentials.ts` | 按地址管理密钥密文、系统加解密、原子替换文件 |
 | `electron/core/models.ts` | 两类模型列表检测、响应解析、大小限制与错误映射 |
 | `electron/core/errors.ts` | `AppError` 与安全的对外错误结构 |
@@ -166,15 +173,16 @@
 | `electron/core/*.test.ts` | 数据迁移、设置、密钥、连接与资料迁移规格 |
 | `tests/desktop.spec.ts` | 已有桌面流程与开发模式验证 |
 | `tests/calendar.spec.ts` | 已验收的月历、4:5 布局、签到、计时和重启恢复流程 |
-| `tests/reading.spec.ts` | 资料导入、Markdown/PDF 阅读和重启恢复规格 |
+| `tests/reading.spec.ts` | 已验收的导入、阅读、原文引用、重启恢复与独立解析取消 |
 | `tests/fixtures/reading-files.ts` | 自动生成测试资料，不使用私人学习文件 |
-| `scripts/build-electron.mjs` | 构建主进程与预加载脚本到 `dist-electron/` |
+| `scripts/build-electron.mjs` | 构建主进程、预加载与独立解析入口到 `dist-electron/` |
+| `scripts/prepare-pdf-assets.mjs` | 开发/构建时复制 PDF.js CMap、字库与 WASM 到生成资源目录 |
 | `scripts/dev.mjs` | 启动 Vite 与 Electron，处理开发进程退出 |
 | `vite.config.ts` | Vite、CSP 注入与 Vitest 文件匹配 |
 | `playwright.config.ts` | Electron 测试配置及本地 Vite 服务 |
 | `.github/workflows/check.yml` | Windows 安装、格式检查、核心与桌面流程验证 |
 
-`node_modules/`、`dist/`、`dist-electron/`、`artifacts/`、`test-results/` 是依赖、生成文件或测试产物，不当作可维护源码。
+`node_modules/`、`dist/`、`dist-electron/`、`public/pdfjs/`、`coverage/`、`artifacts/`、`test-results/` 是依赖、生成文件或测试产物，不当作可维护源码。
 
 ## 7. 进程、接口与错误边界
 
@@ -189,9 +197,11 @@
 - TypeScript 类型不能替代 IPC 的运行时校验。对界面、外部响应、数据库恢复等输入在边界校验。
 - 返回结构为 `Reply<T>`：`{ ok: true, value }` 或 `{ ok: false, error: { code, message } }`；前端统一展示可理解的错误。
 - 失败不伪装成成功或空数据；不在错误文本、日志或截图中输出密钥及包含密钥的地址。
-- 长耗时解析、索引与嵌入推理后续使用工作线程，显示进度并允许取消。
+- 文件解析用独立进程，显示进度并允许取消；不要改回强制终止线程，曾观测到 Node 压缩组件崩溃。后续索引与嵌入也需避免阻塞主窗口。独立进程只隔离崩溃，不等于操作系统文件权限沙箱，V8 堆限额不等于总内存限额。
 
 已有稳定方法：`bootstrap`、`saveSettings`、`storeApiKey`、`removeApiKey`、`hasApiKey`、`checkConnection`、`studyOverview`、`checkIn`、`setStudyRunning`。学习接口只允许读取月份、签到今天和切换计时状态，不接受界面传入日期或累计时长。新增方法同步修改共享类型、preload、主进程处理器与界面封装，不只添加前端按钮。
+
+资料方法：`listSources`、`importSources`、`cancelImport`、`onImportProgress`、`openSource`、`saveReadingPosition`、`copyCitation`。界面只能提供校验过的 SHA-256 资料 ID 和受限位置，导入路径由主进程原生对话框选择；不暴露任意路径、任意频道或剪贴板读取。preload 将进度事件只转换为数据，返回取消监听函数。
 
 ## 8. 本地数据、迁移与密钥
 
@@ -199,9 +209,10 @@
 
 | 文件或目录 | 内容与约束 |
 | --- | --- |
-| `study-companion.sqlite3` | 已交付的主数据库，目前版本 1、`app_settings` 单行设置表 |
+| `study-companion.sqlite3` | 主库版本 2：`app_settings`、`sources`、`source_segments`；保存文字来源与阅读位置 |
 | `study-activity.sqlite3` | 已验收的独立学习活动数据库，版本 1、`study_days` 表；备份须与主库一同导出 |
-| `sources/` | 为导入后的原文件预留；当前尚未完成导入流程 |
+| `sources/` | 内容 SHA-256 命名的 `.pdf`/`.md` 副本；不修改原件；打开前核对内容哈希 |
+| `study-companion.sqlite3.before-v2-*.sqlite3` | 版本 1 升级前的 SQLite 一致性备份；备份失败不继续迁移，不自动删除 |
 | `credentials.enc.json` | 独立密钥密文文件，按规范化地址的 SHA-256 键索引，不是学习备份内容 |
 
 数据库规则：
@@ -210,8 +221,11 @@
 - 迁移使用事务，保持已存数据，不删除个人数据库来解决版本问题。
 - 拒绝用旧版本应用打开更新的数据格式；损坏设置应报错，不能悄悄重置成默认值。
 - 当前启动会探测 FTS5；这只确认能力可用，并不代表已建立资料全文索引。
-- 下一版资料迁移先读 `document-storage.test.ts` 中对保留设置、恢复备份与版本升级的预期。
-- `Source`、`Chunk`、`StudyProject`、`DailyTask`、`FocusSession`、`Note`、`Conversation`、`Memory` 是规划的数据对象，不表示现有数据库已有这些表。
+- 未来迁移先读 `document-storage.test.ts` 中保留旧设置、恢复备份和版本升级的预期，不能把现有版本 2 当作空库重建。
+- 当前已有 `Source`、`SourceSegment`、`ReadingPosition`；`Chunk`、项目、任务、会话、笔记和记忆仍是规划对象。
+- 来源锚点为 `page-N` 或 `md-line-N`，已绑定内容哈希；新文件内容成为新来源，不把旧引用悄悄指向变更后的文件。复制引用前校验原文来自同一段落/页；复制的 URI 尚未注册系统协议，不代表可点击 AI 引用已交付。
+- 导入上限：20 文件/批；PDF 50 MB、1000 页、500 万提取字符；Markdown 5 MB、UTF-8；60 秒/文件。Markdown 原始 HTML/脚本和全部图片不加载，外链不自动打开。扫描件仅原页；密码 PDF 先解锁。新格式与更高限额先评估体验和内存。
+- PDF.js 对 utility 类型的 Node 识别需要 `document-worker.ts` 的进程内兼容提示；只影响解析子进程。升级 PDF.js/Electron 时实测此入口、资源路径、取消与正常打开，不能只运行 Node 单元测试。
 - 学习日历用本地日历日期，存储毫秒、对外展示秒；计时使用单调时钟，跨日分配，超过 30 秒心跳缺失视为中断。每秒保存；退出或睡眠时暂停，重启不自动计时。异常退出可能丢失最后约一秒。这些核心行为已做专项验证，不代表番茄钟或任务完成记录已实现。
 
 密钥规则：
@@ -264,7 +278,7 @@ npm run desktop:start
 | `npm run desktop:dev` | 先构建 Electron 代码，再启动 Vite 与真实桌面窗口 |
 | `npm run typecheck` | 检查界面与 Electron/测试的 TypeScript 类型 |
 | `npm run build` | 类型检查与 Vite 界面生产构建 |
-| `npm run build:electron` | 生成主进程 `main.cjs` 和预加载 `preload.cjs` |
+| `npm run build:electron` | 生成 `main.cjs`、`preload.cjs` 及独立解析 `document-worker.mjs` |
 | `npm run desktop:build` | 构建界面和 Electron 代码，尚不生成安装包 |
 | `npm run desktop:start` | 打开已经构建的桌面版本，不自动构建 |
 | `npm run preview` | Vite 构建产物的浏览器预览 |
@@ -286,6 +300,7 @@ npx vitest run electron/core/models.test.ts
 npx vitest run electron/core/storage.test.ts
 npx vitest run electron/core/credentials.test.ts
 npx vitest run electron/core/document-storage.test.ts
+npx vitest run electron/core/documents.test.ts
 npx vitest run src/lib/calendar.test.ts electron/core/study.test.ts
 npm run desktop:build
 npx playwright test tests/reading.spec.ts
@@ -299,7 +314,7 @@ npx playwright test tests/calendar.spec.ts
 - 桌面界面用 Playwright Electron 验证，浏览器预览不能证明 IPC、本地保存或 Windows 加密可用。
 - 优先测试迁移保留、阅读位置、引用锚点、检索评测、Agent 确认边界、计时中断和备份往返。
 - 不为覆盖率写只重复实现的测试；不默默跳过、削弱断言或将失败记录为成功。
-- 当前 `tests/reading.spec.ts` 是未交付阅读器的测试规格，不应与已验收桌面流程混为一谈。
+- 当前 `tests/reading.spec.ts` 已通过真实桌面验收；修改解析入口、资源路径或迁移时执行相关测试，不能以只在浏览器显示正常代替验收。
 - 新增接口后检查现有桌面测试中对桥接方法列表的断言是否需要同步，保持隔离范围明确。
 - 测试截图与 trace 放在已忽略的产物目录；失败时报告具体未通过的功能和影响。
 - GitHub Actions 配置存在不等于远端通过，推送后才会触发相应流程；不要为了验证 CI 自行突破推送约定。
@@ -319,16 +334,16 @@ npx playwright test tests/calendar.spec.ts
 | 阶段 | 交付内容 | 验收重点 |
 | --- | --- | --- |
 | 0 | 桌面骨架、数据库、空资料库、偏好保存 | 历史验收已完成，新增改动按实际情况再验证 |
-| 1 | PDF/Markdown 导入与阅读 | 去重、损坏反馈、原文件复制、原页/排版、重启位置恢复、扫描件提示 |
+| 1 | PDF/Markdown 导入与阅读，基础版本已交付 | 去重、损坏反馈、原文件复制、原页/排版、重启位置恢复、扫描件提示、取消与引用复制 |
 | 2 | 聊天、流式输出、FTS5/向量混合检索、引用、评测集 | 本地与云端真实同资料问答、引用回原文、证据不足、嵌入失效降级、可重复评测 |
 | 3 | 结构化笔记、Agent、长期记忆 | 可独立写笔记、反馈有出处、取消不写入、删除记忆不再使用 |
 | 4 | 项目任务、番茄钟、打卡、主题、备份 | 数据重启恢复、中断不误完成、备份往返且无密钥；当前日历工作只是其中一部分 |
 | 5 | 全流程与异常验证、RAG 对比、安装包、发布文档 | 新用户按说明完成学习闭环、发布包对应 Git 标签、公开发布有授权 |
 | 6 | 静态展示网站 | 软件稳定后才建设，展示真实功能、评测与下载 |
 
-README 的主线下一步为阶段 1，但工作区同时存在学习日历开发。具体任务以用户最新指示为准，不为机械遵循阶段编号撤销已授权的并行工作。
+README 的主线下一步为阶段 2，日历与基础阅读已集成；具体任务以用户最新指示为准，不为机械遵循阶段编号撤销已授权的并行工作。
 
-接手阅读器时，先看现有资料迁移与阅读测试，再实现原文件复制、元数据存储、Markdown 阅读、PDF 阅读及位置恢复；为 RAG 留好稳定来源锚点。先完成当前请求的可用功能，再报告并更新记录，不跳到官网、云同步或无限自主 Agent。
+接手下一阶段先读 `source_segments` 和锚点契约；实现可停止的流式聊天，再接 FTS5 检索、证据不足反馈和原文跳转，然后引入嵌入与评测集。保留已交付阅读、设置和日历行为。先完成当前请求的可用功能，再报告并更新记录，不跳到官网、云同步或无限自主 Agent。
 
 ## 14. Git、隐私与协作流程
 
