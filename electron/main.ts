@@ -20,6 +20,7 @@ import { Documents } from './core/documents';
 import { string, validateProfile, validateProvider } from './core/settings';
 import { StudyTracker } from './core/study';
 import { StudyStorage } from './core/study-storage';
+import { ChatService } from './core/chat';
 
 app.setName('StudyCompanion');
 const testDataDir = !app.isPackaged ? process.env.STUDY_COMPANION_DATA_DIR : undefined;
@@ -41,6 +42,7 @@ let window: BrowserWindow | null = null;
 let storage: Storage | undefined;
 let documents: Documents | undefined;
 let study: StudyTracker | undefined;
+let chat: ChatService | undefined;
 let studyHeartbeat: ReturnType<typeof setInterval> | undefined;
 
 function isRendererUrl(url: string | undefined): boolean {
@@ -60,6 +62,11 @@ function registerHandlers(database: Storage, credentials: Credentials, tracker: 
       }),
   );
   documents = files;
+  const chats = new ChatService(database, credentials, (turn) => {
+    if (window && !window.isDestroyed() && !window.webContents.isDestroyed())
+      window.webContents.send('study:chat-update', turn);
+  });
+  chat = chats;
   function handle(channel: string, work: (...args: unknown[]) => unknown) {
     ipcMain.handle(channel, async (event, ...args: unknown[]) => {
       const frameUrl = event.senderFrame?.url;
@@ -127,6 +134,12 @@ function registerHandlers(database: Storage, credentials: Credentials, tracker: 
   handle('study:copy-citation', (id, anchor, quote) =>
     clipboard.writeText(files.citation(id, anchor, quote)),
   );
+  handle('study:list-conversations', () => database.chat.list());
+  handle('study:create-conversation', () => database.chat.create());
+  handle('study:get-conversation', (id) => database.chat.get(id));
+  handle('study:send-chat', (request) => chats.send(request));
+  handle('study:stop-chat', (id) => chats.stop(id));
+  handle('study:active-chat', () => chats.current());
 }
 
 function createWindow() {
@@ -211,6 +224,7 @@ else {
     });
   app.on('window-all-closed', () => app.quit());
   app.on('will-quit', () => {
+    chat?.close();
     documents?.cancel();
     clearInterval(studyHeartbeat);
     try {

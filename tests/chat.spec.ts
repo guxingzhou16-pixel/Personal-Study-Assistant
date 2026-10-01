@@ -8,7 +8,11 @@ import { join } from 'node:path';
 test('real desktop streams both protocols, stops, handles broken streams and restores conversations', async () => {
   const dataDir = mkdtempSync(join(tmpdir(), 'study-chat-desktop-'));
   let stoppedConnection = false;
-  const received: { path: string; auth?: string; body: { messages: { role: string; content: string }[] } }[] = [];
+  const received: {
+    path: string;
+    auth?: string;
+    body: { messages: { role: string; content: string }[] };
+  }[] = [];
   const server = createServer(async (request, response) => {
     let text = '';
     for await (const chunk of request) text += chunk;
@@ -16,13 +20,29 @@ test('real desktop streams both protocols, stops, handles broken streams and res
     received.push({ path: request.url!, auth: request.headers.authorization, body });
     const question = body.messages.at(-1).content;
     if (request.url === '/v1/chat/completions') {
-      response.end('data: {"choices":[{"delta":{"content":"兼容接口回答"},"finish_reason":null}]}\n\ndata: {"choices":[{"delta":{},"finish_reason":"stop"}]}\n\ndata: [DONE]\n\n');
+      response.end(
+        'data: {"choices":[{"delta":{"content":"兼容接口回答"},"finish_reason":null}]}\n\ndata: {"choices":[{"delta":{},"finish_reason":"stop"}]}\n\ndata: [DONE]\n\n',
+      );
     } else {
-      response.write(JSON.stringify({ message: { content: question === '停止测试' ? '正在逐步解释' : '中文回答第一段' }, done: false }) + '\n');
+      response.write(
+        JSON.stringify({
+          message: { content: question === '停止测试' ? '正在逐步解释' : '中文回答第一段' },
+          done: false,
+        }) + '\n',
+      );
       if (question === '停止测试') {
-        response.on('close', () => { stoppedConnection = true; });
+        response.on('close', () => {
+          stoppedConnection = true;
+        });
       } else if (question === '断流测试') response.end();
-      else setTimeout(() => response.end(JSON.stringify({ message: { content: '，现在完成。' }, done: true }) + '\n'), 600);
+      else
+        setTimeout(
+          () =>
+            response.end(
+              JSON.stringify({ message: { content: '，现在完成。' }, done: true }) + '\n',
+            ),
+          600,
+        );
     }
   });
   await new Promise<void>((resolve) => server.listen(0, '127.0.0.1', resolve));
@@ -30,7 +50,10 @@ test('real desktop streams both protocols, stops, handles broken streams and res
   let app: ElectronApplication | undefined;
   async function launch() {
     const { ELECTRON_RUN_AS_NODE: _ignored, ...env } = process.env;
-    app = await electron.launch({ args: ['.'], env: { ...env, STUDY_COMPANION_DATA_DIR: dataDir } });
+    app = await electron.launch({
+      args: ['.'],
+      env: { ...env, STUDY_COMPANION_DATA_DIR: dataDir },
+    });
     return app.firstWindow();
   }
   try {
@@ -38,7 +61,10 @@ test('real desktop streams both protocols, stops, handles broken streams and res
     await expect(page.getByRole('heading', { name: '开始今天的小进步' })).toBeVisible();
     await page.evaluate(async (baseUrl) => {
       const { settings } = await window.studyCompanion!.bootstrap();
-      await window.studyCompanion!.saveSettings({ ...settings, ollama: { baseUrl, model: 'test-model' } });
+      await window.studyCompanion!.saveSettings({
+        ...settings,
+        ollama: { baseUrl, model: 'test-model' },
+      });
     }, endpoint);
     await page.reload();
     await page.getByRole('button', { name: '学习助手', exact: true }).click();
@@ -55,11 +81,19 @@ test('real desktop streams both protocols, stops, handles broken streams and res
     await page.getByRole('button', { name: '停止生成', exact: true }).click();
     await expect(page.getByText('已停止生成，保留已收到的内容。')).toBeVisible();
     await expect.poll(() => stoppedConnection).toBe(true);
-    expect(received[1].body.messages.slice(-3).map((message) => message.role)).toEqual(['user', 'assistant', 'user']);
+    expect(received[1].body.messages.slice(-3).map((message) => message.role)).toEqual([
+      'user',
+      'assistant',
+      'user',
+    ]);
     await page.getByRole('textbox', { name: '输入学习问题' }).fill('断流测试');
     await page.getByRole('button', { name: '发送问题', exact: true }).click();
-    await expect(page.getByText('回答中途断开，以下内容尚未完成。请检查连接后重新提问。')).toBeVisible();
-    expect(received[2].body.messages.some((message) => message.content === '正在逐步解释')).toBe(false);
+    await expect(
+      page.getByText('回答中途断开，以下内容尚未完成。请检查连接后重新提问。'),
+    ).toBeVisible();
+    expect(received[2].body.messages.some((message) => message.content === '正在逐步解释')).toBe(
+      false,
+    );
     await page.getByRole('button', { name: '新会话', exact: true }).click();
     await expect(page.getByText('从一个具体的问题开始')).toBeVisible();
     await app!.close();
@@ -69,11 +103,18 @@ test('real desktop streams both protocols, stops, handles broken streams and res
     await expect(page.getByText('正在逐步解释', { exact: true })).toBeVisible();
     await expect(page.getByText('已停止生成，保留已收到的内容。')).toBeVisible();
     const fakeKey = 'fake-chat-e2e-key';
-    await page.evaluate(async ({ baseUrl, key }) => {
-      const { settings } = await window.studyCompanion!.bootstrap();
-      await window.studyCompanion!.saveSettings({ ...settings, provider: 'openai', openai: { baseUrl, model: 'compatible-test' } });
-      await window.studyCompanion!.storeApiKey(baseUrl, key);
-    }, { baseUrl: `${endpoint}/v1`, key: fakeKey });
+    await page.evaluate(
+      async ({ baseUrl, key }) => {
+        const { settings } = await window.studyCompanion!.bootstrap();
+        await window.studyCompanion!.saveSettings({
+          ...settings,
+          provider: 'openai',
+          openai: { baseUrl, model: 'compatible-test' },
+        });
+        await window.studyCompanion!.storeApiKey(baseUrl, key);
+      },
+      { baseUrl: `${endpoint}/v1`, key: fakeKey },
+    );
     await page.reload();
     await page.getByRole('button', { name: '学习助手', exact: true }).click();
     await page.getByRole('button', { name: '新会话', exact: true }).click();
@@ -82,7 +123,9 @@ test('real desktop streams both protocols, stops, handles broken streams and res
     await expect(page.getByTestId('chat-answer').last()).toHaveText('兼容接口回答');
     expect(received.at(-1)?.path).toBe('/v1/chat/completions');
     expect(received.at(-1)?.auth).toBe(`Bearer ${fakeKey}`);
-    expect(readFileSync(join(dataDir, 'study-companion.sqlite3')).includes(Buffer.from(fakeKey))).toBe(false);
+    expect(
+      readFileSync(join(dataDir, 'study-companion.sqlite3')).includes(Buffer.from(fakeKey)),
+    ).toBe(false);
     await page.setViewportSize({ width: 900, height: 640 });
     await expect(page.getByRole('textbox', { name: '输入学习问题' })).toBeInViewport();
     await page.screenshot({ path: 'artifacts/chat-desktop.png', fullPage: true });

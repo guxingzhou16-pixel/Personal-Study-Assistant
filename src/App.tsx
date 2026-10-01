@@ -15,17 +15,24 @@ import {
   Target,
   Timer,
   NotebookPen,
+  MessageCircle,
 } from 'lucide-react';
 import { SettingsPage } from './components/SettingsPage';
 import { LibraryPage } from './components/LibraryPage';
 import { ReadingPage } from './components/ReadingPage';
 import { RecentReadings } from './components/RecentReadings';
 import { StudyCalendar } from './components/StudyCalendar';
+import { ChatPage } from './components/ChatPage';
 import { desktop, errorMessage, isDesktop } from './lib/desktop';
 import { defaultSettings, type Bootstrap, type Settings } from './lib/types';
 
-type Page = 'home' | 'library' | 'settings';
-const pageLabels: Record<Page, string> = { home: '学习首页', library: '资料库', settings: '设置' };
+type Page = 'home' | 'library' | 'chat' | 'settings';
+const pageLabels: Record<Page, string> = {
+  home: '学习首页',
+  library: '资料库',
+  chat: '学习助手',
+  settings: '设置',
+};
 
 export default function App() {
   const mainRef = useRef<HTMLElement>(null);
@@ -104,6 +111,7 @@ export default function App() {
           {[
             { id: 'home' as const, icon: Home },
             { id: 'library' as const, icon: FolderOpen },
+            { id: 'chat' as const, icon: MessageCircle },
           ].map(({ id, icon: Icon }) => (
             <button
               key={id}
@@ -274,6 +282,15 @@ export default function App() {
           )}
           {boot && !failure && page === 'settings' && (
             <SettingsPage boot={boot} onSaved={onSaved} />
+          )}
+          {boot && !failure && (
+            <div className="chat-container" hidden={page !== 'chat'}>
+              <ChatPage
+                settings={settings}
+                onSettings={() => navigate('settings')}
+                visible={page === 'chat'}
+              />
+            </div>
           )}
         </main>
         <footer className="app-footer">

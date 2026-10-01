@@ -84,9 +84,7 @@ test('desktop navigation, persistent preferences, encrypted keys and model check
     await page.getByRole('button', { name: '设置', exact: true }).click();
     await expect(page.getByText('此地址已有保存的密钥', { exact: true })).toBeVisible();
     await page.getByRole('button', { name: '检测连接' }).click();
-    await expect(
-      page.getByText('服务已连接，所选模型存在。聊天生成将在后续阶段接入。'),
-    ).toBeVisible();
+    await expect(page.getByText('服务已连接，所选模型存在。可以前往学习助手提问。')).toBeVisible();
     expect(receivedAuth).toBe(`Bearer ${fakeKey}`);
     const isolation = await page.evaluate(() => ({
       node: typeof (window as unknown as Record<string, unknown>).require,
@@ -110,6 +108,13 @@ test('desktop navigation, persistent preferences, encrypted keys and model check
       'openSource',
       'saveReadingPosition',
       'copyCitation',
+      'listConversations',
+      'createConversation',
+      'getConversation',
+      'sendChat',
+      'stopChat',
+      'activeChat',
+      'onChatUpdate',
     ]);
     await page.getByRole('button', { name: '删除密钥' }).click();
     await expect(page.getByText('此地址未保存密钥', { exact: true })).toBeVisible();

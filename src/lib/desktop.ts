@@ -23,6 +23,13 @@ export const desktop: DesktopApi = {
   openSource: (id) => api().openSource(id),
   saveReadingPosition: (id, position) => api().saveReadingPosition(id, position),
   copyCitation: (id, anchor, quote) => api().copyCitation(id, anchor, quote),
+  listConversations: () => api().listConversations(),
+  createConversation: () => api().createConversation(),
+  getConversation: (id) => api().getConversation(id),
+  sendChat: (request) => api().sendChat(request),
+  stopChat: (id) => api().stopChat(id),
+  activeChat: () => api().activeChat(),
+  onChatUpdate: (listener) => api().onChatUpdate(listener),
 };
 
 export function errorMessage(error: unknown): string {

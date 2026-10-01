@@ -146,6 +146,13 @@ export interface DesktopApi {
   openSource(id: string): Promise<OpenDocument>;
   saveReadingPosition(id: string, position: ReadingPosition): Promise<void>;
   copyCitation(id: string, anchor: string, quote: string): Promise<void>;
+  listConversations(): Promise<ConversationSummary[]>;
+  createConversation(): Promise<Conversation>;
+  getConversation(id: string): Promise<Conversation>;
+  sendChat(request: ChatRequest): Promise<ChatTurn>;
+  stopChat(id: string): Promise<void>;
+  activeChat(): Promise<ChatTurn | null>;
+  onChatUpdate(listener: (turn: ChatTurn) => void): () => void;
 }
 
 declare global {

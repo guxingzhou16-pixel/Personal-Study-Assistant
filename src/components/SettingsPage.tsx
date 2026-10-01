@@ -196,7 +196,7 @@ export function SettingsPage({ boot, onSaved }: Props) {
                 <option value="coach">高效教练 · 目标明确，反馈直接</option>
               </select>
             </label>
-            <p className="field-hint">偏好现在可以保存，AI 回应会在聊天功能接入后使用它。</p>
+            <p className="field-hint">保存后用于学习助手的新回答，实际表达由所选模型决定。</p>
           </section>
           <section className="settings-section" aria-labelledby="models-heading">
             <div className="section-heading">

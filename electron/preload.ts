@@ -12,6 +12,9 @@ import type {
   ImportProgress,
   OpenDocument,
   StudyOverview,
+  ConversationSummary,
+  Conversation,
+  ChatTurn,
 } from '../src/lib/types';
 
 async function call<T>(channel: string, ...args: unknown[]): Promise<T> {
@@ -46,5 +49,16 @@ const api: DesktopApi = {
   openSource: (id) => call<OpenDocument>('study:open-source', id),
   saveReadingPosition: (id, position) => call<void>('study:save-reading-position', id, position),
   copyCitation: (id, anchor, quote) => call<void>('study:copy-citation', id, anchor, quote),
+  listConversations: () => call<ConversationSummary[]>('study:list-conversations'),
+  createConversation: () => call<Conversation>('study:create-conversation'),
+  getConversation: (id) => call<Conversation>('study:get-conversation', id),
+  sendChat: (request) => call<ChatTurn>('study:send-chat', request),
+  stopChat: (id) => call<void>('study:stop-chat', id),
+  activeChat: () => call<ChatTurn | null>('study:active-chat'),
+  onChatUpdate: (listener) => {
+    const receive = (_event: Electron.IpcRendererEvent, turn: ChatTurn) => listener(turn);
+    ipcRenderer.on('study:chat-update', receive);
+    return () => ipcRenderer.removeListener('study:chat-update', receive);
+  },
 };
 contextBridge.exposeInMainWorld('studyCompanion', api);
