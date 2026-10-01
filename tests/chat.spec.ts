@@ -79,7 +79,11 @@ test('real desktop streams both protocols, stops, handles broken streams and res
       return (await window.studyCompanion!.getConversation(latest.id)).turns[0];
     });
     await app!.evaluate(({ BrowserWindow }, turn) => {
-      BrowserWindow.getAllWindows()[0].webContents.send('study:chat-update', { ...turn, status: 'streaming', revision: 0 });
+      BrowserWindow.getAllWindows()[0].webContents.send('study:chat-update', {
+        ...turn,
+        status: 'streaming',
+        revision: 0,
+      });
     }, completed);
     await expect(page.getByRole('button', { name: '停止生成', exact: true })).toHaveCount(0);
     expect(received[0].auth).toBeUndefined();

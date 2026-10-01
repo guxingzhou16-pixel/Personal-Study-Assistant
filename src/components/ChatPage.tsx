@@ -40,14 +40,18 @@ export function ChatPage({
   const [error, setError] = useState('');
   const [busy, setBusy] = useState(false);
   const [loaded, setLoaded] = useState(false);
-  const [consent, setConsent] = useState(false);
+  const [consentProfile, setConsentProfile] = useState<string | null>(null);
+  const lastUpdate = useRef<ChatTurn | null>(null);
   const loadVersion = useRef(0);
   const transcript = useRef<HTMLDivElement>(null);
   const followOutput = useRef(true);
   const profile = settings[settings.provider];
   const signature = `${settings.provider}|${profile.baseUrl}|${profile.model}`;
+  const consent = consentProfile === signature;
   const remote = !['localhost', '127.0.0.1', '[::1]'].includes(new URL(profile.baseUrl).hostname);
   const applyTurn = useCallback((turn: ChatTurn) => {
+    if (lastUpdate.current?.id === turn.id && lastUpdate.current.revision > turn.revision) return;
+    lastUpdate.current = turn;
     setConversation((previous) =>
       previous?.id === turn.conversationId ? withTurn(previous, turn) : previous,
     );
@@ -57,35 +61,45 @@ export function ChatPage({
       return previous?.id === turn.id ? null : previous;
     });
   }, []);
+  const restoreActive = useCallback((snapshot: ChatTurn | null) => {
+    const latest = lastUpdate.current;
+    const turn =
+      snapshot && latest?.id === snapshot.id && latest.revision > snapshot.revision
+        ? latest
+        : snapshot;
+    setActive(turn?.status === 'streaming' ? turn : null);
+  }, []);
   const refresh = useCallback(async () => {
     setConversations(await desktop.listConversations());
   }, []);
-  const openConversation = useCallback(async (id: string) => {
-    const version = ++loadVersion.current;
-    setBusy(true);
-    setError('');
-    try {
-      const saved = await desktop.getConversation(id);
-      const running = await desktop.activeChat();
-      if (version !== loadVersion.current) return;
-      setConversation((previous) => {
-        let result = saved;
-        if (previous?.id === saved.id)
-          for (const turn of previous.turns) result = withTurn(result, turn);
-        if (running?.conversationId === saved.id) result = withTurn(result, running);
-        return result;
-      });
-      setActive(running);
-      followOutput.current = true;
-    } catch (failure) {
-      if (version === loadVersion.current) setError(errorMessage(failure));
-    } finally {
-      if (version === loadVersion.current) setBusy(false);
-    }
-  }, []);
-  useEffect(() => {
-    setConsent(false);
-  }, [signature]);
+  const openConversation = useCallback(
+    async (id: string) => {
+      const version = ++loadVersion.current;
+      setBusy(true);
+      setError('');
+      try {
+        const saved = await desktop.getConversation(id);
+        const running = await desktop.activeChat();
+        if (version !== loadVersion.current) return;
+        setConversation((previous) => {
+          let result = saved;
+          if (previous?.id === saved.id)
+            for (const turn of previous.turns) result = withTurn(result, turn);
+          if (running?.conversationId === saved.id) result = withTurn(result, running);
+          if (lastUpdate.current?.conversationId === saved.id)
+            result = withTurn(result, lastUpdate.current);
+          return result;
+        });
+        restoreActive(running);
+        followOutput.current = true;
+      } catch (failure) {
+        if (version === loadVersion.current) setError(errorMessage(failure));
+      } finally {
+        if (version === loadVersion.current) setBusy(false);
+      }
+    },
+    [restoreActive],
+  );
   useEffect(() => {
     if (!isDesktop) return;
     let cancelled = false;
@@ -100,7 +114,7 @@ export function ChatPage({
         if (cancelled) return;
         setConversations(items);
         if (items[0]) await openConversation(items[0].id);
-        else setActive(await desktop.activeChat());
+        else restoreActive(await desktop.activeChat());
       } catch (failure) {
         if (!cancelled) setError(errorMessage(failure));
       } finally {
@@ -112,7 +126,7 @@ export function ChatPage({
       loadVersion.current++;
       stop();
     };
-  }, [applyTurn, openConversation, refresh]);
+  }, [applyTurn, openConversation, refresh, restoreActive]);
   useEffect(() => {
     if (visible && followOutput.current && transcript.current)
       transcript.current.scrollTop = transcript.current.scrollHeight;
@@ -150,6 +164,7 @@ export function ChatPage({
       });
       // The first stream event can arrive before the invoke reply; revision guards preserve it.
       applyTurn(turn);
+      setQuestion('');
       const latest = await desktop.getConversation(current.id);
       setConversation((previous) => {
         let result = latest;
@@ -157,8 +172,7 @@ export function ChatPage({
           for (const entry of previous.turns) result = withTurn(result, entry);
         return result;
       });
-      setActive(await desktop.activeChat());
-      setQuestion('');
+      restoreActive(await desktop.activeChat());
       await refresh();
     } catch (failure) {
       setError(errorMessage(failure));
@@ -299,7 +313,7 @@ export function ChatPage({
                 <input
                   type="checkbox"
                   checked={consent}
-                  onChange={(event) => setConsent(event.target.checked)}
+                  onChange={(event) => setConsentProfile(event.target.checked ? signature : null)}
                 />
                 允许将问题及近期完整对话发送至 {profile.baseUrl}；服务费用由我承担。
               </label>
