@@ -74,6 +74,14 @@ test('real desktop streams both protocols, stops, handles broken streams and res
     await expect(page.getByTestId('chat-answer').last()).toHaveText('中文回答第一段');
     await expect(page.getByTestId('chat-answer').last()).toHaveText('中文回答第一段，现在完成。');
     await expect(page.getByText('回答完成', { exact: true })).toBeVisible();
+    const completed = await page.evaluate(async () => {
+      const [latest] = await window.studyCompanion!.listConversations();
+      return (await window.studyCompanion!.getConversation(latest.id)).turns[0];
+    });
+    await app!.evaluate(({ BrowserWindow }, turn) => {
+      BrowserWindow.getAllWindows()[0].webContents.send('study:chat-update', { ...turn, status: 'streaming', revision: 0 });
+    }, completed);
+    await expect(page.getByRole('button', { name: '停止生成', exact: true })).toHaveCount(0);
     expect(received[0].auth).toBeUndefined();
     await page.getByRole('textbox', { name: '输入学习问题' }).fill('停止测试');
     await page.getByRole('button', { name: '发送问题', exact: true }).click();
