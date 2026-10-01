@@ -1,7 +1,16 @@
 import { DatabaseSync } from 'node:sqlite';
-import { defaultSettings, type Settings } from '../../src/lib/types';
+import { randomUUID } from 'node:crypto';
+import {
+  defaultSettings,
+  type Settings,
+  type Source,
+  type ParsedDocument,
+  type ReadingPosition,
+  type SourceSegment,
+} from '../../src/lib/types';
 import { AppError } from './errors';
-import { validateSettings } from './settings';
+import { record, validateSettings } from './settings';
+import { sourceId } from './documents';
 
 const INITIAL_MIGRATION = `
   CREATE TABLE app_settings (
@@ -9,6 +18,25 @@ const INITIAL_MIGRATION = `
     value TEXT NOT NULL CHECK (json_valid(value))
   );
   PRAGMA user_version = 1;
+`;
+const READING_MIGRATION = `
+  CREATE TABLE sources (
+    id TEXT PRIMARY KEY, name TEXT NOT NULL,
+    kind TEXT NOT NULL CHECK (kind IN ('pdf', 'markdown')),
+    bytes INTEGER NOT NULL CHECK (bytes > 0),
+    page_count INTEGER NOT NULL CHECK (page_count > 0),
+    text_status TEXT NOT NULL CHECK (text_status IN ('ready', 'partial', 'none')),
+    imported_at TEXT NOT NULL, opened_at TEXT,
+    outline TEXT NOT NULL CHECK (json_valid(outline)),
+    position TEXT NOT NULL CHECK (json_valid(position))
+  );
+  CREATE TABLE source_segments (
+    source_id TEXT NOT NULL REFERENCES sources(id) ON DELETE CASCADE,
+    anchor TEXT NOT NULL, title TEXT NOT NULL, depth INTEGER NOT NULL,
+    page INTEGER, line INTEGER, text TEXT NOT NULL,
+    PRIMARY KEY (source_id, anchor)
+  );
+  PRAGMA user_version = 2;
 `;
 
 export class Storage {
@@ -18,12 +46,17 @@ export class Storage {
     this.db = new DatabaseSync(path);
     try {
       this.db.exec('PRAGMA foreign_keys = ON; PRAGMA busy_timeout = 5000;');
-      if (this.schemaVersion > 1)
+      const version = this.schemaVersion;
+      if (version > 2)
         throw new AppError('databaseVersion', '数据来自更新的软件版本，请升级应用后再打开。');
-      if (this.schemaVersion === 0) {
+      if (version > 0 && version < 2 && path !== ':memory:') {
+        this.db.prepare('VACUUM INTO ?').run(`${path}.before-v2-${randomUUID()}.sqlite3`);
+      }
+      if (version < 2) {
         this.db.exec('BEGIN IMMEDIATE;');
         try {
-          this.db.exec(INITIAL_MIGRATION);
+          if (version === 0) this.db.exec(INITIAL_MIGRATION);
+          this.db.exec(READING_MIGRATION);
           this.db.exec('COMMIT;');
         } catch (error) {
           this.db.exec('ROLLBACK;');
@@ -61,6 +94,130 @@ export class Storage {
       )
       .run(JSON.stringify(settings));
     return settings;
+  }
+
+  private source(row: Record<string, unknown>): Source {
+    return {
+      id: String(row.id),
+      name: String(row.name),
+      kind: row.kind as Source['kind'],
+      bytes: Number(row.bytes),
+      pageCount: Number(row.page_count),
+      textStatus: row.text_status as Source['textStatus'],
+      importedAt: String(row.imported_at),
+      openedAt: row.opened_at ? String(row.opened_at) : null,
+      outline: JSON.parse(String(row.outline)),
+      position: JSON.parse(String(row.position)),
+    };
+  }
+  listSources(): Source[] {
+    return this.db
+      .prepare('SELECT * FROM sources ORDER BY COALESCE(opened_at, imported_at) DESC, id')
+      .all()
+      .map((row) => this.source(row));
+  }
+  getSource(input: unknown): Source | undefined {
+    const row = this.db.prepare('SELECT * FROM sources WHERE id = ?').get(sourceId(input));
+    return row ? this.source(row) : undefined;
+  }
+  addSource(
+    input: { id: string; name: string; kind: Source['kind']; bytes: number } & ParsedDocument,
+  ): void {
+    const id = sourceId(input.id);
+    const position: ReadingPosition = {
+      page: 1,
+      anchor: input.outline[0]?.anchor ?? '',
+      offset: 0,
+      zoom: 1,
+      tone: 'paper',
+    };
+    this.db.exec('BEGIN IMMEDIATE;');
+    try {
+      this.db
+        .prepare('INSERT INTO sources VALUES (?, ?, ?, ?, ?, ?, ?, NULL, ?, ?)')
+        .run(
+          id,
+          input.name,
+          input.kind,
+          input.bytes,
+          input.pageCount,
+          input.textStatus,
+          new Date().toISOString(),
+          JSON.stringify(input.outline),
+          JSON.stringify(position),
+        );
+      const insert = this.db.prepare('INSERT INTO source_segments VALUES (?, ?, ?, ?, ?, ?, ?)');
+      for (const segment of input.segments)
+        insert.run(
+          id,
+          segment.anchor,
+          segment.title,
+          segment.depth,
+          segment.page ?? null,
+          segment.line ?? null,
+          segment.text,
+        );
+      this.db.exec('COMMIT;');
+    } catch (error) {
+      this.db.exec('ROLLBACK;');
+      throw error;
+    }
+  }
+  touchSource(input: unknown): void {
+    this.db
+      .prepare('UPDATE sources SET opened_at = ? WHERE id = ?')
+      .run(new Date().toISOString(), sourceId(input));
+  }
+  saveReadingPosition(input: unknown, positionInput: unknown): void {
+    const source = this.getSource(input);
+    if (!source) throw new AppError('sourceMissing', '这份资料不存在。');
+    const position = record(positionInput);
+    if (
+      Object.keys(position).some(
+        (key) => !['page', 'anchor', 'offset', 'zoom', 'tone'].includes(key),
+      ) ||
+      typeof position.page !== 'number' ||
+      !Number.isInteger(position.page) ||
+      position.page < 1 ||
+      position.page > source.pageCount ||
+      typeof position.offset !== 'number' ||
+      !Number.isFinite(position.offset) ||
+      position.offset < 0 ||
+      position.offset > 10_000_000 ||
+      typeof position.zoom !== 'number' ||
+      ![0.75, 1, 1.25, 1.5, 2].includes(position.zoom) ||
+      !['paper', 'warm'].includes(String(position.tone)) ||
+      typeof position.anchor !== 'string' ||
+      (position.anchor !== '' &&
+        !source.outline.some((entry) => entry.anchor === position.anchor) &&
+        !this.getSegment(source.id, position.anchor))
+    ) {
+      throw new AppError('readingPosition', '阅读位置格式或页码无效。');
+    }
+    const safe: ReadingPosition = {
+      page: position.page,
+      anchor: position.anchor,
+      offset: position.offset,
+      zoom: position.zoom,
+      tone: position.tone as ReadingPosition['tone'],
+    };
+    this.db
+      .prepare('UPDATE sources SET position = ? WHERE id = ?')
+      .run(JSON.stringify(safe), source.id);
+  }
+  getSegment(input: unknown, anchor: string): SourceSegment | undefined {
+    const row = this.db
+      .prepare('SELECT * FROM source_segments WHERE source_id = ? AND anchor = ?')
+      .get(sourceId(input), anchor);
+    if (!row) return undefined;
+    return {
+      anchor: String(row.anchor),
+      title: String(row.title),
+      depth: Number(row.depth),
+      text: String(row.text),
+      ...(row.page === null ? {} : { page: Number(row.page) }),
+      ...(row.line === null ? {} : { line: Number(row.line) }),
+    };
   }
 
   close(): void {

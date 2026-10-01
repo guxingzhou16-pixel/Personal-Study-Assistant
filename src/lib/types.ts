@@ -33,6 +33,59 @@ export interface AppFailure {
   message: string;
 }
 export type Reply<T> = { ok: true; value: T } | { ok: false; error: AppFailure };
+export type SourceKind = 'pdf' | 'markdown';
+export interface OutlineEntry {
+  anchor: string;
+  title: string;
+  depth: number;
+  page?: number;
+  line?: number;
+}
+export interface ReadingPosition {
+  page: number;
+  anchor: string;
+  offset: number;
+  zoom: number;
+  tone: 'paper' | 'warm';
+}
+export interface Source {
+  id: string;
+  name: string;
+  kind: SourceKind;
+  bytes: number;
+  pageCount: number;
+  textStatus: 'ready' | 'partial' | 'none';
+  importedAt: string;
+  openedAt: string | null;
+  outline: OutlineEntry[];
+  position: ReadingPosition;
+}
+export interface SourceSegment extends OutlineEntry {
+  text: string;
+}
+export interface ParsedDocument {
+  pageCount: number;
+  textStatus: Source['textStatus'];
+  outline: OutlineEntry[];
+  segments: SourceSegment[];
+}
+export interface OpenDocument {
+  source: Source;
+  text?: string;
+  data?: Uint8Array;
+}
+export interface ImportProgress {
+  file: string;
+  current: number;
+  total: number;
+  message: string;
+}
+export interface ImportReport {
+  added: number;
+  duplicates: number;
+  cancelled: boolean;
+  failures: { file: string; message: string }[];
+}
 export interface DesktopApi {
   bootstrap(): Promise<Bootstrap>;
   saveSettings(settings: Settings): Promise<Settings>;
@@ -44,6 +97,13 @@ export interface DesktopApi {
     profile: ModelProfile,
     key?: string,
   ): Promise<ConnectionReport>;
+  listSources(): Promise<Source[]>;
+  importSources(): Promise<ImportReport>;
+  cancelImport(): Promise<void>;
+  onImportProgress(listener: (progress: ImportProgress) => void): () => void;
+  openSource(id: string): Promise<OpenDocument>;
+  saveReadingPosition(id: string, position: ReadingPosition): Promise<void>;
+  copyCitation(id: string, anchor: string, quote: string): Promise<void>;
 }
 
 declare global {

@@ -5,7 +5,6 @@ import {
   Check,
   ChevronRight,
   CircleHelp,
-  FileText,
   FolderOpen,
   Home,
   Leaf,
@@ -18,6 +17,9 @@ import {
   NotebookPen,
 } from 'lucide-react';
 import { SettingsPage } from './components/SettingsPage';
+import { LibraryPage } from './components/LibraryPage';
+import { ReadingPage } from './components/ReadingPage';
+import { RecentReadings } from './components/RecentReadings';
 import { desktop, errorMessage, isDesktop } from './lib/desktop';
 import { defaultSettings, type Bootstrap, type Settings } from './lib/types';
 
@@ -27,6 +29,7 @@ const pageLabels: Record<Page, string> = { home: '学习首页', library: '资�
 export default function App() {
   const mainRef = useRef<HTMLElement>(null);
   const [page, setPage] = useState<Page>('home');
+  const [sourceId, setSourceId] = useState<string | null>(null);
   const [boot, setBoot] = useState<Bootstrap | null>(null);
   const [failure, setFailure] = useState<string | null>(null);
   const [attempt, setAttempt] = useState(0);
@@ -58,6 +61,14 @@ export default function App() {
 
   function onSaved(settings: Settings, hasApiKey: boolean) {
     setBoot((previous) => (previous ? { ...previous, settings, hasApiKey } : previous));
+  }
+  function navigate(next: Page) {
+    setSourceId(null);
+    setPage(next);
+  }
+  function openSource(id: string) {
+    setSourceId(id);
+    setPage('library');
   }
 
   const settings = boot?.settings ?? defaultSettings;
@@ -97,7 +108,7 @@ export default function App() {
               key={id}
               className={`nav-item ${page === id ? 'selected' : ''}`}
               aria-current={page === id ? 'page' : undefined}
-              onClick={() => setPage(id)}
+              onClick={() => navigate(id)}
             >
               <Icon size={18} />
               {pageLabels[id]}
@@ -127,7 +138,7 @@ export default function App() {
           </div>
           <button
             className={`nav-item ${page === 'settings' ? 'selected' : ''}`}
-            onClick={() => setPage('settings')}
+            onClick={() => navigate('settings')}
             aria-current={page === 'settings' ? 'page' : undefined}
           >
             <SettingsIcon size={18} />
@@ -144,11 +155,16 @@ export default function App() {
           <div>
             我的空间
             <ChevronRight size={14} />
-            <span>{pageLabels[page]}</span>
+            <span>{sourceId ? '资料阅读' : pageLabels[page]}</span>
           </div>
           <span className="date">{date}</span>
         </header>
-        <main id="main-content" ref={mainRef} tabIndex={-1}>
+        <main
+          id="main-content"
+          ref={mainRef}
+          tabIndex={-1}
+          className={sourceId ? 'reader-main' : undefined}
+        >
           {!boot && !failure && (
             <div className="center-state" role="status">
               <LoaderCircle className="spin" size={26} />
@@ -227,12 +243,7 @@ export default function App() {
                       <ArrowRight size={14} />
                     </button>
                   </div>
-                  <div className="empty-reading">
-                    <FolderOpen size={30} strokeWidth={1.4} />
-                    <h3>还没有阅读中的资料</h3>
-                    <p>资料导入与阅读器正在下一阶段开发。</p>
-                    <span>首版支持 PDF 和 Markdown</span>
-                  </div>
+                  <RecentReadings onOpen={openSource} />
                 </section>
                 <section className="daily-section">
                   <div className="section-heading">
@@ -272,42 +283,11 @@ export default function App() {
               </div>
             </div>
           )}
-          {boot && !failure && page === 'library' && (
-            <div className="page">
-              <div className="page-heading">
-                <div>
-                  <p className="eyebrow">A PLACE FOR YOUR CURIOSITY</p>
-                  <h1>我的资料库</h1>
-                  <p className="muted">把想读懂的资料放在一起，慢慢建立自己的知识。</p>
-                </div>
-                <span className="version-label">导入与阅读 · 规划中</span>
-              </div>
-              <section className="library-empty">
-                <div className="library-symbol">
-                  <BookOpen size={38} strokeWidth={1.3} />
-                </div>
-                <h2>第一份资料，值得一个安静的位置</h2>
-                <p>资料导入和阅读器将在下一阶段开放。</p>
-                <div className="format-tags">
-                  <span>
-                    <FileText size={15} />
-                    PDF 原页阅读
-                  </span>
-                  <span>
-                    <FileText size={15} />
-                    Markdown 舒适排版
-                  </span>
-                </div>
-                <button className="button secondary" disabled>
-                  导入资料（规划中）
-                </button>
-                <p className="field-hint">导入后，原文件将复制到本机学习空间。</p>
-              </section>
-              <div className="library-note">
-                <ShieldCheck size={18} />
-                <p>阅读和保存资料在本机进行。使用云端 AI 时，会明确提示资料发送给所选服务。</p>
-              </div>
-            </div>
+          {boot && !failure && page === 'library' && !sourceId && (
+            <LibraryPage onOpen={openSource} />
+          )}
+          {boot && !failure && sourceId && (
+            <ReadingPage key={sourceId} id={sourceId} onBack={() => setSourceId(null)} />
           )}
           {boot && !failure && page === 'settings' && (
             <SettingsPage boot={boot} onSaved={onSaved} />

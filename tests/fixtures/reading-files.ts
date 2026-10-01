@@ -11,7 +11,10 @@ export async function createReadingFiles(directory: string) {
     '',
     '## 阅读与提问',
     '',
-    ...Array.from({ length: 35 }, (_, index) => `第 ${index + 1} 段：阅读之后，写下一个具体的问题，并返回原文寻找依据。\n`),
+    ...Array.from(
+      { length: 35 },
+      (_, index) => `第 ${index + 1} 段：阅读之后，写下一个具体的问题，并返回原文寻找依据。\n`,
+    ),
     '## 复盘与检验',
     '',
     '验证自己的理解，保留资料出处。',

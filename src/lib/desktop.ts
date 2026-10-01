@@ -13,6 +13,13 @@ export const desktop: DesktopApi = {
   removeApiKey: (baseUrl) => api().removeApiKey(baseUrl),
   hasApiKey: (baseUrl) => api().hasApiKey(baseUrl),
   checkConnection: (provider, profile, key) => api().checkConnection(provider, profile, key),
+  listSources: () => api().listSources(),
+  importSources: () => api().importSources(),
+  cancelImport: () => api().cancelImport(),
+  onImportProgress: (listener) => api().onImportProgress(listener),
+  openSource: (id) => api().openSource(id),
+  saveReadingPosition: (id, position) => api().saveReadingPosition(id, position),
+  copyCitation: (id, anchor, quote) => api().copyCitation(id, anchor, quote),
 };
 
 export function errorMessage(error: unknown): string {

@@ -43,7 +43,7 @@ test('desktop navigation, persistent preferences, encrypted keys and model check
     await expect(page.getByRole('button', { name: '学习笔记 规划中' })).toBeDisabled();
     await page.getByRole('button', { name: '打开我的资料库' }).click();
     await expect(page.getByRole('heading', { name: '我的资料库' })).toBeVisible();
-    await expect(page.getByRole('button', { name: '导入资料（规划中）' })).toBeDisabled();
+    await expect(page.getByRole('button', { name: '导入资料', exact: true })).toBeEnabled();
     await page.getByRole('button', { name: '设置', exact: true }).click();
     await page.getByRole('textbox', { name: '怎么称呼你' }).fill('小舟');
     await page.getByRole('spinbutton', { name: /每日学习目标/ }).fill('60');
@@ -100,6 +100,13 @@ test('desktop navigation, persistent preferences, encrypted keys and model check
       'removeApiKey',
       'hasApiKey',
       'checkConnection',
+      'listSources',
+      'importSources',
+      'cancelImport',
+      'onImportProgress',
+      'openSource',
+      'saveReadingPosition',
+      'copyCitation',
     ]);
     await page.getByRole('button', { name: '删除密钥' }).click();
     await expect(page.getByText('此地址未保存密钥', { exact: true })).toBeVisible();

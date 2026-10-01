@@ -7,6 +7,10 @@ import type {
   Provider,
   Reply,
   Settings,
+  Source,
+  ImportReport,
+  ImportProgress,
+  OpenDocument,
 } from '../src/lib/types';
 
 async function call<T>(channel: string, ...args: unknown[]): Promise<T> {
@@ -23,5 +27,19 @@ const api: DesktopApi = {
   hasApiKey: (baseUrl: string) => call<boolean>('study:has-key', baseUrl),
   checkConnection: (provider: Provider, profile: ModelProfile, key?: string) =>
     call<ConnectionReport>('study:check-connection', provider, profile, key),
+  listSources: () => call<Source[]>('study:list-sources'),
+  importSources: () => call<ImportReport>('study:import-sources'),
+  cancelImport: () => call<void>('study:cancel-import'),
+  onImportProgress: (listener) => {
+    const receive = (_event: Electron.IpcRendererEvent, progress: ImportProgress) =>
+      listener(progress);
+    ipcRenderer.on('study:import-progress', receive);
+    return () => {
+      ipcRenderer.removeListener('study:import-progress', receive);
+    };
+  },
+  openSource: (id) => call<OpenDocument>('study:open-source', id),
+  saveReadingPosition: (id, position) => call<void>('study:save-reading-position', id, position),
+  copyCitation: (id, anchor, quote) => call<void>('study:copy-citation', id, anchor, quote),
 };
 contextBridge.exposeInMainWorld('studyCompanion', api);

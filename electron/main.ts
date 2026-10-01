@@ -1,4 +1,4 @@
-import { app, BrowserWindow, dialog, ipcMain, Menu, safeStorage } from 'electron';
+import { app, BrowserWindow, clipboard, dialog, ipcMain, Menu, safeStorage } from 'electron';
 import { mkdirSync } from 'node:fs';
 import { join, resolve } from 'node:path';
 import { pathToFileURL } from 'node:url';
@@ -6,6 +6,7 @@ import { Credentials } from './core/credentials';
 import { AppError, failure } from './core/errors';
 import { checkConnection } from './core/models';
 import { Storage } from './core/storage';
+import { Documents } from './core/documents';
 import { string, validateProfile, validateProvider } from './core/settings';
 
 app.setName('StudyCompanion');
@@ -26,12 +27,19 @@ const rendererPath = join(__dirname, '../dist/index.html');
 const rendererUrl = devUrl ? new URL(devUrl).href : pathToFileURL(rendererPath).href;
 let window: BrowserWindow | null = null;
 let storage: Storage | undefined;
+let documents: Documents | undefined;
 
 function isRendererUrl(url: string | undefined): boolean {
   return url?.split('#', 1)[0] === rendererUrl;
 }
 
 function registerHandlers(database: Storage, credentials: Credentials) {
+  const files = new Documents(
+    database,
+    join(dataDir, 'sources'),
+    join(__dirname, 'document-worker.mjs'),
+  );
+  documents = files;
   function handle(channel: string, work: (...args: unknown[]) => unknown) {
     ipcMain.handle(channel, async (event, ...args: unknown[]) => {
       const frameUrl = event.senderFrame?.url;
@@ -74,6 +82,28 @@ function registerHandlers(database: Storage, credentials: Credentials) {
     const key = provider === 'openai' ? typedKey || credentials.load(profile.baseUrl) : undefined;
     return checkConnection(provider, profile, key);
   });
+  handle('study:list-sources', () => database.listSources());
+  handle('study:import-sources', async () => {
+    if (!window) throw new AppError('window', '请在桌面窗口中导入。');
+    const selection = await dialog.showOpenDialog(window, {
+      title: '选择学习资料',
+      properties: ['openFile', 'multiSelections'],
+      filters: [{ name: 'PDF 与 Markdown', extensions: ['pdf', 'md', 'markdown'] }],
+    });
+    if (selection.canceled) return { added: 0, duplicates: 0, failures: [], cancelled: true };
+    return files.import(selection.filePaths, (progress) => {
+      if (window && !window.isDestroyed())
+        window.webContents.send('study:import-progress', progress);
+    });
+  });
+  handle('study:cancel-import', () => files.cancel());
+  handle('study:open-source', (id) => files.open(id));
+  handle('study:save-reading-position', (id, position) =>
+    database.saveReadingPosition(id, position),
+  );
+  handle('study:copy-citation', (id, anchor, quote) =>
+    clipboard.writeText(files.citation(id, anchor, quote)),
+  );
 }
 
 function createWindow() {
@@ -141,5 +171,8 @@ else {
       app.quit();
     });
   app.on('window-all-closed', () => app.quit());
-  app.on('will-quit', () => storage?.close());
+  app.on('will-quit', () => {
+    documents?.cancel();
+    storage?.close();
+  });
 }
