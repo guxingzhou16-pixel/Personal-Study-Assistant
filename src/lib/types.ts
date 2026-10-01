@@ -98,6 +98,33 @@ export interface ImportReport {
   cancelled: boolean;
   failures: { file: string; message: string }[];
 }
+export interface ChatTurn {
+  id: string;
+  conversationId: string;
+  question: string;
+  answer: string;
+  status: 'streaming' | 'completed' | 'stopped' | 'error' | 'interrupted';
+  notice: string;
+  provider: Provider;
+  baseUrl: string;
+  model: string;
+  createdAt: string;
+  revision: number;
+}
+export interface ConversationSummary {
+  id: string;
+  title: string;
+  updatedAt: string;
+}
+export interface Conversation extends ConversationSummary {
+  turns: ChatTurn[];
+}
+export interface ChatRequest {
+  conversationId: string;
+  question: string;
+  consentEndpoint?: string;
+  expectedProfile?: string;
+}
 export interface DesktopApi {
   bootstrap(): Promise<Bootstrap>;
   saveSettings(settings: Settings): Promise<Settings>;

@@ -11,6 +11,7 @@ import {
 import { AppError } from './errors';
 import { record, validateSettings } from './settings';
 import { sourceId } from './documents';
+import { CHAT_MIGRATION, ChatStorage } from './chat-storage';
 
 const INITIAL_MIGRATION = `
   CREATE TABLE app_settings (
@@ -41,22 +42,26 @@ const READING_MIGRATION = `
 
 export class Storage {
   private readonly db: DatabaseSync;
+  readonly chat: ChatStorage;
 
   constructor(path: string) {
     this.db = new DatabaseSync(path);
     try {
       this.db.exec('PRAGMA foreign_keys = ON; PRAGMA busy_timeout = 5000;');
       const version = this.schemaVersion;
-      if (version > 2)
+      if (version > 3)
         throw new AppError('databaseVersion', '数据来自更新的软件版本，请升级应用后再打开。');
-      if (version > 0 && version < 2 && path !== ':memory:') {
-        this.db.prepare('VACUUM INTO ?').run(`${path}.before-v2-${randomUUID()}.sqlite3`);
+      if (version > 0 && version < 3 && path !== ':memory:') {
+        this.db
+          .prepare('VACUUM INTO ?')
+          .run(`${path}.before-v${version === 1 ? 2 : 3}-${randomUUID()}.sqlite3`);
       }
-      if (version < 2) {
+      if (version < 3) {
         this.db.exec('BEGIN IMMEDIATE;');
         try {
           if (version === 0) this.db.exec(INITIAL_MIGRATION);
-          this.db.exec(READING_MIGRATION);
+          if (version < 2) this.db.exec(READING_MIGRATION);
+          this.db.exec(CHAT_MIGRATION);
           this.db.exec('COMMIT;');
         } catch (error) {
           this.db.exec('ROLLBACK;');
@@ -66,6 +71,7 @@ export class Storage {
       this.db.exec(
         'CREATE VIRTUAL TABLE temp.fts_probe USING fts5(content); DROP TABLE temp.fts_probe;',
       );
+      this.chat = new ChatStorage(this.db);
     } catch (error) {
       this.db.close();
       throw error;

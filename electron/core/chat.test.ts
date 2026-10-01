@@ -19,18 +19,32 @@ function setup() {
   const path = join(directory, 'study.sqlite3');
   const storage = new Storage(path);
   stores.push(storage);
-  storage.saveSettings({ ...defaultSettings, ollama: { baseUrl: 'http://127.0.0.1:11434', model: 'local' } });
+  storage.saveSettings({
+    ...defaultSettings,
+    ollama: { baseUrl: 'http://127.0.0.1:11434', model: 'local' },
+  });
   return { storage, path, directory };
 }
 
 it('migrates v2 without losing settings or source anchors and makes a readable backup', () => {
   const { storage, path, directory } = setup();
-  storage.addSource({ id: 'a'.repeat(64), name: '原资料.md', kind: 'markdown', bytes: 50, pageCount: 1, textStatus: 'ready', outline: [], segments: [{ anchor: 'md-line-1', title: '闭包', depth: 1, line: 1, text: '保留原文' }] });
-  storage.close(); stores.pop();
+  storage.addSource({
+    id: 'a'.repeat(64),
+    name: '原资料.md',
+    kind: 'markdown',
+    bytes: 50,
+    pageCount: 1,
+    textStatus: 'ready',
+    outline: [],
+    segments: [{ anchor: 'md-line-1', title: '闭包', depth: 1, line: 1, text: '保留原文' }],
+  });
+  storage.close();
+  stores.pop();
   const legacy = new DatabaseSync(path);
   legacy.exec('DROP TABLE chat_turns; DROP TABLE conversations; PRAGMA user_version = 2;');
   legacy.close();
-  const upgraded = new Storage(path); stores.push(upgraded);
+  const upgraded = new Storage(path);
+  stores.push(upgraded);
   expect(upgraded.schemaVersion).toBe(3);
   expect(upgraded.loadSettings().ollama.model).toBe('local');
   expect(upgraded.getSegment('a'.repeat(64), 'md-line-1')?.text).toBe('保留原文');
@@ -44,14 +58,21 @@ it('migrates v2 without losing settings or source anchors and makes a readable b
 it('saves turns, sends only completed history, and does not read cloud keys for Ollama', async () => {
   const { storage } = setup();
   const load = vi.fn();
-  const transport = vi.fn(async (_input, onText) => { onText('解释结果'); return { truncated: false }; });
+  const transport = vi.fn(async (_input, onText) => {
+    onText('解释结果');
+    return { truncated: false };
+  });
   const chat = new ChatService(storage, { load }, () => {}, transport);
   const conversation = storage.chat.create();
   chat.send({ conversationId: conversation.id, question: '第一个问题' });
   await expect.poll(() => storage.chat.get(conversation.id).turns[0]?.status).toBe('completed');
   chat.send({ conversationId: conversation.id, question: '继续解释' });
   await expect.poll(() => storage.chat.get(conversation.id).turns[1]?.status).toBe('completed');
-  expect(transport.mock.calls[1][0].messages.slice(-3)).toEqual([{ role: 'user', content: '第一个问题' }, { role: 'assistant', content: '解释结果' }, { role: 'user', content: '继续解释' }]);
+  expect(transport.mock.calls[1][0].messages.slice(-3)).toEqual([
+    { role: 'user', content: '第一个问题' },
+    { role: 'assistant', content: '解释结果' },
+    { role: 'user', content: '继续解释' },
+  ]);
   expect(load).not.toHaveBeenCalled();
   expect(storage.chat.list()[0].title).toBe('第一个问题');
   chat.close();
@@ -62,45 +83,77 @@ it('stops immediately and rejects late text even from an uncooperative transport
   let release!: () => void;
   let emit!: (text: string) => void;
   const updates: ChatTurn[] = [];
-  const chat = new ChatService(storage, { load: () => undefined }, (turn) => updates.push(turn), async (_input, onText) => {
-    emit = onText; onText('保留部分');
-    await new Promise<void>((resolve) => { release = resolve; });
-    onText('不应出现'); return { truncated: false };
-  });
+  const chat = new ChatService(
+    storage,
+    { load: () => undefined },
+    (turn) => updates.push(turn),
+    async (_input, onText) => {
+      emit = onText;
+      onText('保留部分');
+      await new Promise<void>((resolve) => {
+        release = resolve;
+      });
+      onText('不应出现');
+      return { truncated: false };
+    },
+  );
   const conversation = storage.chat.create();
   const turn = chat.send({ conversationId: conversation.id, question: '问题' });
-  expect(() => chat.send({ conversationId: conversation.id, question: '重复发送' })).toThrow('停止');
+  expect(() => chat.send({ conversationId: conversation.id, question: '重复发送' })).toThrow(
+    '停止',
+  );
   chat.stop(turn.id);
-  emit('迟到文本'); release();
+  emit('迟到文本');
+  release();
   await new Promise((resolve) => setTimeout(resolve, 10));
-  expect(storage.chat.get(conversation.id).turns[0]).toMatchObject({ answer: '保留部分', status: 'stopped' });
+  expect(storage.chat.get(conversation.id).turns[0]).toMatchObject({
+    answer: '保留部分',
+    status: 'stopped',
+  });
   expect(updates.at(-1)?.status).toBe('stopped');
   chat.close();
 });
 
 it('requires consent bound to the exact remote endpoint before reading keys or sending any content', () => {
   const { storage } = setup();
-  storage.saveSettings({ ...defaultSettings, provider: 'openai', openai: { baseUrl: 'https://models.example/v1', model: 'remote' } });
-  const load = vi.fn(); const transport = vi.fn();
+  storage.saveSettings({
+    ...defaultSettings,
+    provider: 'openai',
+    openai: { baseUrl: 'https://models.example/v1', model: 'remote' },
+  });
+  const load = vi.fn();
+  const transport = vi.fn();
   const chat = new ChatService(storage, { load }, () => {}, transport);
   const conversation = storage.chat.create();
   for (const consentEndpoint of [undefined, 'https://other.example/v1']) {
-    expect(() => chat.send({ conversationId: conversation.id, question: '隐私内容', consentEndpoint })).toThrow('确认');
+    expect(() =>
+      chat.send({ conversationId: conversation.id, question: '隐私内容', consentEndpoint }),
+    ).toThrow('确认');
   }
-  expect(transport).not.toHaveBeenCalled(); expect(load).not.toHaveBeenCalled();
+  expect(transport).not.toHaveBeenCalled();
+  expect(load).not.toHaveBeenCalled();
   expect(storage.chat.get(conversation.id).turns).toHaveLength(0);
   chat.close();
 });
 
 it('persists partial answers as interrupted when closing and recovers unfinished rows on restart', async () => {
   const { storage } = setup();
-  const chat = new ChatService(storage, { load: () => undefined }, () => {}, async (_input, onText) => {
-    onText('未完的回答'); return new Promise(() => {});
-  });
+  const chat = new ChatService(
+    storage,
+    { load: () => undefined },
+    () => {},
+    async (_input, onText) => {
+      onText('未完的回答');
+      return new Promise(() => {});
+    },
+  );
   const conversation = storage.chat.create();
   chat.send({ conversationId: conversation.id, question: '需要继续' });
   chat.close();
-  expect(storage.chat.get(conversation.id).turns[0]).toMatchObject({ answer: '未完的回答', status: 'interrupted' });
+  expect(storage.chat.get(conversation.id).turns[0]).toMatchObject({
+    answer: '未完的回答',
+    status: 'interrupted',
+  });
   const row = storage.chat.get(conversation.id).turns[0];
   storage.chat.saveTurn({ ...row, status: 'streaming' });
   const reopened = new ChatService(storage, { load: () => undefined }, () => {});
@@ -109,7 +162,8 @@ it('persists partial answers as interrupted when closing and recovers unfinished
 });
 
 it('rejects invalid input, an absent model, and unknown conversations before network use', () => {
-  const { storage } = setup(); const transport = vi.fn();
+  const { storage } = setup();
+  const transport = vi.fn();
   const chat = new ChatService(storage, { load: () => undefined }, () => {}, transport);
   const conversation = storage.chat.create();
   for (const question of ['', '   ', 5, 'x'.repeat(4001)]) {
@@ -118,5 +172,6 @@ it('rejects invalid input, an absent model, and unknown conversations before net
   expect(() => chat.send({ conversationId: 'nope', question: '问' })).toThrow();
   storage.saveSettings(defaultSettings);
   expect(() => chat.send({ conversationId: conversation.id, question: '问' })).toThrow('模型');
-  expect(transport).not.toHaveBeenCalled(); chat.close();
+  expect(transport).not.toHaveBeenCalled();
+  chat.close();
 });
