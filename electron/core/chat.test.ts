@@ -46,7 +46,7 @@ it('migrates v2 without losing settings or source anchors and makes a readable b
   legacy.close();
   const upgraded = new Storage(path);
   stores.push(upgraded);
-  expect(upgraded.schemaVersion).toBe(3);
+  expect(upgraded.schemaVersion).toBe(4);
   expect(upgraded.loadSettings().ollama.model).toBe('local');
   expect(upgraded.getSegment('a'.repeat(64), 'md-line-1')?.text).toBe('保留原文');
   const backupName = readdirSync(directory).find((name) => name.includes('before-v3'))!;

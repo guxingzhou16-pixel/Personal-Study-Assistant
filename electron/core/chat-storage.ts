@@ -56,17 +56,21 @@ export class ChatStorage {
     const turns = this.db
       .prepare(
         `SELECT id, conversation_id AS conversationId, question, answer, status,
-      notice, provider, base_url AS baseUrl, model, created_at AS createdAt, revision
+      notice, provider, base_url AS baseUrl, model, created_at AS createdAt, revision, mode, evidence
       FROM chat_turns WHERE conversation_id = ? ORDER BY rowid`,
       )
-      .all(id) as unknown as ChatTurn[];
+      .all(id)
+      .map((turn) => ({
+        ...turn,
+        evidence: JSON.parse(String(turn.evidence)),
+      })) as unknown as ChatTurn[];
     return { ...(row as unknown as ConversationSummary), turns };
   }
   addTurn(turn: ChatTurn): void {
     this.db.exec('BEGIN IMMEDIATE');
     try {
       this.db
-        .prepare('INSERT INTO chat_turns VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)')
+        .prepare('INSERT INTO chat_turns VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)')
         .run(
           turn.id,
           turn.conversationId,
@@ -79,6 +83,8 @@ export class ChatStorage {
           turn.model,
           turn.createdAt,
           turn.revision,
+          turn.mode,
+          JSON.stringify(turn.evidence),
         );
       this.db
         .prepare(

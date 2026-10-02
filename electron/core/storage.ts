@@ -49,19 +49,24 @@ export class Storage {
     try {
       this.db.exec('PRAGMA foreign_keys = ON; PRAGMA busy_timeout = 5000;');
       const version = this.schemaVersion;
-      if (version > 3)
+      if (version > 4)
         throw new AppError('databaseVersion', '数据来自更新的软件版本，请升级应用后再打开。');
-      if (version > 0 && version < 3 && path !== ':memory:') {
+      if (version > 0 && version < 4 && path !== ':memory:') {
         this.db
           .prepare('VACUUM INTO ?')
-          .run(`${path}.before-v${version === 1 ? 2 : 3}-${randomUUID()}.sqlite3`);
+          .run(`${path}.before-v${version + 1}-${randomUUID()}.sqlite3`);
       }
-      if (version < 3) {
+      if (version < 4) {
         this.db.exec('BEGIN IMMEDIATE;');
         try {
           if (version === 0) this.db.exec(INITIAL_MIGRATION);
           if (version < 2) this.db.exec(READING_MIGRATION);
-          this.db.exec(CHAT_MIGRATION);
+          if (version < 3) this.db.exec(CHAT_MIGRATION);
+          this.db.exec(`
+            ALTER TABLE chat_turns ADD COLUMN mode TEXT NOT NULL DEFAULT 'chat' CHECK(mode IN ('chat', 'sources'));
+            ALTER TABLE chat_turns ADD COLUMN evidence TEXT NOT NULL DEFAULT '[]' CHECK(json_valid(evidence));
+            PRAGMA user_version = 4;
+          `);
           this.db.exec('COMMIT;');
         } catch (error) {
           this.db.exec('ROLLBACK;');

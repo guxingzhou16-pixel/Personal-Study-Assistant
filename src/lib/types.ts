@@ -110,6 +110,39 @@ export interface ChatTurn {
   model: string;
   createdAt: string;
   revision: number;
+  mode: 'chat' | 'sources';
+  evidence: Evidence[];
+}
+export interface Evidence {
+  number: number;
+  sourceId: string;
+  sourceName: string;
+  kind: SourceKind;
+  anchor: string;
+  title: string;
+  page?: number;
+  line?: number;
+  start: number;
+  end: number;
+  text: string;
+}
+export interface EvidencePreview {
+  id: string;
+  question: string;
+  sourceId: string | null;
+  sourceCount: number;
+  notice: string;
+  hits: Evidence[];
+}
+export interface RetrievalProgress {
+  current: number;
+  total: number;
+  message: string;
+}
+export interface CitationTarget {
+  sourceId: string;
+  anchor: string;
+  page: number;
 }
 export interface ConversationSummary {
   id: string;
@@ -124,6 +157,7 @@ export interface ChatRequest {
   question: string;
   consentEndpoint?: string;
   expectedProfile?: string;
+  retrievalId?: string;
 }
 export interface DesktopApi {
   bootstrap(): Promise<Bootstrap>;
