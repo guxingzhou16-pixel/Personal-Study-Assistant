@@ -125,6 +125,7 @@ async function vectorCandidates(
   encoder: EmbeddingEncoder,
   question: string,
   scope: string | null,
+  keywordSources: ReadonlySet<string>,
 ): Promise<Evidence[]> {
   if (!question.trim()) return [];
   // Long questions use all windows, then average normalized vectors. Nothing is
@@ -160,7 +161,12 @@ async function vectorCandidates(
     const vector = normalized(new Float32Array(Uint8Array.from(bytes).buffer), encoder.dimensions);
     let score = 0;
     for (let i = 0; i < query.length; i++) score += query[i] * vector[i];
-    if (score < vectorPolicy.minimumSimilarity) continue;
+    // Moderate matches can complete evidence from a lexically relevant source.
+    // A source with no keyword support keeps the stronger semantic-only gate.
+    const minimum = keywordSources.has(String(row.source_id))
+      ? vectorPolicy.keywordSourceSimilarity
+      : vectorPolicy.minimumSimilarity;
+    if (score < minimum) continue;
     ranked.push({
       sourceId: String(row.source_id),
       anchor: String(row.anchor),
@@ -239,7 +245,14 @@ export async function retrieveHybrid(
   try {
     index = openVectorIndex(indexPath);
     await indexVectors(main, index, encoder, scope, progress);
-    const vector = await vectorCandidates(main, index, encoder, question, scope);
+    const vector = await vectorCandidates(
+      main,
+      index,
+      encoder,
+      question,
+      scope,
+      new Set(keyword.hits.map((hit) => hit.sourceId)),
+    );
     return {
       ...keyword,
       hits: fuse(keyword.hits, vector),

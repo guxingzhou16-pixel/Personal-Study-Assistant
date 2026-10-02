@@ -59,6 +59,7 @@ export const vectorPolicy = {
   batchSize: 8,
   candidateLimit: 40,
   minimumSimilarity: 0.6,
+  keywordSourceSimilarity: 0.5,
   reciprocalRankConstant: 60,
   maximumHits: 4,
 };
