@@ -22,6 +22,7 @@
     "format:check": "prettier --check src electron scripts tests *.json *.ts .github index.html"
   },
   "dependencies": {
+    "@huggingface/transformers": "4.3.0",
     "lucide-react": "^0.577.0",
     "mdast-util-to-string": "^4.0.0",
     "pdfjs-dist": "^6.3.289",

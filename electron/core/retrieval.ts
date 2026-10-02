@@ -29,15 +29,19 @@ function indexTerms(text: string): string {
   }
   return [...new Set(result)].join(' ');
 }
-export function* chunks(text: string): Generator<{ start: number; end: number; text: string }> {
+export function* chunks(
+  text: string,
+  size = 800,
+  overlap = 120,
+): Generator<{ start: number; end: number; text: string }> {
   let start = 0;
   while (start < text.length) {
-    let end = Math.min(start + 800, text.length);
+    let end = Math.min(start + size, text.length);
     if (end < text.length && /[\uD800-\uDBFF]/.test(text[end - 1])) end--;
     const excerpt = text.slice(start, end);
     if (excerpt.trim()) yield { start, end, text: excerpt };
     if (end === text.length) break;
-    start = end - 120;
+    start = end - overlap;
     if (/[\uDC00-\uDFFF]/.test(text[start])) start++;
   }
 }
@@ -65,7 +69,7 @@ export function retrieve(
     index = new DatabaseSync(indexPath);
     index.exec('PRAGMA busy_timeout = 5000');
     const version = Number(index.prepare('PRAGMA user_version').get()?.user_version);
-    if (version > 1) throw new AppError('indexVersion', '检索索引来自更新的版本，请升级应用。');
+    if (version > 2) throw new AppError('indexVersion', '检索索引来自更新的版本，请升级应用。');
     if (!version) {
       index.exec('BEGIN IMMEDIATE');
       try {
@@ -83,7 +87,10 @@ export function retrieve(
       throw new AppError('sourceMissing', '选中的资料不存在，请刷新资料列表。');
     index.exec('BEGIN IMMEDIATE');
     try {
-      if (rebuild) index.exec('DELETE FROM chunks_fts; DELETE FROM indexed_sources;');
+      if (rebuild) {
+        index.exec('DELETE FROM chunks_fts; DELETE FROM indexed_sources;');
+        if (version === 2) index.exec('DELETE FROM chunk_vectors; DELETE FROM embedded_sources;');
+      }
       const indexed = new Set(
         index
           .prepare('SELECT id FROM indexed_sources')

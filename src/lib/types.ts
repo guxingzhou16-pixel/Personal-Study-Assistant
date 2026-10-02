@@ -139,6 +139,14 @@ export interface RetrievalProgress {
   total: number;
   message: string;
 }
+export interface EmbeddingStatus {
+  state: 'missing' | 'downloading' | 'invalid' | 'ready';
+  name: string;
+  dimensions: number;
+  bytes: number;
+  revision: string;
+  message: string;
+}
 export interface CitationTarget {
   sourceId: string;
   anchor: string;
