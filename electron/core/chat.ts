@@ -132,7 +132,7 @@ export class ChatService {
     if (evidence && !evidence.hits.length) {
       turn.status = 'completed';
       turn.answer =
-        '在所选资料范围内没有找到足够的关键词证据，暂时无法据此回答。请换用资料中的概念、补充资料或调整范围。';
+        '在所选资料范围内没有找到足够的资料证据，暂时无法据此回答。请换用资料中的概念、补充资料或调整范围。';
       turn.notice = evidence.notice;
       this.storage.chat.addTurn(turn);
       return turn;

@@ -82,7 +82,7 @@ test('desktop retrieves source evidence, answers with citations, opens original 
     await page.getByRole('button', { name: '检索原文', exact: true }).click();
     await expect(page.getByText('没有找到匹配的原文')).toBeVisible();
     await page.getByRole('button', { name: '发送问题', exact: true }).click();
-    await expect(page.getByTestId('chat-answer').last()).toContainText('没有找到足够的关键词证据');
+    await expect(page.getByTestId('chat-answer').last()).toContainText('没有找到足够的资料证据');
     expect(calls).toBe(1);
     await page.getByRole('combobox', { name: '资料范围' }).selectOption('');
     await page.getByRole('textbox', { name: '输入学习问题' }).fill('Evidence original source');

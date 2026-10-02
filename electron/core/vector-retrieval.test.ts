@@ -4,7 +4,8 @@ import { tmpdir } from 'node:os';
 import { DatabaseSync } from 'node:sqlite';
 import { afterEach, expect, it, vi } from 'vitest';
 import { Storage } from './storage';
-import { retrieve } from './retrieval';
+import { chunks, retrieve } from './retrieval';
+import { vectorPolicy } from './embedding-model';
 import { retrieveHybrid } from './vector-retrieval';
 import type { EmbeddingEncoder } from './embeddings';
 
@@ -190,4 +191,64 @@ it('admits moderate semantic matches from a keyword-supported source without bro
     expect.objectContaining({ sourceId: 'c'.repeat(64), anchor: 'md-line-8' }),
   );
   expect(result.hits.some((hit) => hit.sourceId === 'b'.repeat(64))).toBe(false);
+});
+
+it('resumes partially committed vector batches after an interrupted embedding pass', async () => {
+  const { mainPath, indexPath, encoder } = fixture();
+  const store = new Storage(mainPath);
+  const text = '数据库索引与存储开销。'.repeat(400);
+  store.addSource({
+    id: 'c'.repeat(64),
+    name: '长资料.md',
+    kind: 'markdown',
+    bytes: 10000,
+    pageCount: 1,
+    textStatus: 'ready',
+    outline: [],
+    segments: [{ anchor: 'md-line-1', title: '长资料', depth: 1, line: 1, text }],
+  });
+  store.close();
+  let batch = 0;
+  const failing = {
+    ...encoder,
+    embed: async (texts: string[]) => {
+      if (++batch === 2) throw new Error('interrupted inference');
+      return texts.map(() => Float32Array.of(1, 0, 0));
+    },
+  };
+  const failed = await retrieveHybrid(
+    mainPath,
+    indexPath,
+    '数据库索引',
+    'c'.repeat(64),
+    false,
+    () => {},
+    failing,
+  );
+  expect(failed.notice).toContain('已使用关键词检索');
+  let index = new DatabaseSync(indexPath);
+  try {
+    expect(index.prepare('SELECT count(*) AS n FROM chunk_vectors').get()?.n).toBe(
+      vectorPolicy.batchSize,
+    );
+    expect(index.prepare('SELECT count(*) AS n FROM embedded_sources').get()?.n).toBe(0);
+  } finally {
+    index.close();
+  }
+  const embed = vi.fn(async (texts: string[]) => texts.map(() => Float32Array.of(1, 0, 0)));
+  await retrieveHybrid(mainPath, indexPath, '数据库索引', 'c'.repeat(64), false, () => {}, {
+    ...encoder,
+    embed,
+  });
+  const expected = [...chunks(text, vectorPolicy.windowCharacters, vectorPolicy.windowOverlap)]
+    .length;
+  expect(embed.mock.calls.flatMap(([texts]) => texts)).toHaveLength(
+    expected - vectorPolicy.batchSize + 1,
+  );
+  index = new DatabaseSync(indexPath);
+  try {
+    expect(index.prepare('SELECT count(*) AS n FROM chunk_vectors').get()?.n).toBe(expected);
+  } finally {
+    index.close();
+  }
 });
