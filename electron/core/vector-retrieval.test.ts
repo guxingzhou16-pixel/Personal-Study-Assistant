@@ -151,3 +151,43 @@ it('covers the end of long excerpts in bounded embedding windows, instead of sil
   expect(inputs.some((input) => input.endsWith('数据库索引使查询更快。'))).toBe(true);
   expect(inputs.every((input) => input.length <= 480)).toBe(true);
 });
+
+it('admits moderate semantic matches from a keyword-supported source without broadening unrelated sources', async () => {
+  const { mainPath, indexPath, encoder } = fixture();
+  const store = new Storage(mainPath);
+  store.addSource({
+    id: 'c'.repeat(64),
+    name: '索引代价.md',
+    kind: 'markdown',
+    bytes: 100,
+    pageCount: 1,
+    textStatus: 'ready',
+    outline: [],
+    segments: [
+      { anchor: 'md-line-1', title: '索引', depth: 1, line: 1, text: '数据库索引让查询更快。' },
+      { anchor: 'md-line-8', title: '代价', depth: 1, line: 8, text: '额外的磁盘空间和写入开销。' },
+    ],
+  });
+  store.close();
+  const result = await retrieveHybrid(
+    mainPath,
+    indexPath,
+    '数据库索引的代价',
+    null,
+    false,
+    () => {},
+    {
+      ...encoder,
+      embed: async (texts, kind) =>
+        texts.map((text) =>
+          kind === 'query' || text.includes('查询')
+            ? Float32Array.of(1, 0, 0)
+            : Float32Array.of(0.55, Math.sqrt(1 - 0.55 ** 2), 0),
+        ),
+    },
+  );
+  expect(result.hits).toContainEqual(
+    expect.objectContaining({ sourceId: 'c'.repeat(64), anchor: 'md-line-8' }),
+  );
+  expect(result.hits.some((hit) => hit.sourceId === 'b'.repeat(64))).toBe(false);
+});
