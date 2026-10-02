@@ -21,10 +21,11 @@ test('real CPU model retrieves a Chinese synonym offline, opens its citation, re
   );
   cpSync(cached, installed, { recursive: true });
   let calls = 0;
+  let sentEvidence = '';
   const server = createServer(async (request, response) => {
     let body = '';
     for await (const part of request) body += part;
-    expect(JSON.parse(body).messages[1].content).toContain('数据库索引使查询更快。');
+    sentEvidence = JSON.parse(body).messages[1].content;
     calls++;
     response.end(
       JSON.stringify({ message: { content: '索引使查询更快。[1]' }, done: true }) + '\n',
@@ -67,6 +68,7 @@ test('real CPU model retrieves a Chinese synonym offline, opens its citation, re
     expect(calls).toBe(0);
     await page.getByRole('button', { name: '发送问题', exact: true }).click();
     await expect(page.getByTestId('chat-answer')).toContainText('索引使查询更快。');
+    expect(sentEvidence).toContain('数据库索引使查询更快。');
     await page.getByRole('button', { name: '引用 1', exact: true }).click();
     await expect(page.locator('.markdown-reading #md-line-5')).toBeInViewport();
     await page.getByRole('button', { name: '返回问答', exact: true }).click();
