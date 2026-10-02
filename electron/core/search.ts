@@ -41,6 +41,11 @@ export class SearchService {
     if (
       !source ||
       !segment ||
+      hit.sourceName !== source.name ||
+      hit.kind !== source.kind ||
+      hit.title !== segment.title ||
+      hit.page !== segment.page ||
+      hit.line !== segment.line ||
       !Number.isInteger(hit.start) ||
       !Number.isInteger(hit.end) ||
       hit.start < 0 ||
@@ -151,7 +156,9 @@ export class SearchService {
               throw new AppError('retrieval', '检索结果格式无效，请重新建立索引。');
             for (const id of new Set(result.hits.map((hit) => hit.sourceId)))
               await this.verifySource(id);
-            for (const hit of result.hits) {
+            for (const [index, hit] of result.hits.entries()) {
+              if (hit.number !== index + 1)
+                throw new AppError('retrieval', '检索引用编号无效，请重新建立索引。');
               if (scope !== null && hit.sourceId !== scope)
                 throw new AppError('retrieval', '检索结果超出所选资料范围。');
               this.checkEvidence(hit);

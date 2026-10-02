@@ -66,7 +66,16 @@ export function retrieve(
     index.exec('PRAGMA busy_timeout = 5000');
     const version = Number(index.prepare('PRAGMA user_version').get()?.user_version);
     if (version > 1) throw new AppError('indexVersion', '检索索引来自更新的版本，请升级应用。');
-    if (!version) index.exec(INDEX_SCHEMA);
+    if (!version) {
+      index.exec('BEGIN IMMEDIATE');
+      try {
+        index.exec(INDEX_SCHEMA);
+        index.exec('COMMIT');
+      } catch (error) {
+        index.exec('ROLLBACK');
+        throw error;
+      }
+    }
     const sources = main
       .prepare('SELECT id, name, kind, text_status FROM sources ORDER BY id')
       .all();

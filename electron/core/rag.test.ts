@@ -56,7 +56,9 @@ it('builds a grounded request from server-held evidence, isolates it from normal
   chat.send({ conversationId: conversation.id, question: '普通聊天' });
   await expect.poll(() => storage.chat.get(conversation.id).turns[1]?.status).toBe('completed');
   expect(
-    transport.mock.calls[1][0].messages.some((message: { content: string }) => message.content.includes('脏读')),
+    transport.mock.calls[1][0].messages.some((message: { content: string }) =>
+      message.content.includes('脏读'),
+    ),
   ).toBe(false);
   chat.close();
   storage.close();
@@ -64,6 +66,7 @@ it('builds a grounded request from server-held evidence, isolates it from normal
 it('does not call a model or read a key when there is no retrieved evidence', () => {
   const { storage, preview, evidence, conversation } = fixture();
   evidence.consume.mockReturnValue({ ...preview, hits: [] });
+  storage.saveSettings({ ...defaultSettings, provider: 'openai' });
   const transport = vi.fn();
   const load = vi.fn();
   const chat = new ChatService(storage, { load }, () => {}, transport, evidence);
@@ -79,6 +82,43 @@ it('does not call a model or read a key when there is no retrieved evidence', ()
   expect(storage.chat.get(conversation.id).turns[0].evidence).toEqual([]);
   chat.close();
   storage.close();
+});
+it('requires consent before remote evidence transmission and uses only the bound compatible-service key', async () => {
+  const { storage, preview, evidence, conversation } = fixture();
+  const endpoint = 'https://model.example/v1';
+  storage.saveSettings({
+    ...defaultSettings,
+    provider: 'openai',
+    openai: { baseUrl: endpoint, model: 'test' },
+  });
+  const load = vi.fn(() => 'fake-test-key');
+  const transport = vi.fn(async (_input, onText) => {
+    onText('证据回答 [1]');
+    return { truncated: false };
+  });
+  const chat = new ChatService(storage, { load }, () => {}, transport, evidence);
+  const request = {
+    conversationId: conversation.id,
+    question: preview.question,
+    retrievalId: preview.id,
+  };
+  try {
+    expect(() => chat.send(request)).toThrow('确认');
+    expect(load).not.toHaveBeenCalled();
+    expect(transport).not.toHaveBeenCalled();
+    chat.send({
+      ...request,
+      consentEndpoint: endpoint,
+      expectedProfile: `openai|${endpoint}|test`,
+    });
+    await expect.poll(() => storage.chat.get(conversation.id).turns[0]?.status).toBe('completed');
+    expect(load).toHaveBeenCalledWith(endpoint);
+    expect(transport.mock.calls[0][0]).toMatchObject({ provider: 'openai', key: 'fake-test-key' });
+    expect(transport.mock.calls[0][0].messages).toHaveLength(3);
+  } finally {
+    chat.close();
+    storage.close();
+  }
 });
 it.each(['没有引用的回答', '错误的引用 [99]'])(
   'marks unsupported citation claims as unverified',

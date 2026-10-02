@@ -63,7 +63,12 @@ export class ChatService {
       throw new AppError('profileChanged', '模型设置已变化，请重新打开聊天页确认后再发送。');
     const remote = !['localhost', '127.0.0.1', '[::1]'].includes(new URL(profile.baseUrl).hostname);
     if (needsModel && remote && request.consentEndpoint !== profile.baseUrl)
-      throw new AppError('remoteConsent', '请先确认将本次问题和近期会话发送至当前远程服务。');
+      throw new AppError(
+        'remoteConsent',
+        evidence
+          ? '请先确认将本次问题和预览的检索片段发送至当前远程服务。'
+          : '请先确认将本次问题和近期会话发送至当前远程服务。',
+      );
     const key =
       needsModel && settings.provider === 'openai'
         ? this.credentials.load(profile.baseUrl)

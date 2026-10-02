@@ -101,6 +101,21 @@ test('desktop retrieves source evidence, answers with citations, opens original 
     await expect(page.getByRole('spinbutton', { name: 'PDF 页码' })).toHaveValue('2');
     await page.getByRole('button', { name: '返回问答', exact: true }).click();
     await page.getByRole('combobox', { name: '问答方式' }).selectOption('sources');
+    const cancelled = await page.evaluate(async () => {
+      const pending = window.studyCompanion!.rebuildIndex().then(
+        () => null,
+        (error: { code: string }) => ({ code: error.code }),
+      );
+      await window.studyCompanion!.cancelRetrieval();
+      return pending;
+    });
+    expect(cancelled).toMatchObject({ code: 'cancelled' });
+    const retained = await page.evaluate(() =>
+      window.studyCompanion!.prepareQuestion('Evidence original source', null),
+    );
+    expect(retained).toMatchObject({
+      hits: [expect.objectContaining({ page: 2 })],
+    });
     await page.getByRole('button', { name: '重建检索索引', exact: true }).click();
     await expect(page.getByText('检索索引已重建。', { exact: true })).toBeVisible();
     await page.setViewportSize({ width: 900, height: 640 });
