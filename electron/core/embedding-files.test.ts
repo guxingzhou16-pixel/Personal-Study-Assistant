@@ -81,3 +81,57 @@ it('cancels a pending download, rejects concurrent installation, and leaves no r
   expect(await outcome).toBe('cancelled');
   expect((await files.status()).state).toBe('missing');
 });
+
+it('allows a slow but progressing download to finish after more than five minutes', async () => {
+  vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout'] });
+  const timeout = vi.spyOn(AbortSignal, 'timeout').mockImplementation((delay) => {
+    const controller = new AbortController();
+    setTimeout(() => controller.abort(new DOMException('Timed out', 'TimeoutError')), delay);
+    return controller.signal;
+  });
+  let requested!: () => void;
+  const started = new Promise<void>((resolve) => {
+    requested = resolve;
+  });
+  const files = new EmbeddingFiles(
+    directory(),
+    async (_url, options) => {
+      const stream = new ReadableStream<Uint8Array>({
+        start(controller) {
+          options!.signal!.addEventListener(
+            'abort',
+            () => controller.error(new Error('timed out')),
+            { once: true },
+          );
+          for (let part = 0; part < 4; part++)
+            setTimeout(
+              () => {
+                if (options!.signal!.aborted) return;
+                controller.enqueue(
+                  content.subarray(
+                    Math.floor((content.length * part) / 4),
+                    Math.floor((content.length * (part + 1)) / 4),
+                  ),
+                );
+                if (part === 3) controller.close();
+              },
+              (part + 1) * 120_000,
+            );
+        },
+      });
+      requested();
+      return new Response(stream);
+    },
+    model,
+  );
+  try {
+    const pending = files.install(() => {});
+    void pending.catch(() => {});
+    await started;
+    await vi.advanceTimersByTimeAsync(480_000);
+    await expect(pending).resolves.toMatchObject({ state: 'ready' });
+  } finally {
+    timeout.mockRestore();
+    vi.useRealTimers();
+  }
+});
