@@ -1,5 +1,5 @@
 import { createHash, randomUUID } from 'node:crypto';
-import { createReadStream } from 'node:fs';
+import { createReadStream, statSync } from 'node:fs';
 import { mkdir, mkdtemp, open, rename, rm, stat } from 'node:fs/promises';
 import { dirname, join } from 'node:path';
 import type { EmbeddingStatus, RetrievalProgress } from '../../src/lib/types';
@@ -36,6 +36,21 @@ export class EmbeddingFiles {
     private readonly model: EmbeddingModel = embeddingModel,
   ) {
     this.modelPath = embeddingPath(directory, model);
+  }
+  // Fast candidate check for launching a worker. The worker verifies every hash
+  // before loading; never hash the ONNX weight synchronously in the main process.
+  candidatePath(): string | null {
+    if (this.active) return null;
+    try {
+      return this.model.files.every((file) => {
+        const info = statSync(join(this.modelPath, file.path));
+        return info.isFile() && info.size === file.bytes;
+      })
+        ? this.modelPath
+        : null;
+    } catch {
+      return null;
+    }
   }
   async status(): Promise<EmbeddingStatus> {
     let state: EmbeddingStatus['state'] = 'missing';

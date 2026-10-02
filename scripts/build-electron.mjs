@@ -34,4 +34,5 @@ await build({
   platform: 'node',
   format: 'esm',
   target: 'node24',
+  external: ['@huggingface/transformers'],
 });

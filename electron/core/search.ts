@@ -34,6 +34,7 @@ export class SearchService {
     private readonly workerPath: string,
     private readonly launch: SearchLauncher,
     private readonly verifySource: (id: string) => Promise<void>,
+    private readonly modelPath: () => string | null = () => null,
   ) {}
   private checkEvidence(hit: Evidence): CitationTarget {
     const source = this.storage.getSource(hit.sourceId);
@@ -74,9 +75,10 @@ export class SearchService {
       return preview;
     });
   }
-  async rebuild(progress: (value: RetrievalProgress) => void): Promise<void> {
-    await this.run('', null, true, progress);
+  async rebuild(progress: (value: RetrievalProgress) => void): Promise<string> {
+    const result = await this.run('', null, true, progress);
     this.previews.clear();
+    return result.notice;
   }
   consume(input: unknown, question: string): EvidencePreview {
     const id = chatId(input);
@@ -106,6 +108,28 @@ export class SearchService {
     rebuild: boolean,
     progress: (value: RetrievalProgress) => void,
   ): Promise<Omit<EvidencePreview, 'id'>> {
+    const model = this.modelPath();
+    return this.runWorker(question, scope, rebuild, progress, model).catch((error) => {
+      if (
+        !model ||
+        !(error instanceof AppError) ||
+        !['indexProcess', 'indexTimeout'].includes(error.code)
+      )
+        throw error;
+      progress({ current: 0, total: 0, message: '语义处理未完成，正在使用关键词检索…' });
+      return this.runWorker(question, scope, rebuild, progress, null).then((result) => ({
+        ...result,
+        notice: `语义检索进程退出或超时，已使用关键词检索。可在设置中检查模型并重试。 ${result.notice}`,
+      }));
+    });
+  }
+  private runWorker(
+    question: string,
+    scope: string | null,
+    rebuild: boolean,
+    progress: (value: RetrievalProgress) => void,
+    modelPath: string | null,
+  ): Promise<Omit<EvidencePreview, 'id'>> {
     if (this.active)
       return Promise.reject(new AppError('searchBusy', '已有检索正在进行，请先取消或等待完成。'));
     const indexPath = join(this.directory, 'search-index.sqlite3');
@@ -119,6 +143,7 @@ export class SearchService {
         question,
         scope ?? '',
         rebuild ? '1' : '0',
+        modelPath ?? '',
       ]);
       let finished = false;
       let resultReceived = false;
