@@ -98,6 +98,17 @@ export class ChatStorage {
       throw error;
     }
   }
+  getTurn(input: unknown): ChatTurn {
+    const row = this.db
+      .prepare(
+        `SELECT id, conversation_id AS conversationId, question, answer, status,
+      notice, provider, base_url AS baseUrl, model, created_at AS createdAt, revision, mode, evidence
+      FROM chat_turns WHERE id = ?`,
+      )
+      .get(chatId(input));
+    if (!row) throw new AppError('chatMissing', '找不到这次回答，请重新打开会话。');
+    return { ...row, evidence: JSON.parse(String(row.evidence)) } as unknown as ChatTurn;
+  }
   saveTurn(turn: ChatTurn): void {
     this.db
       .prepare(

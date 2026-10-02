@@ -217,6 +217,26 @@ export class Documents {
       ? { source, text: data.toString('utf8') }
       : { source, data: new Uint8Array(data) };
   }
+  async verify(input: unknown): Promise<void> {
+    const id = sourceId(input);
+    const source = this.storage.getSource(id);
+    if (!source) throw new AppError('sourceMissing', '这份资料不存在，请刷新资料库。');
+    const hash = createHash('sha256');
+    let bytes = 0;
+    try {
+      for await (const chunk of createReadStream(this.filePath(id, source.kind))) {
+        bytes += chunk.length;
+        if (bytes > source.bytes)
+          throw new AppError('sourceChanged', '资料副本已被修改，请重新导入。');
+        hash.update(chunk);
+      }
+    } catch (error) {
+      if (error instanceof AppError) throw error;
+      throw new AppError('sourceFileMissing', '资料副本无法读取，请检查文件或备份后重试。');
+    }
+    if (bytes !== source.bytes || hash.digest('hex') !== id)
+      throw new AppError('sourceChanged', '资料副本已被修改，请重新导入后再检索和引用。');
+  }
   citation(input: unknown, anchorInput: unknown, quoteInput: unknown): string {
     const id = sourceId(input);
     const source = this.storage.getSource(id);

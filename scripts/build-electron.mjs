@@ -27,3 +27,11 @@ await build({
   target: 'node24',
   external: ['electron'],
 });
+await build({
+  entryPoints: ['electron/search-worker.ts'],
+  outfile: 'dist-electron/search-worker.mjs',
+  bundle: true,
+  platform: 'node',
+  format: 'esm',
+  target: 'node24',
+});
