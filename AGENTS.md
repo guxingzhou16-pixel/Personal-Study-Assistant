@@ -90,11 +90,19 @@
 - 主进程缓存预览 UUID、问题、范围和最多 4 个确切片段，不接受 renderer 自造证据。预览及引用打开前核对副本完整性，原文/位置/资料名逐项匹配。远程发送确认绑定本次预览与模型，只发送当前问题和证据；普通聊天历史排除资料问答。
 - 37 项相关核心测试、类型检查、生产桌面构建与修改文件格式检查通过。6 条相关真实 Electron 流程验证 RAG、原有聊天/设置/开发模式/阅读/解析取消；RAG 追加索引取消规格按 preload 解包/抛错契约修正后单条重跑通过。本次未重跑完整日历桌面流程、真实模型、规模性能、安装包或远端 CI。
 - `npm run eval:retrieval`：6 份合成资料、15 个固定问题，12 个可回答问题 Hit@4 = 100%、Mean Recall@4 = 87.5%、MRR@4 = 1；3 个不可回答/范围不符问题为空。3 个跨段落或换说法问题未完整命中；逐题报告可重复生成。只评测检索锚点，不能作为真实模型回答/引用语义准确性。
-- `codex/keyword-rag` 保留 RED/GREEN 检查点，功能验收代码提交 `75a9c73`；只提交本地。向量/混合检索、真正的模型质量评测仍未交付，阶段 2 尚未整体验收。
+- `codex/keyword-rag` 保留 RED/GREEN，验收代码 `75a9c73`；只提交本地。该历史阶段尚无向量/混合，后续见 3.6；真实生成质量仍未验收。
 
-### 3.6 仍待开发的主要能力
+### 3.6 已交付的本地嵌入与混合检索
 
-向量/混合检索、真实模型回答与引用语义评测、会话删除/重命名/导出、结构化笔记、学习 Agent、长期记忆、完整计划与任务、番茄钟、主题切换、完整备份恢复、OCR、更多文件格式、安装包及展示网站。
+- 2026-10-02：设置主动下载固定 BGE 中文 Q8，进度/取消、文件完整性校验、独立 CPU 进程、本地向量缓存与 RRF 融合。云端聊天不依赖 Ollama；缺少/损坏模型、推理故障或语义进程退出/超时，明确保留关键词结果。用户取消不触发降级重试。
+- 权重与配置约 23.3 MiB，固定 revision/SHA-256；Transformers.js 4.3.0、ONNX Runtime Node 1.30.0 的 Windows 预编译绑定，无 C++ 编译。本机真实权重验证通过；其他机器和安装包尚未验证。
+- 原主库版本 4、活动库版本 1 不变；派生索引首次向量检索事务升级到版本 2。模型标识含输入/权重/运行时版本，批次事务保存，可恢复部分索引，重建成功才替换旧文件。
+- 固定 15 题未改动：关键词 Mean Recall@4 = 87.5%，混合 = 95.83%，Target Precision@4 = 100%，空证据 3/3，仍有 `cache-multi` 不完整。数据集参与开发调参，不是独立质量测试；不等于真实回答/引用准确性。CPU 样本和原始指标定义见 README。
+- `codex/local-hybrid-retrieval` 保留 RED/GREEN：8 个相关核心文件 37 项、4 条常规桌面与 1 条真实 BGE 门禁、类型检查/生产构建通过。门禁使用真实 BGE 与模拟回答，不调用收费 API。未跑全局回归/完整日历/完整独立阅读/普通聊天桌面；README 保存具体范围。默认仅本地提交。
+
+### 3.7 仍待开发的主要能力
+
+真实聊天回答与引用语义评测、检索规模与独立数据验证、会话管理、结构化笔记、学习 Agent、长期记忆、完整计划与任务、番茄钟、主题切换、备份恢复、OCR、更多格式、安装包及展示网站。
 
 ## 4. 产品范围与功能要求
 
@@ -114,7 +122,7 @@
 - 分块保留文档 ID、页码或标题锚点、引用原文，不能丢失来源后再猜出处。
 - 组合 SQLite FTS5 全文检索与本地向量检索，不要求用户部署外部数据库或向量服务。
 - 本地嵌入模型独立于聊天模型。云端聊天用户不必因此安装 Ollama；嵌入下载或加载失败时保留关键词检索及阅读。
-- 嵌入模型具体实现与版本尚未确定，选型要记录中文效果、CPU 性能、下载大小、许可证和 Windows 分发条件。
+- 当前 BGE-small 中文 Q8 的版本/文件清单和向量政策集中在 `embedding-model.ts`；替换模型更新清单、缓存标识并跑固定对比和真实桌面门禁，记录中文/CPU/体积/许可证/分发条件。不要把不同模型向量混用，也不提前扩展多模型注册框架。
 - 证据不足时说明限制；回答只引用实际取回的资料，不虚构文档、页码或引用。
 - 保留固定评测集，包含可回答、跨段落、无法回答的问题。记录指标定义、检索命中率、引用准确性、关键词与混合检索对比及失败案例。
 - 简历中的效果数据必须来自可重复运行的真实评测，不填写估计值作为成绩。
@@ -147,7 +155,8 @@
 | 图标与样式 | `lucide-react`、普通 CSS；全局样式在 `src/styles.css` |
 | 桌面构建 | esbuild，主进程与预加载脚本输出 CommonJS |
 | 后台解析 | Electron `utilityProcess` 独立 Node 进程，解析入口输出 ESM；256 MB V8 堆限制、60 秒超时、进度与取消 |
-| 后台检索 | 独立 `utilityProcess`，只读主库、写派生 FTS5 索引；256 MB V8 堆、5 分钟超时；中文分词/汉字二元词，BM25 与覆盖率排序 |
+| 后台检索/嵌入 | 独立 `utilityProcess`，只读主库、写派生 FTS5/向量；512 MB V8 堆、5 分钟超时；模型不可用保留关键词 |
+| 本地嵌入 | Transformers.js 4.3.0 / ONNX Runtime Node 1.30.0，中文 BGE-small Q8，CPU 最多 4 线程，仅校验过的本地文件 |
 | 本地数据库 | Electron 内置 Node.js 的 `node:sqlite` / `DatabaseSync` |
 | 密钥 | Electron `safeStorage`，Windows DPAPI 系统加密 |
 | 模型请求 | 主进程 `fetch`、运行时参数校验、结构化错误 |
@@ -168,6 +177,7 @@
 | `AGENTS.md` | 面向 AI 开发者的项目约定、模块边界、工作流程与接手信息 |
 | `src/App.tsx` | 工作台、导航、启动加载、页面切换和学习首页 |
 | `src/components/SettingsPage.tsx` | 偏好及模型表单、连接检测、密钥操作；输入密钥只作必要的临时传递 |
+| `src/components/EmbeddingSettings.tsx` | 独立模型下载/取消、进度和文件状态；不改变聊天配置 |
 | `src/components/LibraryPage.tsx` | 文件选择、导入状态、失败、搜索/格式筛选与真实资料列表 |
 | `src/components/ReadingPage.tsx`、`PdfPage.tsx` | 原页/排版、引用复制、保存、受验证的出处跳转及资料问答入口 |
 | `src/components/RecentReadings.tsx` | 首页从主库读取实际最近阅读，不用示例数据 |
@@ -186,6 +196,10 @@
 | `electron/core/chat-stream.ts` | Ollama NDJSON / 兼容 OpenAI SSE、UTF-8 拆包、大小/超时边界与错误映射 |
 | `electron/core/chat.ts` | 单活动请求、设置/密钥快照、上下文、远程确认、停止、定期保存与退出处理 |
 | `electron/core/retrieval.ts` | 精确偏移分块、中文查询词、FTS5 索引事务、范围与排序；同步实现仅在后台进程或测试运行 |
+| `electron/core/embedding-model.ts` | 固定模型 revision/文件摘要、输入/分块/融合政策与下载时限 |
+| `electron/core/embedding-files.ts` | 主动下载/状态、SHA-256 校验、暂存替换；不上传资料、无聊天密钥 |
+| `electron/core/embeddings.ts` | `EmbeddingEncoder` 及 ONNX CPU 适配器，只负责编码和释放；禁止远程加载 |
+| `electron/core/vector-index.ts`、`vector-retrieval.ts` | 派生 v2 表、增量批次/恢复、模型隔离、余弦候选、RRF 与显式降级 |
 | `electron/core/search.ts` | 单索引进程、取消/重建文件替换、主进程预览缓存、证据/副本验证和保存引用解析 |
 | `electron/search-worker.ts` | 固定独立检索入口，只读主库、写派生索引，不访问密钥 |
 | `electron/core/documents.ts` | 文件复制/去重/限额、解析进程、完整性检查、引用验证；原生对话框路径不由 renderer 提供 |
@@ -202,10 +216,12 @@
 | `tests/reading.spec.ts` | 已验收的导入、阅读、原文引用、重启恢复与独立解析取消 |
 | `tests/chat.spec.ts` | 双协议流式回答、停止/断流、迟到事件、退出恢复、密钥使用及目标地址确认 |
 | `tests/rag.spec.ts` | 中文/英文检索、无证据、PDF/Markdown 出处跳转、重启引用与实际索引进程取消/重建 |
-| `tests/fixtures/retrieval-cases.ts`、`tests/retrieval-evaluation.ts` | 固定合成证据与问题、逐题命中和指标；保留未完整命中项，不调用模型 |
+| `tests/fixtures/retrieval-cases.ts`、`tests/retrieval-evaluation.ts` | 固定合成题、关键词/混合指标与逐题失败；只在混合模式调用真实本地嵌入 |
+| `tests/embedding.spec.ts` | 模拟下载的 UI/取消流程，保留关键词路径 |
+| `tests/embedding.real.ts`、`playwright.embedding.config.ts` | 独立真实 BGE 门禁：离线中文同义检索、引用、重启缓存、索引取消、损坏降级 |
 | `tests/fixtures/reading-files.ts` | 自动生成测试资料，不使用私人学习文件 |
 | `scripts/build-electron.mjs` | 构建主进程、预加载、独立解析/检索入口到 `dist-electron/` |
-| `scripts/eval-retrieval.mjs` | 执行固定 FTS5 评测，报告到已忽略的 `artifacts/` |
+| `scripts/eval-retrieval.mjs`、`download-embedding.mjs` | 固定关键词/混合评测；开发模型缓存/报告写 `artifacts/`，不使用用户数据 |
 | `scripts/prepare-pdf-assets.mjs` | 开发/构建时复制 PDF.js CMap、字库与 WASM 到生成资源目录 |
 | `scripts/dev.mjs` | 启动 Vite 与 Electron，处理开发进程退出 |
 | `vite.config.ts` | Vite、CSP 注入与 Vitest 文件匹配 |
@@ -237,6 +253,8 @@
 
 检索方法：`prepareQuestion(question, sourceId | null)`、`cancelRetrieval`、`rebuildIndex`、`onRetrievalProgress`、`resolveCitation(turnId, number)`。只接受受限问题、资料哈希、保存轮次 UUID 和整数编号；主进程持有实际范围/片段，缓存上限 10 份、10 分钟有效，问题变化须重新检索。取消只结束索引子进程，不修改原资料/主库；新索引完成后同步原子替换旧文件。引用解析从保存轮次查证，不接受 renderer 提供路径、锚点或原文。进度订阅只传数据并返回取消监听函数。
 
+本地模型方法：`embeddingStatus`、`downloadEmbedding`、`cancelEmbeddingDownload`、`onEmbeddingProgress`。不接受地址、路径、模型 ID 或资料；下载主进程固定的公开模型，使用 Electron 系统网络配置，公开 CDN 可重定向，逐文件校验，无聊天密钥。一次下载、15 分钟上限、不续传；全部就绪后替换，取消不破坏旧副本。`rebuildIndex` 现在返回说明字符串，包括语义降级；不能收到成功就宣称向量完整建立。模型候选路径由主进程给后台，后台再次核对摘要。
+
 ## 8. 本地数据、迁移与密钥
 
 默认数据目录：`%APPDATA%\StudyCompanion\`。
@@ -245,7 +263,8 @@
 | --- | --- |
 | `study-companion.sqlite3` | 主库版本 4：设置、来源/段落、阅读位置、会话/轮次；轮次保存模式与确切证据快照 |
 | `study-activity.sqlite3` | 已验收的独立学习活动数据库，版本 1、`study_days` 表；备份须与主库一同导出 |
-| `search-index.sqlite3` | 派生索引版本 1，`indexed_sources`/`chunks_fts`；分块、原文/偏移、元数据和查询词；可重建 |
+| `search-index.sqlite3` | 关键词版 v1；首次向量使用事务升级 v2，新增 `chunk_vectors`/`embedded_sources`，可重建、不代替原文 |
+| `embedding-models/` | 固定版本模型/配置与下载暂存；摘要校验，只是可重新下载缓存，不进 Git/学习备份 |
 | `search-index.*.sqlite3` | 重建暂存索引，成功才替换旧文件；取消/失败尽力清理，Windows 文件锁可能留下可丢弃的派生暂存 |
 | `sources/` | 内容 SHA-256 命名的 `.pdf`/`.md` 副本；不修改原件；打开前核对内容哈希 |
 | `study-companion.sqlite3.before-v2-*.sqlite3` | 版本 1 升级前的 SQLite 一致性备份；备份失败不继续迁移，不自动删除 |
@@ -264,6 +283,8 @@
 - 聊天轮次状态为 `streaming/completed/stopped/error/interrupted`，保存部分回答与错误提示。主进程退出先取消聊天并保存，再关库；重启将残留的 streaming 标记为 interrupted。保存失败须向界面报告，不能冒充成功。单会话限 100 轮、会话总数限 500，未来会话管理/清理需保留恢复边界。
 - 来源锚点为 `page-N` 或 `md-line-N`，绑定内容哈希。资料问答轮次保存证据编号、资料名/类型、标题/页码/行号、UTF-16 偏移与原文；打开核对保存原文、元数据和副本哈希，不猜位置。复制 URI 尚未注册系统协议；应用内引用编号走受限 IPC，不依赖系统协议。
 - 当前分块最多 800 字符、重叠 120 字符，不拆开代理对；中文分词/汉字二元词入 FTS5。查询最多 24 个非停用词，BM25 前 40 候选经至少 50% 字面关键词覆盖过滤、排序/去重取最多 4 片段。阈值不证明证据充分，跨段落/同义表达可能遗漏；调整须保留固定评测失败案例。
+- 向量窗口 384/重叠 64、标题最多 64、批次 8；BGE CLS/归一化/查询指令，禁止静默 token 截断。长问题分窗口并平均。模型标识包括权重 revision、维数、池化、指令、窗口/标题政策和运行时；阈值调整不要求重做同一编码，输入政策变化必须换缓存标识。向量主键是模型/来源/锚点/偏移，不使用易变化的 FTS rowid。
+- 逐批事务提交，来源全部编码后才标记完成，取消后的增量任务可恢复；重建仍用新文件。线性余弦扫描当前模型；全局门槛 0.6，关键词支持资料内门槛 0.5，RRF 常数 60，最多 4 个去重片段。不混用模型，不自动切换云服务，不把门槛当证据充分概率。只有嵌入错误降级；SQL/磁盘失败仍报错。
 - 导入上限：20 文件/批；PDF 50 MB、1000 页、500 万提取字符；Markdown 5 MB、UTF-8；60 秒/文件。Markdown 原始 HTML/脚本和全部图片不加载，外链不自动打开。扫描件仅原页；密码 PDF 先解锁。新格式与更高限额先评估体验和内存。
 - PDF.js 对 utility 类型的 Node 识别需要 `document-worker.ts` 的进程内兼容提示；只影响解析子进程。升级 PDF.js/Electron 时实测此入口、资源路径、取消与正常打开，不能只运行 Node 单元测试。
 - 学习日历用本地日历日期，存储毫秒、对外展示秒；计时使用单调时钟，跨日分配，超过 30 秒心跳缺失视为中断。每秒保存；退出或睡眠时暂停，重启不自动计时。异常退出可能丢失最后约一秒。这些核心行为已做专项验证，不代表番茄钟或任务完成记录已实现。
@@ -321,7 +342,7 @@ npm run desktop:start
 | `npm run desktop:dev` | 先构建 Electron 代码，再启动 Vite 与真实桌面窗口 |
 | `npm run typecheck` | 检查界面与 Electron/测试的 TypeScript 类型 |
 | `npm run build` | 类型检查与 Vite 界面生产构建 |
-| `npm run build:electron` | 生成 `main.cjs`、`preload.cjs` 及独立解析 `document-worker.mjs` |
+| `npm run build:electron` | 生成 main/preload 及解析/检索 worker；检索运行时依赖留在 node_modules，不把原生库打包进 JS |
 | `npm run desktop:build` | 构建界面和 Electron 代码，尚不生成安装包 |
 | `npm run desktop:start` | 打开已经构建的桌面版本，不自动构建 |
 | `npm run preview` | Vite 构建产物的浏览器预览 |
@@ -329,7 +350,10 @@ npm run desktop:start
 | `npm run format` | 批量格式化；工作区有他人改动时优先只格式化自己的文件 |
 | `npm test` | 当前所有 Vitest 核心测试，可能包含正在开发的 RED 规格 |
 | `npm run eval:retrieval` | 6 份合成资料/15 固定问题的关键词检索评测；不调用模型、不读个人资料，报告保留未完整命中项 |
-| `npm run test:e2e` | 完整桌面构建与所有 Playwright 测试，属于阶段/发布回归 |
+| `npm run model:download` | 下载校验开发评测权重至 `artifacts/embedding-model`，与用户数据独立 |
+| `npm run eval:hybrid` | 同一固定题的真实 BGE 对比，缺权重时报错，无聊天/云 API，发生降级返回非零 |
+| `npm run test:embedding` | 构建后、已有开发权重时运行独立真实 CPU/Electron 门禁，不自动下载 |
+| `npm run test:e2e` | 完整桌面构建与常规 Playwright 测试；真实权重门禁单独执行，属于阶段/发布回归 |
 
 React 界面支持热更新；修改 `electron/` 或 preload 后重启桌面开发命令。Electron 首次下载失败时检查网络，使用官方安装方式重试，不默认安装 C++ 工具或换框架。Vite 端口固定且严格占用，发生冲突时确认进程归属，不结束无关程序。
 
@@ -365,7 +389,7 @@ npx playwright test tests/rag.spec.ts
 - 不为覆盖率写只重复实现的测试；不默默跳过、削弱断言或将失败记录为成功。
 - 当前 `tests/reading.spec.ts` 已通过真实桌面验收；修改解析入口、资源路径或迁移时执行相关测试，不能以只在浏览器显示正常代替验收。
 - 新增接口后检查现有桌面测试中对桥接方法列表的断言是否需要同步，保持隔离范围明确。测试 renderer 方法用 preload 解包后的值/结构化异常，不假设它返回原始 IPC Reply。
-- 检索评测与功能测试不同：当前只测锚点命中，不调用模型，未完整命中项不会让评测命令报错；不能把退出码 0 解释成每题完整通过。真实回答/引用语义质量与混合检索对比仍需独立评测。
+- 检索评测只测标注锚点，关键词模式不调用模型，混合模式使用真实本地 BGE；未完整命中不会使评测退出非零，嵌入降级则失败。不能把退出码 0 当每题通过，也不能把参与开发的 15 题当独立测试集。真实回答/引用语义质量仍待评测。真实权重门禁单独执行，普通 e2e 不自动联网获取模型。
 - 测试截图与 trace 放在已忽略的产物目录；失败时报告具体未通过的功能和影响。
 - GitHub Actions 配置存在不等于远端通过，推送后才会触发相应流程；不要为了验证 CI 自行突破推送约定。
 
@@ -385,7 +409,7 @@ npx playwright test tests/rag.spec.ts
 | --- | --- | --- |
 | 0 | 桌面骨架、数据库、空资料库、偏好保存 | 历史验收已完成，新增改动按实际情况再验证 |
 | 1 | PDF/Markdown 导入与阅读，基础版本已交付 | 去重、损坏反馈、原文件复制、原页/排版、重启位置恢复、扫描件提示、取消与引用复制 |
-| 2 | 聊天、关键词 RAG、引用与检索基线已交付；向量/混合检索及真实生成评测待做 | 本地与云端真实同资料问答、引用回原文、证据不足、嵌入失效降级、可重复评测 |
+| 2 | 聊天协议、可追溯 RAG、本地嵌入/混合检索与对比已交付；真实聊天质量待做 | 本地/云端真实同资料问答、引用语义质量、独立数据、规模与安装包 |
 | 3 | 结构化笔记、Agent、长期记忆 | 可独立写笔记、反馈有出处、取消不写入、删除记忆不再使用 |
 | 4 | 项目任务、番茄钟、打卡、主题、备份 | 数据重启恢复、中断不误完成、备份往返且无密钥；当前日历工作只是其中一部分 |
 | 5 | 全流程与异常验证、RAG 对比、安装包、发布文档 | 新用户按说明完成学习闭环、发布包对应 Git 标签、公开发布有授权 |
@@ -393,7 +417,7 @@ npx playwright test tests/rag.spec.ts
 
 README 的主线下一步为阶段 2，日历与基础阅读已集成；具体任务以用户最新指示为准，不为机械遵循阶段编号撤销已授权的并行工作。
 
-接手下一步先读 `retrieval.ts`、`search.ts`、`rag.test.ts` 和固定评测案例。关键词检索/证据预览/跳转已交付；不要重建另一套问答或索引接口。下一步先记录独立嵌入方案的中文效果、CPU 性能、体积、许可证与 Windows 分发条件，再接向量/混合检索，失效保留关键词路径。保留现有停止、保存、发送确认、阅读与日历，扩充评测并报告真实模型验证缺口，不跳到官网、云同步或无限自主 Agent。
+接手先读 `embedding-model.ts`、`embeddings.ts`、`vector-retrieval.ts`、`search.ts` 与固定案例。沿用现有问答/引用接口，不建第二套。下一步扩充许可资料与未参与调参的问题，保留 `cache-multi`；验证真实本地/云端聊天和引用语义质量，再推进笔记与受控 Agent。保留停止、保存、确认、阅读和日历，不跳到官网、同步或无限 Agent。
 
 ## 14. Git、隐私与协作流程
 
