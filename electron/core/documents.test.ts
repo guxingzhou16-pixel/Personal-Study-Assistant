@@ -180,9 +180,12 @@ describe('local document import, storage and provenance', () => {
     await expect(documents.open('0'.repeat(64))).rejects.toThrow('不存在');
     expect(() => documents.citation('0'.repeat(64), 'page-1', 'text')).toThrow('不存在');
     expect(() => storage.saveReadingPosition('0'.repeat(64), position)).toThrow('不存在');
+    await expect(documents.verify(markdown.id)).resolves.toBeUndefined();
     writeFileSync(join(sources, `${markdown.id}.md`), 'changed');
+    await expect(documents.verify(markdown.id)).rejects.toThrow('已被修改');
     await expect(documents.open(markdown.id)).rejects.toThrow('已被修改');
     rmSync(join(sources, `${pdf.id}.pdf`));
+    await expect(documents.verify(pdf.id)).rejects.toThrow('无法读取');
     await expect(documents.open(pdf.id)).rejects.toThrow('无法读取');
   });
   it('rejects oversized, empty and unsupported files without touching originals', async () => {

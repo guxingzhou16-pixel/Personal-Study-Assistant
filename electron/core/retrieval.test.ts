@@ -133,6 +133,21 @@ it('upgrades v3 with a recoverable backup, preserving existing conversations and
   let store = new Storage(mainPath);
   store.saveSettings({ ...defaultSettings, displayName: '保留我' });
   const conversation = store.chat.create();
+  store.chat.addTurn({
+    id: 'bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb',
+    conversationId: conversation.id,
+    question: '旧问题',
+    answer: '旧回答',
+    status: 'completed',
+    notice: '',
+    provider: 'ollama',
+    baseUrl: 'http://127.0.0.1:11434',
+    model: 'test',
+    createdAt: new Date().toISOString(),
+    revision: 2,
+    mode: 'chat',
+    evidence: [],
+  });
   store.close();
   const old = new DatabaseSync(mainPath);
   old.exec(
@@ -142,11 +157,36 @@ it('upgrades v3 with a recoverable backup, preserving existing conversations and
   store = new Storage(mainPath);
   expect(store.schemaVersion).toBe(4);
   expect(store.loadSettings().displayName).toBe('保留我');
-  expect(store.chat.get(conversation.id).turns).toEqual([]);
+  expect(store.chat.get(conversation.id).turns).toEqual([
+    expect.objectContaining({
+      question: '旧问题',
+      answer: '旧回答',
+      status: 'completed',
+      revision: 2,
+      mode: 'chat',
+      evidence: [],
+    }),
+  ]);
   expect(store.getSegment('a'.repeat(64), 'md-line-1')?.text).toContain('事务隔离');
   store.close();
   const backupName = readdirSync(directory).find((name) => name.includes('before-v4'))!;
   const backup = new DatabaseSync(join(directory, backupName), { readOnly: true });
   expect(backup.prepare('PRAGMA user_version').get()?.user_version).toBe(3);
   backup.close();
+});
+it('rolls back index schema creation if initialization fails halfway', () => {
+  const { mainPath, indexPath } = fixture();
+  let index = new DatabaseSync(indexPath);
+  index.exec('CREATE VIEW chunks_fts AS SELECT 1 AS terms');
+  index.close();
+  expect(() => retrieve(mainPath, indexPath, '事务')).toThrow();
+  index = new DatabaseSync(indexPath);
+  try {
+    expect(
+      index.prepare("SELECT name FROM sqlite_master WHERE name = 'indexed_sources'").get(),
+    ).toBeUndefined();
+    expect(index.prepare('PRAGMA user_version').get()?.user_version).toBe(0);
+  } finally {
+    index.close();
+  }
 });

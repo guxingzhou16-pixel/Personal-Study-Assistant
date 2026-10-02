@@ -2,7 +2,7 @@ import { mkdtempSync, rmSync } from 'node:fs';
 import { join } from 'node:path';
 import { tmpdir } from 'node:os';
 import { EventEmitter } from 'node:events';
-import { expect, it } from 'vitest';
+import { expect, it, vi } from 'vitest';
 import { Storage } from './storage';
 import { SearchService } from './search';
 import type { EvidencePreview } from '../../src/lib/types';
@@ -86,6 +86,18 @@ it('holds evidence on the server, rejects changed/expired questions, and validat
     await expect(
       search.resolveCitation('bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb', '1'),
     ).rejects.toThrow('引用');
+    const clock = vi.spyOn(Date, 'now').mockReturnValue(Date.now() + 600_001);
+    try {
+      expect(() => search.consume(preview.id, '事务')).toThrow('重新检索');
+    } finally {
+      clock.mockRestore();
+    }
+    const altered = search.prepare('事务', null, () => {});
+    worker.emit('message', {
+      type: 'result',
+      result: { ...preview, hits: [{ ...preview.hits[0], sourceName: '伪造资料.pdf', page: 99 }] },
+    });
+    await expect(altered).rejects.toThrow('引用');
   } finally {
     search.cancel();
     storage.close();
