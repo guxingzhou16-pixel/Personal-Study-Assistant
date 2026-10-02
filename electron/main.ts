@@ -5,6 +5,7 @@ import {
   dialog,
   ipcMain,
   Menu,
+  net,
   powerMonitor,
   safeStorage,
   utilityProcess,
@@ -22,6 +23,7 @@ import { StudyTracker } from './core/study';
 import { StudyStorage } from './core/study-storage';
 import { ChatService } from './core/chat';
 import { SearchService } from './core/search';
+import { EmbeddingFiles } from './core/embedding-files';
 
 app.setName('StudyCompanion');
 const testDataDir = !app.isPackaged ? process.env.STUDY_COMPANION_DATA_DIR : undefined;
@@ -45,6 +47,7 @@ let documents: Documents | undefined;
 let study: StudyTracker | undefined;
 let chat: ChatService | undefined;
 let search: SearchService | undefined;
+let embeddingFiles: EmbeddingFiles | undefined;
 let studyHeartbeat: ReturnType<typeof setInterval> | undefined;
 
 function isRendererUrl(url: string | undefined): boolean {
@@ -64,6 +67,10 @@ function registerHandlers(database: Storage, credentials: Credentials, tracker: 
       }),
   );
   documents = files;
+  const embeddings = new EmbeddingFiles(join(dataDir, 'embedding-models'), (url, options) =>
+    net.fetch(url, options),
+  );
+  embeddingFiles = embeddings;
   const retrieval = new SearchService(
     database,
     dataDir,
@@ -72,9 +79,10 @@ function registerHandlers(database: Storage, credentials: Credentials, tracker: 
       utilityProcess.fork(modulePath, args, {
         stdio: 'ignore',
         serviceName: 'Study source retrieval',
-        execArgv: ['--max-old-space-size=256'],
+        execArgv: ['--max-old-space-size=512'],
       }),
     (id) => files.verify(id),
+    () => embeddings.candidatePath(),
   );
   search = retrieval;
   const chats = new ChatService(
@@ -171,6 +179,17 @@ function registerHandlers(database: Storage, credentials: Credentials, tracker: 
   handle('study:cancel-retrieval', () => retrieval.cancel());
   handle('study:rebuild-index', () => retrieval.rebuild(retrievalProgress));
   handle('study:resolve-citation', (turnId, number) => retrieval.resolveCitation(turnId, number));
+  handle('study:embedding-status', () => embeddings.status());
+  handle('study:cancel-embedding-download', () => embeddings.cancel());
+  handle('study:download-embedding', () => {
+    let lastProgress = 0;
+    return embeddings.install((progress) => {
+      if (Date.now() - lastProgress < 100 && progress.current !== progress.total) return;
+      lastProgress = Date.now();
+      if (window && !window.isDestroyed() && !window.webContents.isDestroyed())
+        window.webContents.send('study:embedding-progress', progress);
+    });
+  });
 }
 
 function createWindow() {
@@ -255,6 +274,7 @@ else {
     });
   app.on('window-all-closed', () => app.quit());
   app.on('will-quit', () => {
+    embeddingFiles?.cancel();
     search?.cancel();
     chat?.close();
     documents?.cancel();

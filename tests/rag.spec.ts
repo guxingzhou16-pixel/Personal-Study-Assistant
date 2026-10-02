@@ -117,7 +117,7 @@ test('desktop retrieves source evidence, answers with citations, opens original 
       hits: [expect.objectContaining({ page: 2 })],
     });
     await page.getByRole('button', { name: '重建检索索引', exact: true }).click();
-    await expect(page.getByText('检索索引已重建。', { exact: true })).toBeVisible();
+    await expect(page.getByText(/^检索索引已重建。/)).toBeVisible();
     await page.setViewportSize({ width: 900, height: 640 });
     await expect(page.getByRole('textbox', { name: '输入学习问题' })).toBeInViewport();
     await page.screenshot({ path: 'artifacts/rag-desktop.png', fullPage: true });

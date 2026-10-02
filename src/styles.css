@@ -2123,6 +2123,16 @@ select:hover {
     display: none;
   }
 }
+.embedding-settings {
+  margin-top: 24px;
+}
+.embedding-settings > p {
+  line-height: 1.7;
+}
+.embedding-settings progress {
+  width: 100%;
+  accent-color: var(--accent);
+}
 @media (prefers-reduced-motion: reduce) {
   * {
     animation: none !important;

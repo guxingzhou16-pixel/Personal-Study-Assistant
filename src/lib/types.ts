@@ -197,9 +197,13 @@ export interface DesktopApi {
   onChatUpdate(listener: (turn: ChatTurn) => void): () => void;
   prepareQuestion(question: string, sourceId: string | null): Promise<EvidencePreview>;
   cancelRetrieval(): Promise<void>;
-  rebuildIndex(): Promise<void>;
+  rebuildIndex(): Promise<string>;
   onRetrievalProgress(listener: (progress: RetrievalProgress) => void): () => void;
   resolveCitation(turnId: string, number: number): Promise<CitationTarget>;
+  embeddingStatus(): Promise<EmbeddingStatus>;
+  downloadEmbedding(): Promise<EmbeddingStatus>;
+  cancelEmbeddingDownload(): Promise<void>;
+  onEmbeddingProgress(listener: (progress: RetrievalProgress) => void): () => void;
 }
 
 declare global {

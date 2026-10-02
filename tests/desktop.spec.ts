@@ -120,6 +120,10 @@ test('desktop navigation, persistent preferences, encrypted keys and model check
       'rebuildIndex',
       'onRetrievalProgress',
       'resolveCitation',
+      'embeddingStatus',
+      'downloadEmbedding',
+      'cancelEmbeddingDownload',
+      'onEmbeddingProgress',
     ]);
     await page.getByRole('button', { name: '删除密钥' }).click();
     await expect(page.getByText('此地址未保存密钥', { exact: true })).toBeVisible();

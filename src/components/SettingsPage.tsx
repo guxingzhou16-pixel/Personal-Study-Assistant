@@ -12,6 +12,7 @@ import {
 } from 'lucide-react';
 import { desktop, errorMessage, isDesktop, sameEndpoint } from '../lib/desktop';
 import type { Bootstrap, ConnectionReport, Provider, Settings } from '../lib/types';
+import { EmbeddingSettings } from './EmbeddingSettings';
 
 interface Props {
   boot: Bootstrap;
@@ -374,6 +375,7 @@ export function SettingsPage({ boot, onSaved }: Props) {
           </div>
         </fieldset>
       </form>
+      <EmbeddingSettings />
       <div className="storage-details">
         <h3>
           <HardDrive size={15} />

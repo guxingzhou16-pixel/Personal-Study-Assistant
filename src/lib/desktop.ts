@@ -35,6 +35,10 @@ export const desktop: DesktopApi = {
   rebuildIndex: () => api().rebuildIndex(),
   onRetrievalProgress: (listener) => api().onRetrievalProgress(listener),
   resolveCitation: (turnId, number) => api().resolveCitation(turnId, number),
+  embeddingStatus: () => api().embeddingStatus(),
+  downloadEmbedding: () => api().downloadEmbedding(),
+  cancelEmbeddingDownload: () => api().cancelEmbeddingDownload(),
+  onEmbeddingProgress: (listener) => api().onEmbeddingProgress(listener),
 };
 
 export function errorMessage(error: unknown): string {

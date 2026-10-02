@@ -205,8 +205,8 @@ export function ChatPage({
     followOutput.current = true;
     try {
       if (rebuild) {
-        await desktop.rebuildIndex();
-        if (version === searchVersion.current) setIndexNotice('检索索引已重建。');
+        const notice = await desktop.rebuildIndex();
+        if (version === searchVersion.current) setIndexNotice(`检索索引已重建。${notice}`);
       } else {
         const result = await desktop.prepareQuestion(question, scope || null);
         if (version === searchVersion.current) setPreview(result);

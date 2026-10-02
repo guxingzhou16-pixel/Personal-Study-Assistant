@@ -18,6 +18,7 @@ import type {
   EvidencePreview,
   RetrievalProgress,
   CitationTarget,
+  EmbeddingStatus,
 } from '../src/lib/types';
 
 async function call<T>(channel: string, ...args: unknown[]): Promise<T> {
@@ -66,7 +67,7 @@ const api: DesktopApi = {
   prepareQuestion: (question, sourceId) =>
     call<EvidencePreview>('study:prepare-question', question, sourceId),
   cancelRetrieval: () => call<void>('study:cancel-retrieval'),
-  rebuildIndex: () => call<void>('study:rebuild-index'),
+  rebuildIndex: () => call<string>('study:rebuild-index'),
   onRetrievalProgress: (listener) => {
     const receive = (_event: Electron.IpcRendererEvent, progress: RetrievalProgress) =>
       listener(progress);
@@ -75,5 +76,14 @@ const api: DesktopApi = {
   },
   resolveCitation: (turnId, number) =>
     call<CitationTarget>('study:resolve-citation', turnId, number),
+  embeddingStatus: () => call<EmbeddingStatus>('study:embedding-status'),
+  downloadEmbedding: () => call<EmbeddingStatus>('study:download-embedding'),
+  cancelEmbeddingDownload: () => call<void>('study:cancel-embedding-download'),
+  onEmbeddingProgress: (listener) => {
+    const receive = (_event: Electron.IpcRendererEvent, progress: RetrievalProgress) =>
+      listener(progress);
+    ipcRenderer.on('study:embedding-progress', receive);
+    return () => ipcRenderer.removeListener('study:embedding-progress', receive);
+  },
 };
 contextBridge.exposeInMainWorld('studyCompanion', api);
