@@ -62,3 +62,5 @@ export const vectorPolicy = {
   reciprocalRankConstant: 60,
   maximumHits: 4,
 };
+
+export const embeddingDownloadTimeoutMs = 15 * 60_000;

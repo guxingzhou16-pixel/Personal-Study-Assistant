@@ -3,7 +3,7 @@ import { createReadStream, statSync } from 'node:fs';
 import { mkdir, mkdtemp, open, rename, rm, stat } from 'node:fs/promises';
 import { dirname, join } from 'node:path';
 import type { EmbeddingStatus, RetrievalProgress } from '../../src/lib/types';
-import { embeddingModel, type EmbeddingModel } from './embedding-model';
+import { embeddingModel, embeddingDownloadTimeoutMs, type EmbeddingModel } from './embedding-model';
 import { AppError } from './errors';
 
 type Download = (url: string, options?: RequestInit) => Promise<Response>;
@@ -86,7 +86,10 @@ export class EmbeddingFiles {
     if (this.active) throw new AppError('embeddingBusy', '检索模型正在下载，请先等待或取消。');
     const controller = new AbortController();
     this.active = controller;
-    const signal = AbortSignal.any([controller.signal, AbortSignal.timeout(300_000)]);
+    const signal = AbortSignal.any([
+      controller.signal,
+      AbortSignal.timeout(embeddingDownloadTimeoutMs),
+    ]);
     let staged: string | undefined;
     try {
       await mkdir(this.directory, { recursive: true });
@@ -152,15 +155,21 @@ export class EmbeddingFiles {
       if (controller.signal.aborted)
         throw new AppError('cancelled', '已取消模型下载，关键词检索仍可用。');
       if (signal.aborted)
-        throw new AppError('embeddingTimeout', '模型下载超过 5 分钟，请检查网络后重试。');
+        throw new AppError(
+          'embeddingTimeout',
+          `模型下载超过 ${embeddingDownloadTimeoutMs / 60_000} 分钟，请检查网络后重试。`,
+        );
       if (error instanceof AppError) throw error;
       throw new AppError(
         'embeddingDownload',
         '无法下载或保存模型，请检查网络、磁盘空间与目录权限。',
       );
     } finally {
-      if (staged) await rm(staged, { recursive: true, force: true });
-      this.active = undefined;
+      try {
+        if (staged) await rm(staged, { recursive: true, force: true });
+      } finally {
+        this.active = undefined;
+      }
     }
     return this.status();
   }
