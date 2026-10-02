@@ -12,23 +12,36 @@ test('desktop retrieves source evidence, answers with citations, opens original 
   mkdirSync(join(directory, 'originals'));
   const files = await createReadingFiles(join(directory, 'originals'));
   const chinese = join(directory, 'originals', '数据库.md');
-  writeFileSync(chinese, '# 数据库学习\n\n入门内容。\n\n## 事务隔离\n\n事务隔离避免脏读。事务由 BEGIN 开始，COMMIT 提交。\n\n## 原文位置\n\n这是另一个章节。');
+  writeFileSync(
+    chinese,
+    '# 数据库学习\n\n入门内容。\n\n## 事务隔离\n\n事务隔离避免脏读。事务由 BEGIN 开始，COMMIT 提交。\n\n## 原文位置\n\n这是另一个章节。',
+  );
   let calls = 0;
   let sentEvidence = '';
   const server = createServer(async (request, response) => {
-    let body = ''; for await (const chunk of request) body += chunk;
+    let body = '';
+    for await (const chunk of request) body += chunk;
     calls++;
     const messages = JSON.parse(body).messages;
     sentEvidence = messages[1].content;
     response.write(JSON.stringify({ message: { content: '根据原文，' }, done: false }) + '\n');
-    setTimeout(() => response.end(JSON.stringify({ message: { content: '可以据此理解。[1]' }, done: true }) + '\n'), 150);
+    setTimeout(
+      () =>
+        response.end(
+          JSON.stringify({ message: { content: '可以据此理解。[1]' }, done: true }) + '\n',
+        ),
+      150,
+    );
   });
   await new Promise<void>((resolve) => server.listen(0, '127.0.0.1', resolve));
   const baseUrl = `http://127.0.0.1:${(server.address() as AddressInfo).port}`;
   let application: ElectronApplication | undefined;
   async function launch() {
     const { ELECTRON_RUN_AS_NODE: _ignored, ...env } = process.env;
-    application = await electron.launch({ args: ['.'], env: { ...env, STUDY_COMPANION_DATA_DIR: join(directory, 'data') } });
+    application = await electron.launch({
+      args: ['.'],
+      env: { ...env, STUDY_COMPANION_DATA_DIR: join(directory, 'data') },
+    });
     return application.firstWindow();
   }
   try {
@@ -36,10 +49,18 @@ test('desktop retrieves source evidence, answers with citations, opens original 
     await expect(page.getByRole('heading', { name: '开始今天的小进步' })).toBeVisible();
     await page.evaluate(async (endpoint) => {
       const { settings } = await window.studyCompanion!.bootstrap();
-      await window.studyCompanion!.saveSettings({ ...settings, ollama: { baseUrl: endpoint, model: 'rag-test' } });
+      await window.studyCompanion!.saveSettings({
+        ...settings,
+        ollama: { baseUrl: endpoint, model: 'rag-test' },
+      });
     }, baseUrl);
     await page.reload();
-    await application!.evaluate(({ dialog }, paths) => { dialog.showOpenDialog = async () => ({ canceled: false, filePaths: paths }); }, [chinese, files.pdf, files.scan]);
+    await application!.evaluate(
+      ({ dialog }, paths) => {
+        dialog.showOpenDialog = async () => ({ canceled: false, filePaths: paths });
+      },
+      [chinese, files.pdf, files.scan],
+    );
     await page.getByRole('button', { name: '资料库', exact: true }).click();
     await page.getByRole('button', { name: '导入资料', exact: true }).click();
     await expect(page.getByRole('button', { name: '阅读 数据库', exact: true })).toBeVisible();
@@ -49,7 +70,7 @@ test('desktop retrieves source evidence, answers with citations, opens original 
     await expect(page.getByRole('combobox', { name: '问答方式' })).toHaveValue('sources');
     await page.getByRole('textbox', { name: '输入学习问题' }).fill('什么是事务隔离？');
     await page.getByRole('button', { name: '检索原文', exact: true }).click();
-    await expect(page.getByText('事务隔离避免脏读。', { exact: false }).last()).toBeVisible();
+    await expect(page.locator('.evidence-preview summary')).toContainText('事务隔离避免脏读。');
     expect(calls).toBe(0);
     await page.getByRole('button', { name: '发送问题', exact: true }).click();
     await expect(page.getByTestId('chat-answer').last()).toContainText('可以据此理解。');
@@ -86,7 +107,8 @@ test('desktop retrieves source evidence, answers with citations, opens original 
     await expect(page.getByRole('textbox', { name: '输入学习问题' })).toBeInViewport();
     await page.screenshot({ path: 'artifacts/rag-desktop.png', fullPage: true });
   } finally {
-    await application?.close(); server.closeAllConnections();
+    await application?.close();
+    server.closeAllConnections();
     await new Promise<void>((resolve) => server.close(() => resolve()));
     rmSync(directory, { recursive: true, force: true });
   }

@@ -3,7 +3,17 @@ import { MessageCircle, Plus, Send, Square, Settings2 } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { desktop, errorMessage, isDesktop } from '../lib/desktop';
-import type { ChatTurn, Conversation, ConversationSummary, Settings } from '../lib/types';
+import type {
+  ChatTurn,
+  Conversation,
+  ConversationSummary,
+  Settings,
+  Source,
+  EvidencePreview,
+  RetrievalProgress,
+} from '../lib/types';
+import { EvidenceCards } from './EvidenceCards';
+import { citationNumber, remarkEvidence } from '../lib/citations';
 
 function withTurn(conversation: Conversation, turn: ChatTurn): Conversation {
   const existing = conversation.turns.find((item) => item.id === turn.id);
@@ -28,10 +38,14 @@ export function ChatPage({
   settings,
   onSettings,
   visible,
+  presetSource,
+  onOpenCitation,
 }: {
   settings: Settings;
   onSettings: () => void;
   visible: boolean;
+  presetSource: { id: string; sequence: number } | null;
+  onOpenCitation: (turnId: string, number: number) => Promise<void>;
 }) {
   const [conversations, setConversations] = useState<ConversationSummary[]>([]);
   const [conversation, setConversation] = useState<Conversation | null>(null);
@@ -40,6 +54,14 @@ export function ChatPage({
   const [error, setError] = useState('');
   const [busy, setBusy] = useState(false);
   const [loaded, setLoaded] = useState(false);
+  const [mode, setMode] = useState<'chat' | 'sources'>('chat');
+  const [scope, setScope] = useState('');
+  const [sources, setSources] = useState<Source[]>([]);
+  const [preview, setPreview] = useState<EvidencePreview | null>(null);
+  const [searching, setSearching] = useState(false);
+  const [progress, setProgress] = useState<RetrievalProgress | null>(null);
+  const [indexNotice, setIndexNotice] = useState('');
+  const searchVersion = useRef(0);
   const [consentProfile, setConsentProfile] = useState<string | null>(null);
   const lastUpdate = useRef<ChatTurn | null>(null);
   const loadVersion = useRef(0);
@@ -47,7 +69,13 @@ export function ChatPage({
   const followOutput = useRef(true);
   const profile = settings[settings.provider];
   const signature = `${settings.provider}|${profile.baseUrl}|${profile.model}`;
-  const consent = consentProfile === signature;
+  const consentSignature = `${signature}|${mode}|${mode === 'sources' ? (preview?.id ?? '') : ''}`;
+  const consent = consentProfile === consentSignature;
+  const needsModel = mode === 'chat' || Boolean(preview?.hits.length);
+  const previewValid =
+    preview !== null &&
+    preview.question === question.trim() &&
+    preview.sourceId === (scope || null);
   const remote = !['localhost', '127.0.0.1', '[::1]'].includes(new URL(profile.baseUrl).hostname);
   const applyTurn = useCallback((turn: ChatTurn) => {
     if (lastUpdate.current?.id === turn.id && lastUpdate.current.revision > turn.revision) return;
@@ -130,9 +158,20 @@ export function ChatPage({
   useEffect(() => {
     if (visible && followOutput.current && transcript.current)
       transcript.current.scrollTop = transcript.current.scrollHeight;
-  }, [conversation, visible]);
+  }, [conversation, preview, visible]);
+  useEffect(() => {
+    if (visible && isDesktop)
+      void desktop
+        .listSources()
+        .then(setSources)
+        .catch((failure) => setError(errorMessage(failure)));
+  }, [visible]);
+  useEffect(() => {
+    if (!isDesktop) return;
+    return desktop.onRetrievalProgress(setProgress);
+  }, []);
 
-  async function newConversation() {
+  const newConversation = useCallback(async () => {
     setBusy(true);
     setError('');
     loadVersion.current++;
@@ -140,6 +179,7 @@ export function ChatPage({
       const created = await desktop.createConversation();
       setConversation(created);
       setQuestion('');
+      setPreview(null);
       followOutput.current = true;
       await refresh();
     } catch (failure) {
@@ -147,9 +187,60 @@ export function ChatPage({
     } finally {
       setBusy(false);
     }
+  }, [refresh]);
+  useEffect(() => {
+    if (!presetSource) return;
+    setMode('sources');
+    setScope(presetSource.id);
+    setPreview(null);
+    void newConversation();
+  }, [presetSource, newConversation]);
+  async function retrieve(rebuild = false) {
+    const version = ++searchVersion.current;
+    setSearching(true);
+    setError('');
+    setPreview(null);
+    setProgress(null);
+    setIndexNotice('');
+    followOutput.current = true;
+    try {
+      if (rebuild) {
+        await desktop.rebuildIndex();
+        if (version === searchVersion.current) setIndexNotice('检索索引已重建。');
+      } else {
+        const result = await desktop.prepareQuestion(question, scope || null);
+        if (version === searchVersion.current) setPreview(result);
+      }
+    } catch (failure) {
+      if (version === searchVersion.current) setError(errorMessage(failure));
+    } finally {
+      if (version === searchVersion.current) {
+        setSearching(false);
+        setProgress(null);
+      }
+    }
+  }
+  async function cancelRetrieval() {
+    try {
+      await desktop.cancelRetrieval();
+    } catch (failure) {
+      setError(errorMessage(failure));
+    }
+  }
+  async function openEvidence(turnId: string, number: number) {
+    setError('');
+    try {
+      await onOpenCitation(turnId, number);
+    } catch (failure) {
+      setError(errorMessage(failure));
+    }
   }
   async function send() {
-    if (busy || active || !question.trim()) return;
+    if (busy || active || searching || !question.trim()) return;
+    if (mode === 'sources' && !previewValid) {
+      setError('请先检索当前问题的原文，再发送。');
+      return;
+    }
     setBusy(true);
     setError('');
     followOutput.current = true;
@@ -161,10 +252,12 @@ export function ChatPage({
         question,
         expectedProfile: signature,
         ...(remote && consent ? { consentEndpoint: profile.baseUrl } : {}),
+        ...(mode === 'sources' && preview ? { retrievalId: preview.id } : {}),
       });
       // The first stream event can arrive before the invoke reply; revision guards preserve it.
       applyTurn(turn);
       setQuestion('');
+      setPreview(null);
       const latest = await desktop.getConversation(current.id);
       setConversation((previous) => {
         let result = latest;
@@ -207,7 +300,9 @@ export function ChatPage({
         </button>
       </div>
       <p className="chat-scope">
-        普通聊天 · 尚未检索资料库。回答请结合原文核对，资料问答正在后续开发中。
+        {mode === 'sources'
+          ? '资料问答 · 先查看检索原文，再让拾知依据证据回答。每次问题独立检索，请写清具体概念。'
+          : '普通聊天 · 不检索资料库。回答请结合原文核对。'}
       </p>
       <div className="chat-workspace">
         <aside className="chat-history" aria-label="会话记录">
@@ -240,6 +335,53 @@ export function ChatPage({
             <span>{profile.model || '尚未选择模型'}</span>
             <small>{profile.baseUrl}</small>
           </div>
+          <div className="chat-retrieval-controls">
+            <label>
+              问答方式
+              <select
+                aria-label="问答方式"
+                value={mode}
+                disabled={searching}
+                onChange={(event) => {
+                  setMode(event.target.value as 'chat' | 'sources');
+                  setPreview(null);
+                }}
+              >
+                <option value="chat">普通聊天</option>
+                <option value="sources">资料问答</option>
+              </select>
+            </label>
+            {mode === 'sources' && (
+              <>
+                <label className="scope-select">
+                  资料范围
+                  <select
+                    aria-label="资料范围"
+                    value={scope}
+                    disabled={searching}
+                    onChange={(event) => {
+                      setScope(event.target.value);
+                      setPreview(null);
+                    }}
+                  >
+                    <option value="">全部已导入资料</option>
+                    {sources.map((source) => (
+                      <option key={source.id} value={source.id}>
+                        {source.name}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+                <button
+                  className="text-button"
+                  disabled={!isDesktop || searching || busy}
+                  onClick={() => void retrieve(true)}
+                >
+                  重建检索索引
+                </button>
+              </>
+            )}
+          </div>
           <div
             className="chat-transcript"
             ref={transcript}
@@ -271,13 +413,36 @@ export function ChatPage({
                   <p>{turn.question}</p>
                 </div>
                 <div className="chat-response">
-                  <span>拾知 · {turn.model}</span>
+                  <span>
+                    拾知 · {turn.mode === 'sources' ? '资料问答' : '普通聊天'} ·{' '}
+                    {turn.model || '未调用模型'}
+                  </span>
                   <div className="chat-answer" data-testid="chat-answer">
                     <ReactMarkdown
-                      remarkPlugins={[remarkGfm]}
+                      remarkPlugins={
+                        turn.mode === 'sources' ? [remarkGfm, remarkEvidence] : [remarkGfm]
+                      }
                       skipHtml
-                      urlTransform={() => ''}
-                      components={{ img: () => null, a: ({ children }) => <span>{children}</span> }}
+                      urlTransform={(url) =>
+                        citationNumber(url, turn.evidence) !== null ? url : ''
+                      }
+                      components={{
+                        img: () => null,
+                        a: ({ href, children }) => {
+                          const number = citationNumber(href, turn.evidence);
+                          return number === null ? (
+                            <span>{children}</span>
+                          ) : (
+                            <button
+                              className="citation-link"
+                              aria-label={`引用 ${number}`}
+                              onClick={() => void openEvidence(turn.id, number)}
+                            >
+                              {children}
+                            </button>
+                          );
+                        },
+                      }}
                     >
                       {turn.answer ||
                         (turn.status === 'streaming' ? '正在等待模型回应…' : '本次没有收到回答。')}
@@ -291,9 +456,27 @@ export function ChatPage({
                       {turn.notice}
                     </p>
                   )}
+                  {turn.evidence.length > 0 && (
+                    <EvidenceCards
+                      hits={turn.evidence}
+                      onOpen={(number) => void openEvidence(turn.id, number)}
+                    />
+                  )}
                 </div>
               </article>
             ))}
+            {preview && previewValid && (
+              <div className="evidence-preview" role="region" aria-label="本次检索证据">
+                <h2>本次检索原文</h2>
+                <p>
+                  {preview.hits.length
+                    ? `从 ${preview.sourceCount} 份资料范围中找到 ${preview.hits.length} 个片段。发送后只携带下列原文。`
+                    : '没有找到匹配的原文'}
+                </p>
+                <EvidenceCards hits={preview.hits} />
+                <p className="evidence-note">{preview.notice}</p>
+              </div>
+            )}
           </div>
           <form
             className="chat-composer"
@@ -308,14 +491,34 @@ export function ChatPage({
               </p>
             )}
             {!isDesktop && <p className="chat-error">请启动桌面版以保存会话并连接模型。</p>}
-            {remote && (
+            {indexNotice && (
+              <p className="chat-index-notice" role="status">
+                {indexNotice}
+              </p>
+            )}
+            {searching && (
+              <div className="chat-index-progress" role="status">
+                <span>{progress?.message ?? '正在准备索引和检索原文…'}</span>
+                <button
+                  type="button"
+                  className="text-button"
+                  onClick={() => void cancelRetrieval()}
+                >
+                  取消检索
+                </button>
+              </div>
+            )}
+            {remote && needsModel && (
               <label className="chat-consent">
                 <input
                   type="checkbox"
                   checked={consent}
-                  onChange={(event) => setConsentProfile(event.target.checked ? signature : null)}
+                  onChange={(event) =>
+                    setConsentProfile(event.target.checked ? consentSignature : null)
+                  }
                 />
-                允许将问题及近期完整对话发送至 {profile.baseUrl}；服务费用由我承担。
+                允许将{mode === 'sources' ? '问题及本次预览的原文' : '问题及近期完整对话'}发送至{' '}
+                {profile.baseUrl}；服务费用由我承担。
               </label>
             )}
             {active && active.conversationId !== conversation?.id && (
@@ -335,7 +538,11 @@ export function ChatPage({
               value={question}
               maxLength={4000}
               placeholder="写下你想弄明白的问题…"
-              onChange={(event) => setQuestion(event.target.value)}
+              onChange={(event) => {
+                setQuestion(event.target.value);
+                setPreview(null);
+              }}
+              disabled={searching}
               onKeyDown={(event) => {
                 if (
                   (event.ctrlKey || event.metaKey) &&
@@ -343,12 +550,26 @@ export function ChatPage({
                   !event.nativeEvent.isComposing
                 ) {
                   event.preventDefault();
-                  if (!remote || consent) void send();
+                  if (!remote || !needsModel || consent) void send();
                 }
               }}
             />
             <div className="chat-actions">
-              <small>Ctrl + Enter 发送 · 仅携带最近 6 轮完整回答，超长历史会截断</small>
+              <small>
+                {mode === 'sources'
+                  ? '先检索原文，Ctrl + Enter 发送 · 引用编号可打开出处'
+                  : 'Ctrl + Enter 发送 · 仅携带最近 6 轮完整回答，超长历史会截断'}
+              </small>
+              {mode === 'sources' && (
+                <button
+                  type="button"
+                  className="button secondary"
+                  disabled={!isDesktop || searching || busy || !question.trim()}
+                  onClick={() => void retrieve()}
+                >
+                  检索原文
+                </button>
+              )}
               {active ? (
                 <button
                   className="button secondary"
@@ -367,9 +588,11 @@ export function ChatPage({
                     !isDesktop ||
                     !loaded ||
                     busy ||
-                    !profile.model ||
+                    searching ||
+                    (needsModel && !profile.model) ||
                     !question.trim() ||
-                    (remote && !consent)
+                    (mode === 'sources' && !previewValid) ||
+                    (remote && needsModel && !consent)
                   }
                 >
                   <Send size={15} />

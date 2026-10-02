@@ -24,7 +24,7 @@ import { RecentReadings } from './components/RecentReadings';
 import { StudyCalendar } from './components/StudyCalendar';
 import { ChatPage } from './components/ChatPage';
 import { desktop, errorMessage, isDesktop } from './lib/desktop';
-import { defaultSettings, type Bootstrap, type Settings } from './lib/types';
+import { defaultSettings, type Bootstrap, type Settings, type CitationTarget } from './lib/types';
 
 type Page = 'home' | 'library' | 'chat' | 'settings';
 const pageLabels: Record<Page, string> = {
@@ -38,6 +38,11 @@ export default function App() {
   const mainRef = useRef<HTMLElement>(null);
   const [page, setPage] = useState<Page>('home');
   const [sourceId, setSourceId] = useState<string | null>(null);
+  const [citationTarget, setCitationTarget] = useState<CitationTarget | null>(null);
+  const [readerReturn, setReaderReturn] = useState<'library' | 'chat'>('library');
+  const [questionSource, setQuestionSource] = useState<{ id: string; sequence: number } | null>(
+    null,
+  );
   const [boot, setBoot] = useState<Bootstrap | null>(null);
   const [failure, setFailure] = useState<string | null>(null);
   const [attempt, setAttempt] = useState(0);
@@ -72,11 +77,26 @@ export default function App() {
   }
   function navigate(next: Page) {
     setSourceId(null);
+    setCitationTarget(null);
     setPage(next);
   }
   function openSource(id: string) {
+    setCitationTarget(null);
+    setReaderReturn('library');
     setSourceId(id);
     setPage('library');
+  }
+  async function openCitation(turnId: string, number: number) {
+    const target = await desktop.resolveCitation(turnId, number);
+    setCitationTarget(target);
+    setSourceId(target.sourceId);
+    setReaderReturn('chat');
+    setPage('library');
+  }
+  function askSource() {
+    if (!sourceId) return;
+    setQuestionSource((previous) => ({ id: sourceId, sequence: (previous?.sequence ?? 0) + 1 }));
+    navigate('chat');
   }
 
   const settings = boot?.settings ?? defaultSettings;
@@ -278,7 +298,14 @@ export default function App() {
             <LibraryPage onOpen={openSource} />
           )}
           {boot && !failure && sourceId && (
-            <ReadingPage key={sourceId} id={sourceId} onBack={() => setSourceId(null)} />
+            <ReadingPage
+              key={`${sourceId}:${citationTarget?.anchor ?? ''}`}
+              id={sourceId}
+              target={citationTarget ?? undefined}
+              onBack={() => navigate(readerReturn)}
+              backLabel={readerReturn === 'chat' ? '返回问答' : '返回资料库'}
+              onAsk={askSource}
+            />
           )}
           {boot && !failure && page === 'settings' && (
             <SettingsPage boot={boot} onSaved={onSaved} />
@@ -289,6 +316,8 @@ export default function App() {
                 settings={settings}
                 onSettings={() => navigate('settings')}
                 visible={page === 'chat'}
+                presetSource={questionSource}
+                onOpenCitation={openCitation}
               />
             </div>
           )}

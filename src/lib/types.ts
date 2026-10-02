@@ -187,6 +187,11 @@ export interface DesktopApi {
   stopChat(id: string): Promise<void>;
   activeChat(): Promise<ChatTurn | null>;
   onChatUpdate(listener: (turn: ChatTurn) => void): () => void;
+  prepareQuestion(question: string, sourceId: string | null): Promise<EvidencePreview>;
+  cancelRetrieval(): Promise<void>;
+  rebuildIndex(): Promise<void>;
+  onRetrievalProgress(listener: (progress: RetrievalProgress) => void): () => void;
+  resolveCitation(turnId: string, number: number): Promise<CitationTarget>;
 }
 
 declare global {

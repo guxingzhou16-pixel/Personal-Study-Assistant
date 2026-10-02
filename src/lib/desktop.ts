@@ -30,6 +30,11 @@ export const desktop: DesktopApi = {
   stopChat: (id) => api().stopChat(id),
   activeChat: () => api().activeChat(),
   onChatUpdate: (listener) => api().onChatUpdate(listener),
+  prepareQuestion: (question, sourceId) => api().prepareQuestion(question, sourceId),
+  cancelRetrieval: () => api().cancelRetrieval(),
+  rebuildIndex: () => api().rebuildIndex(),
+  onRetrievalProgress: (listener) => api().onRetrievalProgress(listener),
+  resolveCitation: (turnId, number) => api().resolveCitation(turnId, number),
 };
 
 export function errorMessage(error: unknown): string {

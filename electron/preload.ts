@@ -15,6 +15,9 @@ import type {
   ConversationSummary,
   Conversation,
   ChatTurn,
+  EvidencePreview,
+  RetrievalProgress,
+  CitationTarget,
 } from '../src/lib/types';
 
 async function call<T>(channel: string, ...args: unknown[]): Promise<T> {
@@ -60,5 +63,17 @@ const api: DesktopApi = {
     ipcRenderer.on('study:chat-update', receive);
     return () => ipcRenderer.removeListener('study:chat-update', receive);
   },
+  prepareQuestion: (question, sourceId) =>
+    call<EvidencePreview>('study:prepare-question', question, sourceId),
+  cancelRetrieval: () => call<void>('study:cancel-retrieval'),
+  rebuildIndex: () => call<void>('study:rebuild-index'),
+  onRetrievalProgress: (listener) => {
+    const receive = (_event: Electron.IpcRendererEvent, progress: RetrievalProgress) =>
+      listener(progress);
+    ipcRenderer.on('study:retrieval-progress', receive);
+    return () => ipcRenderer.removeListener('study:retrieval-progress', receive);
+  },
+  resolveCitation: (turnId, number) =>
+    call<CitationTarget>('study:resolve-citation', turnId, number),
 };
 contextBridge.exposeInMainWorld('studyCompanion', api);

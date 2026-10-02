@@ -21,6 +21,7 @@ import { string, validateProfile, validateProvider } from './core/settings';
 import { StudyTracker } from './core/study';
 import { StudyStorage } from './core/study-storage';
 import { ChatService } from './core/chat';
+import { SearchService } from './core/search';
 
 app.setName('StudyCompanion');
 const testDataDir = !app.isPackaged ? process.env.STUDY_COMPANION_DATA_DIR : undefined;
@@ -43,6 +44,7 @@ let storage: Storage | undefined;
 let documents: Documents | undefined;
 let study: StudyTracker | undefined;
 let chat: ChatService | undefined;
+let search: SearchService | undefined;
 let studyHeartbeat: ReturnType<typeof setInterval> | undefined;
 
 function isRendererUrl(url: string | undefined): boolean {
@@ -62,10 +64,29 @@ function registerHandlers(database: Storage, credentials: Credentials, tracker: 
       }),
   );
   documents = files;
-  const chats = new ChatService(database, credentials, (turn) => {
-    if (window && !window.isDestroyed() && !window.webContents.isDestroyed())
-      window.webContents.send('study:chat-update', turn);
-  });
+  const retrieval = new SearchService(
+    database,
+    dataDir,
+    join(__dirname, 'search-worker.mjs'),
+    (modulePath, args) =>
+      utilityProcess.fork(modulePath, args, {
+        stdio: 'ignore',
+        serviceName: 'Study source retrieval',
+        execArgv: ['--max-old-space-size=256'],
+      }),
+    (id) => files.verify(id),
+  );
+  search = retrieval;
+  const chats = new ChatService(
+    database,
+    credentials,
+    (turn) => {
+      if (window && !window.isDestroyed() && !window.webContents.isDestroyed())
+        window.webContents.send('study:chat-update', turn);
+    },
+    undefined,
+    retrieval,
+  );
   chat = chats;
   function handle(channel: string, work: (...args: unknown[]) => unknown) {
     ipcMain.handle(channel, async (event, ...args: unknown[]) => {
@@ -140,6 +161,16 @@ function registerHandlers(database: Storage, credentials: Credentials, tracker: 
   handle('study:send-chat', (request) => chats.send(request));
   handle('study:stop-chat', (id) => chats.stop(id));
   handle('study:active-chat', () => chats.current());
+  const retrievalProgress = (progress: import('../src/lib/types').RetrievalProgress) => {
+    if (window && !window.isDestroyed() && !window.webContents.isDestroyed())
+      window.webContents.send('study:retrieval-progress', progress);
+  };
+  handle('study:prepare-question', (question, id) =>
+    retrieval.prepare(question, id, retrievalProgress),
+  );
+  handle('study:cancel-retrieval', () => retrieval.cancel());
+  handle('study:rebuild-index', () => retrieval.rebuild(retrievalProgress));
+  handle('study:resolve-citation', (turnId, number) => retrieval.resolveCitation(turnId, number));
 }
 
 function createWindow() {
@@ -224,6 +255,7 @@ else {
     });
   app.on('window-all-closed', () => app.quit());
   app.on('will-quit', () => {
+    search?.cancel();
     chat?.close();
     documents?.cancel();
     clearInterval(studyHeartbeat);

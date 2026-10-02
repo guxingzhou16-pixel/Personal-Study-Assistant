@@ -10,9 +10,10 @@ import {
   List,
   LoaderCircle,
   Sun,
+  MessageCircle,
 } from 'lucide-react';
 import { desktop, errorMessage } from '../lib/desktop';
-import type { OpenDocument, ReadingPosition } from '../lib/types';
+import type { OpenDocument, ReadingPosition, CitationTarget } from '../lib/types';
 import { PdfPage } from './PdfPage';
 
 function heading(level: number) {
@@ -40,7 +41,19 @@ const headingComponents = {
   h6: heading(6),
 };
 
-export function ReadingPage({ id, onBack }: { id: string; onBack: () => void }) {
+export function ReadingPage({
+  id,
+  onBack,
+  target,
+  backLabel = '返回资料库',
+  onAsk,
+}: {
+  id: string;
+  onBack: () => void;
+  target?: CitationTarget;
+  backLabel?: string;
+  onAsk: () => void;
+}) {
   const [document, setDocument] = useState<OpenDocument | null>(null);
   const [position, setPosition] = useState<ReadingPosition>({
     page: 1,
@@ -92,6 +105,19 @@ export function ReadingPage({ id, onBack }: { id: string; onBack: () => void }) 
       .openSource(id)
       .then((value) => {
         if (!alive.current) return;
+        if (target)
+          value = {
+            ...value,
+            source: {
+              ...value.source,
+              position: {
+                ...value.source.position,
+                page: target.page,
+                anchor: target.anchor,
+                offset: 0,
+              },
+            },
+          };
         latest.current = value.source.position;
         setPosition(value.source.position);
         setDocument(value);
@@ -104,7 +130,7 @@ export function ReadingPage({ id, onBack }: { id: string; onBack: () => void }) 
       clearTimeout(timer.current);
       if (ready.current) void save(latest.current);
     };
-  }, [id, save]);
+  }, [id, save, target]);
   useEffect(() => {
     if (!document || !scroll.current) return;
     const root = scroll.current;
@@ -126,6 +152,15 @@ export function ReadingPage({ id, onBack }: { id: string; onBack: () => void }) 
       onBack();
     } catch {
       /* Keep the reader open with its save error so the user can retry. */
+    }
+  }
+  async function ask() {
+    clearTimeout(timer.current);
+    try {
+      if (ready.current) await save(latest.current);
+      onAsk();
+    } catch {
+      /* The reading-position save error remains visible. */
     }
   }
   function scrollPosition() {
@@ -200,7 +235,7 @@ export function ReadingPage({ id, onBack }: { id: string; onBack: () => void }) 
           <>
             <p>{error}</p>
             <button className="button secondary" onClick={onBack}>
-              返回资料库
+              {backLabel}
             </button>
           </>
         ) : (
@@ -218,7 +253,7 @@ export function ReadingPage({ id, onBack }: { id: string; onBack: () => void }) 
       aria-label={`阅读 ${source.name}`}
     >
       <header className="reader-header">
-        <button className="icon-button" aria-label="返回资料库" onClick={() => void back()}>
+        <button className="icon-button" aria-label={backLabel} onClick={() => void back()}>
           <ArrowLeft size={18} />
         </button>
         <div>
@@ -229,6 +264,10 @@ export function ReadingPage({ id, onBack }: { id: string; onBack: () => void }) 
           <Check size={13} />
           {saveState}
         </span>
+        <button className="button secondary reader-ask" onClick={() => void ask()}>
+          <MessageCircle size={16} />
+          问这份资料
+        </button>
       </header>
       <div className="reader-toolbar">
         <button className="toolbar-button" aria-pressed={toc} onClick={() => setToc(!toc)}>

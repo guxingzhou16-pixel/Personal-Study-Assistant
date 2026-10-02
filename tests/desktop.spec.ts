@@ -115,6 +115,11 @@ test('desktop navigation, persistent preferences, encrypted keys and model check
       'stopChat',
       'activeChat',
       'onChatUpdate',
+      'prepareQuestion',
+      'cancelRetrieval',
+      'rebuildIndex',
+      'onRetrievalProgress',
+      'resolveCitation',
     ]);
     await page.getByRole('button', { name: '删除密钥' }).click();
     await expect(page.getByText('此地址未保存密钥', { exact: true })).toBeVisible();
