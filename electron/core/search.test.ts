@@ -1,4 +1,4 @@
-import { mkdtempSync, rmSync } from 'node:fs';
+import { mkdtempSync, rmSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { tmpdir } from 'node:os';
 import { EventEmitter } from 'node:events';
@@ -163,6 +163,86 @@ it('rejects evidence when the source copy fails its integrity check', async () =
     };
     worker.emit('message', { type: 'result', result });
     await expect(pending).rejects.toThrow('source changed');
+  } finally {
+    search.cancel();
+    storage.close();
+    rmSync(directory, { recursive: true, force: true });
+  }
+});
+
+it('passes only the main-process model path and retries a crashed semantic worker with keywords', async () => {
+  const directory = mkdtempSync(join(tmpdir(), 'study-search-fallback-'));
+  const storage = new Storage(join(directory, 'main.sqlite3'));
+  const workers: (EventEmitter & { kill: () => boolean })[] = [];
+  const launch = vi.fn((_modulePath: string, _args: string[]) => {
+    const worker = Object.assign(new EventEmitter(), { kill: () => true });
+    workers.push(worker);
+    return worker;
+  });
+  const search = new SearchService(
+    storage,
+    directory,
+    'worker.mjs',
+    launch,
+    async () => {},
+    () => 'verified-local-model',
+  );
+  try {
+    const pending = search.prepare('事务', null, () => {});
+    void pending.catch(() => {});
+    expect(launch.mock.calls[0][1].at(-1)).toBe('verified-local-model');
+    workers[0].emit('exit', 1);
+    await vi.waitFor(() => expect(workers).toHaveLength(2));
+    expect(launch.mock.calls[1][1].at(-1)).toBe('');
+    workers[1].emit('message', {
+      type: 'result',
+      result: {
+        question: '事务',
+        sourceId: null,
+        sourceCount: 0,
+        hits: [],
+        notice: 'keyword result',
+      },
+    });
+    expect((await pending).notice).toContain('已使用关键词检索');
+    const cancelled = search.prepare('事务', null, () => {});
+    search.cancel();
+    await expect(cancelled).rejects.toMatchObject({ code: 'cancelled' });
+    expect(workers).toHaveLength(3);
+  } finally {
+    search.cancel();
+    storage.close();
+    rmSync(directory, { recursive: true, force: true });
+  }
+});
+
+it('returns index notices so a semantic fallback is visible after a rebuild', async () => {
+  const directory = mkdtempSync(join(tmpdir(), 'study-index-report-'));
+  const storage = new Storage(join(directory, 'main.sqlite3'));
+  const worker = Object.assign(new EventEmitter(), { kill: () => true });
+  const search = new SearchService(
+    storage,
+    directory,
+    'worker.mjs',
+    (_modulePath, args) => {
+      writeFileSync(args[1], 'completed staging fixture');
+      return worker;
+    },
+    async () => {},
+  );
+  try {
+    const pending = search.rebuild(() => {});
+    worker.emit('message', {
+      type: 'result',
+      result: {
+        question: '',
+        sourceId: null,
+        sourceCount: 0,
+        hits: [],
+        notice: '已使用关键词检索',
+      },
+    });
+    expect(await pending).toContain('已使用关键词检索');
   } finally {
     search.cancel();
     storage.close();
