@@ -39,7 +39,7 @@
 
 ## 3. 当前状态与接手快照
 
-本节核对日期：**2026-10-01**。接手时重新检查，不将下面的提交号、测试数量或工作区状态写成实时结果。
+本节核对日期：**2026-10-02**。接手时重新检查，不将下面的提交号、测试数量或工作区状态写成实时结果。
 
 ### 3.1 已交付并有历史验收记录
 
@@ -58,7 +58,7 @@
 - `0ed6eea` 实现导入与阅读；后续改为独立解析进程，`a3dee7d` 修复 Electron utility 进程的 PDF.js Node 环境识别，`3d5036a` 修复首个书签不在第一页时的初始锚点。RED/GREEN 检查点保留，最终验证以 README 为准。
 - 原生文件选择、本机副本、SHA-256 去重、逐文件失败、后台进度与取消、搜索/格式过滤、首页真实最近阅读已接入。
 - PDF 原页、可选文字、书签/页码目录、翻页、缩放；Markdown 标题、表格和代码；护眼及独立阅读位置重启恢复已接入。
-- 选中同页/同章节原文可复制含资料名、页码/标题行号和来源标识的引用。该阶段主库版本 2 保存资料与文字段落；当时尚无聊天、FTS/向量索引或 RAG。当前聊天与主库版本见 3.4。
+- 选中同页/同章节原文可复制含资料名、页码/标题行号和来源标识的引用。该阶段主库版本 2 保存资料与文字段落；当时尚无聊天、FTS/向量索引或 RAG。当前聊天与关键词 RAG 见 3.4、3.5。
 - 本阶段核心测试 34 项及定向 PDF 锚点修复验证通过；合并后的 5 条真实 Electron 流程通过，覆盖设置、日历、阅读、引用及取消。资料由测试生成，不使用私人文件、真实模型或收费 API；用户真实复杂中文 PDF 与安装包待验证。
 
 先读 `documents.test.ts`、`document-storage.test.ts` 与 `reading.spec.ts`，维护已有行为，不删测试或降低断言来冒充修复。`a541eed` 的中间提交说明曾提前写入桌面通过，实际 PDF 环境修复后才通过；不要引用中间描述代替验收记录。
@@ -83,9 +83,18 @@
 - 26 项相关核心测试、生产构建与类型检查、3 条真实 Electron 流程（聊天、原有设置/密钥/导航、开发模式）通过；追加聊天流程确认退出保留部分回答与地址变化后重新确认。修复迟到更新复活已完成回答的状态问题，保留复现测试。
 - 此为模拟服务与假密钥的协议验收；默认本机 Ollama 当时不可达，真实模型质量与云服务仍待验证。阅读/日历完整桌面流程未在此次重跑。详细覆盖范围见 README。
 
-### 3.5 仍待开发的主要能力
+### 3.5 已交付的关键词 RAG
 
-AI 可点击引用、全文与向量检索、RAG 评测、会话删除/重命名/导出、结构化笔记、学习 Agent、长期记忆、完整计划与任务、番茄钟、主题切换、完整备份恢复、OCR、更多文件格式、安装包及展示网站。
+- 2026-10-02：指定资料/全部资料的 FTS5 中文检索、原文预览、流式资料问答、有效引用跳回 PDF 页码/Markdown 标题、返回问答与重启引用恢复。空证据直接保存本地说明，不请求模型。阅读器“问这份资料”新建会话并限定资料。
+- 主库版本 4 为 `chat_turns` 增加 `mode`/`evidence`，升级前备份并保留旧轮次/资料/阅读位置；活动库仍是版本 1。派生全文索引独立保存，后台增量建立与重建，支持进度、取消；重建成功才替换旧文件。
+- 主进程缓存预览 UUID、问题、范围和最多 4 个确切片段，不接受 renderer 自造证据。预览及引用打开前核对副本完整性，原文/位置/资料名逐项匹配。远程发送确认绑定本次预览与模型，只发送当前问题和证据；普通聊天历史排除资料问答。
+- 37 项相关核心测试、类型检查、生产桌面构建与修改文件格式检查通过。6 条相关真实 Electron 流程验证 RAG、原有聊天/设置/开发模式/阅读/解析取消；RAG 追加索引取消规格按 preload 解包/抛错契约修正后单条重跑通过。本次未重跑完整日历桌面流程、真实模型、规模性能、安装包或远端 CI。
+- `npm run eval:retrieval`：6 份合成资料、15 个固定问题，12 个可回答问题 Hit@4 = 100%、Mean Recall@4 = 87.5%、MRR@4 = 1；3 个不可回答/范围不符问题为空。3 个跨段落或换说法问题未完整命中；逐题报告可重复生成。只评测检索锚点，不能作为真实模型回答/引用语义准确性。
+- `codex/keyword-rag` 保留 RED/GREEN 检查点，功能验收代码提交 `75a9c73`；只提交本地。向量/混合检索、真正的模型质量评测仍未交付，阶段 2 尚未整体验收。
+
+### 3.6 仍待开发的主要能力
+
+向量/混合检索、真实模型回答与引用语义评测、会话删除/重命名/导出、结构化笔记、学习 Agent、长期记忆、完整计划与任务、番茄钟、主题切换、完整备份恢复、OCR、更多文件格式、安装包及展示网站。
 
 ## 4. 产品范围与功能要求
 
@@ -138,6 +147,7 @@ AI 可点击引用、全文与向量检索、RAG 评测、会话删除/重命名
 | 图标与样式 | `lucide-react`、普通 CSS；全局样式在 `src/styles.css` |
 | 桌面构建 | esbuild，主进程与预加载脚本输出 CommonJS |
 | 后台解析 | Electron `utilityProcess` 独立 Node 进程，解析入口输出 ESM；256 MB V8 堆限制、60 秒超时、进度与取消 |
+| 后台检索 | 独立 `utilityProcess`，只读主库、写派生 FTS5 索引；256 MB V8 堆、5 分钟超时；中文分词/汉字二元词，BM25 与覆盖率排序 |
 | 本地数据库 | Electron 内置 Node.js 的 `node:sqlite` / `DatabaseSync` |
 | 密钥 | Electron `safeStorage`，Windows DPAPI 系统加密 |
 | 模型请求 | 主进程 `fetch`、运行时参数校验、结构化错误 |
@@ -159,10 +169,11 @@ AI 可点击引用、全文与向量检索、RAG 评测、会话删除/重命名
 | `src/App.tsx` | 工作台、导航、启动加载、页面切换和学习首页 |
 | `src/components/SettingsPage.tsx` | 偏好及模型表单、连接检测、密钥操作；输入密钥只作必要的临时传递 |
 | `src/components/LibraryPage.tsx` | 文件选择、导入状态、失败、搜索/格式筛选与真实资料列表 |
-| `src/components/ReadingPage.tsx`、`PdfPage.tsx` | 目录、排版/原页、文字选择、引用复制及位置/缩放/护眼保存 |
+| `src/components/ReadingPage.tsx`、`PdfPage.tsx` | 原页/排版、引用复制、保存、受验证的出处跳转及资料问答入口 |
 | `src/components/RecentReadings.tsx` | 首页从主库读取实际最近阅读，不用示例数据 |
 | `src/components/StudyCalendar.tsx` | 已验收的日历、签到及学习计时界面 |
-| `src/components/ChatPage.tsx` | 会话列表、Markdown 回答、生成状态、停止与绑定模型配置的远程发送确认；用 revision 拒绝迟到更新 |
+| `src/components/ChatPage.tsx` | 普通/资料问答、检索预览、停止、绑定配置及预览的远程确认；用 revision 拒绝迟到更新 |
+| `src/components/EvidenceCards.tsx`、`src/lib/citations.ts` | 折叠原文与出处按钮；把有效编号转换为受限跳转，未知编号及外链不跳转 |
 | `src/lib/types.ts` | 共享数据类型、`DesktopApi`、`Reply<T>`、默认设置 |
 | `src/lib/desktop.ts` | 界面调用桌面桥接的唯一入口、错误文本与地址比较 |
 | `src/lib/calendar.ts` | 本地日期键、月历网格、相邻月份计算 |
@@ -170,10 +181,13 @@ AI 可点击引用、全文与向量检索、RAG 评测、会话删除/重命名
 | `electron/main.ts` | 应用与窗口生命周期、IPC 注册、调用方校验、数据目录；当前也有学习心跳及睡眠暂停接入 |
 | `electron/preload.ts` | 沙箱内通过 `contextBridge` 暴露明确的桌面方法 |
 | `electron/core/settings.ts` | 运行时设置、地址、服务类型与模型配置校验 |
-| `electron/core/storage.ts` | 主库版本 3、迁移前备份、设置/资料/段落/阅读位置与聊天迁移；不改活动库版本 |
+| `electron/core/storage.ts` | 主库版本 4、迁移前备份、阅读/聊天/问答模式与证据迁移；不改活动库版本 |
 | `electron/core/chat-storage.ts` | 会话与问答轮次持久化、异常中断恢复；通过 `Storage.chat` 共用主数据库 |
 | `electron/core/chat-stream.ts` | Ollama NDJSON / 兼容 OpenAI SSE、UTF-8 拆包、大小/超时边界与错误映射 |
 | `electron/core/chat.ts` | 单活动请求、设置/密钥快照、上下文、远程确认、停止、定期保存与退出处理 |
+| `electron/core/retrieval.ts` | 精确偏移分块、中文查询词、FTS5 索引事务、范围与排序；同步实现仅在后台进程或测试运行 |
+| `electron/core/search.ts` | 单索引进程、取消/重建文件替换、主进程预览缓存、证据/副本验证和保存引用解析 |
+| `electron/search-worker.ts` | 固定独立检索入口，只读主库、写派生索引，不访问密钥 |
 | `electron/core/documents.ts` | 文件复制/去重/限额、解析进程、完整性检查、引用验证；原生对话框路径不由 renderer 提供 |
 | `electron/core/document-parser.ts` | PDF 每页文字、书签定位与 Markdown 标题/文字结构提取 |
 | `electron/document-worker.ts` | 固定独立解析入口，只读本次副本，不访问密钥与数据库 |
@@ -187,8 +201,11 @@ AI 可点击引用、全文与向量检索、RAG 评测、会话删除/重命名
 | `tests/calendar.spec.ts` | 已验收的月历、4:5 布局、签到、计时和重启恢复流程 |
 | `tests/reading.spec.ts` | 已验收的导入、阅读、原文引用、重启恢复与独立解析取消 |
 | `tests/chat.spec.ts` | 双协议流式回答、停止/断流、迟到事件、退出恢复、密钥使用及目标地址确认 |
+| `tests/rag.spec.ts` | 中文/英文检索、无证据、PDF/Markdown 出处跳转、重启引用与实际索引进程取消/重建 |
+| `tests/fixtures/retrieval-cases.ts`、`tests/retrieval-evaluation.ts` | 固定合成证据与问题、逐题命中和指标；保留未完整命中项，不调用模型 |
 | `tests/fixtures/reading-files.ts` | 自动生成测试资料，不使用私人学习文件 |
-| `scripts/build-electron.mjs` | 构建主进程、预加载与独立解析入口到 `dist-electron/` |
+| `scripts/build-electron.mjs` | 构建主进程、预加载、独立解析/检索入口到 `dist-electron/` |
+| `scripts/eval-retrieval.mjs` | 执行固定 FTS5 评测，报告到已忽略的 `artifacts/` |
 | `scripts/prepare-pdf-assets.mjs` | 开发/构建时复制 PDF.js CMap、字库与 WASM 到生成资源目录 |
 | `scripts/dev.mjs` | 启动 Vite 与 Electron，处理开发进程退出 |
 | `vite.config.ts` | Vite、CSP 注入与 Vitest 文件匹配 |
@@ -208,7 +225,7 @@ AI 可点击引用、全文与向量检索、RAG 评测、会话删除/重命名
 - 外部导航、新窗口和权限申请目前默认阻止。新增资料链接行为时明确设计，不直接把不可信内容放进有桥接能力的应用窗口。
 - CSP 在 `index.html` / `vite.config.ts` 中维护，区分开发预加载与生产脚本限制。不要通过无限放宽 CSP 解决 PDF worker 或 Markdown 内容问题。
 - TypeScript 类型不能替代 IPC 的运行时校验。对界面、外部响应、数据库恢复等输入在边界校验。
-- 返回结构为 `Reply<T>`：`{ ok: true, value }` 或 `{ ok: false, error: { code, message } }`；前端统一展示可理解的错误。
+- IPC 返回 `Reply<T>`：成功值或结构化错误。preload 的 `call` 解包 `value`、失败时抛出 `error`，renderer 的 `DesktopApi` 返回成功值，不直接返回 Reply；测试取消/失败须捕获 Promise 错误。
 - 失败不伪装成成功或空数据；不在错误文本、日志或截图中输出密钥及包含密钥的地址。
 - 文件解析用独立进程，显示进度并允许取消；不要改回强制终止线程，曾观测到 Node 压缩组件崩溃。后续索引与嵌入也需避免阻塞主窗口。独立进程只隔离崩溃，不等于操作系统文件权限沙箱，V8 堆限额不等于总内存限额。
 
@@ -216,7 +233,9 @@ AI 可点击引用、全文与向量检索、RAG 评测、会话删除/重命名
 
 资料方法：`listSources`、`importSources`、`cancelImport`、`onImportProgress`、`openSource`、`saveReadingPosition`、`copyCitation`。界面只能提供校验过的 SHA-256 资料 ID 和受限位置，导入路径由主进程原生对话框选择；不暴露任意路径、任意频道或剪贴板读取。preload 将进度事件只转换为数据，返回取消监听函数。
 
-聊天方法：`listConversations`、`createConversation`、`getConversation`、`sendChat`、`stopChat`、`activeChat`、`onChatUpdate`。请求只接受会话 UUID、问题、目标确认地址和当前模型配置签名；实际服务设置与密钥在主进程读取，界面不能传任意消息角色、系统提示或密钥来覆盖。`onChatUpdate` 只传轮次数据并提供取消监听；每轮 `revision` 单调增加，初始调用结果或旧事件不得覆盖新文本或终止状态。页面切换时聊天组件保持挂载，生成可继续；全应用只有一个活动请求。
+聊天方法：`listConversations`、`createConversation`、`getConversation`、`sendChat`、`stopChat`、`activeChat`、`onChatUpdate`。请求只接受会话 UUID、问题、目标确认地址、模型配置签名和可选 `retrievalId`；实际设置、密钥、预览在主进程读取，界面不能传消息角色、系统提示或自造证据。`onChatUpdate` 只传轮次并提供取消监听；`revision` 单调增加，旧事件不得覆盖新文本/终止状态。页面切换时组件保持挂载；全应用只有一个活动模型请求。
+
+检索方法：`prepareQuestion(question, sourceId | null)`、`cancelRetrieval`、`rebuildIndex`、`onRetrievalProgress`、`resolveCitation(turnId, number)`。只接受受限问题、资料哈希、保存轮次 UUID 和整数编号；主进程持有实际范围/片段，缓存上限 10 份、10 分钟有效，问题变化须重新检索。取消只结束索引子进程，不修改原资料/主库；新索引完成后同步原子替换旧文件。引用解析从保存轮次查证，不接受 renderer 提供路径、锚点或原文。进度订阅只传数据并返回取消监听函数。
 
 ## 8. 本地数据、迁移与密钥
 
@@ -224,11 +243,14 @@ AI 可点击引用、全文与向量检索、RAG 评测、会话删除/重命名
 
 | 文件或目录 | 内容与约束 |
 | --- | --- |
-| `study-companion.sqlite3` | 主库版本 3：`app_settings`、`sources`、`source_segments`、`conversations`、`chat_turns`；保存文字来源、阅读位置和会话 |
+| `study-companion.sqlite3` | 主库版本 4：设置、来源/段落、阅读位置、会话/轮次；轮次保存模式与确切证据快照 |
 | `study-activity.sqlite3` | 已验收的独立学习活动数据库，版本 1、`study_days` 表；备份须与主库一同导出 |
+| `search-index.sqlite3` | 派生索引版本 1，`indexed_sources`/`chunks_fts`；分块、原文/偏移、元数据和查询词；可重建 |
+| `search-index.*.sqlite3` | 重建暂存索引，成功才替换旧文件；取消/失败尽力清理，Windows 文件锁可能留下可丢弃的派生暂存 |
 | `sources/` | 内容 SHA-256 命名的 `.pdf`/`.md` 副本；不修改原件；打开前核对内容哈希 |
 | `study-companion.sqlite3.before-v2-*.sqlite3` | 版本 1 升级前的 SQLite 一致性备份；备份失败不继续迁移，不自动删除 |
 | `study-companion.sqlite3.before-v3-*.sqlite3` | 版本 2 升级前的 SQLite 一致性备份，包含资料/段落/位置与设置；不自动删除 |
+| `study-companion.sqlite3.before-v4-*.sqlite3` | 版本 3 升级前的完整主库备份，包括旧聊天与阅读；不自动删除 |
 | `credentials.enc.json` | 独立密钥密文文件，按规范化地址的 SHA-256 键索引，不是学习备份内容 |
 
 数据库规则：
@@ -236,11 +258,12 @@ AI 可点击引用、全文与向量检索、RAG 评测、会话删除/重命名
 - 使用参数化 SQL，不拼接用户输入到查询语句。
 - 迁移使用事务，保持已存数据，不删除个人数据库来解决版本问题。
 - 拒绝用旧版本应用打开更新的数据格式；损坏设置应报错，不能悄悄重置成默认值。
-- 当前启动会探测 FTS5；这只确认能力可用，并不代表已建立资料全文索引。
-- 未来迁移先读 `document-storage.test.ts` 和 `chat.test.ts` 中保留旧设置/资料锚点、恢复备份和版本升级的预期，不能把现有版本 3 当作空库重建。
-- 当前已有 `Source`、`SourceSegment`、`ReadingPosition`、`Conversation`、`ChatTurn`；`Chunk`、项目、任务、笔记和记忆仍是规划对象。
+- 启动探测 FTS5；首次检索才增量建派生索引。DDL 与内容写入用事务，重建在新文件完成；不可直接重建主库。源文字不可变，新哈希成为新资料。
+- 未来迁移先读 `document-storage.test.ts`、`chat.test.ts`、`retrieval.test.ts` 的保留旧数据与备份预期，不能把版本 4 当空库重建。
+- 当前已有 `Source`、`SourceSegment`、`ReadingPosition`、`Conversation`、`ChatTurn`、`Evidence`、`EvidencePreview`；分块已在派生索引实现。项目、任务、笔记和记忆仍是规划对象。
 - 聊天轮次状态为 `streaming/completed/stopped/error/interrupted`，保存部分回答与错误提示。主进程退出先取消聊天并保存，再关库；重启将残留的 streaming 标记为 interrupted。保存失败须向界面报告，不能冒充成功。单会话限 100 轮、会话总数限 500，未来会话管理/清理需保留恢复边界。
-- 来源锚点为 `page-N` 或 `md-line-N`，已绑定内容哈希；新文件内容成为新来源，不把旧引用悄悄指向变更后的文件。复制引用前校验原文来自同一段落/页；复制的 URI 尚未注册系统协议，不代表可点击 AI 引用已交付。
+- 来源锚点为 `page-N` 或 `md-line-N`，绑定内容哈希。资料问答轮次保存证据编号、资料名/类型、标题/页码/行号、UTF-16 偏移与原文；打开核对保存原文、元数据和副本哈希，不猜位置。复制 URI 尚未注册系统协议；应用内引用编号走受限 IPC，不依赖系统协议。
+- 当前分块最多 800 字符、重叠 120 字符，不拆开代理对；中文分词/汉字二元词入 FTS5。查询最多 24 个非停用词，BM25 前 40 候选经至少 50% 字面关键词覆盖过滤、排序/去重取最多 4 片段。阈值不证明证据充分，跨段落/同义表达可能遗漏；调整须保留固定评测失败案例。
 - 导入上限：20 文件/批；PDF 50 MB、1000 页、500 万提取字符；Markdown 5 MB、UTF-8；60 秒/文件。Markdown 原始 HTML/脚本和全部图片不加载，外链不自动打开。扫描件仅原页；密码 PDF 先解锁。新格式与更高限额先评估体验和内存。
 - PDF.js 对 utility 类型的 Node 识别需要 `document-worker.ts` 的进程内兼容提示；只影响解析子进程。升级 PDF.js/Electron 时实测此入口、资源路径、取消与正常打开，不能只运行 Node 单元测试。
 - 学习日历用本地日历日期，存储毫秒、对外展示秒；计时使用单调时钟，跨日分配，超过 30 秒心跳缺失视为中断。每秒保存；退出或睡眠时暂停，重启不自动计时。异常退出可能丢失最后约一秒。这些核心行为已做专项验证，不代表番茄钟或任务完成记录已实现。
@@ -263,8 +286,8 @@ AI 可点击引用、全文与向量检索、RAG 评测、会话删除/重命名
 - 仅兼容 OpenAI 的请求携带其对应密钥；不要把云端密钥发给 Ollama。
 - 模型列表检测超时 15 秒、响应上限 2 MiB。聊天使用 Ollama `/api/chat` 或兼容接口 `/chat/completions`；两类请求均禁止重定向。
 - 聊天连续 120 秒无网络数据、总时长 10 分钟、总响应 8 MiB、单行/事件数据缓冲 1048576 字符、答案 64000 字符设有边界。未收到正常结束标记就断流时保留文本并报错；空回答报错；长度截断须明确提示。停止后拒收迟到文本，但不能保证远端服务立即停止计算/计费。
-- 普通聊天单问题限 4000 字符，最多最近 6 轮已完成问答且历史合计不超过 12000 字符；失败、停止、中断轮次不进入上下文。这是字符预算，不是精确 token 预算；服务可能拒绝超过实际上下文窗口的请求，不自动重试或切换服务。
-- 远程聊天需确认发送当前问题和近期会话；界面确认绑定地址/模型/接口，主进程校验规范化目标地址和界面配置签名。当前不检索资料、不生成受验证的引用；接 RAG 时扩展资料范围预览与确认，不能默认上传整个资料库。
+- 单问题限 4000 字符。普通聊天最多最近 6 轮已完成普通问答、历史不超 12000 字符，资料/失败/停止/中断轮次不进入普通上下文。资料问答每次独立检索，无旧历史。预算不是精确 token 数，不自动重试或切换服务。
+- 普通远程聊天确认发送问题/近期会话；资料问答确认当前问题/预览片段，界面绑定地址、模型、接口与预览 ID，主进程复核配置与缓存预览。只发送实际片段，不上传整库/文件；空证据不发请求或读密钥。编号验证只能确认出处存在，不能保证每句结论被证据支持，未知或缺少编号需提示核对。
 - 远程服务使用 HTTPS；`localhost`、`127.0.0.1`、`[::1]` 的本机服务允许 HTTP。
 - 基础地址拒绝嵌入账号密码、查询参数和片段，避免混入密钥。
 - 保留鉴权、地址、限流/额度、服务错误、不可达、超时、格式错误的区别；模型不在列表时明确说明，不报生成成功。
@@ -305,6 +328,7 @@ npm run desktop:start
 | `npm run format:check` | 检查项目配置、源码和测试的格式 |
 | `npm run format` | 批量格式化；工作区有他人改动时优先只格式化自己的文件 |
 | `npm test` | 当前所有 Vitest 核心测试，可能包含正在开发的 RED 规格 |
+| `npm run eval:retrieval` | 6 份合成资料/15 固定问题的关键词检索评测；不调用模型、不读个人资料，报告保留未完整命中项 |
 | `npm run test:e2e` | 完整桌面构建与所有 Playwright 测试，属于阶段/发布回归 |
 
 React 界面支持热更新；修改 `electron/` 或 preload 后重启桌面开发命令。Electron 首次下载失败时检查网络，使用官方安装方式重试，不默认安装 C++ 工具或换框架。Vite 端口固定且严格占用，发生冲突时确认进程归属，不结束无关程序。
@@ -323,10 +347,13 @@ npx vitest run electron/core/document-storage.test.ts
 npx vitest run electron/core/documents.test.ts
 npx vitest run src/lib/calendar.test.ts electron/core/study.test.ts
 npx vitest run electron/core/chat.test.ts electron/core/chat-stream.test.ts
+npx vitest run electron/core/retrieval.test.ts electron/core/search.test.ts electron/core/rag.test.ts src/lib/citations.test.ts
+npm run eval:retrieval
 npm run desktop:build
 npx playwright test tests/reading.spec.ts
 npx playwright test tests/calendar.spec.ts
 npx playwright test tests/chat.spec.ts
+npx playwright test tests/rag.spec.ts
 ```
 
 按改动选择执行，不把上面全部命令当成每次提交的强制清单。阶段验收、发布前或用户明确要求时，再执行格式检查、核心测试、完整桌面流程与对应异常路径。
@@ -337,7 +364,8 @@ npx playwright test tests/chat.spec.ts
 - 优先测试迁移保留、阅读位置、引用锚点、检索评测、Agent 确认边界、计时中断和备份往返。
 - 不为覆盖率写只重复实现的测试；不默默跳过、削弱断言或将失败记录为成功。
 - 当前 `tests/reading.spec.ts` 已通过真实桌面验收；修改解析入口、资源路径或迁移时执行相关测试，不能以只在浏览器显示正常代替验收。
-- 新增接口后检查现有桌面测试中对桥接方法列表的断言是否需要同步，保持隔离范围明确。
+- 新增接口后检查现有桌面测试中对桥接方法列表的断言是否需要同步，保持隔离范围明确。测试 renderer 方法用 preload 解包后的值/结构化异常，不假设它返回原始 IPC Reply。
+- 检索评测与功能测试不同：当前只测锚点命中，不调用模型，未完整命中项不会让评测命令报错；不能把退出码 0 解释成每题完整通过。真实回答/引用语义质量与混合检索对比仍需独立评测。
 - 测试截图与 trace 放在已忽略的产物目录；失败时报告具体未通过的功能和影响。
 - GitHub Actions 配置存在不等于远端通过，推送后才会触发相应流程；不要为了验证 CI 自行突破推送约定。
 
@@ -357,7 +385,7 @@ npx playwright test tests/chat.spec.ts
 | --- | --- | --- |
 | 0 | 桌面骨架、数据库、空资料库、偏好保存 | 历史验收已完成，新增改动按实际情况再验证 |
 | 1 | PDF/Markdown 导入与阅读，基础版本已交付 | 去重、损坏反馈、原文件复制、原页/排版、重启位置恢复、扫描件提示、取消与引用复制 |
-| 2 | 聊天、流式输出、FTS5/向量混合检索、引用、评测集 | 本地与云端真实同资料问答、引用回原文、证据不足、嵌入失效降级、可重复评测 |
+| 2 | 聊天、关键词 RAG、引用与检索基线已交付；向量/混合检索及真实生成评测待做 | 本地与云端真实同资料问答、引用回原文、证据不足、嵌入失效降级、可重复评测 |
 | 3 | 结构化笔记、Agent、长期记忆 | 可独立写笔记、反馈有出处、取消不写入、删除记忆不再使用 |
 | 4 | 项目任务、番茄钟、打卡、主题、备份 | 数据重启恢复、中断不误完成、备份往返且无密钥；当前日历工作只是其中一部分 |
 | 5 | 全流程与异常验证、RAG 对比、安装包、发布文档 | 新用户按说明完成学习闭环、发布包对应 Git 标签、公开发布有授权 |
@@ -365,7 +393,7 @@ npx playwright test tests/chat.spec.ts
 
 README 的主线下一步为阶段 2，日历与基础阅读已集成；具体任务以用户最新指示为准，不为机械遵循阶段编号撤销已授权的并行工作。
 
-接手下一阶段先读 `source_segments` 和锚点契约，以及现有聊天的停止、保存、远程确认边界；实现带中文查询验证的 FTS5 检索、证据不足反馈和原文跳转，再引入嵌入与评测集。流式聊天已交付，不重建第二套接口。保留阅读、设置和日历行为。先完成当前请求的可用功能，再报告并更新记录，不跳到官网、云同步或无限自主 Agent。
+接手下一步先读 `retrieval.ts`、`search.ts`、`rag.test.ts` 和固定评测案例。关键词检索/证据预览/跳转已交付；不要重建另一套问答或索引接口。下一步先记录独立嵌入方案的中文效果、CPU 性能、体积、许可证与 Windows 分发条件，再接向量/混合检索，失效保留关键词路径。保留现有停止、保存、发送确认、阅读与日历，扩充评测并报告真实模型验证缺口，不跳到官网、云同步或无限自主 Agent。
 
 ## 14. Git、隐私与协作流程
 
