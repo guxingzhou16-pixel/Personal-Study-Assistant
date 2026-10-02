@@ -415,7 +415,9 @@ export function ChatPage({
                 <div className="chat-response">
                   <span>
                     拾知 · {turn.mode === 'sources' ? '资料问答' : '普通聊天'} ·{' '}
-                    {turn.model || '未调用模型'}
+                    {turn.mode === 'sources' && !turn.evidence.length
+                      ? '未调用模型'
+                      : turn.model || '未选择模型'}
                   </span>
                   <div className="chat-answer" data-testid="chat-answer">
                     <ReactMarkdown
@@ -470,7 +472,7 @@ export function ChatPage({
                 <h2>本次检索原文</h2>
                 <p>
                   {preview.hits.length
-                    ? `从 ${preview.sourceCount} 份资料范围中找到 ${preview.hits.length} 个片段。发送后只携带下列原文。`
+                    ? `从 ${preview.sourceCount} 份资料范围中找到 ${preview.hits.length} 个片段。发送本次问题及下列原文。`
                     : '没有找到匹配的原文'}
                 </p>
                 <EvidenceCards hits={preview.hits} />
