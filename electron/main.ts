@@ -11,7 +11,7 @@ import {
   utilityProcess,
 } from 'electron';
 import { mkdirSync } from 'node:fs';
-import { join, resolve } from 'node:path';
+import { basename, join, resolve } from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { Credentials } from './core/credentials';
 import { AppError, failure } from './core/errors';
@@ -24,6 +24,9 @@ import { StudyStorage } from './core/study-storage';
 import { ChatService } from './core/chat';
 import { SearchService } from './core/search';
 import { EmbeddingFiles } from './core/embedding-files';
+import { noteRevision } from './core/note-storage';
+import { noteFileName, writeNoteExport } from './core/note-export';
+import { noteMarkdown } from '../src/lib/notes';
 
 app.setName('StudyCompanion');
 const testDataDir = !app.isPackaged ? process.env.STUDY_COMPANION_DATA_DIR : undefined;
@@ -49,6 +52,8 @@ let chat: ChatService | undefined;
 let search: SearchService | undefined;
 let embeddingFiles: EmbeddingFiles | undefined;
 let studyHeartbeat: ReturnType<typeof setInterval> | undefined;
+let noteDraftDirty = false;
+let checkingNoteExit = false;
 
 function isRendererUrl(url: string | undefined): boolean {
   return url?.split('#', 1)[0] === rendererUrl;
@@ -190,6 +195,45 @@ function registerHandlers(database: Storage, credentials: Credentials, tracker: 
         window.webContents.send('study:embedding-progress', progress);
     });
   });
+  handle('study:list-notes', () => database.notes.list());
+  handle('study:get-note', (id) => database.notes.get(id));
+  handle('study:save-note', (request) => database.notes.save(request));
+  handle('study:delete-note', (id, revision) => database.notes.delete(id, revision));
+  handle('study:set-note-draft-dirty', (dirty) => {
+    if (typeof dirty !== 'boolean') throw new AppError('validation', '笔记编辑状态无效。');
+    noteDraftDirty = dirty;
+  });
+  let exportingNote = false;
+  handle('study:export-note', async (id, revisionInput) => {
+    if (!window) throw new AppError('window', '请在桌面窗口中导出笔记。');
+    if (exportingNote) throw new AppError('noteBusy', '请完成当前导出后再试。');
+    const revision = noteRevision(revisionInput);
+    const note = database.notes.get(id);
+    if (note.revision !== revision)
+      throw new AppError('noteConflict', '笔记已更新，请重新加载后再导出。');
+    exportingNote = true;
+    try {
+      const selection = await dialog.showSaveDialog(window, {
+        title: '导出学习笔记',
+        defaultPath: noteFileName(note.title),
+        filters: [{ name: 'Markdown 笔记', extensions: ['md'] }],
+        properties: ['showOverwriteConfirmation'],
+      });
+      if (selection.canceled || !selection.filePath) return { cancelled: true };
+      const current = database.notes.get(id);
+      if (current.revision !== revision)
+        throw new AppError('noteConflict', '选择位置期间笔记已更新，请重新加载后再导出。');
+      const source = current.sourceId ? database.getSource(current.sourceId) : undefined;
+      await writeNoteExport(
+        selection.filePath,
+        noteMarkdown(current, source?.name ?? null),
+        dataDir,
+      );
+      return { cancelled: false, fileName: basename(selection.filePath) };
+    } finally {
+      exportingNote = false;
+    }
+  });
 }
 
 function createWindow() {
@@ -217,6 +261,37 @@ function createWindow() {
   );
   window.webContents.session.setPermissionCheckHandler(() => false);
   window.once('ready-to-show', () => window?.show());
+  window.on('close', (event) => {
+    if (!noteDraftDirty) return;
+    event.preventDefault();
+    if (checkingNoteExit) return;
+    checkingNoteExit = true;
+    const closingWindow = window!;
+    void dialog
+      .showMessageBox(closingWindow, {
+        type: 'warning',
+        title: '笔记尚未保存',
+        message: '有未保存的笔记内容。',
+        detail: '继续编辑可以返回笔记保存；放弃并退出会丢失这次尚未保存的修改。',
+        buttons: ['继续编辑', '放弃并退出'],
+        defaultId: 0,
+        cancelId: 0,
+        noLink: true,
+      })
+      .then(({ response }) => {
+        if (closingWindow.isDestroyed()) return;
+        if (response === 1) {
+          noteDraftDirty = false;
+          closingWindow.close();
+        } else closingWindow.webContents.send('study:show-notes');
+      })
+      .catch(() => {
+        dialog.showErrorBox('未退出应用', '无法显示退出确认。请先保存笔记后再退出。');
+      })
+      .finally(() => {
+        checkingNoteExit = false;
+      });
+  });
   window.on('closed', () => {
     window = null;
   });

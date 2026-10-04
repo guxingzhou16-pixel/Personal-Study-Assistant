@@ -167,6 +167,35 @@ export interface ChatRequest {
   expectedProfile?: string;
   retrievalId?: string;
 }
+export interface NoteDraft {
+  title: string;
+  sourceId: string | null;
+  understanding: string;
+  evidence: string;
+  questions: string;
+  nextStep: string;
+}
+export interface StudyNote extends NoteDraft {
+  id: string;
+  revision: number;
+  createdAt: string;
+  updatedAt: string;
+}
+export interface NoteSummary {
+  id: string;
+  title: string;
+  sourceId: string | null;
+  sourceName: string | null;
+  updatedAt: string;
+}
+export interface NoteSaveRequest extends NoteDraft {
+  id: string | null;
+  revision: number;
+}
+export interface NoteExportResult {
+  cancelled: boolean;
+  fileName?: string;
+}
 export interface DesktopApi {
   bootstrap(): Promise<Bootstrap>;
   saveSettings(settings: Settings): Promise<Settings>;
@@ -204,6 +233,13 @@ export interface DesktopApi {
   downloadEmbedding(): Promise<EmbeddingStatus>;
   cancelEmbeddingDownload(): Promise<void>;
   onEmbeddingProgress(listener: (progress: RetrievalProgress) => void): () => void;
+  listNotes(): Promise<NoteSummary[]>;
+  getNote(id: string): Promise<StudyNote>;
+  saveNote(request: NoteSaveRequest): Promise<StudyNote>;
+  deleteNote(id: string, revision: number): Promise<void>;
+  exportNote(id: string, revision: number): Promise<NoteExportResult>;
+  setNoteDraftDirty(dirty: boolean): Promise<void>;
+  onShowNotes(listener: () => void): () => void;
 }
 
 declare global {

@@ -12,6 +12,9 @@ import { AppError } from './errors';
 import { record, validateSettings } from './settings';
 import { sourceId } from './documents';
 import { CHAT_MIGRATION, ChatStorage } from './chat-storage';
+import { NOTES_MIGRATION, NoteStorage } from './note-storage';
+
+const SCHEMA_VERSION = 5;
 
 const INITIAL_MIGRATION = `
   CREATE TABLE app_settings (
@@ -43,30 +46,33 @@ const READING_MIGRATION = `
 export class Storage {
   private readonly db: DatabaseSync;
   readonly chat: ChatStorage;
+  readonly notes: NoteStorage;
 
   constructor(path: string) {
     this.db = new DatabaseSync(path);
     try {
       this.db.exec('PRAGMA foreign_keys = ON; PRAGMA busy_timeout = 5000;');
       const version = this.schemaVersion;
-      if (version > 4)
+      if (version > SCHEMA_VERSION)
         throw new AppError('databaseVersion', '数据来自更新的软件版本，请升级应用后再打开。');
-      if (version > 0 && version < 4 && path !== ':memory:') {
+      if (version > 0 && version < SCHEMA_VERSION && path !== ':memory:') {
         this.db
           .prepare('VACUUM INTO ?')
           .run(`${path}.before-v${version + 1}-${randomUUID()}.sqlite3`);
       }
-      if (version < 4) {
+      if (version < SCHEMA_VERSION) {
         this.db.exec('BEGIN IMMEDIATE;');
         try {
           if (version === 0) this.db.exec(INITIAL_MIGRATION);
           if (version < 2) this.db.exec(READING_MIGRATION);
           if (version < 3) this.db.exec(CHAT_MIGRATION);
-          this.db.exec(`
+          if (version < 4)
+            this.db.exec(`
             ALTER TABLE chat_turns ADD COLUMN mode TEXT NOT NULL DEFAULT 'chat' CHECK(mode IN ('chat', 'sources'));
             ALTER TABLE chat_turns ADD COLUMN evidence TEXT NOT NULL DEFAULT '[]' CHECK(json_valid(evidence));
             PRAGMA user_version = 4;
           `);
+          if (version < 5) this.db.exec(NOTES_MIGRATION);
           this.db.exec('COMMIT;');
         } catch (error) {
           this.db.exec('ROLLBACK;');
@@ -77,6 +83,7 @@ export class Storage {
         'CREATE VIRTUAL TABLE temp.fts_probe USING fts5(content); DROP TABLE temp.fts_probe;',
       );
       this.chat = new ChatStorage(this.db);
+      this.notes = new NoteStorage(this.db);
     } catch (error) {
       this.db.close();
       throw error;

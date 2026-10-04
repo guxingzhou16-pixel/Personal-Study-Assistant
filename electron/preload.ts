@@ -19,6 +19,9 @@ import type {
   RetrievalProgress,
   CitationTarget,
   EmbeddingStatus,
+  NoteSummary,
+  StudyNote,
+  NoteExportResult,
 } from '../src/lib/types';
 
 async function call<T>(channel: string, ...args: unknown[]): Promise<T> {
@@ -84,6 +87,17 @@ const api: DesktopApi = {
       listener(progress);
     ipcRenderer.on('study:embedding-progress', receive);
     return () => ipcRenderer.removeListener('study:embedding-progress', receive);
+  },
+  listNotes: () => call<NoteSummary[]>('study:list-notes'),
+  getNote: (id) => call<StudyNote>('study:get-note', id),
+  saveNote: (request) => call<StudyNote>('study:save-note', request),
+  deleteNote: (id, revision) => call<void>('study:delete-note', id, revision),
+  exportNote: (id, revision) => call<NoteExportResult>('study:export-note', id, revision),
+  setNoteDraftDirty: (dirty) => call<void>('study:set-note-draft-dirty', dirty),
+  onShowNotes: (listener) => {
+    const receive = () => listener();
+    ipcRenderer.on('study:show-notes', receive);
+    return () => ipcRenderer.removeListener('study:show-notes', receive);
   },
 };
 contextBridge.exposeInMainWorld('studyCompanion', api);

@@ -23,32 +23,39 @@ import { ReadingPage } from './components/ReadingPage';
 import { RecentReadings } from './components/RecentReadings';
 import { StudyCalendar } from './components/StudyCalendar';
 import { ChatPage } from './components/ChatPage';
+import { NotesPage } from './components/NotesPage';
 import { desktop, errorMessage, isDesktop } from './lib/desktop';
 import { defaultSettings, type Bootstrap, type Settings, type CitationTarget } from './lib/types';
 
-type Page = 'home' | 'library' | 'chat' | 'settings';
+type Page = 'home' | 'library' | 'chat' | 'notes' | 'settings';
 const pageLabels: Record<Page, string> = {
   home: '学习首页',
   library: '资料库',
   chat: '学习助手',
+  notes: '学习笔记',
   settings: '设置',
 };
+const readerBackLabels = { library: '返回资料库', chat: '返回问答', notes: '返回笔记' };
 
 export default function App() {
   const mainRef = useRef<HTMLElement>(null);
   const [page, setPage] = useState<Page>('home');
   const [sourceId, setSourceId] = useState<string | null>(null);
   const [citationTarget, setCitationTarget] = useState<CitationTarget | null>(null);
-  const [readerReturn, setReaderReturn] = useState<'library' | 'chat'>('library');
+  const [readerReturn, setReaderReturn] = useState<'library' | 'chat' | 'notes'>('library');
   const [questionSource, setQuestionSource] = useState<{ id: string; sequence: number } | null>(
     null,
   );
+  const [noteSource, setNoteSource] = useState<{ id: string; sequence: number } | null>(null);
   const [boot, setBoot] = useState<Bootstrap | null>(null);
   const [failure, setFailure] = useState<string | null>(null);
   const [attempt, setAttempt] = useState(0);
   useEffect(() => {
     mainRef.current?.scrollTo(0, 0);
   }, [page]);
+  useEffect(() => {
+    if (isDesktop) return desktop.onShowNotes(() => navigate('notes'));
+  }, []);
   useEffect(() => {
     let cancelled = false;
     setFailure(null);
@@ -98,6 +105,17 @@ export default function App() {
     setQuestionSource((previous) => ({ id: sourceId, sequence: (previous?.sequence ?? 0) + 1 }));
     navigate('chat');
   }
+  function takeNote() {
+    if (!sourceId) return;
+    setNoteSource((previous) => ({ id: sourceId, sequence: (previous?.sequence ?? 0) + 1 }));
+    navigate('notes');
+  }
+  function openNoteSource(id: string) {
+    setCitationTarget(null);
+    setReaderReturn('notes');
+    setSourceId(id);
+    setPage('library');
+  }
 
   const settings = boot?.settings ?? defaultSettings;
   const date = new Intl.DateTimeFormat('zh-CN', {
@@ -132,6 +150,7 @@ export default function App() {
             { id: 'home' as const, icon: Home },
             { id: 'library' as const, icon: FolderOpen },
             { id: 'chat' as const, icon: MessageCircle },
+            { id: 'notes' as const, icon: NotebookPen },
           ].map(({ id, icon: Icon }) => (
             <button
               key={id}
@@ -146,7 +165,6 @@ export default function App() {
           ))}
           <div className="nav-divider" />
           {[
-            { title: '学习笔记', icon: NotebookPen },
             { title: '计划与打卡', icon: Target },
             { title: '专注时光', icon: Timer },
           ].map(({ title, icon: Icon }) => (
@@ -303,12 +321,22 @@ export default function App() {
               id={sourceId}
               target={citationTarget ?? undefined}
               onBack={() => navigate(readerReturn)}
-              backLabel={readerReturn === 'chat' ? '返回问答' : '返回资料库'}
+              backLabel={readerBackLabels[readerReturn]}
               onAsk={askSource}
+              onTakeNote={takeNote}
             />
           )}
           {boot && !failure && page === 'settings' && (
             <SettingsPage boot={boot} onSaved={onSaved} />
+          )}
+          {boot && !failure && (
+            <div className="notes-container" hidden={page !== 'notes'}>
+              <NotesPage
+                visible={page === 'notes'}
+                presetSource={noteSource}
+                onOpenSource={openNoteSource}
+              />
+            </div>
           )}
           {boot && !failure && (
             <div className="chat-container" hidden={page !== 'chat'}>

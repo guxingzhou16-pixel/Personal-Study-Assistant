@@ -11,6 +11,7 @@ import {
   LoaderCircle,
   Sun,
   MessageCircle,
+  NotebookPen,
 } from 'lucide-react';
 import { desktop, errorMessage } from '../lib/desktop';
 import type { OpenDocument, ReadingPosition, CitationTarget } from '../lib/types';
@@ -47,12 +48,14 @@ export function ReadingPage({
   target,
   backLabel = '返回资料库',
   onAsk,
+  onTakeNote,
 }: {
   id: string;
   onBack: () => void;
   target?: CitationTarget;
   backLabel?: string;
   onAsk: () => void;
+  onTakeNote: () => void;
 }) {
   const [document, setDocument] = useState<OpenDocument | null>(null);
   const [position, setPosition] = useState<ReadingPosition>({
@@ -145,22 +148,13 @@ export function ReadingPage({
     }
     ready.current = true;
   }, [document]);
-  async function back() {
+  async function leave(action: () => void) {
     clearTimeout(timer.current);
     try {
       if (ready.current) await save(latest.current);
-      onBack();
+      action();
     } catch {
       /* Keep the reader open with its save error so the user can retry. */
-    }
-  }
-  async function ask() {
-    clearTimeout(timer.current);
-    try {
-      if (ready.current) await save(latest.current);
-      onAsk();
-    } catch {
-      /* The reading-position save error remains visible. */
     }
   }
   function scrollPosition() {
@@ -253,7 +247,7 @@ export function ReadingPage({
       aria-label={`阅读 ${source.name}`}
     >
       <header className="reader-header">
-        <button className="icon-button" aria-label={backLabel} onClick={() => void back()}>
+        <button className="icon-button" aria-label={backLabel} onClick={() => void leave(onBack)}>
           <ArrowLeft size={18} />
         </button>
         <div>
@@ -264,7 +258,7 @@ export function ReadingPage({
           <Check size={13} />
           {saveState}
         </span>
-        <button className="button secondary reader-ask" onClick={() => void ask()}>
+        <button className="button secondary reader-ask" onClick={() => void leave(onAsk)}>
           <MessageCircle size={16} />
           问这份资料
         </button>
@@ -273,6 +267,10 @@ export function ReadingPage({
         <button className="toolbar-button" aria-pressed={toc} onClick={() => setToc(!toc)}>
           <List size={16} />
           目录
+        </button>
+        <button className="toolbar-button" onClick={() => void leave(onTakeNote)}>
+          <NotebookPen size={16} />
+          记笔记
         </button>
         {source.kind === 'pdf' && (
           <div className="page-controls">

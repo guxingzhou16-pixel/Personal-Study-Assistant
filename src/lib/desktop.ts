@@ -39,6 +39,13 @@ export const desktop: DesktopApi = {
   downloadEmbedding: () => api().downloadEmbedding(),
   cancelEmbeddingDownload: () => api().cancelEmbeddingDownload(),
   onEmbeddingProgress: (listener) => api().onEmbeddingProgress(listener),
+  listNotes: () => api().listNotes(),
+  getNote: (id) => api().getNote(id),
+  saveNote: (request) => api().saveNote(request),
+  deleteNote: (id, revision) => api().deleteNote(id, revision),
+  exportNote: (id, revision) => api().exportNote(id, revision),
+  setNoteDraftDirty: (dirty) => api().setNoteDraftDirty(dirty),
+  onShowNotes: (listener) => api().onShowNotes(listener),
 };
 
 export function errorMessage(error: unknown): string {
