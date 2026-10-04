@@ -66,6 +66,9 @@ for (const dataset of report.datasets) {
   console.log(
     `  引用位置错误：${dataset.citationFailures.map((entry) => entry.id).join(', ') || '无'}`,
   );
+  console.log(
+    `  回答依据越界：${dataset.groundingFailures.map((entry) => entry.id).join(', ') || '无'}`,
+  );
 }
 console.log(
   `性能（本机样本）：${JSON.stringify(report.datasets[0].performance)}；模型加载 ${Math.round(loadMs)} ms`,

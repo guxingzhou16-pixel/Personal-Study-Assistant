@@ -94,6 +94,20 @@ export const independentRetrievalSources: {
       },
     ],
   },
+  {
+    key: 'cdn',
+    name: '内容分发网络.md',
+    kind: 'markdown',
+    segments: [
+      {
+        anchor: 'md-line-1',
+        title: '降低访问延迟',
+        depth: 1,
+        line: 1,
+        text: '内容分发网络把内容缓存在靠近用户的节点以降低访问延迟，缓存和就近调度与传输层是否可靠无关。',
+      },
+    ],
+  },
 ];
 
 export function independentSourceId(key: string): string {
@@ -160,6 +174,18 @@ export const independentRetrievalCases: IndependentRetrievalCase[] = [
     category: 'distractor',
     question: '带宽和延迟分别决定什么？',
     expected: expected('distractor', 'md-line-1'),
+  },
+  {
+    id: 'ind-udp-low-latency',
+    category: 'distractor',
+    question: '为什么低延迟的音视频场景选择 UDP？',
+    expected: expected('networking', 'md-line-6'),
+  },
+  {
+    id: 'ind-tcp-udp',
+    category: 'multi',
+    question: 'TCP 和 UDP 在可靠性和实时性上有什么区别？',
+    expected: expected('networking', 'md-line-1', 'md-line-6'),
   },
   { id: 'ind-unanswerable', category: 'unanswerable', question: '傅里叶变换的数学公式是什么？', expected: [] },
   {

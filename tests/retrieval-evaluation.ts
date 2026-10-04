@@ -108,6 +108,12 @@ async function evaluateDataset(
       );
       const citationComplete =
         result.hits.length > 0 && result.hits.every((hit) => citedNumbers.includes(hit.number));
+      // 回答依据（管道级）：每个引用编号都必须有检索证据支撑，指向不存在证据的编号视为无依据。
+      const validNumbers = new Set(result.hits.map((hit) => hit.number));
+      const groundedUnsupported = citedNumbers.filter((number) => !validNumbers.has(number));
+      const hallucinatedDetected = citationNumbers(
+        `依据 [${result.hits.length + 1}] 说明这段原文。`,
+      ).some((number) => !validNumbers.has(number));
       observedRssBytes = Math.max(observedRssBytes, process.memoryUsage().rss);
       results.push({
         ...entry,
@@ -126,6 +132,8 @@ async function evaluateDataset(
         reciprocalRank: found.length ? 1 / Math.min(...found) : 0,
         citationPositionIssues: citationIssues,
         citationComplete,
+        groundedUnsupported,
+        hallucinatedDetected,
         passed: entry.expected.length
           ? found.length === entry.expected.length
           : actual.length === 0,
@@ -155,6 +163,13 @@ async function evaluateDataset(
           0,
         ),
         citationCompleteness: average(withHits.map((entry) => Number(entry.citationComplete))),
+        answerGroundingUnsupported: results.reduce(
+          (sum, entry) => sum + entry.groundedUnsupported.length,
+          0,
+        ),
+        hallucinatedCitationDetected: average(
+          withHits.map((entry) => Number(entry.hallucinatedDetected)),
+        ),
       },
       performance: {
         firstQueryMs: results[0]?.elapsedMs ?? 0,
@@ -166,6 +181,11 @@ async function evaluateDataset(
         : 0,
       failures: results.filter((entry) => !entry.passed),
       citationFailures: results.filter((entry) => entry.citationPositionIssues.length > 0),
+      groundingFailures: results.filter(
+        (entry) =>
+          entry.groundedUnsupported.length > 0 ||
+          (entry.actual.length > 0 && !entry.hallucinatedDetected),
+      ),
       cases: results,
     };
   } finally {
