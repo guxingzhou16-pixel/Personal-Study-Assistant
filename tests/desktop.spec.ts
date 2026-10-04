@@ -40,7 +40,10 @@ test('desktop navigation, persistent preferences, encrypted keys and model check
     await page.keyboard.press('Tab');
     await expect(page.getByRole('link', { name: '跳到主要内容' })).toBeFocused();
     await page.keyboard.press('Enter');
-    await expect(page.getByRole('button', { name: '学习笔记 规划中' })).toBeDisabled();
+    await expect(page.getByRole('button', { name: '学习笔记', exact: true })).toBeEnabled();
+    await page.getByRole('button', { name: '学习笔记', exact: true }).click();
+    await expect(page.getByRole('heading', { name: '学习笔记', exact: true })).toBeVisible();
+    await page.getByRole('button', { name: '学习首页', exact: true }).click();
     await page.getByRole('button', { name: '打开我的资料库' }).click();
     await expect(page.getByRole('heading', { name: '我的资料库' })).toBeVisible();
     await expect(page.getByRole('button', { name: '导入资料', exact: true })).toBeEnabled();
@@ -124,6 +127,13 @@ test('desktop navigation, persistent preferences, encrypted keys and model check
       'downloadEmbedding',
       'cancelEmbeddingDownload',
       'onEmbeddingProgress',
+      'listNotes',
+      'getNote',
+      'saveNote',
+      'deleteNote',
+      'exportNote',
+      'setNoteDraftDirty',
+      'onShowNotes',
     ]);
     await page.getByRole('button', { name: '删除密钥' }).click();
     await expect(page.getByText('此地址未保存密钥', { exact: true })).toBeVisible();

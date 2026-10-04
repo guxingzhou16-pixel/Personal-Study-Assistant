@@ -42,11 +42,13 @@ it('migrates v2 without losing settings or source anchors and makes a readable b
   storage.close();
   stores.pop();
   const legacy = new DatabaseSync(path);
-  legacy.exec('DROP TABLE chat_turns; DROP TABLE conversations; PRAGMA user_version = 2;');
+  legacy.exec(
+    'DROP TABLE notes; DROP TABLE chat_turns; DROP TABLE conversations; PRAGMA user_version = 2;',
+  );
   legacy.close();
   const upgraded = new Storage(path);
   stores.push(upgraded);
-  expect(upgraded.schemaVersion).toBe(4);
+  expect(upgraded.schemaVersion).toBe(5);
   expect(upgraded.loadSettings().ollama.model).toBe('local');
   expect(upgraded.getSegment('a'.repeat(64), 'md-line-1')?.text).toBe('保留原文');
   const backupName = readdirSync(directory).find((name) => name.includes('before-v3'))!;

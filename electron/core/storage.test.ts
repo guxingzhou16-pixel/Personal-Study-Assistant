@@ -20,7 +20,7 @@ describe('local settings and database migrations', () => {
   it('creates a database and preserves settings when reopened and migrated again', () => {
     const path = databasePath();
     let storage = new Storage(path);
-    expect(storage.schemaVersion).toBe(4);
+    expect(storage.schemaVersion).toBe(5);
     expect(storage.loadSettings()).toEqual(defaultSettings);
     const saved = storage.saveSettings({
       ...defaultSettings,
@@ -29,7 +29,7 @@ describe('local settings and database migrations', () => {
     });
     storage.close();
     storage = new Storage(path);
-    expect(storage.schemaVersion).toBe(4);
+    expect(storage.schemaVersion).toBe(5);
     expect(storage.loadSettings()).toEqual(saved);
     storage.close();
   });

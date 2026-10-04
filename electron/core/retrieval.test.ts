@@ -151,11 +151,11 @@ it('upgrades v3 with a recoverable backup, preserving existing conversations and
   store.close();
   const old = new DatabaseSync(mainPath);
   old.exec(
-    'ALTER TABLE chat_turns DROP COLUMN mode; ALTER TABLE chat_turns DROP COLUMN evidence; PRAGMA user_version = 3;',
+    'DROP TABLE notes; ALTER TABLE chat_turns DROP COLUMN mode; ALTER TABLE chat_turns DROP COLUMN evidence; PRAGMA user_version = 3;',
   );
   old.close();
   store = new Storage(mainPath);
-  expect(store.schemaVersion).toBe(4);
+  expect(store.schemaVersion).toBe(5);
   expect(store.loadSettings().displayName).toBe('保留我');
   expect(store.chat.get(conversation.id).turns).toEqual([
     expect.objectContaining({
