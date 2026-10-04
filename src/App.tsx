@@ -24,29 +24,40 @@ import { RecentReadings } from './components/RecentReadings';
 import { StudyCalendar } from './components/StudyCalendar';
 import { ChatPage } from './components/ChatPage';
 import { NotesPage } from './components/NotesPage';
+import { AgentPage } from './components/AgentPage';
 import { desktop, errorMessage, isDesktop } from './lib/desktop';
 import { defaultSettings, type Bootstrap, type Settings, type CitationTarget } from './lib/types';
 
-type Page = 'home' | 'library' | 'chat' | 'notes' | 'settings';
+type Page = 'home' | 'library' | 'chat' | 'notes' | 'agent' | 'settings';
 const pageLabels: Record<Page, string> = {
   home: '学习首页',
   library: '资料库',
   chat: '学习助手',
   notes: '学习笔记',
+  agent: '学习路线',
   settings: '设置',
 };
-const readerBackLabels = { library: '返回资料库', chat: '返回问答', notes: '返回笔记' };
+const readerBackLabels = {
+  library: '返回资料库',
+  chat: '返回问答',
+  notes: '返回笔记',
+  agent: '返回路线',
+};
 
 export default function App() {
   const mainRef = useRef<HTMLElement>(null);
   const [page, setPage] = useState<Page>('home');
   const [sourceId, setSourceId] = useState<string | null>(null);
   const [citationTarget, setCitationTarget] = useState<CitationTarget | null>(null);
-  const [readerReturn, setReaderReturn] = useState<'library' | 'chat' | 'notes'>('library');
+  const [readerReturn, setReaderReturn] = useState<'library' | 'chat' | 'notes' | 'agent'>(
+    'library',
+  );
   const [questionSource, setQuestionSource] = useState<{ id: string; sequence: number } | null>(
     null,
   );
-  const [noteSource, setNoteSource] = useState<{ id: string; sequence: number } | null>(null);
+  const [noteSource, setNoteSource] = useState<{ id: string | null; sequence: number } | null>(
+    null,
+  );
   const [boot, setBoot] = useState<Bootstrap | null>(null);
   const [failure, setFailure] = useState<string | null>(null);
   const [attempt, setAttempt] = useState(0);
@@ -93,7 +104,11 @@ export default function App() {
     setSourceId(id);
     setPage('library');
   }
-  async function openCitation(turnId: string, number: number, returnTo: 'chat' | 'notes' = 'chat') {
+  async function openCitation(
+    turnId: string,
+    number: number,
+    returnTo: 'chat' | 'notes' | 'agent' = 'chat',
+  ) {
     const target = await desktop.resolveCitation(turnId, number);
     setCitationTarget(target);
     setSourceId(target.sourceId);
@@ -107,7 +122,10 @@ export default function App() {
   }
   function takeNote() {
     if (!sourceId) return;
-    setNoteSource((previous) => ({ id: sourceId, sequence: (previous?.sequence ?? 0) + 1 }));
+    startNote(sourceId);
+  }
+  function startNote(id: string | null) {
+    setNoteSource((previous) => ({ id, sequence: (previous?.sequence ?? 0) + 1 }));
     navigate('notes');
   }
   function openNoteSource(id: string) {
@@ -151,6 +169,7 @@ export default function App() {
             { id: 'library' as const, icon: FolderOpen },
             { id: 'chat' as const, icon: MessageCircle },
             { id: 'notes' as const, icon: NotebookPen },
+            { id: 'agent' as const, icon: Sparkles },
           ].map(({ id, icon: Icon }) => (
             <button
               key={id}
@@ -338,6 +357,17 @@ export default function App() {
                 settings={settings}
                 onSettings={() => navigate('settings')}
                 onOpenCitation={(turnId, number) => openCitation(turnId, number, 'notes')}
+              />
+            </div>
+          )}
+          {boot && !failure && (
+            <div className="agent-container" hidden={page !== 'agent'}>
+              <AgentPage
+                visible={page === 'agent'}
+                settings={settings}
+                onSettings={() => navigate('settings')}
+                onOpenCitation={(turnId, number) => openCitation(turnId, number, 'agent')}
+                onTakeNote={startNote}
               />
             </div>
           )}

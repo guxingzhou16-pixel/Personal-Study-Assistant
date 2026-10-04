@@ -50,6 +50,9 @@ export const desktop: DesktopApi = {
   prepareNoteFeedback: (id, revision, question) =>
     api().prepareNoteFeedback(id, revision, question),
   sendNoteFeedback: (request) => api().sendNoteFeedback(request),
+  listLearningDrafts: () => api().listLearningDrafts(),
+  prepareLearningDraft: (request) => api().prepareLearningDraft(request),
+  sendLearningDraft: (request) => api().sendLearningDraft(request),
 };
 
 export function errorMessage(error: unknown): string {

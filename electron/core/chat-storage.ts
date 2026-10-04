@@ -3,6 +3,9 @@ import type { DatabaseSync } from 'node:sqlite';
 import type { ChatTurn, Conversation, ConversationSummary } from '../../src/lib/types';
 import { AppError } from './errors';
 import { readNoteSnapshot } from './note-storage';
+import { readLearningRequest } from './learning-input';
+
+type ConversationPurpose = 'chat' | 'note-feedback' | 'learning-agent';
 
 export const CHAT_MIGRATION = `
   CREATE TABLE conversations (id TEXT PRIMARY KEY, title TEXT NOT NULL, updated_at TEXT NOT NULL);
@@ -24,19 +27,33 @@ export const NOTE_FEEDBACK_MIGRATION = `
     CHECK(note_snapshot IS NULL OR json_valid(note_snapshot));
   PRAGMA user_version = 6;
 `;
+export const LEARNING_AGENT_MIGRATION = `
+  ALTER TABLE conversations ADD COLUMN purpose TEXT NOT NULL DEFAULT 'chat'
+    CHECK(purpose IN ('chat', 'note-feedback', 'learning-agent'));
+  UPDATE conversations SET purpose = 'note-feedback' WHERE note_id IS NOT NULL;
+  CREATE UNIQUE INDEX conversations_learning ON conversations(purpose) WHERE purpose = 'learning-agent';
+  ALTER TABLE chat_turns ADD COLUMN learning_request TEXT
+    CHECK(learning_request IS NULL OR (json_valid(learning_request) AND note_snapshot IS NULL AND mode = 'sources'));
+  PRAGMA user_version = 7;
+`;
 
 function decodeTurn(row: Record<string, unknown>): ChatTurn {
   try {
-    const { noteSnapshot, ...fields } = row;
+    const { noteSnapshot, learningRequest, ...fields } = row;
+    if (learningRequest !== null && (noteSnapshot !== null || row.mode !== 'sources'))
+      throw new Error('Conflicting learning snapshots');
     return {
       ...fields,
       evidence: JSON.parse(String(row.evidence)),
       ...(noteSnapshot !== null
         ? { noteSnapshot: readNoteSnapshot(JSON.parse(String(noteSnapshot))) }
         : {}),
+      ...(learningRequest !== null
+        ? { learningRequest: readLearningRequest(JSON.parse(String(learningRequest))) }
+        : {}),
     } as unknown as ChatTurn;
   } catch {
-    throw new AppError('chatCorrupt', '回答或笔记快照格式损坏，请保留数据并检查备份。');
+    throw new AppError('chatCorrupt', '回答或学习内容快照格式损坏，请保留数据并检查备份。');
   }
 }
 export function chatId(input: unknown): string {
@@ -49,18 +66,21 @@ export class ChatStorage {
   list(): ConversationSummary[] {
     return this.db
       .prepare(
-        'SELECT id, title, updated_at AS updatedAt FROM conversations WHERE note_id IS NULL ORDER BY updated_at DESC, rowid DESC',
+        "SELECT id, title, updated_at AS updatedAt FROM conversations WHERE purpose = 'chat' ORDER BY updated_at DESC, rowid DESC",
       )
       .all() as unknown as ConversationSummary[];
   }
   create(): Conversation {
     return this.createConversation(null);
   }
-  private createConversation(noteId: string | null): Conversation {
+  private createConversation(
+    noteId: string | null,
+    purpose: ConversationPurpose = 'chat',
+  ): Conversation {
     if (Number(this.db.prepare('SELECT count(*) AS count FROM conversations').get()?.count) >= 500)
       throw new AppError(
         'chatLimit',
-        '会话数量已达到当前版本上限（500，含笔记反馈）。请保留数据并等待会话管理升级。',
+        '会话数量已达到当前版本上限（500，含笔记反馈和学习路线）。请保留数据并等待会话管理升级。',
       );
     const conversation = {
       id: randomUUID(),
@@ -69,42 +89,51 @@ export class ChatStorage {
       turns: [],
     };
     this.db
-      .prepare('INSERT INTO conversations (id, title, updated_at, note_id) VALUES (?, ?, ?, ?)')
-      .run(conversation.id, conversation.title, conversation.updatedAt, noteId);
+      .prepare(
+        'INSERT INTO conversations (id, title, updated_at, note_id, purpose) VALUES (?, ?, ?, ?, ?)',
+      )
+      .run(conversation.id, conversation.title, conversation.updatedAt, noteId, purpose);
     return conversation;
   }
   findNoteConversation(noteId: string): Conversation | undefined {
     const row = this.db
-      .prepare('SELECT id FROM conversations WHERE note_id = ?')
+      .prepare("SELECT id FROM conversations WHERE note_id = ? AND purpose = 'note-feedback'")
       .get(chatId(noteId));
-    return row ? this.get(row.id, true) : undefined;
+    return row ? this.get(row.id, 'note-feedback') : undefined;
   }
   createNoteConversation(noteId: string): Conversation {
-    return this.createConversation(chatId(noteId));
+    return this.createConversation(chatId(noteId), 'note-feedback');
   }
   listNoteFeedback(noteId: string): ChatTurn[] {
     return this.findNoteConversation(noteId)?.turns ?? [];
   }
-  get(input: unknown, includeFeedback = false): Conversation {
+  findLearningConversation(): Conversation | undefined {
+    const row = this.db
+      .prepare("SELECT id FROM conversations WHERE purpose = 'learning-agent'")
+      .get();
+    return row ? this.get(row.id, 'learning-agent') : undefined;
+  }
+  createLearningConversation(): Conversation {
+    return this.createConversation(null, 'learning-agent');
+  }
+  get(input: unknown, purpose: ConversationPurpose = 'chat'): Conversation {
     const id = chatId(input);
     const row = this.db
-      .prepare(
-        'SELECT id, title, updated_at AS updatedAt, note_id AS noteId FROM conversations WHERE id = ?',
-      )
+      .prepare('SELECT id, title, updated_at AS updatedAt, purpose FROM conversations WHERE id = ?')
       .get(id);
     if (!row) throw new AppError('chatMissing', '找不到这个会话，请新建会话。');
-    if (row.noteId !== null && !includeFeedback)
-      throw new AppError('chatPurpose', '请从学习笔记查看这份反馈。');
+    if (row.purpose !== purpose)
+      throw new AppError('chatPurpose', '请从学习笔记或学习路线页面查看这份专用记录。');
     const turns = this.db
       .prepare(
         `SELECT id, conversation_id AS conversationId, question, answer, status,
       notice, provider, base_url AS baseUrl, model, created_at AS createdAt, revision, mode, evidence,
-      note_snapshot AS noteSnapshot
+      note_snapshot AS noteSnapshot, learning_request AS learningRequest
       FROM chat_turns WHERE conversation_id = ? ORDER BY rowid`,
       )
       .all(id)
       .map(decodeTurn);
-    const { noteId: _noteId, ...summary } = row;
+    const { purpose: _purpose, ...summary } = row;
     return { ...(summary as unknown as ConversationSummary), turns };
   }
   addTurn(turn: ChatTurn): void {
@@ -114,8 +143,8 @@ export class ChatStorage {
         .prepare(
           `INSERT INTO chat_turns
           (id, conversation_id, question, answer, status, notice, provider, base_url, model,
-           created_at, revision, mode, evidence, note_snapshot)
-          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+           created_at, revision, mode, evidence, note_snapshot, learning_request)
+          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
         )
         .run(
           turn.id,
@@ -132,6 +161,7 @@ export class ChatStorage {
           turn.mode,
           JSON.stringify(turn.evidence),
           turn.noteSnapshot ? JSON.stringify(turn.noteSnapshot) : null,
+          turn.learningRequest ? JSON.stringify(turn.learningRequest) : null,
         );
       this.db
         .prepare(
@@ -143,7 +173,9 @@ export class ChatStorage {
           turn.conversationId,
           turn.noteSnapshot
             ? '笔记反馈：' + turn.noteSnapshot.title.slice(0, 34)
-            : turn.question.slice(0, 40),
+            : turn.learningRequest
+              ? '学习路线：' + turn.learningRequest.goal.slice(0, 34)
+              : turn.question.slice(0, 40),
           turn.conversationId,
         );
       this.db.exec('COMMIT');
@@ -157,7 +189,7 @@ export class ChatStorage {
       .prepare(
         `SELECT id, conversation_id AS conversationId, question, answer, status,
       notice, provider, base_url AS baseUrl, model, created_at AS createdAt, revision, mode, evidence,
-      note_snapshot AS noteSnapshot
+      note_snapshot AS noteSnapshot, learning_request AS learningRequest
       FROM chat_turns WHERE id = ?`,
       )
       .get(chatId(input));

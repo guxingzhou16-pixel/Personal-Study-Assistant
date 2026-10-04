@@ -26,7 +26,7 @@ export function NotesPage({
   onOpenCitation,
 }: {
   visible: boolean;
-  presetSource: { id: string; sequence: number } | null;
+  presetSource: { id: string | null; sequence: number } | null;
   onOpenSource: (id: string) => void;
   settings: Settings;
   onSettings: () => void;

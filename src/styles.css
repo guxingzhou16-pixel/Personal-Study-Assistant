@@ -2415,3 +2415,115 @@ select:hover {
     transition: none !important;
   }
 }
+
+.agent-page .page-heading,
+.agent-actions {
+  flex-wrap: wrap;
+}
+.agent-flow {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 14px;
+  padding: 16px 16px 16px 36px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: #f3f5ef;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.7;
+}
+.agent-flow li {
+  margin-left: 14px;
+}
+.agent-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  min-width: 0;
+  padding: 24px;
+  margin-top: 22px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: var(--surface);
+}
+.agent-panel h2 {
+  margin: 0;
+  font-size: 19px;
+}
+.agent-panel > p {
+  margin: 0;
+}
+.agent-field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+  font-size: 13px;
+  font-weight: 600;
+}
+.agent-field input,
+.agent-field textarea,
+.agent-field select {
+  width: 100%;
+  min-width: 0;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 11px 12px;
+  color: inherit;
+  background: var(--surface);
+  font: inherit;
+}
+.agent-field textarea {
+  min-height: 92px;
+  line-height: 1.8;
+  resize: vertical;
+}
+.agent-request-options {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(140px, 180px);
+  gap: 16px;
+}
+.agent-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+.agent-request-summary {
+  display: grid;
+  grid-template-columns: 76px minmax(0, 1fr);
+  gap: 10px 16px;
+  margin: 12px 0;
+  font-size: 13px;
+  line-height: 1.8;
+}
+.agent-request-summary dt {
+  color: var(--muted);
+}
+.agent-request-summary dd {
+  margin: 0;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+.agent-panel .evidence-preview {
+  margin: 0;
+}
+.agent-panel .evidence-preview > .button {
+  margin-top: 16px;
+}
+.agent-result {
+  min-width: 0;
+  border-top: 1px solid var(--line);
+  padding-top: 16px;
+}
+@media (max-width: 1050px) {
+  .agent-flow {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .agent-panel {
+    padding: 18px;
+  }
+  .agent-request-options {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

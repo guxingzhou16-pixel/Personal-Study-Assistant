@@ -82,7 +82,7 @@ export function ChatPage({
     turnRevisions.current.set(turn.id, turn.revision);
     activityRevision.current++;
     lastUpdate.current = turn;
-    if (!turn.noteSnapshot)
+    if (!turn.noteSnapshot && !turn.learningRequest)
       setConversation((previous) =>
         previous?.id === turn.conversationId ? withTurn(previous, turn) : previous,
       );
@@ -138,7 +138,7 @@ export function ChatPage({
     let cancelled = false;
     const stop = desktop.onChatUpdate((turn) => {
       applyTurn(turn);
-      if (!turn.noteSnapshot && turn.status !== 'streaming')
+      if (!turn.noteSnapshot && !turn.learningRequest && turn.status !== 'streaming')
         void refresh().catch((failure) => setError(errorMessage(failure)));
     });
     void (async () => {
@@ -512,15 +512,23 @@ export function ChatPage({
                 笔记“{active.noteSnapshot.title}”正在生成反馈，可从学习笔记查看。
               </p>
             )}
-            {active && !active.noteSnapshot && active.conversationId !== conversation?.id && (
-              <button
-                className="chat-running-link"
-                type="button"
-                onClick={() => void openConversation(active.conversationId)}
-              >
-                另一会话正在回答，点击查看
-              </button>
+            {active?.learningRequest && (
+              <p className="chat-running-link" role="status">
+                学习路线正在起草，可从“学习路线”查看。
+              </p>
             )}
+            {active &&
+              !active.noteSnapshot &&
+              !active.learningRequest &&
+              active.conversationId !== conversation?.id && (
+                <button
+                  className="chat-running-link"
+                  type="button"
+                  onClick={() => void openConversation(active.conversationId)}
+                >
+                  另一会话正在回答，点击查看
+                </button>
+              )}
             <label className="sr-only" htmlFor="chat-question">
               输入学习问题
             </label>

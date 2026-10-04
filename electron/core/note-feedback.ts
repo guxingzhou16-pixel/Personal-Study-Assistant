@@ -120,7 +120,7 @@ export class NoteFeedbackService {
         expectedProfile: request.expectedProfile,
         consentEndpoint: request.consentEndpoint,
       },
-      note,
+      { kind: 'note', note },
     );
     this.previews.delete(id);
     return turn;

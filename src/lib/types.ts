@@ -113,6 +113,7 @@ export interface ChatTurn {
   mode: 'chat' | 'sources';
   evidence: Evidence[];
   noteSnapshot?: StudyNote;
+  learningRequest?: LearningRequest;
 }
 export interface Evidence {
   number: number;
@@ -206,6 +207,21 @@ export interface NoteFeedbackRequest {
   expectedProfile: string;
   consentEndpoint?: string;
 }
+export interface LearningRequest {
+  goal: string;
+  query: string;
+  sourceId: string | null;
+  minutes: number;
+}
+export interface LearningPreview {
+  request: LearningRequest;
+  evidence: EvidencePreview;
+}
+export interface LearningDraftRequest {
+  retrievalId: string;
+  expectedProfile: string;
+  consentEndpoint?: string;
+}
 export interface DesktopApi {
   bootstrap(): Promise<Bootstrap>;
   saveSettings(settings: Settings): Promise<Settings>;
@@ -253,6 +269,9 @@ export interface DesktopApi {
   listNoteFeedback(id: string): Promise<ChatTurn[]>;
   prepareNoteFeedback(id: string, revision: number, question: string): Promise<NoteFeedbackPreview>;
   sendNoteFeedback(request: NoteFeedbackRequest): Promise<ChatTurn>;
+  listLearningDrafts(): Promise<ChatTurn[]>;
+  prepareLearningDraft(request: LearningRequest): Promise<LearningPreview>;
+  sendLearningDraft(request: LearningDraftRequest): Promise<ChatTurn>;
 }
 
 declare global {

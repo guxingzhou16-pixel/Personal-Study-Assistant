@@ -28,6 +28,7 @@ import { noteRevision } from './core/note-storage';
 import { noteFileName, writeNoteExport } from './core/note-export';
 import { noteMarkdown } from '../src/lib/notes';
 import { NoteFeedbackService } from './core/note-feedback';
+import { LearningAgentService } from './core/learning-agent';
 
 app.setName('StudyCompanion');
 const testDataDir = !app.isPackaged ? process.env.STUDY_COMPANION_DATA_DIR : undefined;
@@ -103,6 +104,7 @@ function registerHandlers(database: Storage, credentials: Credentials, tracker: 
   );
   chat = chats;
   const feedback = new NoteFeedbackService(database, retrieval, chats);
+  const learning = new LearningAgentService(database, retrieval, chats);
   function handle(channel: string, work: (...args: unknown[]) => unknown) {
     ipcMain.handle(channel, async (event, ...args: unknown[]) => {
       const frameUrl = event.senderFrame?.url;
@@ -191,6 +193,9 @@ function registerHandlers(database: Storage, credentials: Credentials, tracker: 
     feedback.prepare(id, revision, question, retrievalProgress),
   );
   handle('study:send-note-feedback', (request) => feedback.send(request));
+  handle('study:list-learning-drafts', () => learning.list());
+  handle('study:prepare-learning-draft', (request) => learning.prepare(request, retrievalProgress));
+  handle('study:send-learning-draft', (request) => learning.send(request));
   handle('study:embedding-status', () => embeddings.status());
   handle('study:cancel-embedding-download', () => embeddings.cancel());
   handle('study:download-embedding', () => {

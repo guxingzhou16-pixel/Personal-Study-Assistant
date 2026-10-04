@@ -1,5 +1,5 @@
 import { randomUUID } from 'node:crypto';
-import type { ChatTurn, EvidencePreview, StudyNote } from '../../src/lib/types';
+import type { ChatTurn, EvidencePreview, StudyNote, LearningRequest } from '../../src/lib/types';
 import type { Storage } from './storage';
 import type { Credentials } from './credentials';
 import { AppError, failure } from './errors';
@@ -7,6 +7,10 @@ import { record, string } from './settings';
 import { chatId } from './chat-storage';
 import { streamChat, type ChatMessage, type StreamRequest } from './chat-stream';
 import { noteFeedbackMessages } from './note-feedback';
+import { learningMessages } from './learning-agent';
+
+type LearningContext =
+  { kind: 'note'; note: StudyNote } | { kind: 'learning'; request: LearningRequest };
 
 interface ActiveChat {
   turn: ChatTurn;
@@ -27,8 +31,8 @@ export class ChatService {
     storage.chat.recover();
   }
 
-  // The note snapshot is supplied only by the main-process feedback service.
-  send(input: unknown, noteSnapshot?: StudyNote): ChatTurn {
+  // Trusted context comes only from the main-process feedback or learning workflow.
+  send(input: unknown, context?: LearningContext): ChatTurn {
     if (this.closed) throw new AppError('chatClosed', '聊天服务已关闭，请重启应用。');
     if (this.active) throw new AppError('chatBusy', '请先停止当前回答，再发送新问题。');
     const request = record(input);
@@ -47,15 +51,21 @@ export class ChatService {
       throw new AppError('validation', '聊天请求包含不支持的字段。');
     const question = string(request.question, '问题', 4000);
     if (!question) throw new AppError('question', '请先输入问题。');
+    const noteSnapshot = context?.kind === 'note' ? context.note : undefined;
+    const learningRequest = context?.kind === 'learning' ? context.request : undefined;
     const existing = noteSnapshot
       ? this.storage.chat.findNoteConversation(noteSnapshot.id)
-      : this.storage.chat.get(request.conversationId);
+      : learningRequest
+        ? this.storage.chat.findLearningConversation()
+        : this.storage.chat.get(request.conversationId);
     if (existing && existing.turns.length >= 100)
       throw new AppError(
         'chatLimit',
         noteSnapshot
           ? '此笔记已达到 100 次反馈，当前版本暂不能继续生成。'
-          : '此会话已达到 100 次提问，请新建会话继续。',
+          : learningRequest
+            ? '学习路线已达到当前版本的 100 份草稿上限，请保留数据并等待记录管理升级。'
+            : '此会话已达到 100 次提问，请新建会话继续。',
       );
     const settings = this.storage.loadSettings();
     const profile = settings[settings.provider];
@@ -64,7 +74,8 @@ export class ChatService {
       if (!this.retrieval) throw new AppError('retrieval', '资料检索服务暂不可用，请重新检索。');
       evidence = this.retrieval.consume(request.retrievalId, question);
     }
-    if (noteSnapshot && !evidence) throw new AppError('retrieval', '笔记反馈必须先准备资料证据。');
+    if (context && !evidence)
+      throw new AppError('retrieval', '笔记反馈或学习路线必须先准备资料证据。');
     const needsModel = !evidence || evidence.hits.length > 0;
     if (needsModel && !profile.model)
       throw new AppError('model', '请先在设置中选择并保存聊天模型。');
@@ -74,7 +85,9 @@ export class ChatService {
         'profileChanged',
         noteSnapshot
           ? '模型设置已变化，请重新确认当前模型后再生成反馈。'
-          : '模型设置已变化，请重新打开聊天页确认后再发送。',
+          : learningRequest
+            ? '模型设置已变化，请重新确认当前模型后再起草学习路线。'
+            : '模型设置已变化，请重新打开聊天页确认后再发送。',
       );
     const remote = !['localhost', '127.0.0.1', '[::1]'].includes(new URL(profile.baseUrl).hostname);
     if (needsModel && remote && request.consentEndpoint !== profile.baseUrl)
@@ -82,9 +95,11 @@ export class ChatService {
         'remoteConsent',
         noteSnapshot
           ? '请先确认将已保存笔记、本次问题和预览的检索片段发送至当前远程服务。'
-          : evidence
-            ? '请先确认将本次问题和预览的检索片段发送至当前远程服务。'
-            : '请先确认将本次问题和近期会话发送至当前远程服务。',
+          : learningRequest
+            ? '请先确认将本次学习目标、时间预算、检索概念和预览片段发送至当前远程服务。'
+            : evidence
+              ? '请先确认将本次问题和预览的检索片段发送至当前远程服务。'
+              : '请先确认将本次问题和近期会话发送至当前远程服务。',
       );
     const key =
       needsModel && settings.provider === 'openai'
@@ -95,7 +110,11 @@ export class ChatService {
       game: '可以使用轻量游戏化的表达，不虚构积分或掌握程度。',
       coach: '直接、清楚，优先解释关键概念和下一步练习。',
     };
-    const conversation = existing ?? this.storage.chat.createNoteConversation(noteSnapshot!.id);
+    const conversation =
+      existing ??
+      (noteSnapshot
+        ? this.storage.chat.createNoteConversation(noteSnapshot.id)
+        : this.storage.chat.createLearningConversation());
     const history: ChatMessage[] = [];
     let characters = 0;
     for (const turn of conversation.turns
@@ -138,13 +157,19 @@ export class ChatService {
         messages.length,
         ...noteFeedbackMessages(noteSnapshot, evidence!, styles[settings.responseStyle]),
       );
+    if (learningRequest)
+      messages.splice(
+        0,
+        messages.length,
+        ...learningMessages(learningRequest, evidence!, styles[settings.responseStyle]),
+      );
     const turn: ChatTurn = {
       id: randomUUID(),
       conversationId: conversation.id,
       question,
       answer: '',
       status: 'streaming',
-      notice: noteSnapshot ? evidence!.notice : '',
+      notice: context ? evidence!.notice : '',
       provider: settings.provider,
       baseUrl: profile.baseUrl,
       model: profile.model,
@@ -153,12 +178,15 @@ export class ChatService {
       mode: evidence ? 'sources' : 'chat',
       evidence: evidence?.hits ?? [],
       ...(noteSnapshot ? { noteSnapshot } : {}),
+      ...(learningRequest ? { learningRequest } : {}),
     };
     if (evidence && !evidence.hits.length) {
       turn.status = 'completed';
       turn.answer = noteSnapshot
         ? '在当前资料范围内没有找到匹配证据，无法据此判断笔记中的理解是否正确。请调整关注问题、关联资料或补充资料后重新准备反馈。未调用聊天模型，笔记正文保持原样。'
-        : '在所选资料范围内没有找到足够的资料证据，暂时无法据此回答。请换用资料中的概念、补充资料或调整范围。';
+        : learningRequest
+          ? '在本次资料范围内没有找到匹配证据，无法起草有出处的学习路线。请使用资料中的具体概念检索、调整资料范围或补充资料后重新准备。未调用聊天模型，未创建计划、任务或记忆。'
+          : '在所选资料范围内没有找到足够的资料证据，暂时无法据此回答。请换用资料中的概念、补充资料或调整范围。';
       turn.notice = evidence.notice;
       this.storage.chat.addTurn(turn);
       return turn;
@@ -218,7 +246,7 @@ export class ChatService {
         job,
         'completed',
         [
-          job.turn.noteSnapshot ? job.turn.notice : '',
+          job.turn.noteSnapshot || job.turn.learningRequest ? job.turn.notice : '',
           result.truncated ? '模型达到输出长度上限，回答可能尚未结束。可以继续提问。' : '',
           job.turn.mode === 'sources' ? citationNotice(job.turn) : '',
         ]

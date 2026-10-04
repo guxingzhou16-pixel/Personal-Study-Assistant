@@ -23,6 +23,7 @@ import type {
   StudyNote,
   NoteExportResult,
   NoteFeedbackPreview,
+  LearningPreview,
 } from '../src/lib/types';
 
 async function call<T>(channel: string, ...args: unknown[]): Promise<T> {
@@ -104,5 +105,8 @@ const api: DesktopApi = {
   prepareNoteFeedback: (id, revision, question) =>
     call<NoteFeedbackPreview>('study:prepare-note-feedback', id, revision, question),
   sendNoteFeedback: (request) => call<ChatTurn>('study:send-note-feedback', request),
+  listLearningDrafts: () => call<ChatTurn[]>('study:list-learning-drafts'),
+  prepareLearningDraft: (request) => call<LearningPreview>('study:prepare-learning-draft', request),
+  sendLearningDraft: (request) => call<ChatTurn>('study:send-learning-draft', request),
 };
 contextBridge.exposeInMainWorld('studyCompanion', api);
