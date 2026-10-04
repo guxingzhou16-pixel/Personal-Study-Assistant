@@ -1,7 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { MessageCircle, Plus, Send, Square, Settings2 } from 'lucide-react';
-import ReactMarkdown from 'react-markdown';
-import remarkGfm from 'remark-gfm';
 import { desktop, errorMessage, isDesktop } from '../lib/desktop';
 import type {
   ChatTurn,
@@ -13,7 +11,7 @@ import type {
   RetrievalProgress,
 } from '../lib/types';
 import { EvidenceCards } from './EvidenceCards';
-import { citationNumber, remarkEvidence } from '../lib/citations';
+import { ModelAnswer } from './ModelAnswer';
 
 function withTurn(conversation: Conversation, turn: ChatTurn): Conversation {
   const existing = conversation.turns.find((item) => item.id === turn.id);
@@ -64,6 +62,8 @@ export function ChatPage({
   const searchVersion = useRef(0);
   const [consentProfile, setConsentProfile] = useState<string | null>(null);
   const lastUpdate = useRef<ChatTurn | null>(null);
+  const turnRevisions = useRef(new Map<string, number>());
+  const activityRevision = useRef(0);
   const loadVersion = useRef(0);
   const transcript = useRef<HTMLDivElement>(null);
   const followOutput = useRef(true);
@@ -78,18 +78,22 @@ export function ChatPage({
     preview.sourceId === (scope || null);
   const remote = !['localhost', '127.0.0.1', '[::1]'].includes(new URL(profile.baseUrl).hostname);
   const applyTurn = useCallback((turn: ChatTurn) => {
-    if (lastUpdate.current?.id === turn.id && lastUpdate.current.revision > turn.revision) return;
+    if ((turnRevisions.current.get(turn.id) ?? -1) > turn.revision) return;
+    turnRevisions.current.set(turn.id, turn.revision);
+    activityRevision.current++;
     lastUpdate.current = turn;
-    setConversation((previous) =>
-      previous?.id === turn.conversationId ? withTurn(previous, turn) : previous,
-    );
+    if (!turn.noteSnapshot)
+      setConversation((previous) =>
+        previous?.id === turn.conversationId ? withTurn(previous, turn) : previous,
+      );
     setActive((previous) => {
       if (previous?.id === turn.id && previous.revision > turn.revision) return previous;
       if (turn.status === 'streaming') return turn;
       return previous?.id === turn.id ? null : previous;
     });
   }, []);
-  const restoreActive = useCallback((snapshot: ChatTurn | null) => {
+  const restoreActive = useCallback((snapshot: ChatTurn | null, expectedActivity: number) => {
+    if (activityRevision.current !== expectedActivity) return;
     const latest = lastUpdate.current;
     const turn =
       snapshot && latest?.id === snapshot.id && latest.revision > snapshot.revision
@@ -107,6 +111,7 @@ export function ChatPage({
       setError('');
       try {
         const saved = await desktop.getConversation(id);
+        const activity = activityRevision.current;
         const running = await desktop.activeChat();
         if (version !== loadVersion.current) return;
         setConversation((previous) => {
@@ -118,7 +123,7 @@ export function ChatPage({
             result = withTurn(result, lastUpdate.current);
           return result;
         });
-        restoreActive(running);
+        restoreActive(running, activity);
         followOutput.current = true;
       } catch (failure) {
         if (version === loadVersion.current) setError(errorMessage(failure));
@@ -133,7 +138,7 @@ export function ChatPage({
     let cancelled = false;
     const stop = desktop.onChatUpdate((turn) => {
       applyTurn(turn);
-      if (turn.status !== 'streaming')
+      if (!turn.noteSnapshot && turn.status !== 'streaming')
         void refresh().catch((failure) => setError(errorMessage(failure)));
     });
     void (async () => {
@@ -142,7 +147,10 @@ export function ChatPage({
         if (cancelled) return;
         setConversations(items);
         if (items[0]) await openConversation(items[0].id);
-        else restoreActive(await desktop.activeChat());
+        else {
+          const activity = activityRevision.current;
+          restoreActive(await desktop.activeChat(), activity);
+        }
       } catch (failure) {
         if (!cancelled) setError(errorMessage(failure));
       } finally {
@@ -265,7 +273,8 @@ export function ChatPage({
           for (const entry of previous.turns) result = withTurn(result, entry);
         return result;
       });
-      restoreActive(await desktop.activeChat());
+      const activity = activityRevision.current;
+      restoreActive(await desktop.activeChat(), activity);
       await refresh();
     } catch (failure) {
       setError(errorMessage(failure));
@@ -420,35 +429,10 @@ export function ChatPage({
                       : turn.model || '未选择模型'}
                   </span>
                   <div className="chat-answer" data-testid="chat-answer">
-                    <ReactMarkdown
-                      remarkPlugins={
-                        turn.mode === 'sources' ? [remarkGfm, remarkEvidence] : [remarkGfm]
-                      }
-                      skipHtml
-                      urlTransform={(url) =>
-                        citationNumber(url, turn.evidence) !== null ? url : ''
-                      }
-                      components={{
-                        img: () => null,
-                        a: ({ href, children }) => {
-                          const number = citationNumber(href, turn.evidence);
-                          return number === null ? (
-                            <span>{children}</span>
-                          ) : (
-                            <button
-                              className="citation-link"
-                              aria-label={`引用 ${number}`}
-                              onClick={() => void openEvidence(turn.id, number)}
-                            >
-                              {children}
-                            </button>
-                          );
-                        },
-                      }}
-                    >
-                      {turn.answer ||
-                        (turn.status === 'streaming' ? '正在等待模型回应…' : '本次没有收到回答。')}
-                    </ReactMarkdown>
+                    <ModelAnswer
+                      turn={turn}
+                      onOpenCitation={(number) => void openEvidence(turn.id, number)}
+                    />
                   </div>
                   <p className="chat-turn-status" role="status">
                     {labels[turn.status]}
@@ -523,7 +507,12 @@ export function ChatPage({
                 {profile.baseUrl}；服务费用由我承担。
               </label>
             )}
-            {active && active.conversationId !== conversation?.id && (
+            {active?.noteSnapshot && (
+              <p className="chat-running-link" role="status">
+                笔记“{active.noteSnapshot.title}”正在生成反馈，可从学习笔记查看。
+              </p>
+            )}
+            {active && !active.noteSnapshot && active.conversationId !== conversation?.id && (
               <button
                 className="chat-running-link"
                 type="button"

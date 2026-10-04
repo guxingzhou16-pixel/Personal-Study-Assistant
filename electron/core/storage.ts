@@ -11,10 +11,10 @@ import {
 import { AppError } from './errors';
 import { record, validateSettings } from './settings';
 import { sourceId } from './documents';
-import { CHAT_MIGRATION, ChatStorage } from './chat-storage';
+import { CHAT_MIGRATION, NOTE_FEEDBACK_MIGRATION, ChatStorage } from './chat-storage';
 import { NOTES_MIGRATION, NoteStorage } from './note-storage';
 
-const SCHEMA_VERSION = 5;
+const SCHEMA_VERSION = 6;
 
 const INITIAL_MIGRATION = `
   CREATE TABLE app_settings (
@@ -73,6 +73,7 @@ export class Storage {
             PRAGMA user_version = 4;
           `);
           if (version < 5) this.db.exec(NOTES_MIGRATION);
+          if (version < 6) this.db.exec(NOTE_FEEDBACK_MIGRATION);
           this.db.exec('COMMIT;');
         } catch (error) {
           this.db.exec('ROLLBACK;');

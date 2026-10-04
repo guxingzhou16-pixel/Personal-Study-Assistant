@@ -27,6 +27,7 @@ import { EmbeddingFiles } from './core/embedding-files';
 import { noteRevision } from './core/note-storage';
 import { noteFileName, writeNoteExport } from './core/note-export';
 import { noteMarkdown } from '../src/lib/notes';
+import { NoteFeedbackService } from './core/note-feedback';
 
 app.setName('StudyCompanion');
 const testDataDir = !app.isPackaged ? process.env.STUDY_COMPANION_DATA_DIR : undefined;
@@ -101,6 +102,7 @@ function registerHandlers(database: Storage, credentials: Credentials, tracker: 
     retrieval,
   );
   chat = chats;
+  const feedback = new NoteFeedbackService(database, retrieval, chats);
   function handle(channel: string, work: (...args: unknown[]) => unknown) {
     ipcMain.handle(channel, async (event, ...args: unknown[]) => {
       const frameUrl = event.senderFrame?.url;
@@ -184,6 +186,11 @@ function registerHandlers(database: Storage, credentials: Credentials, tracker: 
   handle('study:cancel-retrieval', () => retrieval.cancel());
   handle('study:rebuild-index', () => retrieval.rebuild(retrievalProgress));
   handle('study:resolve-citation', (turnId, number) => retrieval.resolveCitation(turnId, number));
+  handle('study:list-note-feedback', (id) => feedback.list(id));
+  handle('study:prepare-note-feedback', (id, revision, question) =>
+    feedback.prepare(id, revision, question, retrievalProgress),
+  );
+  handle('study:send-note-feedback', (request) => feedback.send(request));
   handle('study:embedding-status', () => embeddings.status());
   handle('study:cancel-embedding-download', () => embeddings.cancel());
   handle('study:download-embedding', () => {
@@ -198,7 +205,11 @@ function registerHandlers(database: Storage, credentials: Credentials, tracker: 
   handle('study:list-notes', () => database.notes.list());
   handle('study:get-note', (id) => database.notes.get(id));
   handle('study:save-note', (request) => database.notes.save(request));
-  handle('study:delete-note', (id, revision) => database.notes.delete(id, revision));
+  handle('study:delete-note', (id, revision) => {
+    if (chats.current()?.noteSnapshot?.id === id)
+      throw new AppError('noteFeedbackBusy', '请先停止这份笔记的反馈，再确认删除。');
+    database.notes.delete(id, revision);
+  });
   handle('study:set-note-draft-dirty', (dirty) => {
     if (typeof dirty !== 'boolean') throw new AppError('validation', '笔记编辑状态无效。');
     noteDraftDirty = dirty;

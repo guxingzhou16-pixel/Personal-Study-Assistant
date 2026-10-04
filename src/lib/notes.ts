@@ -21,6 +21,7 @@ export const noteSections = [
 ] as const;
 
 export const noteLimits = { title: 120, section: 20_000, count: 1000 };
+export const noteFeedbackLimits = { content: 12_000, question: 1000 };
 
 export function emptyNoteDraft(sourceId: string | null = null): NoteDraft {
   return { title: '', sourceId, understanding: '', evidence: '', questions: '', nextStep: '' };

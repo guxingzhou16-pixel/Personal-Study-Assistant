@@ -93,11 +93,11 @@ export default function App() {
     setSourceId(id);
     setPage('library');
   }
-  async function openCitation(turnId: string, number: number) {
+  async function openCitation(turnId: string, number: number, returnTo: 'chat' | 'notes' = 'chat') {
     const target = await desktop.resolveCitation(turnId, number);
     setCitationTarget(target);
     setSourceId(target.sourceId);
-    setReaderReturn('chat');
+    setReaderReturn(returnTo);
     setPage('library');
   }
   function askSource() {
@@ -335,6 +335,9 @@ export default function App() {
                 visible={page === 'notes'}
                 presetSource={noteSource}
                 onOpenSource={openNoteSource}
+                settings={settings}
+                onSettings={() => navigate('settings')}
+                onOpenCitation={(turnId, number) => openCitation(turnId, number, 'notes')}
               />
             </div>
           )}

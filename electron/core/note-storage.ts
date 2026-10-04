@@ -58,21 +58,35 @@ function validateDraft(input: Record<string, unknown>): NoteDraft {
 
 function decode(row: Record<string, unknown>): StudyNote {
   try {
-    const draft = validateDraft({ ...row, sourceId: row.source_id, nextStep: row.next_step });
-    const createdAt = String(row.created_at);
-    const updatedAt = String(row.updated_at);
-    if (!Number.isFinite(Date.parse(createdAt)) || !Number.isFinite(Date.parse(updatedAt)))
-      throw new Error('invalid timestamp');
-    return {
-      ...draft,
-      id: noteId(row.id),
-      revision: noteRevision(row.revision),
-      createdAt,
-      updatedAt,
-    };
+    return readNoteSnapshot({
+      ...row,
+      sourceId: row.source_id,
+      nextStep: row.next_step,
+      createdAt: row.created_at,
+      updatedAt: row.updated_at,
+    });
   } catch {
     throw new AppError('noteCorrupt', '笔记数据格式损坏。请保留数据目录并检查备份。');
   }
+}
+
+export function readNoteSnapshot(input: unknown): StudyNote {
+  const data = record(input);
+  const draft = validateDraft(data);
+  if (
+    typeof data.createdAt !== 'string' ||
+    typeof data.updatedAt !== 'string' ||
+    !Number.isFinite(Date.parse(data.createdAt)) ||
+    !Number.isFinite(Date.parse(data.updatedAt))
+  )
+    throw new AppError('noteCorrupt', '笔记时间格式损坏。请保留数据目录并检查备份。');
+  return {
+    ...draft,
+    id: noteId(data.id),
+    revision: noteRevision(data.revision),
+    createdAt: data.createdAt,
+    updatedAt: data.updatedAt,
+  };
 }
 
 export class NoteStorage {

@@ -2287,6 +2287,94 @@ select:hover {
 .note-confirmation::backdrop {
   background: #1c2d2866;
 }
+
+.note-work {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+.note-feedback-panel {
+  padding: 24px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: var(--surface);
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  min-width: 0;
+}
+.note-feedback-heading,
+.note-feedback-actions,
+.note-feedback-history-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+.note-feedback-heading h2 {
+  font-size: 19px;
+  margin: 0 0 8px;
+}
+.note-feedback-heading p,
+.note-feedback-history-heading h3,
+.note-feedback-panel > p {
+  margin: 0;
+}
+.note-feedback-question,
+.note-feedback-history-select {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  font-size: 13px;
+  font-weight: 600;
+}
+.note-feedback-question input,
+.note-feedback-history-select select {
+  width: 100%;
+  min-width: 0;
+  padding: 11px 12px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  color: inherit;
+  background: var(--surface);
+  font: inherit;
+}
+.note-feedback-panel .evidence-preview,
+.note-feedback-panel .chat-consent {
+  margin: 0;
+}
+.note-feedback-panel .evidence-preview > .button {
+  margin-top: 16px;
+}
+.note-feedback-result {
+  min-width: 0;
+  border-top: 1px solid var(--line);
+  padding-top: 18px;
+}
+.note-feedback-context {
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+.note-snapshot {
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 12px;
+  margin: 12px 0;
+}
+.note-snapshot summary {
+  cursor: pointer;
+  font-size: 13px;
+}
+.note-snapshot h4 {
+  margin: 16px 0 6px;
+}
+.note-snapshot p {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  line-height: 1.7;
+}
 .note-confirmation > p {
   margin-top: 16px;
   line-height: 1.8;

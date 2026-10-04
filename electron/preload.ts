@@ -22,6 +22,7 @@ import type {
   NoteSummary,
   StudyNote,
   NoteExportResult,
+  NoteFeedbackPreview,
 } from '../src/lib/types';
 
 async function call<T>(channel: string, ...args: unknown[]): Promise<T> {
@@ -99,5 +100,9 @@ const api: DesktopApi = {
     ipcRenderer.on('study:show-notes', receive);
     return () => ipcRenderer.removeListener('study:show-notes', receive);
   },
+  listNoteFeedback: (id) => call<ChatTurn[]>('study:list-note-feedback', id),
+  prepareNoteFeedback: (id, revision, question) =>
+    call<NoteFeedbackPreview>('study:prepare-note-feedback', id, revision, question),
+  sendNoteFeedback: (request) => call<ChatTurn>('study:send-note-feedback', request),
 };
 contextBridge.exposeInMainWorld('studyCompanion', api);

@@ -1,11 +1,12 @@
 import { randomUUID } from 'node:crypto';
-import type { ChatTurn, EvidencePreview } from '../../src/lib/types';
+import type { ChatTurn, EvidencePreview, StudyNote } from '../../src/lib/types';
 import type { Storage } from './storage';
 import type { Credentials } from './credentials';
 import { AppError, failure } from './errors';
 import { record, string } from './settings';
 import { chatId } from './chat-storage';
 import { streamChat, type ChatMessage, type StreamRequest } from './chat-stream';
+import { noteFeedbackMessages } from './note-feedback';
 
 interface ActiveChat {
   turn: ChatTurn;
@@ -26,7 +27,8 @@ export class ChatService {
     storage.chat.recover();
   }
 
-  send(input: unknown): ChatTurn {
+  // The note snapshot is supplied only by the main-process feedback service.
+  send(input: unknown, noteSnapshot?: StudyNote): ChatTurn {
     if (this.closed) throw new AppError('chatClosed', '聊天服务已关闭，请重启应用。');
     if (this.active) throw new AppError('chatBusy', '请先停止当前回答，再发送新问题。');
     const request = record(input);
@@ -45,9 +47,16 @@ export class ChatService {
       throw new AppError('validation', '聊天请求包含不支持的字段。');
     const question = string(request.question, '问题', 4000);
     if (!question) throw new AppError('question', '请先输入问题。');
-    const conversation = this.storage.chat.get(request.conversationId);
-    if (conversation.turns.length >= 100)
-      throw new AppError('chatLimit', '此会话已达到 100 次提问，请新建会话继续。');
+    const existing = noteSnapshot
+      ? this.storage.chat.findNoteConversation(noteSnapshot.id)
+      : this.storage.chat.get(request.conversationId);
+    if (existing && existing.turns.length >= 100)
+      throw new AppError(
+        'chatLimit',
+        noteSnapshot
+          ? '此笔记已达到 100 次反馈，当前版本暂不能继续生成。'
+          : '此会话已达到 100 次提问，请新建会话继续。',
+      );
     const settings = this.storage.loadSettings();
     const profile = settings[settings.provider];
     let evidence: EvidencePreview | undefined;
@@ -55,19 +64,27 @@ export class ChatService {
       if (!this.retrieval) throw new AppError('retrieval', '资料检索服务暂不可用，请重新检索。');
       evidence = this.retrieval.consume(request.retrievalId, question);
     }
+    if (noteSnapshot && !evidence) throw new AppError('retrieval', '笔记反馈必须先准备资料证据。');
     const needsModel = !evidence || evidence.hits.length > 0;
     if (needsModel && !profile.model)
       throw new AppError('model', '请先在设置中选择并保存聊天模型。');
     const signature = `${settings.provider}|${profile.baseUrl}|${profile.model}`;
     if (request.expectedProfile !== undefined && request.expectedProfile !== signature)
-      throw new AppError('profileChanged', '模型设置已变化，请重新打开聊天页确认后再发送。');
+      throw new AppError(
+        'profileChanged',
+        noteSnapshot
+          ? '模型设置已变化，请重新确认当前模型后再生成反馈。'
+          : '模型设置已变化，请重新打开聊天页确认后再发送。',
+      );
     const remote = !['localhost', '127.0.0.1', '[::1]'].includes(new URL(profile.baseUrl).hostname);
     if (needsModel && remote && request.consentEndpoint !== profile.baseUrl)
       throw new AppError(
         'remoteConsent',
-        evidence
-          ? '请先确认将本次问题和预览的检索片段发送至当前远程服务。'
-          : '请先确认将本次问题和近期会话发送至当前远程服务。',
+        noteSnapshot
+          ? '请先确认将已保存笔记、本次问题和预览的检索片段发送至当前远程服务。'
+          : evidence
+            ? '请先确认将本次问题和预览的检索片段发送至当前远程服务。'
+            : '请先确认将本次问题和近期会话发送至当前远程服务。',
       );
     const key =
       needsModel && settings.provider === 'openai'
@@ -78,6 +95,7 @@ export class ChatService {
       game: '可以使用轻量游戏化的表达，不虚构积分或掌握程度。',
       coach: '直接、清楚，优先解释关键概念和下一步练习。',
     };
+    const conversation = existing ?? this.storage.chat.createNoteConversation(noteSnapshot!.id);
     const history: ChatMessage[] = [];
     let characters = 0;
     for (const turn of conversation.turns
@@ -114,13 +132,19 @@ export class ChatService {
         { role: 'user', content: question },
       );
     }
+    if (noteSnapshot)
+      messages.splice(
+        0,
+        messages.length,
+        ...noteFeedbackMessages(noteSnapshot, evidence!, styles[settings.responseStyle]),
+      );
     const turn: ChatTurn = {
       id: randomUUID(),
       conversationId: conversation.id,
       question,
       answer: '',
       status: 'streaming',
-      notice: '',
+      notice: noteSnapshot ? evidence!.notice : '',
       provider: settings.provider,
       baseUrl: profile.baseUrl,
       model: profile.model,
@@ -128,11 +152,13 @@ export class ChatService {
       revision: 0,
       mode: evidence ? 'sources' : 'chat',
       evidence: evidence?.hits ?? [],
+      ...(noteSnapshot ? { noteSnapshot } : {}),
     };
     if (evidence && !evidence.hits.length) {
       turn.status = 'completed';
-      turn.answer =
-        '在所选资料范围内没有找到足够的资料证据，暂时无法据此回答。请换用资料中的概念、补充资料或调整范围。';
+      turn.answer = noteSnapshot
+        ? '在当前资料范围内没有找到匹配证据，无法据此判断笔记中的理解是否正确。请调整关注问题、关联资料或补充资料后重新准备反馈。未调用聊天模型，笔记正文保持原样。'
+        : '在所选资料范围内没有找到足够的资料证据，暂时无法据此回答。请换用资料中的概念、补充资料或调整范围。';
       turn.notice = evidence.notice;
       this.storage.chat.addTurn(turn);
       return turn;
@@ -192,6 +218,7 @@ export class ChatService {
         job,
         'completed',
         [
+          job.turn.noteSnapshot ? job.turn.notice : '',
           result.truncated ? '模型达到输出长度上限，回答可能尚未结束。可以继续提问。' : '',
           job.turn.mode === 'sources' ? citationNotice(job.turn) : '',
         ]

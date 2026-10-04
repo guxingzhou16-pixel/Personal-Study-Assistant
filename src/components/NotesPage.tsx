@@ -11,7 +11,8 @@ import {
 } from 'lucide-react';
 import { desktop, errorMessage, isDesktop } from '../lib/desktop';
 import { emptyNoteDraft, noteDraft, noteLimits, noteSections, sameNoteDraft } from '../lib/notes';
-import type { NoteDraft, NoteSummary, Source, StudyNote } from '../lib/types';
+import type { NoteDraft, NoteSummary, Source, StudyNote, Settings } from '../lib/types';
+import { NoteFeedbackPanel } from './NoteFeedbackPanel';
 
 type NoteAction =
   { type: 'new'; sourceId: string | null } | { type: 'open'; id: string } | { type: 'delete' };
@@ -20,10 +21,16 @@ export function NotesPage({
   visible,
   presetSource,
   onOpenSource,
+  settings,
+  onSettings,
+  onOpenCitation,
 }: {
   visible: boolean;
   presetSource: { id: string; sequence: number } | null;
   onOpenSource: (id: string) => void;
+  settings: Settings;
+  onSettings: () => void;
+  onOpenCitation: (turnId: string, number: number) => Promise<void>;
 }) {
   const [notes, setNotes] = useState<NoteSummary[]>([]);
   const [sources, setSources] = useState<Source[]>([]);
@@ -305,137 +312,152 @@ export function NotesPage({
           </div>
         </aside>
         {editing ? (
-          <form
-            className="note-editor"
-            onSubmit={(event) => {
-              event.preventDefault();
-              if (!busy) void save();
-            }}
-          >
-            <div className="note-editor-toolbar">
-              <span className={dirty ? 'note-unsaved' : 'muted'} role="status">
-                {busy
-                  ? '正在处理…'
-                  : dirty
-                    ? '有未保存的修改'
-                    : current
-                      ? '已保存'
-                      : '新笔记尚未保存'}
-              </span>
-              <div className="note-editor-actions">
-                <button
-                  type="submit"
-                  className="button primary"
-                  disabled={busy || !draft.title.trim()}
-                >
-                  <Save size={15} />
-                  保存笔记
-                </button>
-                <button
-                  type="button"
-                  className="button secondary"
-                  disabled={busy || !draft.title.trim()}
-                  onClick={() => void exportMarkdown()}
-                >
-                  <Download size={15} />
-                  导出 Markdown
-                </button>
-                {current && (
+          <div className="note-work">
+            <form
+              className="note-editor"
+              onSubmit={(event) => {
+                event.preventDefault();
+                if (!busy) void save();
+              }}
+            >
+              <div className="note-editor-toolbar">
+                <span className={dirty ? 'note-unsaved' : 'muted'} role="status">
+                  {busy
+                    ? '正在处理…'
+                    : dirty
+                      ? '有未保存的修改'
+                      : current
+                        ? '已保存'
+                        : '新笔记尚未保存'}
+                </span>
+                <div className="note-editor-actions">
+                  <button
+                    type="submit"
+                    className="button primary"
+                    disabled={busy || !draft.title.trim()}
+                  >
+                    <Save size={15} />
+                    保存笔记
+                  </button>
                   <button
                     type="button"
-                    className="icon-button note-delete"
-                    aria-label="删除这份笔记"
-                    disabled={busy}
-                    onClick={() => requestAction({ type: 'delete' })}
+                    className="button secondary"
+                    disabled={busy || !draft.title.trim()}
+                    onClick={() => void exportMarkdown()}
                   >
-                    <Trash2 size={17} />
+                    <Download size={15} />
+                    导出 Markdown
+                  </button>
+                  {current && (
+                    <button
+                      type="button"
+                      className="icon-button note-delete"
+                      aria-label="删除这份笔记"
+                      disabled={busy}
+                      onClick={() => requestAction({ type: 'delete' })}
+                    >
+                      <Trash2 size={17} />
+                    </button>
+                  )}
+                </div>
+              </div>
+              <label className="note-title-field">
+                笔记标题
+                <input
+                  ref={titleInput}
+                  required
+                  maxLength={noteLimits.title}
+                  value={draft.title}
+                  disabled={busy}
+                  placeholder="这次想读懂什么？"
+                  onChange={(event) => change('title', event.target.value)}
+                />
+              </label>
+              <div className="note-source-field">
+                <label>
+                  关联资料
+                  <select
+                    value={draft.sourceId ?? ''}
+                    disabled={busy}
+                    onChange={(event) => change('sourceId', event.target.value || null)}
+                  >
+                    <option value="">不关联资料</option>
+                    {draft.sourceId && !sources.some((source) => source.id === draft.sourceId) && (
+                      <option value={draft.sourceId}>原关联资料暂不可用</option>
+                    )}
+                    {sources.map((source) => (
+                      <option key={source.id} value={source.id}>
+                        {source.name}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+                {draft.sourceId && (
+                  <button
+                    type="button"
+                    className="button secondary"
+                    disabled={busy}
+                    onClick={() => onOpenSource(draft.sourceId!)}
+                  >
+                    <BookOpen size={15} />
+                    查看资料
                   </button>
                 )}
               </div>
-            </div>
-            <label className="note-title-field">
-              笔记标题
-              <input
-                ref={titleInput}
-                required
-                maxLength={noteLimits.title}
-                value={draft.title}
+              {noteSections.map(({ key, label, hint }) => (
+                <label className="note-section" key={key}>
+                  <strong>{label}</strong>
+                  <span className="field-hint" id={'note-hint-' + key}>
+                    {hint}
+                  </span>
+                  <textarea
+                    aria-describedby={'note-hint-' + key}
+                    rows={key === 'understanding' ? 7 : 4}
+                    maxLength={noteLimits.section}
+                    value={draft[key]}
+                    disabled={busy}
+                    onChange={(event) => change(key, event.target.value)}
+                  />
+                </label>
+              ))}
+              <div className="note-editor-footer">
+                <small className="muted">手动保存。切换页面保留草稿；保存后重启可恢复。</small>
+                {current && (
+                  <div className="note-editor-actions">
+                    <button
+                      type="button"
+                      className="text-button"
+                      disabled={busy}
+                      onClick={() => void save(true)}
+                    >
+                      另存为新笔记
+                    </button>
+                    <button
+                      type="button"
+                      className="text-button"
+                      disabled={busy}
+                      onClick={() => requestAction({ type: 'open', id: current.id })}
+                    >
+                      重新加载已保存版本
+                    </button>
+                  </div>
+                )}
+              </div>
+            </form>
+            {current ? (
+              <NoteFeedbackPanel
+                key={current.id}
+                note={current}
+                hasUnsavedChanges={dirty}
                 disabled={busy}
-                placeholder="这次想读懂什么？"
-                onChange={(event) => change('title', event.target.value)}
+                settings={settings}
+                onSettings={onSettings}
+                onOpenCitation={onOpenCitation}
               />
-            </label>
-            <div className="note-source-field">
-              <label>
-                关联资料
-                <select
-                  value={draft.sourceId ?? ''}
-                  disabled={busy}
-                  onChange={(event) => change('sourceId', event.target.value || null)}
-                >
-                  <option value="">不关联资料</option>
-                  {draft.sourceId && !sources.some((source) => source.id === draft.sourceId) && (
-                    <option value={draft.sourceId}>原关联资料暂不可用</option>
-                  )}
-                  {sources.map((source) => (
-                    <option key={source.id} value={source.id}>
-                      {source.name}
-                    </option>
-                  ))}
-                </select>
-              </label>
-              {draft.sourceId && (
-                <button
-                  type="button"
-                  className="button secondary"
-                  disabled={busy}
-                  onClick={() => onOpenSource(draft.sourceId!)}
-                >
-                  <BookOpen size={15} />
-                  查看资料
-                </button>
-              )}
-            </div>
-            {noteSections.map(({ key, label, hint }) => (
-              <label className="note-section" key={key}>
-                <strong>{label}</strong>
-                <span className="field-hint" id={'note-hint-' + key}>
-                  {hint}
-                </span>
-                <textarea
-                  aria-describedby={'note-hint-' + key}
-                  rows={key === 'understanding' ? 7 : 4}
-                  maxLength={noteLimits.section}
-                  value={draft[key]}
-                  disabled={busy}
-                  onChange={(event) => change(key, event.target.value)}
-                />
-              </label>
-            ))}
-            <div className="note-editor-footer">
-              <small className="muted">手动保存。切换页面保留草稿；保存后重启可恢复。</small>
-              {current && (
-                <div className="note-editor-actions">
-                  <button
-                    type="button"
-                    className="text-button"
-                    disabled={busy}
-                    onClick={() => void save(true)}
-                  >
-                    另存为新笔记
-                  </button>
-                  <button
-                    type="button"
-                    className="text-button"
-                    disabled={busy}
-                    onClick={() => requestAction({ type: 'open', id: current.id })}
-                  >
-                    重新加载已保存版本
-                  </button>
-                </div>
-              )}
-            </div>
-          </form>
+            ) : (
+              <p className="field-hint">先保存笔记，再根据资料准备 AI 反馈。</p>
+            )}
+          </div>
         ) : (
           <div className="note-empty">
             {busy ? (
@@ -463,7 +485,7 @@ export function NotesPage({
         </h2>
         <p id="note-confirm-description">
           {pendingAction?.type === 'delete'
-            ? '删除后不能在应用内撤销，未保存修改也会放弃。需要保留时，请先取消并导出。'
+            ? '笔记及其关联的反馈记录都会删除，不能在应用内撤销，未保存修改也会放弃。需要保留笔记时，请先取消并导出。'
             : '可以保存后继续，或者明确放弃这次修改。取消会回到当前笔记。'}
         </p>
         {error && (

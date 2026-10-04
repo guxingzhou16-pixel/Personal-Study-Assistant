@@ -46,6 +46,10 @@ export const desktop: DesktopApi = {
   exportNote: (id, revision) => api().exportNote(id, revision),
   setNoteDraftDirty: (dirty) => api().setNoteDraftDirty(dirty),
   onShowNotes: (listener) => api().onShowNotes(listener),
+  listNoteFeedback: (id) => api().listNoteFeedback(id),
+  prepareNoteFeedback: (id, revision, question) =>
+    api().prepareNoteFeedback(id, revision, question),
+  sendNoteFeedback: (request) => api().sendNoteFeedback(request),
 };
 
 export function errorMessage(error: unknown): string {

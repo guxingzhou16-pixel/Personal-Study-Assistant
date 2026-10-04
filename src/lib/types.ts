@@ -112,6 +112,7 @@ export interface ChatTurn {
   revision: number;
   mode: 'chat' | 'sources';
   evidence: Evidence[];
+  noteSnapshot?: StudyNote;
 }
 export interface Evidence {
   number: number;
@@ -196,6 +197,15 @@ export interface NoteExportResult {
   cancelled: boolean;
   fileName?: string;
 }
+export interface NoteFeedbackPreview {
+  note: StudyNote;
+  evidence: EvidencePreview;
+}
+export interface NoteFeedbackRequest {
+  retrievalId: string;
+  expectedProfile: string;
+  consentEndpoint?: string;
+}
 export interface DesktopApi {
   bootstrap(): Promise<Bootstrap>;
   saveSettings(settings: Settings): Promise<Settings>;
@@ -240,6 +250,9 @@ export interface DesktopApi {
   exportNote(id: string, revision: number): Promise<NoteExportResult>;
   setNoteDraftDirty(dirty: boolean): Promise<void>;
   onShowNotes(listener: () => void): () => void;
+  listNoteFeedback(id: string): Promise<ChatTurn[]>;
+  prepareNoteFeedback(id: string, revision: number, question: string): Promise<NoteFeedbackPreview>;
+  sendNoteFeedback(request: NoteFeedbackRequest): Promise<ChatTurn>;
 }
 
 declare global {
