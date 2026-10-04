@@ -216,8 +216,14 @@ export class ChatService {
     this.closed = true;
   }
 }
+export function citationNumbers(answer: string): number[] {
+  // Code samples such as arr[0] or items[1] are not evidence references and must
+  // not be counted as citations (or as missing ones) in the completion notice.
+  const visible = answer.replace(/```[\s\S]*?```/g, ' ').replace(/`[^`\n]*`/g, ' ');
+  return [...visible.matchAll(/\[(\d{1,3})\]/g)].map((match) => Number(match[1]));
+}
 function citationNotice(turn: ChatTurn): string {
-  const references = [...turn.answer.matchAll(/\[(\d+)\]/g)].map((match) => Number(match[1]));
+  const references = citationNumbers(turn.answer);
   if (!references.length) return '模型未提供引用编号，回答未完成出处核对，请查看下方检索原文。';
   if (references.some((number) => !turn.evidence.some((hit) => hit.number === number)))
     return '回答包含未检索到的引用编号，这些引用不可跳转。请对照下方原文核查。';

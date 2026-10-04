@@ -145,3 +145,47 @@ it.each(['没有引用的回答', '错误的引用 [99]'])(
     storage.close();
   },
 );
+it('does not count bracket markers inside code blocks or inline code as citations', async () => {
+  const { storage, preview, evidence, conversation } = fixture();
+  const chat = new ChatService(
+    storage,
+    { load: () => undefined },
+    () => {},
+    async (_input, onText) => {
+      onText('事务隔离避免脏读。[1]\n\n```js\nconst items = arr[0]; // 不是引用\n```\n`list[1]`');
+      return { truncated: false };
+    },
+    evidence,
+  );
+  chat.send({
+    conversationId: conversation.id,
+    question: preview.question,
+    retrievalId: preview.id,
+  });
+  await expect.poll(() => storage.chat.get(conversation.id).turns[0]?.status).toBe('completed');
+  expect(storage.chat.get(conversation.id).turns[0].notice).toBe('');
+  chat.close();
+  storage.close();
+});
+it('reports missing citations when the only bracket markers are inside code', async () => {
+  const { storage, preview, evidence, conversation } = fixture();
+  const chat = new ChatService(
+    storage,
+    { load: () => undefined },
+    () => {},
+    async (_input, onText) => {
+      onText('请看实现：`arr[1]` 与 fenced code 中的 `[2]` 都不是引用。');
+      return { truncated: false };
+    },
+    evidence,
+  );
+  chat.send({
+    conversationId: conversation.id,
+    question: preview.question,
+    retrievalId: preview.id,
+  });
+  await expect.poll(() => storage.chat.get(conversation.id).turns[0]?.status).toBe('completed');
+  expect(storage.chat.get(conversation.id).turns[0].notice).toContain('未提供引用编号');
+  chat.close();
+  storage.close();
+});
