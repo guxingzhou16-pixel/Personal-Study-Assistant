@@ -117,9 +117,18 @@
 - 标题/四部分合计 12000 字符、关注问题 1000；明确拒绝超长，不自动截断。每笔记 100 次反馈，会话总数 500 含专用反馈。正文导出不含反馈，卡片/短测验、结构化评分和采纳写入仍未实现。
 - 类型与生产构建、修改源码格式及 diff 检查通过，功能/真实质量验收交其他对话，未打开个人数据、未调用真实模型或收费接口。实现提交 `da48373` 在共享 `codex/structured-notes`，仅本地、未推送；迁移/删除/恢复/双协议/远程确认/引用/状态竞争清单见 README，保留其他对话的未提交改动。
 
-### 3.9 仍待开发或验收的主要能力
+### 3.9 已实现、待独立验收的受控学习路线
 
-笔记与 AI 反馈的独立功能/质量验收、真实聊天/引用语义与规模验证；会话管理、学习 Agent、长期记忆、计划/任务、番茄钟、主题、备份、OCR、更多格式、安装包与展示网站仍待开发。
+- 2026-10-04：目标/检索词/范围/时间预算 → 一次本地检索 → 完整预览/远程确认 → 一次模型起草 → 原文/新笔记入口，支持停止、独立历史与重启恢复。建议由用户实际执行，不显示虚构完成或掌握记录。
+- 主库 v7 增加 `conversations.purpose`（`chat/note-feedback/learning-agent`），旧笔记会话回填用途；`chat_turns.learning_request` 可空 JSON，旧行 NULL。单一路线会话使用唯一部分索引，最多 100 份草稿，全局 500 会话含三类；v6 升级前 `before-v7-*` 一致性备份。活动库 v1/派生索引 v2 不变，迁移仍待测试。
+- `LearningAgentService` 缓存完整请求/证据，UUID/10份/10分钟，发送只能传 ID/配置签名/远程确认；`learning-input.ts` 共用 IPC 与恢复校验，目标和检索词各 1000、预算整数 10～180 分钟，`src/lib/learning.ts` 集中限额/比较。
+- `ChatService.send` 的第二参数改为仅主进程可用的判别联合（笔记或学习请求），不接任意消息/工具。路线沿用 sources 模式、两协议、单活动请求、500ms 保存/停止/恢复及引用；普通列表/get/send 不访问专用会话，旧草稿不进入新提示。双快照不可共存。
+- 固定工作流，不解析模型文本里的工具命令，不自动多次检索/重试；语义故障仍可按现有政策降级关键词，取消不重试。Markdown 四部分与时间合计依赖模型遵循提示，程序未做结构化评分/预算求和，真实效果待验收。空证据只保存本地说明，不读密钥或请求模型。
+- `AgentPage` 保持挂载，用每轮 revision 与活动事件版本防迟到更新；预览输入变化失效，确认绑定模型/地址/预览。出处返回路线，新笔记只带关联资料并沿用未保存确认，不自动保存正文。无计划/进度/记忆写入工具，未新增依赖/功能测试，未访问用户数据库/真实模型/收费接口；类型/生产构建/修改源码格式/diff 与静态审查通过，功能验收见 README。实现提交 `db795b1` 在共享 `codex/structured-notes`，仅本地、未推送。
+
+### 3.10 仍待开发或验收的主要能力
+
+笔记、AI 反馈与学习路线的独立功能/质量验收、真实聊天/引用语义与规模验证；会话/路线管理、Agent 的写入确认、长期记忆、计划/任务、番茄钟、主题、备份、OCR、更多格式、安装包与展示网站仍待开发。
 
 独立合成集 `synthetic-retrieval-v2`（`tests/fixtures/retrieval-independent-cases.ts`）与逐题引用位置校验已加入可重复评测；多锚点召回在独立集上仍有失败（`ind-symmetric-hash`），保留为失败案例。真实本地/云端聊天仍未验收：本机未安装 Ollama，无法据此验证真实生成与引用语义。
 
@@ -200,6 +209,7 @@
 | `src/components/NotesPage.tsx` | 笔记列表/四部分编辑、保存/另存、资料关联、导出/删除及草稿确认；切换页面保持挂载 |
 | `src/components/NoteFeedbackPanel.tsx` | 保存版本/证据预览、远程确认、流式/停止与反馈历史，旧版本提示、引用及返回笔记 |
 | `src/components/ModelAnswer.tsx` | 聊天/反馈共用安全 Markdown、受限引用；无 HTML、图片、外链执行 |
+| `src/components/AgentPage.tsx`、`src/lib/learning.ts` | 目标/范围/预算、预览/确认、路线历史与人工执行入口；共享输入限额和比较 |
 | `src/components/LibraryPage.tsx` | 文件选择、导入状态、失败、搜索/格式筛选与真实资料列表 |
 | `src/components/ReadingPage.tsx`、`PdfPage.tsx` | 原页/排版、引用复制、保存、受验证的出处跳转及资料问答入口 |
 | `src/components/RecentReadings.tsx` | 首页从主库读取实际最近阅读，不用示例数据 |
@@ -214,10 +224,11 @@
 | `electron/main.ts` | 应用与窗口生命周期、IPC 注册、调用方校验、数据目录；当前也有学习心跳及睡眠暂停接入 |
 | `electron/preload.ts` | 沙箱内通过 `contextBridge` 暴露明确的桌面方法 |
 | `electron/core/settings.ts` | 运行时设置、地址、服务类型与模型配置校验 |
-| `electron/core/storage.ts` | 主库版本 6、迁移前备份，保留阅读/聊天/笔记/证据并增加反馈关联/快照；不改活动库版本 |
+| `electron/core/storage.ts` | 主库版本 7、迁移前备份，保留旧阅读/聊天/笔记/反馈，新增会话用途与路线请求；不改活动库版本 |
 | `electron/core/note-storage.ts` | 笔记表/校验/CRUD、关联来源存在检查与 revision 冲突；不调用模型 |
 | `electron/core/note-export.ts` | Markdown 选址后的路径保护/暂存替换，不给 renderer 任意路径能力 |
 | `electron/core/note-feedback.ts` | 保存版本/预览缓存/受控发送与反馈提示，复用检索/聊天，不信任手写依据 |
+| `electron/core/learning-agent.ts`、`learning-input.ts` | 一次检索/一次起草编排、请求缓存/提示；IPC 和恢复共用运行时校验，不分派模型工具命令 |
 | `electron/core/chat-storage.ts` | 普通/笔记会话、轮次/快照与异常中断恢复；专用会话不允许普通入口打开；通过 `Storage.chat` 共用主数据库 |
 | `electron/core/chat-stream.ts` | Ollama NDJSON / 兼容 OpenAI SSE、UTF-8 拆包、大小/超时边界与错误映射 |
 | `electron/core/chat.ts` | 单活动请求、设置/密钥快照、上下文、远程确认、停止、定期保存与退出处理 |
@@ -283,7 +294,9 @@
 
 笔记方法：`listNotes`、`getNote`、`saveNote`、`deleteNote`、`exportNote`、`setNoteDraftDirty`、`onShowNotes`。只接受 UUID、校验过的四部分/标题/来源 ID 和 revision，不接受导出路径。新笔记为 `id = null, revision = 0`，已有笔记须匹配保存版本；标题/正文在主进程校验，SQL 参数化。导出主进程读取已保存内容与来源名、显示 native 保存对话框，只允许 `.md`，校验目录链接后禁止应用数据目录，暂存完成后替换目标。正常关闭时 dirty 笔记默认继续编辑，明确放弃才能退出；事件只通知回笔记，不暴露 Electron event。Agent 不得借这些接口默认修改用户笔记。
 
-反馈方法：`listNoteFeedback(noteId)`、`prepareNoteFeedback(noteId, revision, question)`、`sendNoteFeedback({ retrievalId, expectedProfile, consentEndpoint? })`。范围只能来自保存笔记的资料 ID，未关联则全库；不接受自造正文/证据/角色/路径。预览复核检索期间与发送时笔记版本，签名/确认绑定服务配置与该次预览。复用 `cancelRetrieval`、`onRetrievalProgress`、`stopChat`、`activeChat`、`onChatUpdate`、`resolveCitation`，无新的任意工具执行入口。`ChatService.send` 的第二个 snapshot 参数只供主进程 `NoteFeedbackService`，不能桥接给 renderer。反馈会话不进入 `listConversations`，普通 `get/sendChat` 不得访问它；ChatPage 仅展示活动状态，不把反馈插入普通轮次。
+反馈方法：`listNoteFeedback(noteId)`、`prepareNoteFeedback(noteId, revision, question)`、`sendNoteFeedback({ retrievalId, expectedProfile, consentEndpoint? })`。范围只能来自保存笔记的资料 ID，未关联则全库；不接受自造正文/证据/角色/路径。预览复核检索期间与发送时笔记版本，签名/确认绑定服务配置与该次预览。复用 `cancelRetrieval`、`onRetrievalProgress`、`stopChat`、`activeChat`、`onChatUpdate`、`resolveCitation`，无新的任意工具执行入口。`ChatService.send` 的第二参数为仅主进程使用的判别联合 `{ kind: 'note', note } | { kind: 'learning', request }`，不能桥接给 renderer。反馈/路线会话不进入 `listConversations`，普通 `get/sendChat` 不得访问它；ChatPage 仅展示活动状态，不插入专用轮次。
+
+路线方法：`listLearningDrafts()`、`prepareLearningDraft({ goal, query, sourceId, minutes })`、`sendLearningDraft({ retrievalId, expectedProfile, consentEndpoint? })`。运行时限制字段/文本/来源/整数预算；发送时完整请求与证据只从主进程预览读取。输入/范围/预算变化重新准备，成功发送后不可重用本路线预览；空证据不调用模型。远程提示只含本次目标/时间/检索词/片段，无旧历史/个人笔记/日历。复用停止/进度/更新/引用接口；“去写笔记”是 renderer 导航，不是工具写入。
 
 ## 8. 本地数据、迁移与密钥
 
@@ -291,7 +304,7 @@
 
 | 文件或目录 | 内容与约束 |
 | --- | --- |
-| `study-companion.sqlite3` | 主库版本 6：保留设置/阅读/聊天/证据/笔记，反馈保存笔记快照与专用会话；v5/v6 迁移待功能验收 |
+| `study-companion.sqlite3` | 主库版本 7：保留设置/阅读/聊天/证据/笔记/反馈，增加会话用途与路线请求；v5/v6/v7 迁移待功能验收 |
 | `study-activity.sqlite3` | 已验收的独立学习活动数据库，版本 1、`study_days` 表；备份须与主库一同导出 |
 | `search-index.sqlite3` | 关键词版 v1；首次向量使用事务升级 v2，新增 `chunk_vectors`/`embedded_sources`，可重建、不代替原文 |
 | `embedding-models/` | 固定版本模型/配置与下载暂存；摘要校验，只是可重新下载缓存，不进 Git/学习备份 |
@@ -302,6 +315,7 @@
 | `study-companion.sqlite3.before-v4-*.sqlite3` | 版本 3 升级前的完整主库备份，包括旧聊天与阅读；不自动删除 |
 | `study-companion.sqlite3.before-v5-*.sqlite3` | 版本 4 增加笔记前的一致性主库备份；失败不继续迁移，不自动删除 |
 | `study-companion.sqlite3.before-v6-*.sqlite3` | 版本 5 增加反馈关联/快照前的一致性主库备份；失败不继续迁移，不自动删除 |
+| `study-companion.sqlite3.before-v7-*.sqlite3` | 版本 6 增加会话用途/路线请求前的一致性主库备份；失败不继续迁移，不自动删除 |
 | `credentials.enc.json` | 独立密钥密文文件，按规范化地址的 SHA-256 键索引，不是学习备份内容 |
 
 数据库规则：
@@ -310,10 +324,11 @@
 - 迁移使用事务，保持已存数据，不删除个人数据库来解决版本问题。
 - 拒绝用旧版本应用打开更新的数据格式；损坏设置应报错，不能悄悄重置成默认值。
 - 启动探测 FTS5；首次检索才增量建派生索引。DDL 与内容写入用事务，重建在新文件完成；不可直接重建主库。源文字不可变，新哈希成为新资料。
-- 未来迁移先读已有保留/备份规格，不能把版本 6 当空库重建。旧版本断言和桥接清单交测试对话同步；通过新版库降 `user_version` 模拟旧格式时，要还原实际表结构，包含 v5 表与 v6 列/索引/外键，不用 `IF NOT EXISTS` 掩盖错误夹具。
-- 当前已有 `Source`、`SourceSegment`、`ReadingPosition`、`Conversation`、`ChatTurn`、`Evidence`、`EvidencePreview`、`NoteDraft`、`StudyNote`、`NoteSummary`、`NoteFeedbackPreview`、`NoteFeedbackRequest`。笔记与反馈已实现待测试；项目、任务、Agent 与记忆仍规划中。
+- 未来迁移先读已有保留/备份规格，不能把版本 7 当空库重建。旧版本断言和桥接清单交测试对话同步；通过新版库降 `user_version` 模拟旧格式时，要还原实际表结构，包含 v5 表、v6 列/索引/外键、v7 用途/快照/部分索引，不用 `IF NOT EXISTS` 掩盖错误夹具。
+- 当前已有 `Source`、`SourceSegment`、`ReadingPosition`、`Conversation`、`ChatTurn`、`Evidence`、`EvidencePreview`、`NoteDraft`、`StudyNote`、`NoteSummary`、`NoteFeedbackPreview`、`NoteFeedbackRequest`、`LearningRequest`、`LearningPreview`、`LearningDraftRequest`。笔记/反馈/路线已实现待测试；项目、任务、记忆及对应写入工具仍规划中。
 - `notes` 保存 UUID、来源哈希、标题/四部分、revision 与创建/更新时间；关联来源采用外键，未来删除来源先设计笔记关联处理，不默默级联删除作品。导出读取保存快照，选址期间版本改变要拒绝导出。删除有确认、无回收站；原文依据为手动文字，不是可信检索证据。
-- v6 的 `conversations.note_id` 唯一且可空；NULL 为旧/普通会话，非空关联笔记并 `ON DELETE CASCADE`。`chat_turns.note_snapshot` 可空 JSON，按笔记边界运行时校验；不扩展旧 mode 的 CHECK，反馈仍 sources，普通旧轮次不伪装成反馈。删除笔记会连同其会话/轮次删除，主进程先拒绝活动反馈；删除来源仍不能静默删作品。
+- v6 的 `conversations.note_id` 唯一且可空；普通/路线会话为 NULL，非空关联笔记并 `ON DELETE CASCADE`。`chat_turns.note_snapshot` 可空 JSON，按笔记边界运行时校验；不扩展旧 mode 的 CHECK，反馈仍 sources，普通旧轮次不伪装成反馈。删除笔记会连同其会话/轮次删除，主进程先拒绝活动反馈；删除来源仍不能静默删作品。
+- v7 的 `purpose` 明确三用途，普通列表/读取/发送仅 chat，反馈和路线各有主进程专用 getter；部分唯一索引限制单一路线会话。`learning_request` 非空必须有效 JSON、与 note_snapshot 互斥且 mode=sources，恢复复用输入校验。路线请求保存稳定来源 ID，不依赖后续用户表单，不向模型发送旧路线或推断已完成学习。用途权限不得改回一个绕过全部隔离的布尔值。
 - 聊天轮次状态为 `streaming/completed/stopped/error/interrupted`，保存部分回答与错误提示。主进程退出先取消聊天并保存，再关库；重启将残留的 streaming 标记为 interrupted。保存失败须向界面报告，不能冒充成功。单会话限 100 轮、会话总数限 500，未来会话管理/清理需保留恢复边界。
 - 来源锚点为 `page-N` 或 `md-line-N`，绑定内容哈希。资料问答轮次保存证据编号、资料名/类型、标题/页码/行号、UTF-16 偏移与原文；打开核对保存原文、元数据和副本哈希，不猜位置。复制 URI 尚未注册系统协议；应用内引用编号走受限 IPC，不依赖系统协议。
 - 当前分块最多 800 字符、重叠 120 字符，不拆开代理对；中文分词/汉字二元词入 FTS5。查询最多 24 个非停用词，BM25 前 40 候选经至少 50% 字面关键词覆盖过滤、排序/去重取最多 4 片段。阈值不证明证据充分，跨段落/同义表达可能遗漏；调整须保留固定评测失败案例。
@@ -393,7 +408,7 @@ React 界面支持热更新；修改 `electron/` 或 preload 后重启桌面开�
 
 ## 11. 验证方法与测试要求
 
-**当前分工（用户 2026-10-04 明确指定）：主线对话继续软件实现，只做类型与构建基础检查；功能测试及真实模型验收交由其他对话。** 本轮笔记/反馈未运行 Vitest/Playwright，也未改测试规格。测试对话按 README 接手清单补齐 v5/v6 迁移/保留、CRUD/冲突/删除级联、导出/取消、反馈协议/确认/状态竞争/恢复/引用与受限桥接；不要把构建成功写成这些功能已经通过。
+**当前分工（用户 2026-10-04 明确指定）：主线对话继续软件实现，只做类型与构建基础检查；功能测试及真实模型验收交由其他对话。** 本轮笔记/反馈/路线未运行 Vitest/Playwright，也未改测试规格。测试对话按 README 接手清单补齐 v5/v6/v7 迁移/保留、CRUD/冲突/删除级联、导出/取消、反馈/路线协议/确认/状态竞争/恢复/引用与受限桥接；不要把构建成功写成这些功能已经通过。
 
 日常开发以当前功能的基础验证为准，选择最小但有效的检查。纯文档改动核对事实、路径、命令和 diff 即可，不启动桌面或完整测试。与代码无关的已有 RED 规格要记录，不借文档任务扩大范围修复。
 
@@ -446,14 +461,14 @@ npx playwright test tests/rag.spec.ts
 | 0 | 桌面骨架、数据库、空资料库、偏好保存 | 历史验收已完成，新增改动按实际情况再验证 |
 | 1 | PDF/Markdown 导入与阅读，基础版本已交付 | 去重、损坏反馈、原文件复制、原页/排版、重启位置恢复、扫描件提示、取消与引用复制 |
 | 2 | 聊天协议、可追溯 RAG、本地嵌入/混合检索与对比已交付；真实聊天质量待做 | 本地/云端真实同资料问答、引用语义质量、独立数据、规模与安装包 |
-| 3 | 笔记与有出处反馈已实现待验收；Agent、长期记忆待开发 | 独立写笔记、反馈有出处、取消不写入、删除记忆不再使用 |
+| 3 | 笔记/反馈/固定路线已实现待验收；长期记忆与写入确认待开发 | 独立写笔记、建议/反馈有出处、取消不写入、删除记忆不再使用 |
 | 4 | 项目任务、番茄钟、打卡、主题、备份 | 数据重启恢复、中断不误完成、备份往返且无密钥；当前日历工作只是其中一部分 |
 | 5 | 全流程与异常验证、RAG 对比、安装包、发布文档 | 新用户按说明完成学习闭环、发布包对应 Git 标签、公开发布有授权 |
 | 6 | 静态展示网站 | 软件稳定后才建设，展示真实功能、评测与下载 |
 
 用户 2026-10-04 将测试安排到其他对话，主线进入阶段 3；阶段 2 的未验收项继续保留。测试对话可继续独立验收，不为机械阶段编号停止主线实现；不冒称整阶段或首版已完成。
 
-主线接手先读 `note-feedback.ts`、`NoteFeedbackPanel.tsx`、`chat.ts/search.ts` 与笔记模块，下一步是受控学习 Agent。先复用现有检索/反馈形成有限学习步骤，工具必须有固定输入和次数上限；模型建议不自动成为计划、进度或记忆，新增写入前展示变更预览并明确确认。测试对话继续真实质量与笔记/反馈验收，保留既有评测失败。保持停止、保存、确认、阅读与日历，不跳到官网、同步或无限 Agent。
+主线接手先读 `learning-agent.ts/learning-input.ts`、`AgentPage.tsx`、`chat.ts/chat-storage.ts/search.ts` 及笔记/反馈模块。下一步是可管理长期记忆：来源、查看/编辑/删除与使用范围先明确，再接具体提议/确认写入。路线目前只有固定一次检索/一次起草，保持工具固定输入/次数边界；记忆删除后不再使用，不能把模型建议自动当作已掌握记录。计划/进度写入等待对应数据能力。测试对话继续真实质量与笔记/反馈/路线验收，保留既有失败；保持停止、恢复、确认、阅读与日历，不跳到官网或无限 Agent。
 
 ## 14. Git、隐私与协作流程
 
