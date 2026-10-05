@@ -136,9 +136,19 @@
 - `AgentPage/MemoryProposalPanel` 展示完整预览、远程确认、当时快照与实际写入结果，输入/选择/配置变化失效；隐藏/换路线清理未确认提议、拒收迟到结果。已提交的确认不能因随后切页被当作撤销。记忆页保持挂载，脏稿切换/刷新先放弃确认；无自动保存/关闭拦截，关闭或重载可能丢未保存记忆。
 - `npm run desktop:build`（双TypeScript/Vite/Electron）、17份本轮源码Prettier与diff检查通过；TypeScript reviewer和code-reviewer静态审查通过。Vite仍有已有大块警告，未测性能/安装包。未改功能测试/依赖，未启动应用/读取个人DB/请求模型。功能与真实质量交测试方，新增 `docs/testing/memory-acceptance.md` 均未执行；实现 `ffd4815` 在共享 `codex/structured-notes` 仅本地、未推送，保留其他改动。
 
-### 3.11 仍待开发或验收的主要能力
+### 3.11 已实现、待独立验收的学习项目与每日任务
 
-笔记、AI反馈、路线与记忆管理/确认的独立验收，真实聊天/引用语义与规模验证；会话/路线管理、项目/任务与Agent任务写入确认、番茄钟、主题、备份、卡片/短测验、OCR、更多格式、安装包与展示网站待开发。
+- 2026-10-05：学习计划页面支持项目创建/编辑/归档恢复，指定日期任务的创建/编辑/改期/项目关联/另存、手动完成/重新打开和确认删除。不调用模型、不自动签到或增加学习时间，不把预计分钟当实际时长，不推断掌握；Agent 任务提议与番茄钟仍待开发。
+- 主库 v9 新增 `study_projects`、`daily_tasks` 及索引，关联项目外键 RESTRICT，无旧表重建/旧行改写；v8 升级前 `before-v9-*` 一致性备份，迁移仍事务。保留 v1～v8 全部数据，活动库 v1/派生索引 v2 不变。实际迁移、备份和恢复待独立验证，本轮不打开个人DB。
+- `planning-storage.ts` 负责输入/恢复校验、参数化SQL与revision冲突；`planning.ts` 集中限额与日期纯校验。项目最多200、任务5000，标题120、目标2000、详情4000，预计整数5～480分钟；日期是合法0001～9999的YYYY-MM-DD，不按UTC解释或随完成时间重算。
+- 项目本阶段只归档/恢复、不删除；归档不级联或改变任务。禁止新建/改关联进入归档项目，现有相同关联可编辑/改期/完成/重新打开/解除/删除。任务save不接status/completedAt，创建todo、编辑保留状态；setCompleted生成真实时刻，重开清NULL，同状态请求仍查revision但不变时间/版本。
+- `PlanningPage` 保持挂载，统一编辑区与脏稿确认、删除前完整保存记录预览；异步刷新不能覆盖新写入，busy防重复，失败保留稿、不提前显示完成。切页保留编辑，无自动保存/关闭拦截，关闭或重载可能丢失未保存项目/任务。日期变化前明确处理草稿，不做逾期自动结转/重复任务/子任务。
+- 最终 `npm run desktop:build`（双TypeScript/Vite/Electron）、11份本轮源码Prettier与暂存diff检查通过；TypeScript reviewer及code-reviewer静态批准。已有Vite大块警告保留，性能/安装包待验收。未改功能测试/依赖/配置，未运行应用/个人DB/模型。
+- 功能测试沿用户分工交独立对话，清单 `docs/testing/planning-acceptance.md` 全部待执行；同步README/AGENTS，不称整阶段或首版完成。实现 `4a40b27` 在共享分支 `codex/structured-notes`，仅本地提交、不推送，保留他人文档/脚本/资料。
+
+### 3.12 仍待开发或验收的主要能力
+
+笔记、AI反馈、路线、记忆管理/确认与手动项目/任务的独立验收，真实聊天/引用语义与规模验证；会话/路线管理、Agent任务写入确认、番茄钟、主题、备份、卡片/短测验、OCR、更多格式、安装包与展示网站待开发。
 
 独立合成集 `synthetic-retrieval-v2`（`tests/fixtures/retrieval-independent-cases.ts`）与逐题引用位置校验已加入可重复评测；多锚点召回在独立集上仍有失败（`ind-symmetric-hash`），保留为失败案例。真实本地/云端聊天仍未验收：本机未安装 Ollama，无法据此验证真实生成与引用语义。
 
@@ -222,6 +232,8 @@
 | `src/components/AgentPage.tsx`、`src/lib/learning.ts` | 目标/范围/预算、预览/确认、路线历史与人工执行入口；共享输入限额和比较 |
 | `src/components/MemoryPage.tsx`、`MemoryProposalPanel.tsx` | 记忆编辑/版本/范围/删除确认，学习意向提议的编辑/最终预览/确认/拒绝与实际结果 |
 | `src/lib/memories.ts` | 记忆限额/类别/范围文案与本机地址政策，主进程复用纯函数 |
+| `src/components/PlanningPage.tsx`、`src/lib/planning.ts` | 指定日期任务/项目编辑、归档与完成/删除确认；集中限额/日期纯校验/空稿，页面保持挂载 |
+| `src/components/PlanningEditor.tsx` | 无状态项目/任务表单，接收实际记录与草稿；不读数据库/直接调用桌面接口 |
 | `src/components/LibraryPage.tsx` | 文件选择、导入状态、失败、搜索/格式筛选与真实资料列表 |
 | `src/components/ReadingPage.tsx`、`PdfPage.tsx` | 原页/排版、引用复制、保存、受验证的出处跳转及资料问答入口 |
 | `src/components/RecentReadings.tsx` | 首页从主库读取实际最近阅读，不用示例数据 |
@@ -236,7 +248,8 @@
 | `electron/main.ts` | 应用与窗口生命周期、IPC 注册、调用方校验、数据目录；当前也有学习心跳及睡眠暂停接入 |
 | `electron/preload.ts` | 沙箱内通过 `contextBridge` 暴露明确的桌面方法 |
 | `electron/core/settings.ts` | 运行时设置、地址、服务类型与模型配置校验 |
-| `electron/core/storage.ts` | 主库版本 8、迁移前备份，保留旧数据并新增记忆/路线所选快照；不改活动库版本 |
+| `electron/core/storage.ts` | 主库版本 9、迁移前备份，保留旧数据并新增项目/每日任务；不改活动库版本 |
+| `electron/core/planning-storage.ts` | 项目/任务表、严格CRUD/恢复校验、revision与归档关联、完成状态时间边界；不调用模型/活动计时 |
 | `electron/core/memory-storage.ts`、`memory-proposals.ts` | 记忆CRUD/恢复校验、来源/版本/使用复核，学习意向预览缓存与单次确认 |
 | `electron/core/note-storage.ts` | 笔记表/校验/CRUD、关联来源存在检查与 revision 冲突；不调用模型 |
 | `electron/core/note-export.ts` | Markdown 选址后的路径保护/暂存替换，不给 renderer 任意路径能力 |
@@ -313,13 +326,15 @@
 
 记忆方法：`listMemories()`、`saveMemory({ id, revision, title, content, kind, scope })`、`deleteMemory(id, revision)`、`prepareMemoryProposal(turnId, edit?)`、`confirmMemoryProposal(proposalId)`、`discardMemoryProposal(proposalId)`。手动创建来源manual，编辑保留来源、不接受origin字段。提议edit只允许title/content/scope，最终内容/来源由主进程缓存；确认只收UUID，同步复核/写入后消费，取消/过期/重复不写。提议不是模型工具调用，已发送数据不能通过取消或删除撤回。
 
+计划方法：`planningOverview(day)`、`saveStudyProject({ id, revision, title, goal, archived })`、`saveDailyTask({ id, revision, title, details, projectId, day, minutes })`、`setDailyTaskCompleted(id, revision, completed)`、`deleteDailyTask(id, revision)`。overview取指定日期任务及全部项目；新记录id=null/revision=0，已有须版本匹配，未知字段拒绝。安排日期可由用户指定，和只能签到今天/不接日期时长的活动接口分开；completed必须boolean，不接受伪造状态/时间。仅用户手动操作，Agent不接任意CRUD工具，后续提议须主进程最终预览/确认边界。
+
 ## 8. 本地数据、迁移与密钥
 
 默认数据目录：`%APPDATA%\StudyCompanion\`。
 
 | 文件或目录 | 内容与约束 |
 | --- | --- |
-| `study-companion.sqlite3` | 主库版本 8：保留设置/阅读/聊天/笔记/反馈/路线，新增记忆/所选快照；v5～v8迁移待功能验收 |
+| `study-companion.sqlite3` | 主库版本 9：保留设置/阅读/聊天/笔记/反馈/路线/记忆，新增项目/每日任务；v5～v9迁移待功能验收 |
 | `study-activity.sqlite3` | 已验收的独立学习活动数据库，版本 1、`study_days` 表；备份须与主库一同导出 |
 | `search-index.sqlite3` | 关键词版 v1；首次向量使用事务升级 v2，新增 `chunk_vectors`/`embedded_sources`，可重建、不代替原文 |
 | `embedding-models/` | 固定版本模型/配置与下载暂存；摘要校验，只是可重新下载缓存，不进 Git/学习备份 |
@@ -332,20 +347,23 @@
 | `study-companion.sqlite3.before-v6-*.sqlite3` | 版本 5 增加反馈关联/快照前的一致性主库备份；失败不继续迁移，不自动删除 |
 | `study-companion.sqlite3.before-v7-*.sqlite3` | 版本 6 增加会话用途/路线请求前的一致性主库备份；失败不继续迁移，不自动删除 |
 | `study-companion.sqlite3.before-v8-*.sqlite3` | 版本7增加记忆/所选快照前的一致性主库备份；失败不继续迁移，不自动删除 |
+| `study-companion.sqlite3.before-v9-*.sqlite3` | 版本8增加项目/任务前的一致性主库备份；失败不继续迁移，不自动删除 |
 | `credentials.enc.json` | 独立密钥密文文件，按规范化地址的 SHA-256 键索引，不是学习备份内容 |
 
 数据库规则：
 
 - 使用参数化 SQL，不拼接用户输入到查询语句。
 - 迁移使用事务，保持已存数据，不删除个人数据库来解决版本问题。
+- 当前迁移只有前向升级，无逆向迁移/自动恢复；不通过手改user_version降级。故障恢复先关闭应用、保留完整当前数据，再核对一致性备份与兼容应用版本；旧备份不含升级后的新记录。独立验收验证备份可读与回滚，不能在主线运行个人库恢复。
 - 拒绝用旧版本应用打开更新的数据格式；损坏设置应报错，不能悄悄重置成默认值。
 - 启动探测 FTS5；首次检索才增量建派生索引。DDL 与内容写入用事务，重建在新文件完成；不可直接重建主库。源文字不可变，新哈希成为新资料。
-- 未来迁移先读保留/备份规格，不能把版本8当空库重建。旧断言/桥接清单交测试方同步；降user_version模拟旧格式须还原真实结构，包含v5表、v6列/索引/外键、v7用途/快照/部分索引及去掉v8表/列/索引，不用IF NOT EXISTS掩盖错误夹具。
-- 当前已有资料/阅读/聊天/证据、NoteDraft/StudyNote/NoteSummary/反馈、LearningRequest/Preview/DraftRequest及MemoryDraft/StudyMemory/MemorySaveRequest/MemoryProposalEdit/MemoryProposal。笔记/反馈/路线/记忆已实现待测试；项目/任务及对应写入工具仍规划中。
+- 未来迁移先读保留/备份规格，不能把版本9当空库重建。旧断言/桥接清单交测试方同步；降user_version模拟旧格式须还原真实结构，包含v5表、v6列/索引/外键、v7用途/快照/部分索引，低于v8时去掉记忆表/列/索引、低于v9时去掉项目/任务表/索引，不用IF NOT EXISTS掩盖错误夹具。
+- 当前已有资料/阅读/聊天/证据、笔记/反馈、学习路线、记忆/提议及ProjectDraft/StudyProject/ProjectSaveRequest/TaskDraft/DailyTask/TaskSaveRequest/PlanningOverview。笔记/反馈/路线/记忆/手动项目任务已实现待测试；Agent任务写入工具及FocusSession仍规划中。
 - `notes` 保存 UUID、来源哈希、标题/四部分、revision 与创建/更新时间；关联来源采用外键，未来删除来源先设计笔记关联处理，不默默级联删除作品。导出读取保存快照，选址期间版本改变要拒绝导出。删除有确认、无回收站；原文依据为手动文字，不是可信检索证据。
 - v6 的 `conversations.note_id` 唯一且可空；普通/路线会话为 NULL，非空关联笔记并 `ON DELETE CASCADE`。`chat_turns.note_snapshot` 可空 JSON，按笔记边界运行时校验；不扩展旧 mode 的 CHECK，反馈仍 sources，普通旧轮次不伪装成反馈。删除笔记会连同其会话/轮次删除，主进程先拒绝活动反馈；删除来源仍不能静默删作品。
 - v7 的 `purpose` 明确三用途，普通列表/读取/发送仅 chat，反馈和路线各有主进程专用 getter；部分唯一索引限制单一路线会话。`learning_request` 非空必须有效 JSON、与 note_snapshot 互斥且 mode=sources，恢复复用输入校验。路线请求保存稳定来源 ID，不依赖后续用户表单，不向模型发送旧路线或推断已完成学习。用途权限不得改回一个绕过全部隔离的布尔值。
 - v8 `memories` 保存UUID、title/content/kind/scope、不可由renderer指定的origin/origin_turn_id、revision与时间。来源轮次ID是溯源标识，不级联删除记忆或回填当前内容。`learning_memories`非NULL须依附learning_request且经恢复校验最多5条；旧NULL不读当前表回填。历史只查看、不进新提示；删除阻止后续选择/缓存使用，既往快照/备份保留。
+- v9 `study_projects` 保存标题/目标/archived/revision/时间，`daily_tasks` 保存内容、project_id可空RESTRICT外键、安排日期/预计分钟、status/完成时刻与revision/时间。CHECK约束todo对应NULL、completed对应非NULL；归档不删除历史任务。普通save保留完成状态，另存创建todo；完成只表示用户标记，无实际时长或知识证明。
 - 聊天轮次状态为 `streaming/completed/stopped/error/interrupted`，保存部分回答与错误提示。主进程退出先取消聊天并保存，再关库；重启将残留的 streaming 标记为 interrupted。保存失败须向界面报告，不能冒充成功。单会话限 100 轮、会话总数限 500，未来会话管理/清理需保留恢复边界。
 - 来源锚点为 `page-N` 或 `md-line-N`，绑定内容哈希。资料问答轮次保存证据编号、资料名/类型、标题/页码/行号、UTF-16 偏移与原文；打开核对保存原文、元数据和副本哈希，不猜位置。复制 URI 尚未注册系统协议；应用内引用编号走受限 IPC，不依赖系统协议。
 - 当前分块最多 800 字符、重叠 120 字符，不拆开代理对；中文分词/汉字二元词入 FTS5。查询最多 24 个非停用词，BM25 前 40 候选经至少 50% 字面关键词覆盖过滤、排序/去重取最多 4 片段。阈值不证明证据充分，跨段落/同义表达可能遗漏；调整须保留固定评测失败案例。
@@ -425,7 +443,7 @@ React 界面支持热更新；修改 `electron/` 或 preload 后重启桌面开�
 
 ## 11. 验证方法与测试要求
 
-**当前分工（用户2026-10-04指定，本轮延续）：主线实现与类型/构建基础检查；功能测试及真实模型验收交其他对话。** 笔记/反馈/路线/记忆均未运行功能测试或改规格；2026-10-05新增 `docs/testing/memory-acceptance.md` 详细清单（不是已执行测试）。测试方补齐v5～v8真实结构迁移/保留、CRUD/冲突/级联、导出/取消、协议/确认/恢复/引用及记忆隐私/单次确认/删除不再使用，更新旧断言/桥接清单；构建成功不等于功能通过。
+**当前分工（用户2026-10-04指定，本轮延续）：主线实现与类型/构建基础检查；功能测试及真实模型验收交其他对话。** 笔记/反馈/路线/记忆/项目任务均未运行功能测试或改规格；2026-10-05新增 `docs/testing/memory-acceptance.md`、`docs/testing/planning-acceptance.md` 详细清单（不是已执行测试）。测试方补齐v5～v9真实结构迁移/保留、CRUD/冲突/关联、导出/取消、协议/确认/恢复/引用、记忆隐私/单次确认及任务状态和计时签到隔离，更新旧断言/桥接清单；构建成功不等于功能通过。
 
 日常开发以当前功能的基础验证为准，选择最小但有效的检查。纯文档改动核对事实、路径、命令和 diff 即可，不启动桌面或完整测试。与代码无关的已有 RED 规格要记录，不借文档任务扩大范围修复。
 
@@ -479,13 +497,13 @@ npx playwright test tests/rag.spec.ts
 | 1 | PDF/Markdown 导入与阅读，基础版本已交付 | 去重、损坏反馈、原文件复制、原页/排版、重启位置恢复、扫描件提示、取消与引用复制 |
 | 2 | 聊天协议、可追溯 RAG、本地嵌入/混合检索与对比已交付；真实聊天质量待做 | 本地/云端真实同资料问答、引用语义质量、独立数据、规模与安装包 |
 | 3 | 笔记/反馈/固定路线/记忆管理与确认已实现，独立验收仍待完成 | 独立写笔记、有出处、取消不写入、删除不再新使用、本机记忆不外发 |
-| 4 | 项目任务、番茄钟、打卡、主题、备份 | 数据重启恢复、中断不误完成、备份往返且无密钥；当前日历工作只是其中一部分 |
+| 4 | 手动项目/每日任务已实现待验收；Agent任务确认、番茄钟、主题、备份待开发 | 数据重启恢复、任务不混签到时长、中断不误完成、备份往返且无密钥 |
 | 5 | 全流程与异常验证、RAG 对比、安装包、发布文档 | 新用户按说明完成学习闭环、发布包对应 Git 标签、公开发布有授权 |
 | 6 | 静态展示网站 | 软件稳定后才建设，展示真实功能、评测与下载 |
 
 用户 2026-10-04 将测试安排到其他对话，主线进入阶段 3；阶段 2 的未验收项继续保留。测试对话可继续独立验收，不为机械阶段编号停止主线实现；不冒称整阶段或首版已完成。
 
-主线下一步是阶段4学习项目/每日任务基础：先设计手动管理、持久化/revision与失败边界，再接Agent任务提议预览确认和番茄钟，不把建议自动写成任务/进度。先读memory-storage/proposals、learning-agent、ChatService/Storage、笔记及活动计时；保持一次检索/一次起草、不推断掌握。测试对话继续笔记/反馈/路线/记忆与真实质量验收，使用README及docs/testing/memory-acceptance.md，保留既有失败。阶段3不能因构建通过勾为已验收；网站最后。
+主线下一步是阶段4 Agent任务提议预览确认：手动项目/每日任务基础已实现，先读planning-storage、memory-proposals、learning-agent与ChatService，具体任务/项目/日期/版本由主进程缓存并复核，明确确认后才写，不把模型建议自动变进度。之后接任务关联番茄钟，保持一次检索/一次起草、不推断掌握。测试对话继续笔记/反馈/路线/记忆/项目任务与真实质量验收，使用README及docs/testing/memory-acceptance.md、docs/testing/planning-acceptance.md，保留既有失败。阶段3/4不能因构建通过勾为已验收；网站最后。
 
 ## 14. Git、隐私与协作流程
 
