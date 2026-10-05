@@ -28,6 +28,7 @@ import { NotesPage } from './components/NotesPage';
 import { AgentPage } from './components/AgentPage';
 import { MemoryPage } from './components/MemoryPage';
 import { PlanningPage } from './components/PlanningPage';
+import { FocusPage } from './components/FocusPage';
 import { desktop, errorMessage, isDesktop } from './lib/desktop';
 import {
   defaultSettings,
@@ -37,7 +38,8 @@ import {
   type DailyTask,
 } from './lib/types';
 
-type Page = 'home' | 'library' | 'chat' | 'notes' | 'agent' | 'memories' | 'planning' | 'settings';
+type Page =
+  'home' | 'library' | 'chat' | 'notes' | 'agent' | 'memories' | 'planning' | 'focus' | 'settings';
 const pageLabels: Record<Page, string> = {
   home: '学习首页',
   library: '资料库',
@@ -46,6 +48,7 @@ const pageLabels: Record<Page, string> = {
   agent: '学习路线',
   memories: '长期记忆',
   planning: '学习计划',
+  focus: '专注时光',
   settings: '设置',
 };
 const readerBackLabels = {
@@ -76,6 +79,11 @@ export default function App() {
   } | null>(null);
   const [routeTarget, setRouteTarget] = useState<{ id: string; sequence: number } | null>(null);
   const [planningVersion, setPlanningVersion] = useState(0);
+  const [focusTarget, setFocusTarget] = useState<{
+    id: string;
+    day: string;
+    sequence: number;
+  } | null>(null);
   const [boot, setBoot] = useState<Bootstrap | null>(null);
   const [failure, setFailure] = useState<string | null>(null);
   const [attempt, setAttempt] = useState(0);
@@ -153,12 +161,23 @@ export default function App() {
     setPage('library');
   }
   function openTask(task: DailyTask) {
+    openTaskReference(task.id, task.day);
+  }
+  function openTaskReference(id: string, day: string) {
     setTaskTarget((previous) => ({
+      id,
+      day,
+      sequence: (previous?.sequence ?? 0) + 1,
+    }));
+    navigate('planning');
+  }
+  function focusTask(task: DailyTask) {
+    setFocusTarget((previous) => ({
       id: task.id,
       day: task.day,
       sequence: (previous?.sequence ?? 0) + 1,
     }));
-    navigate('planning');
+    navigate('focus');
   }
   function openLearningRoute(id: string) {
     setRouteTarget((previous) => ({ id, sequence: (previous?.sequence ?? 0) + 1 }));
@@ -223,13 +242,15 @@ export default function App() {
             {pageLabels.planning}
             {page === 'planning' && <span className="nav-dot" />}
           </button>
-          {[{ title: '专注时光', icon: Timer }].map(({ title, icon: Icon }) => (
-            <button key={title} className="nav-item" disabled>
-              <Icon size={18} />
-              {title}
-              <span className="planned-tag">规划中</span>
-            </button>
-          ))}
+          <button
+            className={`nav-item ${page === 'focus' ? 'selected' : ''}`}
+            aria-current={page === 'focus' ? 'page' : undefined}
+            onClick={() => navigate('focus')}
+          >
+            <Timer size={18} />
+            {pageLabels.focus}
+            {page === 'focus' && <span className="nav-dot" />}
+          </button>
         </nav>
         <div className="sidebar-bottom">
           <div className="local-caption">
@@ -423,6 +444,16 @@ export default function App() {
                 refreshVersion={planningVersion}
                 presetTask={taskTarget}
                 onOpenLearningRoute={openLearningRoute}
+                onFocusTask={focusTask}
+              />
+            </div>
+          )}
+          {boot && !failure && (
+            <div hidden={page !== 'focus'}>
+              <FocusPage
+                visible={page === 'focus'}
+                presetTask={focusTarget}
+                onOpenTask={openTaskReference}
               />
             </div>
           )}

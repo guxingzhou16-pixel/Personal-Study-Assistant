@@ -31,6 +31,8 @@ import { NoteFeedbackService } from './core/note-feedback';
 import { LearningAgentService } from './core/learning-agent';
 import { MemoryProposalService } from './core/memory-proposals';
 import { TaskProposalService } from './core/task-proposals';
+import { FocusTracker } from './core/focus';
+import type { FocusEndReason } from '../src/lib/types';
 
 app.setName('StudyCompanion');
 const testDataDir = !app.isPackaged ? process.env.STUDY_COMPANION_DATA_DIR : undefined;
@@ -52,6 +54,8 @@ let window: BrowserWindow | null = null;
 let storage: Storage | undefined;
 let documents: Documents | undefined;
 let study: StudyTracker | undefined;
+let focus: FocusTracker | undefined;
+let focusBackgroundError: unknown;
 let chat: ChatService | undefined;
 let search: SearchService | undefined;
 let embeddingFiles: EmbeddingFiles | undefined;
@@ -63,7 +67,21 @@ function isRendererUrl(url: string | undefined): boolean {
   return url?.split('#', 1)[0] === rendererUrl;
 }
 
-function registerHandlers(database: Storage, credentials: Credentials, tracker: StudyTracker) {
+function interruptFocus(reason: FocusEndReason): void {
+  try {
+    focus?.interrupt(reason);
+  } catch (error) {
+    // The tracker freezes immediately and retains a pending interruption for retry.
+    focusBackgroundError = error;
+  }
+}
+
+function registerHandlers(
+  database: Storage,
+  credentials: Credentials,
+  tracker: StudyTracker,
+  focusTracker: FocusTracker,
+) {
   const files = new Documents(
     database,
     join(dataDir, 'sources'),
@@ -146,6 +164,23 @@ function registerHandlers(database: Storage, credentials: Credentials, tracker: 
   handle('study:overview', (year, month) => tracker.overview(year, month));
   handle('study:check-in', (year, month) => tracker.checkIn(year, month));
   handle('study:set-running', (running, year, month) => tracker.setRunning(running, year, month));
+  function focusWork<T>(work: () => T): T {
+    if (focusBackgroundError) {
+      const error = focusBackgroundError;
+      focusBackgroundError = undefined;
+      throw error;
+    }
+    return work();
+  }
+  handle('study:focus-overview', () => focusWork(() => focusTracker.overview()));
+  handle('study:get-focus-session', (id) => focusWork(() => database.focus.get(id)));
+  handle('study:start-focus', (request) => focusWork(() => focusTracker.start(request)));
+  handle('study:control-focus', (id, revision, action) =>
+    focusWork(() => focusTracker.control(id, revision, action)),
+  );
+  handle('study:save-focus-review', (id, revision, review) =>
+    focusWork(() => focusTracker.saveReview(id, revision, review)),
+  );
   handle('study:check-connection', async (providerInput, profileInput, keyInput) => {
     const provider = validateProvider(providerInput);
     const profile = validateProfile(profileInput);
@@ -293,6 +328,10 @@ function createWindow() {
     },
   });
   window.webContents.setWindowOpenHandler(() => ({ action: 'deny' }));
+  window.webContents.on('did-start-navigation', (details) => {
+    if (details.isMainFrame && !details.isSameDocument) interruptFocus('renderer-reload');
+  });
+  window.webContents.on('render-process-gone', () => interruptFocus('renderer-reload'));
   window.webContents.on('will-navigate', (event, url) => {
     if (!isRendererUrl(url)) event.preventDefault();
   });
@@ -358,14 +397,22 @@ else {
       const credentials = new Credentials(join(dataDir, 'credentials.enc.json'), safeStorage);
       study = new StudyTracker(new StudyStorage(join(dataDir, 'study-activity.sqlite3')));
       const tracker = study;
+      focus = new FocusTracker(storage.focus, storage.planning);
+      const focusTracker = focus;
       studyHeartbeat = setInterval(() => {
         try {
           tracker.checkpoint();
         } catch (error) {
           tracker.interrupt(error);
         }
+        try {
+          focusTracker.checkpoint();
+        } catch (error) {
+          focusBackgroundError = error;
+        }
       }, 1000);
       powerMonitor.on('suspend', () => {
+        interruptFocus('sleep');
         try {
           tracker.pause();
         } catch (error) {
@@ -373,7 +420,7 @@ else {
         }
       });
       Menu.setApplicationMenu(null);
-      registerHandlers(storage, credentials, tracker);
+      registerHandlers(storage, credentials, tracker, focusTracker);
       createWindow();
     })
     .catch((error) => {
@@ -394,6 +441,13 @@ else {
     chat?.close();
     documents?.cancel();
     clearInterval(studyHeartbeat);
+    interruptFocus('app-exit');
+    if (focusBackgroundError) {
+      dialog.showErrorBox(
+        '专注记录未能保存',
+        '最后的专注状态保存失败，请保留数据目录并检查磁盘空间和权限。重启后不会自动继续计时。',
+      );
+    }
     try {
       study?.close();
     } catch {

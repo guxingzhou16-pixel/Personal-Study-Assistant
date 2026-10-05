@@ -193,7 +193,7 @@ export class PlanningStorage {
     return decodeProject(row);
   }
 
-  private getTask(input: unknown): DailyTask {
+  getTask(input: unknown): DailyTask {
     const row = this.db.prepare('SELECT * FROM daily_tasks WHERE id = ?').get(planningId(input));
     if (!row) throw new AppError('taskMissing', '任务已删除或不存在，请重新加载。');
     return decodeTask(row);

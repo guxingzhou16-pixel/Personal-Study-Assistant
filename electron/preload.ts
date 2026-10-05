@@ -30,6 +30,9 @@ import type {
   StudyProject,
   DailyTask,
   TaskProposal,
+  FocusOverview,
+  FocusSession,
+  FocusReviewResult,
 } from '../src/lib/types';
 
 async function call<T>(channel: string, ...args: unknown[]): Promise<T> {
@@ -132,5 +135,12 @@ const api: DesktopApi = {
     call<TaskProposal>('study:prepare-task-proposal', turnId, request),
   confirmTaskProposal: (id) => call<DailyTask>('study:confirm-task-proposal', id),
   discardTaskProposal: (id) => call<void>('study:discard-task-proposal', id),
+  focusOverview: () => call<FocusOverview>('study:focus-overview'),
+  getFocusSession: (id) => call<FocusSession>('study:get-focus-session', id),
+  startFocus: (request) => call<FocusOverview>('study:start-focus', request),
+  controlFocus: (id, revision, action) =>
+    call<FocusOverview>('study:control-focus', id, revision, action),
+  saveFocusReview: (id, revision, review) =>
+    call<FocusReviewResult>('study:save-focus-review', id, revision, review),
 };
 contextBridge.exposeInMainWorld('studyCompanion', api);

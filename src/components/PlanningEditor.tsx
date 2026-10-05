@@ -1,5 +1,5 @@
 import type { RefObject } from 'react';
-import { Save, Trash2 } from 'lucide-react';
+import { Save, Timer, Trash2 } from 'lucide-react';
 import { planningLimits } from '../lib/planning';
 import type { DailyTask, ProjectDraft, StudyProject, TaskDraft } from '../lib/types';
 
@@ -21,6 +21,7 @@ interface Props {
   changeProject<K extends keyof ProjectDraft>(key: K, value: ProjectDraft[K]): void;
   changeTask<K extends keyof TaskDraft>(key: K, value: TaskDraft[K]): void;
   onOpenLearningRoute(id: string): void;
+  onFocusTask(task: DailyTask): void;
 }
 
 export function PlanningEditor({
@@ -37,6 +38,7 @@ export function PlanningEditor({
   changeProject,
   changeTask,
   onOpenLearningRoute,
+  onFocusTask,
 }: Props) {
   const originTurnId = editor.kind === 'task' ? editor.record?.originTurnId : null;
   return (
@@ -206,6 +208,22 @@ export function PlanningEditor({
                 {editor.record.status === 'completed' ? '重新打开任务' : '手动标记完成'}
               </button>
               <p className="field-hint">只修改已保存任务的状态；正文草稿不会随之保存。</p>
+              <button
+                type="button"
+                className="button secondary"
+                disabled={blocked || dirty || editor.record.status !== 'todo'}
+                onClick={() => {
+                  if (editor.record) onFocusTask(editor.record);
+                }}
+              >
+                <Timer size={15} />
+                为这项任务安排专注
+              </button>
+              <p className="field-hint">
+                {dirty
+                  ? '请先保存修改，再选择专注时长。'
+                  : '使用保存版本，前往专注页面核对后开始；已完成任务需先重新打开。'}
+              </p>
             </div>
           )}
         </>

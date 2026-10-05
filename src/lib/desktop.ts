@@ -68,6 +68,11 @@ export const desktop: DesktopApi = {
   prepareTaskProposal: (turnId, request) => api().prepareTaskProposal(turnId, request),
   confirmTaskProposal: (id) => api().confirmTaskProposal(id),
   discardTaskProposal: (id) => api().discardTaskProposal(id),
+  focusOverview: () => api().focusOverview(),
+  getFocusSession: (id) => api().getFocusSession(id),
+  startFocus: (request) => api().startFocus(request),
+  controlFocus: (id, revision, action) => api().controlFocus(id, revision, action),
+  saveFocusReview: (id, revision, review) => api().saveFocusReview(id, revision, review),
 };
 
 export function errorMessage(error: unknown): string {

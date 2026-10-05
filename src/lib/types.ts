@@ -316,6 +316,47 @@ export interface TaskProposal {
   draft: TaskDraft;
   project: StudyProject | null;
 }
+export type FocusStatus = 'running' | 'paused' | 'completed' | 'stopped' | 'interrupted';
+export type FocusEndReason =
+  | 'elapsed'
+  | 'user-stop'
+  | 'sleep'
+  | 'heartbeat-gap'
+  | 'app-exit'
+  | 'app-restart'
+  | 'renderer-reload'
+  | 'storage-error';
+export interface FocusSession {
+  id: string;
+  taskId: string;
+  taskRevision: number;
+  taskTitle: string;
+  taskDay: string;
+  plannedMinutes: number;
+  elapsedMs: number;
+  status: FocusStatus;
+  reason: FocusEndReason | null;
+  review: string;
+  startedAt: string;
+  endedAt: string | null;
+  updatedAt: string;
+  revision: number;
+}
+export interface FocusStartRequest {
+  taskId: string;
+  taskRevision: number;
+  minutes: number;
+}
+export type FocusAction = 'pause' | 'resume' | 'stop';
+export interface FocusOverview {
+  current: FocusSession | null;
+  recent: FocusSession[];
+  version: number;
+}
+export interface FocusReviewResult {
+  session: FocusSession;
+  overview: FocusOverview;
+}
 export interface DesktopApi {
   bootstrap(): Promise<Bootstrap>;
   saveSettings(settings: Settings): Promise<Settings>;
@@ -380,6 +421,11 @@ export interface DesktopApi {
   prepareTaskProposal(turnId: string, request: TaskProposalRequest): Promise<TaskProposal>;
   confirmTaskProposal(id: string): Promise<DailyTask>;
   discardTaskProposal(id: string): Promise<void>;
+  focusOverview(): Promise<FocusOverview>;
+  getFocusSession(id: string): Promise<FocusSession>;
+  startFocus(request: FocusStartRequest): Promise<FocusOverview>;
+  controlFocus(id: string, revision: number, action: FocusAction): Promise<FocusOverview>;
+  saveFocusReview(id: string, revision: number, review: string): Promise<FocusReviewResult>;
 }
 
 declare global {

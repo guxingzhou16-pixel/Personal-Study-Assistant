@@ -58,11 +58,13 @@ export function PlanningPage({
   refreshVersion,
   presetTask,
   onOpenLearningRoute,
+  onFocusTask,
 }: {
   visible: boolean;
   refreshVersion: number;
   presetTask: { id: string; day: string; sequence: number } | null;
   onOpenLearningRoute: (id: string) => void;
+  onFocusTask: (task: DailyTask) => void;
 }) {
   const [day, setDay] = useState(() => localDayKey(new Date()));
   const [overview, setOverview] = useState<PlanningOverview | null>(null);
@@ -555,6 +557,7 @@ export function PlanningPage({
             changeProject={changeProject}
             changeTask={changeTask}
             onOpenLearningRoute={onOpenLearningRoute}
+            onFocusTask={onFocusTask}
           />
         ) : (
           <div className="planning-empty">
