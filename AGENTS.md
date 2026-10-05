@@ -165,9 +165,19 @@
 
 - 最终npm run desktop:build（双TypeScript/Vite/Electron）、14份本轮源码及新增番茄钟清单Prettier、diff检查通过；TypeScript reviewer与code-reviewer最终静态批准，包含按ID核对旧复盘及实际写入回执的修正。Vite已有大块警告仍在，未验性能/安装包，未运行功能测试、应用、个人DB或模型。实现c00fe4a仅本地提交、不推送；保留其他对话改动，下一步完整学习数据备份/恢复。
 
-### 3.14 仍待开发或验收的主要能力
+### 3.14 已实现、待独立验收的完整学习数据备份与恢复
 
-笔记、AI反馈、路线、记忆管理/确认、手动项目/任务、Agent任务提议与任务番茄钟的独立验收，真实聊天/引用语义与规模验证；会话/路线管理、主题、备份、卡片/短测验、OCR、更多格式、安装包与展示网站待开发。
+- 2026-10-05：设置页接入手动导出两库/全部资料、文件夹校验与九类数量预览、放弃/取消、明确确认后重启切换。只备份已保存内容，整份替换、不合并；未保存输入须先处理。未加密备份包含私人学习内容，不导出密钥及密文、本机模型、派生索引、旧备份、日志/缓存或未确认提议，不自动请求模型。
+- 数据结构不变：主库v11/活动v1/派生v2。格式1只支持当前11/1完整备份，SQLite backup API保留两库内容与rowid，业务暂停写入时顺序快照；不直接复制活动WAL数据库、不用VACUUM INTO重建。清单最后写入，SHA-256/大小/精确schema/记录/关联/数量全部核对，摘要不是真实性或AI正确性证明。
+- 主进程维护锁要求首页计时已暂停、focus无running/paused、导入/检索/聊天/下载/其他IPC空闲，不自动停止计时或改任务。处理期间只允许状态读取与取消；常驻备份订阅独立于bootstrap，重载仍能读取/取消，再重试启动加载。独立utility进程256MB V8堆/30分钟，取消/失败先等待退出才清理本次UUID子目录或解除锁，不移除选址父目录。
+- 恢复先复制到 `learning-restores/UUID/`，预览一份/十分钟，确认只接UUID、再次核对副本并原生默认取消。最终commit先禁止取消，再durable写pending并消费预览；丢失应答先读状态、不自动重发。启动再次校验、候选两库成功打开后原子替换active位置；保留原目录和准确旧active/null供手动回退。切换失败隔离等待记录、继续旧数据，切换后残留pending不重复恢复；位置损坏/活动库缺失不创建空库代替。
+- `backup.ts/backup-runner.ts/backup-files.ts/backup-data.ts/data-location.ts` 分别管流程、进程、复制/清单、数据库校验和位置切换，固定 `backup-worker.ts`；`BackupPanel`/独立CSS、`useBackupState`及共享backup限额/类型接入App、preload、desktop。当前学习目录与根目录分开：恢复后Files/Search/两库使用active，Credentials/Embedding始终用根目录；七个桥接含事件，不暴露文件路径/SQL/任意频道。
+- 最终类型/生产桌面构建、22份本轮源码格式与diff检查、TypeScript reviewer与code-reviewer静态审查通过；已有Vite大块警告保留，性能/安装包未验证。没有新增依赖/数据库迁移/功能测试，未运行应用、个人数据库或模型。`docs/testing/backup-acceptance.md` 全部待执行，优先临时数据往返/取消/磁盘与启动故障/回退；不能称恢复或阶段4已验收。
+- 实现 `33f046d` 仅本地提交，不推送；保留其他对话修改。没有压缩/加密/自动备份/合并/云同步；失败/强退暂存和旧目录可能持续占磁盘，无自动清理。恢复重启会丢未保存输入，笔记dirty由主进程拒绝确认，其他编辑需用户事先保存或放弃。下一步三种主题与个性化，网站最后。
+
+### 3.15 仍待开发或验收的主要能力
+
+笔记、AI反馈、路线、记忆管理/确认、手动项目/任务、Agent任务提议、任务番茄钟与完整备份/恢复的独立验收，真实聊天/引用语义与规模验证；会话/路线管理、主题、卡片/短测验、OCR、更多格式、安装包与展示网站待开发。
 
 独立合成集 `synthetic-retrieval-v2`（`tests/fixtures/retrieval-independent-cases.ts`）与逐题引用位置校验已加入可重复评测；多锚点召回在独立集上仍有失败（`ind-symmetric-hash`），保留为失败案例。真实本地/云端聊天仍未验收：本机未安装 Ollama，无法据此验证真实生成与引用语义。
 
@@ -223,6 +233,7 @@
 | 桌面构建 | esbuild，主进程与预加载脚本输出 CommonJS |
 | 后台解析 | Electron `utilityProcess` 独立 Node 进程，解析入口输出 ESM；256 MB V8 堆限制、60 秒超时、进度与取消 |
 | 后台检索/嵌入 | 独立 `utilityProcess`，只读主库、写派生 FTS5/向量；512 MB V8 堆、5 分钟超时；模型不可用保留关键词 |
+| 后台备份/恢复校验 | 固定 `utilityProcess`，SQLite backup API与文件流式复制/哈希；256 MB V8 堆、30 分钟超时，等待退出再清理 |
 | 本地嵌入 | Transformers.js 4.3.0 / ONNX Runtime Node 1.30.0，中文 BGE-small Q8，CPU 最多 4 线程，仅校验过的本地文件 |
 | 本地数据库 | Electron 内置 Node.js 的 `node:sqlite` / `DatabaseSync` |
 | 密钥 | Electron `safeStorage`，Windows DPAPI 系统加密 |
@@ -245,6 +256,8 @@
 | `src/App.tsx` | 工作台、导航、启动加载、页面切换和学习首页 |
 | `src/components/SettingsPage.tsx` | 偏好及模型表单、连接检测、密钥操作；输入密钥只作必要的临时传递 |
 | `src/components/EmbeddingSettings.tsx` | 独立模型下载/取消、进度和文件状态；不改变聊天配置 |
+| `src/components/BackupPanel.tsx`、`BackupPanel.css` | 两库与资料导出、恢复预览/确认/放弃、实际结果与全局进度/取消弹窗 |
+| `src/lib/backup.ts`、`useBackupState.ts` | 版本/大小/数量限额，常驻状态订阅与revision/处理中轮询；不自动重发写入 |
 | `src/components/NotesPage.tsx` | 笔记列表/四部分编辑、保存/另存、资料关联、导出/删除及草稿确认；切换页面保持挂载 |
 | `src/components/NoteFeedbackPanel.tsx` | 保存版本/证据预览、远程确认、流式/停止与反馈历史，旧版本提示、引用及返回笔记 |
 | `src/components/ModelAnswer.tsx` | 聊天/反馈共用安全 Markdown、受限引用；无 HTML、图片、外链执行 |
@@ -272,6 +285,9 @@
 | `electron/core/storage.ts` | 主库版本 11、迁移前备份，保留旧数据并新增专注记录；不改活动库版本 |
 | `electron/core/planning-storage.ts` | 项目/任务CRUD、来源恢复校验、revision/归档/完成边界与提议确认创建事务；不调用模型/活动计时 |
 | `electron/core/focus-storage.ts`、`focus.ts` | 独立专注表/来源快照/条件事务/恢复校验及单调计时/中断/故障冻结，不写活动库或任务进度 |
+| `electron/core/backup.ts`、`backup-runner.ts` | 原生选址/确认、维护锁/预览缓存、固定进程/取消/超时/等待退出与恢复重启 |
+| `electron/core/backup-files.ts`、`backup-data.ts` | 完整文件清单/两库一致性副本/流式复制与摘要、精确schema/记录/关联只读校验 |
+| `electron/core/data-location.ts`、`electron/backup-worker.ts` | 活动/等待/旧位置记录、隔离目录保护与原子切换；固定备份/校验入口不读模型密钥 |
 | `electron/core/task-proposals.ts` | 保存路线单任务提议缓存、来源/项目复核与单次确认，不解析模型输出或调用新模型请求 |
 | `electron/core/memory-storage.ts`、`memory-proposals.ts` | 记忆CRUD/恢复校验、来源/版本/使用复核，学习意向预览缓存与单次确认 |
 | `electron/core/note-storage.ts` | 笔记表/校验/CRUD、关联来源存在检查与 revision 冲突；不调用模型 |
@@ -306,7 +322,7 @@
 | `tests/embedding.spec.ts` | 模拟下载的 UI/取消流程，保留关键词路径 |
 | `tests/embedding.real.ts`、`playwright.embedding.config.ts` | 独立真实 BGE 门禁：离线中文同义检索、引用、重启缓存、索引取消、损坏降级 |
 | `tests/fixtures/reading-files.ts` | 自动生成测试资料，不使用私人学习文件 |
-| `scripts/build-electron.mjs` | 构建主进程、预加载、独立解析/检索入口到 `dist-electron/` |
+| `scripts/build-electron.mjs` | 构建主进程、预加载、独立解析/检索/备份入口到 `dist-electron/` |
 | `scripts/eval-retrieval.mjs`、`download-embedding.mjs` | 固定关键词/混合评测；开发模型缓存/报告写 `artifacts/`，不使用用户数据 |
 | `scripts/prepare-pdf-assets.mjs` | 开发/构建时复制 PDF.js CMap、字库与 WASM 到生成资源目录 |
 | `scripts/dev.mjs` | 启动 Vite 与 Electron，处理开发进程退出 |
@@ -355,9 +371,11 @@
 
 专注方法：`focusOverview()`、`getFocusSession(id)`、`startFocus({taskId,taskRevision,minutes})`、`controlFocus(id,revision,action)`、`saveFocusReview(id,revision,review)`。仅实际保存todo/版本匹配可开始，action为pause/resume/stop；来源/时间/elapsed/状态/原因由主进程生成，不接受renderer自造。elapsed心跳不增控制revision，状态/复盘才增；有活动/未修复故障禁止新轮。读/控制返回实际FocusOverview与递增version，单条读取返回实际FocusSession，复盘返回FocusReviewResult{session,overview}供确认成功和恢复核对，不把读取或选择当开始/完成/签到。
 
+备份方法：`backupState()`、`exportBackup()`、`inspectBackup()`、`confirmRestore(id)`、`discardRestore(id)`、`cancelBackup()`、`onBackupUpdate(listener)`。选址/原生确认由主进程做，恢复只接本进程缓存UUID；不接路径、清单、数据库正文或新数据位置。处理时普通IPC全部拒绝，只允许backup-state/cancel-backup；业务必须空闲，focus暂停也不能开始备份。状态带revision，界面早到/迟到事件按版本合并；不能把pending准备当已恢复成功。最终commit/restart不取消，失败或丢失应答先读取实际状态；事件只传数据并返回取消监听。正常退出清理未确认预览不能受计时/模型busy阻止，清理失败明确报告且不中断已确认结果。
+
 ## 8. 本地数据、迁移与密钥
 
-默认数据目录：`%APPDATA%\StudyCompanion\`。
+默认应用数据根目录：`%APPDATA%\StudyCompanion\`。首次学习数据也在根目录；恢复后 `active-learning.json` 指向 `learning-restores/UUID/`，两库、sources及派生索引使用该目录，密钥/本机模型始终用根目录。路径来自主进程并用realpath/lstat校验，不让源码依赖本机绝对路径。以下库/资料路径相对于当前学习目录，密钥/模型和位置记录相对于根目录。
 
 | 文件或目录 | 内容与约束 |
 | --- | --- |
@@ -378,6 +396,10 @@
 | `study-companion.sqlite3.before-v10-*.sqlite3` | 版本9增加任务来源前的一致性主库备份；失败不继续迁移，不自动删除 |
 | `study-companion.sqlite3.before-v11-*.sqlite3` | 版本10增加专注记录前的一致性主库备份；失败不继续迁移，不自动删除 |
 | `credentials.enc.json` | 独立密钥密文文件，按规范化地址的 SHA-256 键索引，不是学习备份内容 |
+| `active-learning.json`、`pending-restore.json` | 当前学习位置与等待启动的恢复记录；JSON最多4096字节、严格字段/UUID，临时写入flush后rename，不等于备份正文 |
+| `before-restore-UUID.json` | 准确旧active对象或null，结合保留的旧目录供退出应用后的手动回退；不可在运行中修改 |
+| `learning-restores/UUID/` | 恢复隔离副本，校验与候选库成功打开后成为活动学习目录；拒绝链接/硬链接，不自动清理旧数据 |
+| 外部 `拾知备份-时间-标识/` | format1清单、独立两库与全部sources；主库v11/活动v1，只恢复完整目录，不含密钥/模型/索引；未加密 |
 
 数据库规则：
 
@@ -395,6 +417,9 @@
 - v9 `study_projects` 保存标题/目标/archived/revision/时间，`daily_tasks` 保存内容、project_id可空RESTRICT外键、安排日期/预计分钟、status/完成时刻与revision/时间。CHECK约束todo对应NULL、completed对应非NULL；归档不删除历史任务。普通save保留完成状态，另存创建todo；完成只表示用户标记，无实际时长或知识证明。
 - v10 `daily_tasks` 新增origin/manual或learning-route、origin_turn_id、origin_turn_revision；manual必须双NULL，路线必须UUID/有效正版本，SQL组合约束及恢复校验同时维护。旧行manual，新手动/另存manual，编辑不接来源。来源不设轮次外键或级联，缺失来源不删除任务。确认创建用BEGIN IMMEDIATE复核完整项目快照/归档与总数并插入；失败回滚，不拿预览当已保存结果，不使用任务来源或完成状态作为模型新上下文。
 - v11 focus_sessions保存任务ID/revision/标题/日期快照、预算/实际elapsed、状态/终止原因、复盘及自身revision/时间。taskId为溯源标识不级联，只有一个running/paused，恢复中断旧活动。正常心跳计满与睡眠/故障/退出中断分开；复盘不改状态/时长/任务。不要将专注加入首页study_ms，否则同时开启会重复计时；完整备份包含主库专注，排除密钥。
+- 完整备份是独立功能，不是仅主库的迁移前备份。业务暂停写入时SQLite backup API生成两库一致性快照、保留rowid；清单最后写。严格校验全sqlite_schema、版本/quick_check/外键、运行时记录与九类数量，不执行外部schema。每库2GiB/总50GiB/资料10000份/清单3MiB，资料仍受导入限额；复制分块256KiB、fsync，取消先等worker退出。散列只核对完整性，不证明来源可信。
+- `schemaDefinition()` 仅主进程/固定worker用于备份的当前schema对照，不暴露给renderer。未来数据库迁移必须同步备份版本/结构兼容政策与验收，不能只改backupLimits版本号来绕过校验或假称旧包兼容。已保存阅读位置只允许page/anchor/offset/zoom/tone五键，证据JSON须完整校验，不让成功恢复后正常读取/保存崩溃。
+- 恢复前再次验证隔离副本，原子pending为确认消费边界；启动先校验/打开候选两库，再保存准确旧active并原子切换。active提交成功后不能按旧位置初始化Files/Search；剩余pending与active同ID只清理，不重复。切换前失败保留旧目录且隔离pending，当前位置损坏/库缺失拒绝空库fallback。只能删除本次未活动/未等待的UUID子目录，不能递归移除根目录、用户选择父目录或历史活动目录。强退遗留和旧目录不自动删，手动回退见README。
 - 聊天轮次状态为 `streaming/completed/stopped/error/interrupted`，保存部分回答与错误提示。主进程退出先取消聊天并保存，再关库；重启将残留的 streaming 标记为 interrupted。保存失败须向界面报告，不能冒充成功。单会话限 100 轮、会话总数限 500，未来会话管理/清理需保留恢复边界。
 - 来源锚点为 `page-N` 或 `md-line-N`，绑定内容哈希。资料问答轮次保存证据编号、资料名/类型、标题/页码/行号、UTF-16 偏移与原文；打开核对保存原文、元数据和副本哈希，不猜位置。复制 URI 尚未注册系统协议；应用内引用编号走受限 IPC，不依赖系统协议。
 - 当前分块最多 800 字符、重叠 120 字符，不拆开代理对；中文分词/汉字二元词入 FTS5。查询最多 24 个非停用词，BM25 前 40 候选经至少 50% 字面关键词覆盖过滤、排序/去重取最多 4 片段。阈值不证明证据充分，跨段落/同义表达可能遗漏；调整须保留固定评测失败案例。
@@ -409,7 +434,7 @@
 - 只在主进程加解密。用户输入时可临时通过桥接传递，保存后清空输入框；不把已保存密钥回传界面。
 - `safeStorage` 不可用时拒绝保存，不降级为明文。
 - 密钥按规范化服务地址绑定，地址改变时不得将另一地址的密钥发过去。
-- 密文由 Windows 账户保护，不是跨机器通用备份；后续导出明确排除密钥及密文临时文件。
+- 密文由 Windows 账户保护，不是跨机器通用备份；完整导出排除密钥及密文临时文件，恢复保持根目录密钥不变。
 - 密文丢失或损坏、账户不匹配要给出明确反馈，不把损坏文件静默覆盖为空配置。
 
 开发/测试专用环境变量：`STUDY_COMPANION_DATA_DIR` 指定隔离的数据目录，`STUDY_COMPANION_DEV_URL` 目前仅接受 `http://127.0.0.1:1420`；打包模式不使用这些覆盖。不要将测试路径或开发服务写进生产分发配置。
@@ -457,7 +482,7 @@ npm run desktop:start
 | `npm run desktop:dev` | 先构建 Electron 代码，再启动 Vite 与真实桌面窗口 |
 | `npm run typecheck` | 检查界面与 Electron/测试的 TypeScript 类型 |
 | `npm run build` | 类型检查与 Vite 界面生产构建 |
-| `npm run build:electron` | 生成 main/preload 及解析/检索 worker；检索运行时依赖留在 node_modules，不把原生库打包进 JS |
+| `npm run build:electron` | 生成 main/preload 及解析/检索/备份 worker；检索运行时依赖留在 node_modules，不把原生库打包进 JS |
 | `npm run desktop:build` | 构建界面和 Electron 代码，尚不生成安装包 |
 | `npm run desktop:start` | 打开已经构建的桌面版本，不自动构建 |
 | `npm run preview` | Vite 构建产物的浏览器预览 |
@@ -474,7 +499,7 @@ React 界面支持热更新；修改 `electron/` 或 preload 后重启桌面开�
 
 ## 11. 验证方法与测试要求
 
-**当前分工（用户2026-10-04指定，本轮延续）：主线实现与类型/构建基础检查；功能测试及真实模型验收交其他对话。** 笔记/反馈/路线/记忆/项目任务/任务提议/番茄钟均未运行功能测试或改规格；2026-10-05新增 `docs/testing/memory-acceptance.md`、`docs/testing/planning-acceptance.md`、`docs/testing/task-proposal-acceptance.md`、`docs/testing/focus-acceptance.md` 详细清单（不是已执行测试）。测试方补齐v5～v11真实结构迁移/保留、CRUD/冲突/关联、导出/取消、协议/确认/恢复/引用、记忆隐私、提议单次确认/事务与任务状态和计时签到隔离，更新旧断言/桥接清单；构建成功不等于功能通过。
+**当前分工（用户2026-10-04指定，本轮延续）：主线实现与类型/构建基础检查；功能测试及真实模型验收交其他对话。** 笔记/反馈/路线/记忆/项目任务/任务提议/番茄钟/完整备份恢复均未运行功能测试或改规格；2026-10-05新增 `docs/testing/memory-acceptance.md`、`docs/testing/planning-acceptance.md`、`docs/testing/task-proposal-acceptance.md`、`docs/testing/focus-acceptance.md`、`docs/testing/backup-acceptance.md` 详细清单（不是已执行测试）。测试方补齐v5～v11真实结构迁移/保留、CRUD/冲突/关联、导出/取消、协议/确认/恢复/引用、记忆隐私、提议单次确认/事务与任务状态和计时签到隔离、两库完整往返/启动切换/磁盘故障/回退，更新旧断言/桥接清单；构建成功不等于功能通过。
 
 日常开发以当前功能的基础验证为准，选择最小但有效的检查。纯文档改动核对事实、路径、命令和 diff 即可，不启动桌面或完整测试。与代码无关的已有 RED 规格要记录，不借文档任务扩大范围修复。
 
@@ -528,13 +553,13 @@ npx playwright test tests/rag.spec.ts
 | 1 | PDF/Markdown 导入与阅读，基础版本已交付 | 去重、损坏反馈、原文件复制、原页/排版、重启位置恢复、扫描件提示、取消与引用复制 |
 | 2 | 聊天协议、可追溯 RAG、本地嵌入/混合检索与对比已交付；真实聊天质量待做 | 本地/云端真实同资料问答、引用语义质量、独立数据、规模与安装包 |
 | 3 | 笔记/反馈/固定路线/记忆管理与确认已实现，独立验收仍待完成 | 独立写笔记、有出处、取消不写入、删除不再新使用、本机记忆不外发 |
-| 4 | 手动项目/每日任务、Agent单任务确认与任务番茄钟已实现待验收；主题、完整备份待开发 | 数据重启恢复、确认才写/来源可追溯、任务不混签到时长、中断不误完成、备份往返且无密钥 |
+| 4 | 手动项目/每日任务、Agent单任务确认、任务番茄钟及完整备份恢复已实现待验收；主题待开发 | 数据重启恢复、确认才写/来源可追溯、任务不混签到时长、中断不误完成、备份往返且无密钥 |
 | 5 | 全流程与异常验证、RAG 对比、安装包、发布文档 | 新用户按说明完成学习闭环、发布包对应 Git 标签、公开发布有授权 |
 | 6 | 静态展示网站 | 软件稳定后才建设，展示真实功能、评测与下载 |
 
 用户 2026-10-04 将测试安排到其他对话，主线进入阶段 3；阶段 2 的未验收项继续保留。测试对话可继续独立验收，不为机械阶段编号停止主线实现；不冒称整阶段或首版已完成。
 
-主线下一步是阶段4完整学习数据备份/恢复：先界定主库/独立活动库/原资料一致性导出、排除密钥与可重建模型索引，恢复前预览并保留现有数据，不默认覆盖个人库。项目任务/提议/番茄钟已实现待验收；主线实现与类型构建，功能测试继续交其他对话，使用README及四份docs/testing清单。保留真实质量失败和确认边界，不因构建通过勾阶段3/4；网站最后。
+主线下一步是阶段4主题与个性化：实现清爽现代/安静书房/活泼游戏化主题的保存/重启恢复，复用已有回应风格，不用虚构记录制造激励。项目任务/提议/番茄钟/完整备份恢复已实现待验收；主线实现与类型构建，功能测试继续交其他对话，使用README及五份docs/testing清单。保留真实质量失败和确认边界，不因构建通过勾阶段3/4；网站最后。
 
 ## 14. Git、隐私与协作流程
 
