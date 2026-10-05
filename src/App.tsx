@@ -27,10 +27,11 @@ import { ChatPage } from './components/ChatPage';
 import { NotesPage } from './components/NotesPage';
 import { AgentPage } from './components/AgentPage';
 import { MemoryPage } from './components/MemoryPage';
+import { PlanningPage } from './components/PlanningPage';
 import { desktop, errorMessage, isDesktop } from './lib/desktop';
 import { defaultSettings, type Bootstrap, type Settings, type CitationTarget } from './lib/types';
 
-type Page = 'home' | 'library' | 'chat' | 'notes' | 'agent' | 'memories' | 'settings';
+type Page = 'home' | 'library' | 'chat' | 'notes' | 'agent' | 'memories' | 'planning' | 'settings';
 const pageLabels: Record<Page, string> = {
   home: '学习首页',
   library: '资料库',
@@ -38,6 +39,7 @@ const pageLabels: Record<Page, string> = {
   notes: '学习笔记',
   agent: '学习路线',
   memories: '长期记忆',
+  planning: '学习计划',
   settings: '设置',
 };
 const readerBackLabels = {
@@ -187,10 +189,16 @@ export default function App() {
             </button>
           ))}
           <div className="nav-divider" />
-          {[
-            { title: '计划与打卡', icon: Target },
-            { title: '专注时光', icon: Timer },
-          ].map(({ title, icon: Icon }) => (
+          <button
+            className={`nav-item ${page === 'planning' ? 'selected' : ''}`}
+            aria-current={page === 'planning' ? 'page' : undefined}
+            onClick={() => navigate('planning')}
+          >
+            <Target size={18} />
+            {pageLabels.planning}
+            {page === 'planning' && <span className="nav-dot" />}
+          </button>
+          {[{ title: '专注时光', icon: Timer }].map(({ title, icon: Icon }) => (
             <button key={title} className="nav-item" disabled>
               <Icon size={18} />
               {title}
@@ -378,6 +386,11 @@ export default function App() {
           {boot && !failure && (
             <div hidden={page !== 'memories'}>
               <MemoryPage visible={page === 'memories'} />
+            </div>
+          )}
+          {boot && !failure && (
+            <div hidden={page !== 'planning'}>
+              <PlanningPage visible={page === 'planning'} />
             </div>
           )}
           {boot && !failure && (

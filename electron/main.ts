@@ -206,6 +206,13 @@ function registerHandlers(database: Storage, credentials: Credentials, tracker: 
   handle('study:prepare-memory-proposal', (turnId, edit) => memoryProposals.prepare(turnId, edit));
   handle('study:confirm-memory-proposal', (id) => memoryProposals.confirm(id));
   handle('study:discard-memory-proposal', (id) => memoryProposals.discard(id));
+  handle('study:planning-overview', (day) => database.planning.overview(day));
+  handle('study:save-project', (request) => database.planning.saveProject(request));
+  handle('study:save-task', (request) => database.planning.saveTask(request));
+  handle('study:set-task-completed', (id, revision, completed) =>
+    database.planning.setCompleted(id, revision, completed),
+  );
+  handle('study:delete-task', (id, revision) => database.planning.deleteTask(id, revision));
   handle('study:embedding-status', () => embeddings.status());
   handle('study:cancel-embedding-download', () => embeddings.cancel());
   handle('study:download-embedding', () => {

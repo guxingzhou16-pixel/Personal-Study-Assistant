@@ -26,6 +26,9 @@ import type {
   LearningPreview,
   StudyMemory,
   MemoryProposal,
+  PlanningOverview,
+  StudyProject,
+  DailyTask,
 } from '../src/lib/types';
 
 async function call<T>(channel: string, ...args: unknown[]): Promise<T> {
@@ -118,5 +121,11 @@ const api: DesktopApi = {
     call<MemoryProposal>('study:prepare-memory-proposal', turnId, edit),
   confirmMemoryProposal: (id) => call<StudyMemory>('study:confirm-memory-proposal', id),
   discardMemoryProposal: (id) => call<void>('study:discard-memory-proposal', id),
+  planningOverview: (day) => call<PlanningOverview>('study:planning-overview', day),
+  saveStudyProject: (request) => call<StudyProject>('study:save-project', request),
+  saveDailyTask: (request) => call<DailyTask>('study:save-task', request),
+  setDailyTaskCompleted: (id, revision, completed) =>
+    call<DailyTask>('study:set-task-completed', id, revision, completed),
+  deleteDailyTask: (id, revision) => call<void>('study:delete-task', id, revision),
 };
 contextBridge.exposeInMainWorld('studyCompanion', api);

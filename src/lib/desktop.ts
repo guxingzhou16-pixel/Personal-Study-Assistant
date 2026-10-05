@@ -59,6 +59,12 @@ export const desktop: DesktopApi = {
   prepareMemoryProposal: (turnId, edit) => api().prepareMemoryProposal(turnId, edit),
   confirmMemoryProposal: (id) => api().confirmMemoryProposal(id),
   discardMemoryProposal: (id) => api().discardMemoryProposal(id),
+  planningOverview: (day) => api().planningOverview(day),
+  saveStudyProject: (request) => api().saveStudyProject(request),
+  saveDailyTask: (request) => api().saveDailyTask(request),
+  setDailyTaskCompleted: (id, revision, completed) =>
+    api().setDailyTaskCompleted(id, revision, completed),
+  deleteDailyTask: (id, revision) => api().deleteDailyTask(id, revision),
 };
 
 export function errorMessage(error: unknown): string {

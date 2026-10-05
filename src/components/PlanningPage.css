@@ -1,0 +1,196 @@
+.planning-toolbar,
+.planning-actions,
+.planning-list-heading,
+.planning-datebar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+.planning-actions {
+  justify-content: flex-end;
+}
+.planning-page h2 {
+  font-size: 15px;
+}
+.planning-notice {
+  color: var(--accent);
+  margin: 14px 0;
+  font-size: 12px;
+  line-height: 1.8;
+}
+.planning-datebar {
+  justify-content: flex-start;
+  margin: 20px 0 12px;
+  font-size: 12px;
+}
+.planning-workspace {
+  display: grid;
+  grid-template-columns: minmax(180px, 0.8fr) minmax(0, 1.8fr);
+  gap: 18px;
+  align-items: start;
+  margin-top: 18px;
+}
+.planning-sidebar,
+.planning-editor {
+  min-width: 0;
+  padding: 18px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--surface);
+  display: grid;
+  gap: 16px;
+}
+.planning-field {
+  display: grid;
+  gap: 7px;
+  min-width: 0;
+  font-size: 12px;
+}
+.planning-field input,
+.planning-field select,
+.planning-field textarea {
+  width: 100%;
+  min-width: 0;
+  border: 1px solid var(--line);
+  border-radius: 7px;
+  background: var(--surface);
+  color: inherit;
+  padding: 9px;
+  font: inherit;
+  font-size: 13px;
+  line-height: 1.7;
+}
+.planning-field textarea {
+  resize: vertical;
+}
+.planning-check {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+}
+.planning-options {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 12px;
+}
+.planning-project-list,
+.planning-task-list {
+  display: grid;
+  gap: 8px;
+  max-height: 300px;
+  overflow-y: auto;
+}
+.planning-project-list {
+  max-height: 190px;
+}
+.planning-list-item {
+  display: grid;
+  gap: 6px;
+  min-width: 0;
+  padding: 11px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--surface);
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  overflow-wrap: anywhere;
+}
+.planning-list-item.selected {
+  border-color: var(--accent);
+}
+.planning-list-item strong {
+  font-size: 13px;
+}
+.planning-list-item span,
+.planning-list-item small,
+.planning-editor > p,
+.planning-sidebar .muted,
+.planning-task-status {
+  font-size: 12px;
+  line-height: 1.8;
+  overflow-wrap: anywhere;
+}
+.planning-list-item span,
+.planning-list-item small {
+  color: var(--muted);
+}
+.planning-unsaved {
+  color: #8a6227;
+}
+.planning-task-status {
+  border-top: 1px solid var(--line);
+  padding-top: 14px;
+  display: grid;
+  gap: 10px;
+  justify-items: start;
+}
+.planning-empty {
+  padding: 60px 20px;
+  display: grid;
+  justify-items: center;
+  gap: 14px;
+  color: var(--muted);
+  text-align: center;
+  font-size: 12px;
+  line-height: 1.8;
+}
+.planning-confirmation {
+  width: min(560px, calc(100vw - 48px));
+  max-height: calc(100vh - 48px);
+  overflow-y: auto;
+  margin: auto;
+  padding: 24px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: var(--surface);
+  color: inherit;
+}
+.planning-confirmation::backdrop {
+  background: rgb(23 40 29 / 30%);
+}
+.planning-confirmation h2 {
+  margin-bottom: 12px;
+}
+.planning-confirmation p {
+  font-size: 12px;
+  line-height: 1.8;
+  overflow-wrap: anywhere;
+}
+.planning-delete-preview {
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 14px;
+  margin: 16px 0;
+  overflow-wrap: anywhere;
+  font-size: 13px;
+}
+.planning-delete-preview p {
+  margin-top: 8px;
+  white-space: pre-wrap;
+}
+.planning-confirmation > .planning-actions {
+  margin-top: 20px;
+}
+@media (max-width: 1050px) {
+  .planning-workspace {
+    grid-template-columns: minmax(150px, 0.75fr) minmax(0, 1.5fr);
+    gap: 12px;
+  }
+  .planning-sidebar,
+  .planning-editor {
+    padding: 14px;
+  }
+  .planning-options {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+@media (max-width: 700px) {
+  .planning-workspace {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

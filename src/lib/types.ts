@@ -256,6 +256,45 @@ export interface MemoryProposal {
   expiresAt: string;
   draft: MemoryDraft;
 }
+export interface ProjectDraft {
+  title: string;
+  goal: string;
+  archived: boolean;
+}
+export interface StudyProject extends ProjectDraft {
+  id: string;
+  revision: number;
+  createdAt: string;
+  updatedAt: string;
+}
+export interface ProjectSaveRequest extends ProjectDraft {
+  id: string | null;
+  revision: number;
+}
+export interface TaskDraft {
+  title: string;
+  details: string;
+  projectId: string | null;
+  day: string;
+  minutes: number;
+}
+export interface DailyTask extends TaskDraft {
+  id: string;
+  revision: number;
+  status: 'todo' | 'completed';
+  completedAt: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+export interface TaskSaveRequest extends TaskDraft {
+  id: string | null;
+  revision: number;
+}
+export interface PlanningOverview {
+  day: string;
+  projects: StudyProject[];
+  tasks: DailyTask[];
+}
 export interface DesktopApi {
   bootstrap(): Promise<Bootstrap>;
   saveSettings(settings: Settings): Promise<Settings>;
@@ -312,6 +351,11 @@ export interface DesktopApi {
   prepareMemoryProposal(turnId: string, edit?: MemoryProposalEdit): Promise<MemoryProposal>;
   confirmMemoryProposal(id: string): Promise<StudyMemory>;
   discardMemoryProposal(id: string): Promise<void>;
+  planningOverview(day: string): Promise<PlanningOverview>;
+  saveStudyProject(request: ProjectSaveRequest): Promise<StudyProject>;
+  saveDailyTask(request: TaskSaveRequest): Promise<DailyTask>;
+  setDailyTaskCompleted(id: string, revision: number, completed: boolean): Promise<DailyTask>;
+  deleteDailyTask(id: string, revision: number): Promise<void>;
 }
 
 declare global {
