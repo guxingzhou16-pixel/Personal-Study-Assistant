@@ -1,5 +1,11 @@
 import { randomUUID } from 'node:crypto';
-import type { ChatTurn, EvidencePreview, StudyNote, LearningRequest } from '../../src/lib/types';
+import type {
+  ChatTurn,
+  EvidencePreview,
+  StudyNote,
+  LearningRequest,
+  StudyMemory,
+} from '../../src/lib/types';
 import type { Storage } from './storage';
 import type { Credentials } from './credentials';
 import { AppError, failure } from './errors';
@@ -10,7 +16,8 @@ import { noteFeedbackMessages } from './note-feedback';
 import { learningMessages } from './learning-agent';
 
 type LearningContext =
-  { kind: 'note'; note: StudyNote } | { kind: 'learning'; request: LearningRequest };
+  | { kind: 'note'; note: StudyNote }
+  | { kind: 'learning'; request: LearningRequest; memories: StudyMemory[] };
 
 interface ActiveChat {
   turn: ChatTurn;
@@ -53,6 +60,7 @@ export class ChatService {
     if (!question) throw new AppError('question', '请先输入问题。');
     const noteSnapshot = context?.kind === 'note' ? context.note : undefined;
     const learningRequest = context?.kind === 'learning' ? context.request : undefined;
+    const learningMemories = context?.kind === 'learning' ? context.memories : undefined;
     const existing = noteSnapshot
       ? this.storage.chat.findNoteConversation(noteSnapshot.id)
       : learningRequest
@@ -69,6 +77,7 @@ export class ChatService {
       );
     const settings = this.storage.loadSettings();
     const profile = settings[settings.provider];
+    if (learningMemories) this.storage.memories.verify(learningMemories, profile.baseUrl);
     let evidence: EvidencePreview | undefined;
     if (request.retrievalId !== undefined) {
       if (!this.retrieval) throw new AppError('retrieval', '资料检索服务暂不可用，请重新检索。');
@@ -96,7 +105,7 @@ export class ChatService {
         noteSnapshot
           ? '请先确认将已保存笔记、本次问题和预览的检索片段发送至当前远程服务。'
           : learningRequest
-            ? '请先确认将本次学习目标、时间预算、检索概念和预览片段发送至当前远程服务。'
+            ? '请先确认将本次学习目标、时间预算、检索概念、预览片段和所选记忆发送至当前远程服务。'
             : evidence
               ? '请先确认将本次问题和预览的检索片段发送至当前远程服务。'
               : '请先确认将本次问题和近期会话发送至当前远程服务。',
@@ -161,7 +170,12 @@ export class ChatService {
       messages.splice(
         0,
         messages.length,
-        ...learningMessages(learningRequest, evidence!, styles[settings.responseStyle]),
+        ...learningMessages(
+          learningRequest,
+          evidence!,
+          styles[settings.responseStyle],
+          learningMemories,
+        ),
       );
     const turn: ChatTurn = {
       id: randomUUID(),
@@ -179,6 +193,7 @@ export class ChatService {
       evidence: evidence?.hits ?? [],
       ...(noteSnapshot ? { noteSnapshot } : {}),
       ...(learningRequest ? { learningRequest } : {}),
+      ...(learningMemories ? { learningMemories } : {}),
     };
     if (evidence && !evidence.hits.length) {
       turn.status = 'completed';

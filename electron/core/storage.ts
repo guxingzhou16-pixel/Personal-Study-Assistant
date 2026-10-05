@@ -18,8 +18,9 @@ import {
   ChatStorage,
 } from './chat-storage';
 import { NOTES_MIGRATION, NoteStorage } from './note-storage';
+import { MEMORIES_MIGRATION, MemoryStorage } from './memory-storage';
 
-const SCHEMA_VERSION = 7;
+const SCHEMA_VERSION = 8;
 
 const INITIAL_MIGRATION = `
   CREATE TABLE app_settings (
@@ -52,6 +53,7 @@ export class Storage {
   private readonly db: DatabaseSync;
   readonly chat: ChatStorage;
   readonly notes: NoteStorage;
+  readonly memories: MemoryStorage;
 
   constructor(path: string) {
     this.db = new DatabaseSync(path);
@@ -80,6 +82,7 @@ export class Storage {
           if (version < 5) this.db.exec(NOTES_MIGRATION);
           if (version < 6) this.db.exec(NOTE_FEEDBACK_MIGRATION);
           if (version < 7) this.db.exec(LEARNING_AGENT_MIGRATION);
+          if (version < 8) this.db.exec(MEMORIES_MIGRATION);
           this.db.exec('COMMIT;');
         } catch (error) {
           this.db.exec('ROLLBACK;');
@@ -91,6 +94,7 @@ export class Storage {
       );
       this.chat = new ChatStorage(this.db);
       this.notes = new NoteStorage(this.db);
+      this.memories = new MemoryStorage(this.db);
     } catch (error) {
       this.db.close();
       throw error;

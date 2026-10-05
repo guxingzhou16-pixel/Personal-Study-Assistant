@@ -114,6 +114,7 @@ export interface ChatTurn {
   evidence: Evidence[];
   noteSnapshot?: StudyNote;
   learningRequest?: LearningRequest;
+  learningMemories?: StudyMemory[];
 }
 export interface Evidence {
   number: number;
@@ -216,11 +217,44 @@ export interface LearningRequest {
 export interface LearningPreview {
   request: LearningRequest;
   evidence: EvidencePreview;
+  memories: StudyMemory[];
 }
 export interface LearningDraftRequest {
   retrievalId: string;
   expectedProfile: string;
   consentEndpoint?: string;
+}
+export type MemoryKind = 'preference' | 'learning';
+export type MemoryScope = 'disabled' | 'local' | 'remote';
+export interface MemoryDraft {
+  title: string;
+  content: string;
+  kind: MemoryKind;
+  scope: MemoryScope;
+}
+export interface StudyMemory extends MemoryDraft {
+  id: string;
+  revision: number;
+  origin: 'manual' | 'learning-route';
+  originTurnId: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+export interface MemorySaveRequest extends MemoryDraft {
+  id: string | null;
+  revision: number;
+}
+export interface MemoryProposalEdit {
+  title: string;
+  content: string;
+  scope: MemoryScope;
+}
+export interface MemoryProposal {
+  id: string;
+  turnId: string;
+  turnRevision: number;
+  expiresAt: string;
+  draft: MemoryDraft;
 }
 export interface DesktopApi {
   bootstrap(): Promise<Bootstrap>;
@@ -270,8 +304,14 @@ export interface DesktopApi {
   prepareNoteFeedback(id: string, revision: number, question: string): Promise<NoteFeedbackPreview>;
   sendNoteFeedback(request: NoteFeedbackRequest): Promise<ChatTurn>;
   listLearningDrafts(): Promise<ChatTurn[]>;
-  prepareLearningDraft(request: LearningRequest): Promise<LearningPreview>;
+  prepareLearningDraft(request: LearningRequest, memoryIds?: string[]): Promise<LearningPreview>;
   sendLearningDraft(request: LearningDraftRequest): Promise<ChatTurn>;
+  listMemories(): Promise<StudyMemory[]>;
+  saveMemory(request: MemorySaveRequest): Promise<StudyMemory>;
+  deleteMemory(id: string, revision: number): Promise<void>;
+  prepareMemoryProposal(turnId: string, edit?: MemoryProposalEdit): Promise<MemoryProposal>;
+  confirmMemoryProposal(id: string): Promise<StudyMemory>;
+  discardMemoryProposal(id: string): Promise<void>;
 }
 
 declare global {

@@ -16,6 +16,7 @@ import {
   Timer,
   NotebookPen,
   MessageCircle,
+  Brain,
 } from 'lucide-react';
 import { SettingsPage } from './components/SettingsPage';
 import { LibraryPage } from './components/LibraryPage';
@@ -25,16 +26,18 @@ import { StudyCalendar } from './components/StudyCalendar';
 import { ChatPage } from './components/ChatPage';
 import { NotesPage } from './components/NotesPage';
 import { AgentPage } from './components/AgentPage';
+import { MemoryPage } from './components/MemoryPage';
 import { desktop, errorMessage, isDesktop } from './lib/desktop';
 import { defaultSettings, type Bootstrap, type Settings, type CitationTarget } from './lib/types';
 
-type Page = 'home' | 'library' | 'chat' | 'notes' | 'agent' | 'settings';
+type Page = 'home' | 'library' | 'chat' | 'notes' | 'agent' | 'memories' | 'settings';
 const pageLabels: Record<Page, string> = {
   home: '学习首页',
   library: '资料库',
   chat: '学习助手',
   notes: '学习笔记',
   agent: '学习路线',
+  memories: '长期记忆',
   settings: '设置',
 };
 const readerBackLabels = {
@@ -170,6 +173,7 @@ export default function App() {
             { id: 'chat' as const, icon: MessageCircle },
             { id: 'notes' as const, icon: NotebookPen },
             { id: 'agent' as const, icon: Sparkles },
+            { id: 'memories' as const, icon: Brain },
           ].map(({ id, icon: Icon }) => (
             <button
               key={id}
@@ -369,6 +373,11 @@ export default function App() {
                 onOpenCitation={(turnId, number) => openCitation(turnId, number, 'agent')}
                 onTakeNote={startNote}
               />
+            </div>
+          )}
+          {boot && !failure && (
+            <div hidden={page !== 'memories'}>
+              <MemoryPage visible={page === 'memories'} />
             </div>
           )}
           {boot && !failure && (

@@ -29,6 +29,7 @@ import { noteFileName, writeNoteExport } from './core/note-export';
 import { noteMarkdown } from '../src/lib/notes';
 import { NoteFeedbackService } from './core/note-feedback';
 import { LearningAgentService } from './core/learning-agent';
+import { MemoryProposalService } from './core/memory-proposals';
 
 app.setName('StudyCompanion');
 const testDataDir = !app.isPackaged ? process.env.STUDY_COMPANION_DATA_DIR : undefined;
@@ -105,6 +106,7 @@ function registerHandlers(database: Storage, credentials: Credentials, tracker: 
   chat = chats;
   const feedback = new NoteFeedbackService(database, retrieval, chats);
   const learning = new LearningAgentService(database, retrieval, chats);
+  const memoryProposals = new MemoryProposalService(database);
   function handle(channel: string, work: (...args: unknown[]) => unknown) {
     ipcMain.handle(channel, async (event, ...args: unknown[]) => {
       const frameUrl = event.senderFrame?.url;
@@ -194,8 +196,16 @@ function registerHandlers(database: Storage, credentials: Credentials, tracker: 
   );
   handle('study:send-note-feedback', (request) => feedback.send(request));
   handle('study:list-learning-drafts', () => learning.list());
-  handle('study:prepare-learning-draft', (request) => learning.prepare(request, retrievalProgress));
+  handle('study:prepare-learning-draft', (request, memoryIds) =>
+    learning.prepare(request, retrievalProgress, memoryIds),
+  );
   handle('study:send-learning-draft', (request) => learning.send(request));
+  handle('study:list-memories', () => database.memories.list());
+  handle('study:save-memory', (request) => database.memories.save(request));
+  handle('study:delete-memory', (id, revision) => database.memories.delete(id, revision));
+  handle('study:prepare-memory-proposal', (turnId, edit) => memoryProposals.prepare(turnId, edit));
+  handle('study:confirm-memory-proposal', (id) => memoryProposals.confirm(id));
+  handle('study:discard-memory-proposal', (id) => memoryProposals.discard(id));
   handle('study:embedding-status', () => embeddings.status());
   handle('study:cancel-embedding-download', () => embeddings.cancel());
   handle('study:download-embedding', () => {

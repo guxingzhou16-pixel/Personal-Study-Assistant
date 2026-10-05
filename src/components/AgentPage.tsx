@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { NotebookPen, Search, Send, Settings2, Square } from 'lucide-react';
 import { desktop, errorMessage, isDesktop } from '../lib/desktop';
 import { learningLimits, sameLearningRequest } from '../lib/learning';
+import { memoryAllowed, memoryKindLabels, memoryLimits, memoryScopeLabels } from '../lib/memories';
 import type {
   ChatTurn,
   LearningPreview,
@@ -9,9 +10,12 @@ import type {
   RetrievalProgress,
   Settings,
   Source,
+  StudyMemory,
 } from '../lib/types';
 import { EvidenceCards } from './EvidenceCards';
 import { ModelAnswer } from './ModelAnswer';
+import { MemoryProposalPanel } from './MemoryProposalPanel';
+import './AgentMemory.css';
 
 const statusLabels: Record<ChatTurn['status'], string> = {
   streaming: '正在起草…',
@@ -42,6 +46,35 @@ function RequestSummary({ request, scope }: { request: LearningRequest; scope: s
   );
 }
 
+function memorySelectionKey(memories: StudyMemory[]): string {
+  return memories.map((memory) => `${memory.id}:${memory.revision}`).join('|');
+}
+
+function MemorySnapshots({ memories }: { memories: StudyMemory[] }) {
+  return (
+    <ul className="agent-memory-snapshots">
+      {memories.map((memory) => (
+        <li key={memory.id}>
+          <strong>
+            {memory.title} · 第 {memory.revision} 版
+          </strong>
+          <p>{memory.content}</p>
+          <p className="field-hint">
+            {memoryKindLabels[memory.kind]} · {memoryScopeLabels[memory.scope]} · 来源：
+            {memory.origin === 'manual' ? '手动记录' : '学习路线提议'}
+          </p>
+          {memory.originTurnId && (
+            <details>
+              <summary>查看来源路线标识</summary>
+              <small>{memory.originTurnId}</small>
+            </details>
+          )}
+        </li>
+      ))}
+    </ul>
+  );
+}
+
 export function AgentPage({
   visible,
   settings,
@@ -60,7 +93,13 @@ export function AgentPage({
   const [sourceId, setSourceId] = useState('');
   const [minutes, setMinutes] = useState('30');
   const [sources, setSources] = useState<Source[]>([]);
+  const [memories, setMemories] = useState<StudyMemory[]>([]);
+  const [memoryIds, setMemoryIds] = useState<string[]>([]);
+  const [memoriesLoaded, setMemoriesLoaded] = useState(false);
+  const [memoriesLoading, setMemoriesLoading] = useState(false);
+  const [memoryError, setMemoryError] = useState('');
   const [preview, setPreview] = useState<LearningPreview | null>(null);
+  const [previewProfile, setPreviewProfile] = useState<string | null>(null);
   const [turns, setTurns] = useState<ChatTurn[]>([]);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [active, setActive] = useState<ChatTurn | null>(null);
@@ -78,6 +117,7 @@ export function AgentPage({
   const activityVersion = useRef(0);
   const searchVersion = useRef(0);
   const loadVersion = useRef(0);
+  const memoryLoadVersion = useRef(0);
   const request: LearningRequest = {
     goal,
     query,
@@ -88,10 +128,28 @@ export function AgentPage({
   currentRequest.current = request;
   const profile = settings[settings.provider];
   const signature = `${settings.provider}|${profile.baseUrl}|${profile.model}`;
+  const currentProfile = useRef(profile.baseUrl);
+  currentProfile.current = profile.baseUrl;
+  const availableMemories = memories.filter((memory) =>
+    memoryAllowed(memory.scope, profile.baseUrl),
+  );
+  const selectedMemories = memoryIds.flatMap((id) => {
+    const memory = availableMemories.find((item) => item.id === id);
+    return memory ? [memory] : [];
+  });
+  const selectionKey = memorySelectionKey(selectedMemories);
+  const currentPreparation = useRef({ signature, selectionKey });
+  currentPreparation.current = { signature, selectionKey };
   const confirmationKey = `${signature}|${preview?.evidence.id ?? ''}`;
   const consent = consentKey === confirmationKey;
   const remote = !['localhost', '127.0.0.1', '[::1]'].includes(new URL(profile.baseUrl).hostname);
-  const previewValid = Boolean(preview && sameLearningRequest(preview.request, request));
+  const previewValid = Boolean(
+    preview &&
+    sameLearningRequest(preview.request, request) &&
+    previewProfile === signature &&
+    selectedMemories.length === memoryIds.length &&
+    memorySelectionKey(preview.memories) === selectionKey,
+  );
   const needsModel = Boolean(preview?.evidence.hits.length);
   const requestValid = Boolean(
     goal.trim() &&
@@ -102,6 +160,38 @@ export function AgentPage({
   );
   const selected = turns.find((turn) => turn.id === selectedId);
   const runningHere = Boolean(active?.learningRequest);
+
+  const invalidatePreview = useCallback(() => {
+    searchVersion.current++;
+    setPreview(null);
+    setPreviewProfile(null);
+    setConsentKey(null);
+  }, []);
+
+  const refreshMemories = useCallback(async () => {
+    const version = ++memoryLoadVersion.current;
+    invalidatePreview();
+    setMemoriesLoading(true);
+    setMemoryError('');
+    try {
+      const items = await desktop.listMemories();
+      if (!mounted.current || version !== memoryLoadVersion.current) return;
+      setMemories(items);
+      setMemoryIds((previous) =>
+        previous.filter((id) =>
+          items.some(
+            (memory) => memory.id === id && memoryAllowed(memory.scope, currentProfile.current),
+          ),
+        ),
+      );
+      setMemoriesLoaded(true);
+    } catch (reason) {
+      if (mounted.current && version === memoryLoadVersion.current)
+        setMemoryError(errorMessage(reason));
+    } finally {
+      if (mounted.current && version === memoryLoadVersion.current) setMemoriesLoading(false);
+    }
+  }, [invalidatePreview]);
 
   const applyTurn = useCallback((turn: ChatTurn) => {
     if ((revisions.current.get(turn.id) ?? -1) > turn.revision) return;
@@ -165,10 +255,28 @@ export function AgentPage({
       mounted.current = false;
       loadVersion.current++;
       searchVersion.current++;
+      memoryLoadVersion.current++;
       stopUpdates();
       stopProgress();
     };
   }, [applyTurn, refreshHistory]);
+
+  useEffect(() => {
+    invalidatePreview();
+    setMemoryIds((previous) =>
+      previous.filter((id) =>
+        memories.some((memory) => memory.id === id && memoryAllowed(memory.scope, profile.baseUrl)),
+      ),
+    );
+  }, [signature, invalidatePreview]);
+
+  useEffect(() => {
+    if (!visible || !isDesktop) return;
+    void refreshMemories();
+    return () => {
+      memoryLoadVersion.current++;
+    };
+  }, [visible, refreshMemories]);
 
   useEffect(() => {
     if (!visible || !isDesktop) return;
@@ -186,12 +294,6 @@ export function AgentPage({
     };
   }, [visible]);
 
-  function invalidatePreview() {
-    searchVersion.current++;
-    setPreview(null);
-    setConsentKey(null);
-  }
-
   function scopeName(id: string | null, hits: ChatTurn['evidence'] = []) {
     if (!id) return '全部已导入资料';
     return (
@@ -202,21 +304,37 @@ export function AgentPage({
   }
 
   async function prepare() {
-    if (searching || sending || !requestValid) return;
+    if (
+      searching ||
+      sending ||
+      memoriesLoading ||
+      !requestValid ||
+      selectedMemories.length !== memoryIds.length
+    )
+      return;
     const version = ++searchVersion.current;
+    const preparation = { signature, selectionKey };
     setSearching(true);
     setError('');
     setPreview(null);
     setConsentKey(null);
     setProgress(null);
     try {
-      const result = await desktop.prepareLearningDraft(request);
+      const result = await desktop.prepareLearningDraft(request, memoryIds);
       if (
         mounted.current &&
         version === searchVersion.current &&
-        sameLearningRequest(result.request, currentRequest.current)
-      )
-        setPreview(result);
+        sameLearningRequest(result.request, currentRequest.current) &&
+        preparation.signature === currentPreparation.current.signature &&
+        preparation.selectionKey === currentPreparation.current.selectionKey
+      ) {
+        if (memorySelectionKey(result.memories) !== currentPreparation.current.selectionKey)
+          setError('所选记忆已变化，请刷新记忆，再重新准备路线证据。');
+        else {
+          setPreview(result);
+          setPreviewProfile(preparation.signature);
+        }
+      }
     } catch (reason) {
       if (mounted.current && version === searchVersion.current) setError(errorMessage(reason));
     } finally {
@@ -251,6 +369,7 @@ export function AgentPage({
       applyTurn(seenDrafts.current.get(turn.id) ?? turn);
       setSelectedId(turn.id);
       setPreview(null);
+      setPreviewProfile(null);
       setConsentKey(null);
     } catch (reason) {
       if (mounted.current) setError(errorMessage(reason));
@@ -382,11 +501,77 @@ export function AgentPage({
         <p className="field-hint">
           时间范围 10–180 分钟。每次只检索一次；修改目标或范围后，需要重新准备证据。
         </p>
+        <fieldset className="agent-memory-selection">
+          <legend>本次参考的记忆（可选，最多 {memoryLimits.selection} 条）</legend>
+          <p className="field-hint">
+            默认不选。停用的记忆，以及当前远程地址不能使用的仅本机记忆，不出现在列表中。
+          </p>
+          <button
+            type="button"
+            className="text-button"
+            disabled={!isDesktop || memoriesLoading || sending}
+            onClick={() => void refreshMemories()}
+          >
+            刷新记忆
+          </button>
+          {memoryError && (
+            <p className="feedback error" role="alert">
+              {memoryError}
+            </p>
+          )}
+          {!memoriesLoaded && (
+            <p className="muted">
+              {memoriesLoading ? '正在读取记忆…' : '记忆未加载，请刷新重试。'}
+            </p>
+          )}
+          {memoriesLoaded && !availableMemories.length && (
+            <p className="muted">当前没有可用记忆，可以直接准备路线。</p>
+          )}
+          <div className="agent-memory-options">
+            {availableMemories.map((memory) => (
+              <label key={memory.id}>
+                <input
+                  type="checkbox"
+                  checked={memoryIds.includes(memory.id)}
+                  disabled={
+                    sending ||
+                    memoriesLoading ||
+                    (!memoryIds.includes(memory.id) && memoryIds.length >= memoryLimits.selection)
+                  }
+                  onChange={(event) => {
+                    setMemoryIds((previous) =>
+                      event.target.checked
+                        ? [...previous, memory.id]
+                        : previous.filter((id) => id !== memory.id),
+                    );
+                    invalidatePreview();
+                  }}
+                />
+                <span>
+                  <strong>{memory.title}</strong>
+                  <small>
+                    {memoryKindLabels[memory.kind]} · {memoryScopeLabels[memory.scope]}
+                  </small>
+                </span>
+              </label>
+            ))}
+          </div>
+          <p className="field-hint">
+            已选 {memoryIds.length} 条。记忆只用来调整学习建议，不作为资料事实或已掌握的证明。
+          </p>
+        </fieldset>
         <div className="agent-actions">
           <button
             type="button"
             className="button secondary"
-            disabled={!isDesktop || searching || sending || !requestValid}
+            disabled={
+              !isDesktop ||
+              searching ||
+              sending ||
+              memoriesLoading ||
+              !requestValid ||
+              selectedMemories.length !== memoryIds.length
+            }
             onClick={() => void prepare()}
           >
             <Search size={16} /> 准备路线证据
@@ -407,6 +592,12 @@ export function AgentPage({
               request={preview.request}
               scope={scopeName(preview.request.sourceId, preview.evidence.hits)}
             />
+            <h4>本次参考的记忆</h4>
+            {preview.memories.length ? (
+              <MemorySnapshots memories={preview.memories} />
+            ) : (
+              <p>未选择记忆。</p>
+            )}
             <p>
               {preview.evidence.sourceCount} 份资料范围 · {preview.evidence.hits.length} 个检索片段
             </p>
@@ -425,12 +616,12 @@ export function AgentPage({
                   checked={consent}
                   onChange={(event) => setConsentKey(event.target.checked ? confirmationKey : null)}
                 />
-                允许将上面的目标、检索词、时间安排和检索片段发送至 {profile.baseUrl}（
+                允许将上面的目标、检索词、时间安排、所选记忆和检索片段发送至 {profile.baseUrl}（
                 {profile.model || '未选择模型'}）；服务费用由我承担。
               </label>
             )}
             <p className="field-hint">
-              路线作为建议单独保存。它不会创建任务、标记进度或写入长期记忆。
+              路线作为建议单独保存。它不会创建任务、标记进度或自动写入长期记忆。
             </p>
             <button
               type="button"
@@ -510,6 +701,20 @@ export function AgentPage({
               request={selected.learningRequest}
               scope={scopeName(selected.learningRequest.sourceId, selected.evidence)}
             />
+            <details className="agent-memory-history">
+              <summary>本次选择的记忆快照（{selected.learningMemories?.length ?? 0} 条）</summary>
+              <p className="field-hint">
+                这是这条路线保存的选择快照，记录之后可能已更新、停用或删除；下次路线只使用你重新选择的当前记忆。
+              </p>
+              {!selected.evidence.length && (
+                <p className="field-hint">当时仅保存本地说明，没有向模型发送记忆。</p>
+              )}
+              {selected.learningMemories?.length ? (
+                <MemorySnapshots memories={selected.learningMemories} />
+              ) : (
+                <p>当时没有使用记忆。</p>
+              )}
+            </details>
             <p className="field-hint">
               {selected.evidence.length
                 ? `${selected.model} · ${selected.baseUrl}`
@@ -546,6 +751,15 @@ export function AgentPage({
             <p className="field-hint">
               打开空白笔记供你手动填写，不自动复制或保存模型内容。写完保存后，可在笔记中核对反馈。
             </p>
+            {selected.status === 'completed' && selected.evidence.length > 0 && (
+              <MemoryProposalPanel
+                key={selected.id}
+                turn={selected}
+                visible={visible}
+                onSaved={() => void refreshMemories()}
+                onCleanupError={setError}
+              />
+            )}
           </article>
         )}
       </section>

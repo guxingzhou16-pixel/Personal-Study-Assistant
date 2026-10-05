@@ -51,8 +51,14 @@ export const desktop: DesktopApi = {
     api().prepareNoteFeedback(id, revision, question),
   sendNoteFeedback: (request) => api().sendNoteFeedback(request),
   listLearningDrafts: () => api().listLearningDrafts(),
-  prepareLearningDraft: (request) => api().prepareLearningDraft(request),
+  prepareLearningDraft: (request, memoryIds) => api().prepareLearningDraft(request, memoryIds),
   sendLearningDraft: (request) => api().sendLearningDraft(request),
+  listMemories: () => api().listMemories(),
+  saveMemory: (request) => api().saveMemory(request),
+  deleteMemory: (id, revision) => api().deleteMemory(id, revision),
+  prepareMemoryProposal: (turnId, edit) => api().prepareMemoryProposal(turnId, edit),
+  confirmMemoryProposal: (id) => api().confirmMemoryProposal(id),
+  discardMemoryProposal: (id) => api().discardMemoryProposal(id),
 };
 
 export function errorMessage(error: unknown): string {

@@ -24,6 +24,8 @@ import type {
   NoteExportResult,
   NoteFeedbackPreview,
   LearningPreview,
+  StudyMemory,
+  MemoryProposal,
 } from '../src/lib/types';
 
 async function call<T>(channel: string, ...args: unknown[]): Promise<T> {
@@ -106,7 +108,15 @@ const api: DesktopApi = {
     call<NoteFeedbackPreview>('study:prepare-note-feedback', id, revision, question),
   sendNoteFeedback: (request) => call<ChatTurn>('study:send-note-feedback', request),
   listLearningDrafts: () => call<ChatTurn[]>('study:list-learning-drafts'),
-  prepareLearningDraft: (request) => call<LearningPreview>('study:prepare-learning-draft', request),
+  prepareLearningDraft: (request, memoryIds) =>
+    call<LearningPreview>('study:prepare-learning-draft', request, memoryIds),
   sendLearningDraft: (request) => call<ChatTurn>('study:send-learning-draft', request),
+  listMemories: () => call<StudyMemory[]>('study:list-memories'),
+  saveMemory: (request) => call<StudyMemory>('study:save-memory', request),
+  deleteMemory: (id, revision) => call<void>('study:delete-memory', id, revision),
+  prepareMemoryProposal: (turnId, edit) =>
+    call<MemoryProposal>('study:prepare-memory-proposal', turnId, edit),
+  confirmMemoryProposal: (id) => call<StudyMemory>('study:confirm-memory-proposal', id),
+  discardMemoryProposal: (id) => call<void>('study:discard-memory-proposal', id),
 };
 contextBridge.exposeInMainWorld('studyCompanion', api);

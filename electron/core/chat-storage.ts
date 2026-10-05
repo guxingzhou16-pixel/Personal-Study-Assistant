@@ -4,6 +4,7 @@ import type { ChatTurn, Conversation, ConversationSummary } from '../../src/lib/
 import { AppError } from './errors';
 import { readNoteSnapshot } from './note-storage';
 import { readLearningRequest } from './learning-input';
+import { readLearningMemories } from './memory-storage';
 
 type ConversationPurpose = 'chat' | 'note-feedback' | 'learning-agent';
 
@@ -39,9 +40,11 @@ export const LEARNING_AGENT_MIGRATION = `
 
 function decodeTurn(row: Record<string, unknown>): ChatTurn {
   try {
-    const { noteSnapshot, learningRequest, ...fields } = row;
+    const { noteSnapshot, learningRequest, learningMemories, ...fields } = row;
     if (learningRequest !== null && (noteSnapshot !== null || row.mode !== 'sources'))
       throw new Error('Conflicting learning snapshots');
+    if (learningMemories !== null && learningRequest === null)
+      throw new Error('Memory snapshot outside learning route');
     return {
       ...fields,
       evidence: JSON.parse(String(row.evidence)),
@@ -50,6 +53,9 @@ function decodeTurn(row: Record<string, unknown>): ChatTurn {
         : {}),
       ...(learningRequest !== null
         ? { learningRequest: readLearningRequest(JSON.parse(String(learningRequest))) }
+        : {}),
+      ...(learningMemories !== null
+        ? { learningMemories: readLearningMemories(JSON.parse(String(learningMemories))) }
         : {}),
     } as unknown as ChatTurn;
   } catch {
@@ -128,7 +134,7 @@ export class ChatStorage {
       .prepare(
         `SELECT id, conversation_id AS conversationId, question, answer, status,
       notice, provider, base_url AS baseUrl, model, created_at AS createdAt, revision, mode, evidence,
-      note_snapshot AS noteSnapshot, learning_request AS learningRequest
+      note_snapshot AS noteSnapshot, learning_request AS learningRequest, learning_memories AS learningMemories
       FROM chat_turns WHERE conversation_id = ? ORDER BY rowid`,
       )
       .all(id)
@@ -143,8 +149,8 @@ export class ChatStorage {
         .prepare(
           `INSERT INTO chat_turns
           (id, conversation_id, question, answer, status, notice, provider, base_url, model,
-           created_at, revision, mode, evidence, note_snapshot, learning_request)
-          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+           created_at, revision, mode, evidence, note_snapshot, learning_request, learning_memories)
+          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
         )
         .run(
           turn.id,
@@ -162,6 +168,7 @@ export class ChatStorage {
           JSON.stringify(turn.evidence),
           turn.noteSnapshot ? JSON.stringify(turn.noteSnapshot) : null,
           turn.learningRequest ? JSON.stringify(turn.learningRequest) : null,
+          turn.learningMemories ? JSON.stringify(turn.learningMemories) : null,
         );
       this.db
         .prepare(
@@ -189,7 +196,7 @@ export class ChatStorage {
       .prepare(
         `SELECT id, conversation_id AS conversationId, question, answer, status,
       notice, provider, base_url AS baseUrl, model, created_at AS createdAt, revision, mode, evidence,
-      note_snapshot AS noteSnapshot, learning_request AS learningRequest
+      note_snapshot AS noteSnapshot, learning_request AS learningRequest, learning_memories AS learningMemories
       FROM chat_turns WHERE id = ?`,
       )
       .get(chatId(input));
