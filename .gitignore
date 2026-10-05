@@ -6,6 +6,15 @@
 /user-data/
 /models/
 /backups/
+/learning-restores/
+/active-learning*.json
+/before-restore-*.json
+/pending-restore*.json
+/.active-learning.json.*.tmp
+/.pending-restore.json.*.tmp
+/.before-restore-*.json.*.tmp
+/.拾知备份-*/
+拾知备份-*/
 *.db
 *.db-*
 *.sqlite

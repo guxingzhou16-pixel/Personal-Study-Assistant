@@ -33,6 +33,17 @@ import { MemoryProposalService } from './core/memory-proposals';
 import { TaskProposalService } from './core/task-proposals';
 import { FocusTracker } from './core/focus';
 import type { FocusEndReason } from '../src/lib/types';
+import { BackupRunner } from './core/backup-runner';
+import { BackupService } from './core/backup';
+import {
+  activateRestore,
+  clearAppliedRestore,
+  learningLocation,
+  pendingRestore,
+  quarantineRestore,
+  restoreDirectory,
+  type LearningLocation,
+} from './core/data-location';
 
 app.setName('StudyCompanion');
 const testDataDir = !app.isPackaged ? process.env.STUDY_COMPANION_DATA_DIR : undefined;
@@ -62,6 +73,8 @@ let embeddingFiles: EmbeddingFiles | undefined;
 let studyHeartbeat: ReturnType<typeof setInterval> | undefined;
 let noteDraftDirty = false;
 let checkingNoteExit = false;
+let backups: BackupService | undefined;
+let releasingRestorePreview = false;
 
 function isRendererUrl(url: string | undefined): boolean {
   return url?.split('#', 1)[0] === rendererUrl;
@@ -81,10 +94,12 @@ function registerHandlers(
   credentials: Credentials,
   tracker: StudyTracker,
   focusTracker: FocusTracker,
+  location: LearningLocation,
+  backupRunner: BackupRunner,
 ) {
   const files = new Documents(
     database,
-    join(dataDir, 'sources'),
+    join(location.directory, 'sources'),
     join(__dirname, 'document-worker.mjs'),
     (modulePath, args) =>
       utilityProcess.fork(modulePath, args, {
@@ -100,7 +115,7 @@ function registerHandlers(
   embeddingFiles = embeddings;
   const retrieval = new SearchService(
     database,
-    dataDir,
+    location.directory,
     join(__dirname, 'search-worker.mjs'),
     (modulePath, args) =>
       utilityProcess.fork(modulePath, args, {
@@ -127,6 +142,85 @@ function registerHandlers(
   const learning = new LearningAgentService(database, retrieval, chats);
   const memoryProposals = new MemoryProposalService(database);
   const taskProposals = new TaskProposalService(database);
+  let runningOperations = 0;
+  const backupService = new BackupService(dataDir, location, backupRunner, {
+    selectFolder: async (purpose) => {
+      if (!window) throw new AppError('window', '请在桌面窗口中选择备份位置。');
+      const selection = await dialog.showOpenDialog(window, {
+        title:
+          purpose === 'export'
+            ? '选择保存备份的目录（将新建独立备份文件夹）'
+            : '选择包含 manifest.json 的完整拾知备份文件夹',
+        properties: [
+          'openDirectory',
+          ...(purpose === 'export' ? ['createDirectory' as const] : []),
+        ],
+      });
+      return selection.canceled ? null : (selection.filePaths[0] ?? null);
+    },
+    approveRestore: async (preview) => {
+      if (!window) throw new AppError('window', '请在桌面窗口中确认恢复。');
+      if (noteDraftDirty)
+        throw new AppError('noteDirty', '请先保存笔记或明确放弃笔记草稿，再恢复数据。');
+      const answer = await dialog.showMessageBox(window, {
+        type: 'warning',
+        title: '恢复学习数据并重启',
+        message: '确认使用这份备份作为当前学习数据？',
+        detail: `备份：${preview.folderName}\n时间：${preview.createdAt}\n\n这是整份替换，不合并记录。当前保存的数据将完整保留在原目录。应用会重启，所有尚未保存的输入会丢失。密钥和本机模型保持原样。`,
+        buttons: ['取消', '恢复并重启'],
+        defaultId: 0,
+        cancelId: 0,
+        noLink: true,
+      });
+      return answer.response === 1;
+    },
+    requireIdle: () => {
+      if (
+        runningOperations > 1 ||
+        files.busy ||
+        retrieval.busy ||
+        chats.current() ||
+        embeddings.busy
+      )
+        throw new AppError(
+          'backupBusy',
+          '请先完成或取消导入、检索、生成、模型下载和其他文件操作，再处理备份。',
+        );
+      if (tracker.isRunning || database.focus.active())
+        throw new AppError(
+          'backupTimer',
+          '请先暂停首页累计计时，并结束当前专注（暂停的专注也需要先结束）。',
+        );
+      if (focusBackgroundError)
+        throw new AppError(
+          'backupFocus',
+          '专注记录曾保存失败，请先在专注页面重新读取并核对状态，再处理备份。',
+        );
+    },
+    notify: (state) => {
+      try {
+        if (window && !window.isDestroyed() && !window.webContents.isDestroyed())
+          window.webContents.send('study:backup-update', state);
+      } catch {
+        // The actual state remains readable through backupState after a renderer failure.
+      }
+    },
+    restart: () => {
+      setTimeout(() => {
+        try {
+          app.relaunch();
+          app.quit();
+        } catch {
+          dialog.showErrorBox(
+            '恢复已准备',
+            '自动重启未能完成，请退出并重新打开应用以完成恢复。原学习数据已保留。',
+          );
+        }
+      }, 500);
+    },
+  });
+  backups = backupService;
+  const backupControlChannels = new Set(['study:backup-state', 'study:cancel-backup']);
   function handle(channel: string, work: (...args: unknown[]) => unknown) {
     ipcMain.handle(channel, async (event, ...args: unknown[]) => {
       const frameUrl = event.senderFrame?.url;
@@ -141,13 +235,27 @@ function registerHandlers(
           error: { code: 'permission', message: '此页面无权访问本地学习数据。' },
         };
       }
+      if (backupService.busy && !backupControlChannels.has(channel))
+        return {
+          ok: false,
+          error: { code: 'backupBusy', message: '正在处理备份或恢复，请等待完成或取消后再操作。' },
+        };
+      runningOperations++;
       try {
         return { ok: true, value: await work(...args) };
       } catch (error) {
         return { ok: false, error: failure(error) };
+      } finally {
+        runningOperations--;
       }
     });
   }
+  handle('study:backup-state', () => backupService.snapshot());
+  handle('study:export-backup', () => backupService.export());
+  handle('study:inspect-backup', () => backupService.inspect());
+  handle('study:confirm-restore', (id) => backupService.confirm(id));
+  handle('study:discard-restore', (id) => backupService.discard(id));
+  handle('study:cancel-backup', () => backupService.cancel());
   handle('study:bootstrap', () => {
     const settings = database.loadSettings();
     return {
@@ -341,6 +449,14 @@ function createWindow() {
   window.webContents.session.setPermissionCheckHandler(() => false);
   window.once('ready-to-show', () => window?.show());
   window.on('close', (event) => {
+    if (backups?.busy && backups.snapshot().operation !== 'restart') {
+      event.preventDefault();
+      dialog.showErrorBox(
+        '备份仍在处理',
+        '请先等待备份完成，或在界面取消并等待处理结束，再退出应用。',
+      );
+      return;
+    }
     if (!noteDraftDirty) return;
     event.preventDefault();
     if (checkingNoteExit) return;
@@ -390,14 +506,81 @@ else {
   });
   app
     .whenReady()
-    .then(() => {
+    .then(async () => {
       if (startupError) throw startupError;
-      storage = new Storage(join(dataDir, 'study-companion.sqlite3'));
-      mkdirSync(join(dataDir, 'sources'), { recursive: true });
+      const backupRunner = new BackupRunner(join(__dirname, 'backup-worker.mjs'), (path, args) =>
+        utilityProcess.fork(path, args, {
+          stdio: 'ignore',
+          serviceName: 'Study data backup',
+          execArgv: ['--max-old-space-size=256'],
+        }),
+      );
+      let location = await learningLocation(dataDir);
+      const openData = (directory: string) => {
+        let database: Storage | undefined;
+        let activity: StudyStorage | undefined;
+        try {
+          database = new Storage(join(directory, 'study-companion.sqlite3'));
+          database.loadSettings();
+          mkdirSync(join(directory, 'sources'), { recursive: true });
+          activity = new StudyStorage(join(directory, 'study-activity.sqlite3'));
+          return {
+            database,
+            tracker: new StudyTracker(activity),
+            focusTracker: new FocusTracker(database.focus, database.planning),
+          };
+        } catch (error) {
+          activity?.close();
+          database?.close();
+          throw error;
+        }
+      };
+      let opened: ReturnType<typeof openData> | undefined;
+      try {
+        const pending = await pendingRestore(dataDir);
+        if (pending && pending.id === location.id) {
+          await clearAppliedRestore(dataDir).catch(() => {
+            dialog.showErrorBox(
+              '学习数据已恢复',
+              '恢复后的数据正在使用，但残留的恢复标记未能清理。请保留应用数据目录并检查文件占用与权限。',
+            );
+          });
+        } else if (pending) {
+          if (pending.previousId !== location.id)
+            throw new AppError('restoreConflict', '恢复前的数据位置已变化。');
+          const directory = await restoreDirectory(dataDir, pending.id);
+          await backupRunner.run('verify', directory, '', () => {});
+          opened = openData(directory);
+          try {
+            location = await activateRestore(dataDir, pending);
+          } catch (error) {
+            opened.tracker.close();
+            opened.database.close();
+            opened = undefined;
+            throw error;
+          }
+        }
+      } catch (error) {
+        let isolationNotice = '';
+        try {
+          await quarantineRestore(dataDir);
+        } catch {
+          isolationNotice =
+            '\n等待恢复记录未能隔离，下次启动可能再次报告。请保留数据目录并检查文件占用与权限。';
+        }
+        dialog.showErrorBox(
+          '恢复未完成，原数据已保留',
+          failure(error).message +
+            '\n将继续使用恢复前保存的数据。请保留整个应用数据目录并重新选择完整备份。' +
+            isolationNotice,
+        );
+      }
+      opened ??= openData(location.directory);
+      storage = opened.database;
       const credentials = new Credentials(join(dataDir, 'credentials.enc.json'), safeStorage);
-      study = new StudyTracker(new StudyStorage(join(dataDir, 'study-activity.sqlite3')));
+      study = opened.tracker;
       const tracker = study;
-      focus = new FocusTracker(storage.focus, storage.planning);
+      focus = opened.focusTracker;
       const focusTracker = focus;
       studyHeartbeat = setInterval(() => {
         try {
@@ -420,7 +603,7 @@ else {
         }
       });
       Menu.setApplicationMenu(null);
-      registerHandlers(storage, credentials, tracker, focusTracker);
+      registerHandlers(storage, credentials, tracker, focusTracker, location, backupRunner);
       createWindow();
     })
     .catch((error) => {
@@ -435,6 +618,23 @@ else {
       app.quit();
     });
   app.on('window-all-closed', () => app.quit());
+  app.on('before-quit', (event) => {
+    const preview = backups?.snapshot().preview;
+    if (!preview || !backups || backups.busy || releasingRestorePreview || noteDraftDirty) return;
+    event.preventDefault();
+    releasingRestorePreview = true;
+    void backups
+      .releasePreview()
+      .catch(() => {
+        dialog.showErrorBox(
+          '暂存副本未能清理',
+          '未确认的恢复副本可能仍占用磁盘空间，当前学习数据未被替换。请保留应用数据目录并检查权限。',
+        );
+      })
+      .finally(() => {
+        app.quit();
+      });
+  });
   app.on('will-quit', () => {
     embeddingFiles?.cancel();
     search?.cancel();

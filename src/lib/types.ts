@@ -357,6 +357,55 @@ export interface FocusReviewResult {
   session: FocusSession;
   overview: FocusOverview;
 }
+export interface BackupCounts {
+  sources: number;
+  notes: number;
+  conversations: number;
+  turns: number;
+  memories: number;
+  projects: number;
+  tasks: number;
+  focusSessions: number;
+  studyDays: number;
+}
+export interface BackupFile {
+  path: string;
+  bytes: number;
+  sha256: string;
+}
+export interface BackupManifest {
+  format: 1;
+  application: 'StudyCompanion';
+  createdAt: string;
+  mainVersion: number;
+  activityVersion: number;
+  counts: BackupCounts;
+  files: BackupFile[];
+}
+export interface RestorePreview {
+  id: string;
+  folderName: string;
+  createdAt: string;
+  expiresAt: string;
+  mainVersion: number;
+  activityVersion: number;
+  counts: BackupCounts;
+  bytes: number;
+}
+export interface RestoreReceipt {
+  restoredAt: string;
+  preservedDirectory: string;
+}
+export interface BackupState {
+  revision: number;
+  learningDirectory: string;
+  operation: 'idle' | 'export' | 'inspect' | 'confirm' | 'commit' | 'restart';
+  progress: { current: number; total: number; message: string } | null;
+  preview: RestorePreview | null;
+  lastExport: { directory: string; createdAt: string; counts: BackupCounts } | null;
+  lastError: string | null;
+  restoreReceipt: RestoreReceipt | null;
+}
 export interface DesktopApi {
   bootstrap(): Promise<Bootstrap>;
   saveSettings(settings: Settings): Promise<Settings>;
@@ -426,6 +475,13 @@ export interface DesktopApi {
   startFocus(request: FocusStartRequest): Promise<FocusOverview>;
   controlFocus(id: string, revision: number, action: FocusAction): Promise<FocusOverview>;
   saveFocusReview(id: string, revision: number, review: string): Promise<FocusReviewResult>;
+  backupState(): Promise<BackupState>;
+  exportBackup(): Promise<BackupState>;
+  inspectBackup(): Promise<BackupState>;
+  confirmRestore(id: string): Promise<BackupState>;
+  discardRestore(id: string): Promise<BackupState>;
+  cancelBackup(): Promise<void>;
+  onBackupUpdate(listener: (state: BackupState) => void): () => void;
 }
 
 declare global {

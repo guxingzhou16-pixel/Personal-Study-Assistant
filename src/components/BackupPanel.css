@@ -1,0 +1,78 @@
+.backup-panel {
+  margin-top: 24px;
+}
+.backup-panel h2,
+.backup-progress-dialog h2 {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.backup-panel > p {
+  margin: 10px 0;
+}
+.backup-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin: 16px 0;
+}
+.backup-path {
+  overflow-wrap: anywhere;
+  user-select: text;
+}
+.backup-preview {
+  margin-top: 20px;
+  padding: 20px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--surface);
+}
+.backup-preview h3 {
+  margin-top: 0;
+}
+.backup-counts {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+  margin: 20px 0;
+}
+.backup-counts dt {
+  color: var(--muted);
+  font-size: 12px;
+}
+.backup-counts dd {
+  margin: 5px 0 0;
+  font-weight: 600;
+}
+.backup-consent {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  margin: 16px 0;
+}
+.backup-consent input {
+  margin-top: 4px;
+  flex: 0 0 auto;
+}
+.backup-progress-dialog {
+  width: min(520px, calc(100vw - 48px));
+  max-height: calc(100vh - 48px);
+  overflow: auto;
+  padding: 24px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: var(--surface);
+  color: inherit;
+}
+.backup-progress-dialog::backdrop {
+  background: rgb(25 36 29 / 35%);
+}
+.backup-progress-dialog progress {
+  width: 100%;
+  accent-color: var(--accent);
+}
+@media (max-width: 1050px) {
+  .backup-counts {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}

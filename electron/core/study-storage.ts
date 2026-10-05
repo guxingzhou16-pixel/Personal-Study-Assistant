@@ -47,6 +47,14 @@ export class StudyStorage {
     };
   }
 
+  schemaDefinition(): string {
+    return JSON.stringify(
+      this.db
+        .prepare('SELECT type, name, tbl_name, sql FROM sqlite_schema ORDER BY type, name')
+        .all(),
+    );
+  }
+
   studyMonth(year: number, month: number): StudyDay[] {
     const prefix = `${year}-${String(month).padStart(2, '0')}`;
     return this.db

@@ -58,6 +58,9 @@ export class Documents {
   cancel(): void {
     this.active?.abort();
   }
+  get busy(): boolean {
+    return this.active !== undefined;
+  }
   private filePath(id: string, kind: SourceKind) {
     return join(this.directory, `${sourceId(id)}.${kind === 'pdf' ? 'pdf' : 'md'}`);
   }

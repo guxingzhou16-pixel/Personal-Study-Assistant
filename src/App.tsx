@@ -29,6 +29,8 @@ import { AgentPage } from './components/AgentPage';
 import { MemoryPage } from './components/MemoryPage';
 import { PlanningPage } from './components/PlanningPage';
 import { FocusPage } from './components/FocusPage';
+import { BackupPanel, BackupBusyDialog } from './components/BackupPanel';
+import { useBackupState } from './lib/useBackupState';
 import { desktop, errorMessage, isDesktop } from './lib/desktop';
 import {
   defaultSettings,
@@ -87,6 +89,7 @@ export default function App() {
   const [boot, setBoot] = useState<Bootstrap | null>(null);
   const [failure, setFailure] = useState<string | null>(null);
   const [attempt, setAttempt] = useState(0);
+  const backup = useBackupState(true);
   useEffect(() => {
     mainRef.current?.scrollTo(0, 0);
   }, [page]);
@@ -406,6 +409,17 @@ export default function App() {
           {boot && !failure && page === 'settings' && (
             <SettingsPage boot={boot} onSaved={onSaved} />
           )}
+          {boot && !failure && (
+            <div hidden={page !== 'settings'} className="page settings-page backup-settings">
+              <BackupPanel
+                state={backup.state}
+                stateError={backup.error}
+                accept={backup.accept}
+                refresh={backup.refresh}
+              />
+            </div>
+          )}
+          <BackupBusyDialog state={backup.state} />
           {boot && !failure && (
             <div className="notes-container" hidden={page !== 'notes'}>
               <NotesPage

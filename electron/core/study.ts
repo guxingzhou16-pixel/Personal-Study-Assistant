@@ -91,6 +91,9 @@ export class StudyTracker {
     this.checkpoint();
     this.running = false;
   }
+  get isRunning(): boolean {
+    return this.running;
+  }
 
   interrupt(error: unknown): void {
     this.running = false;

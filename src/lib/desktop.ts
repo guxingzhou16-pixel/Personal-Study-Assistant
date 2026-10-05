@@ -73,6 +73,13 @@ export const desktop: DesktopApi = {
   startFocus: (request) => api().startFocus(request),
   controlFocus: (id, revision, action) => api().controlFocus(id, revision, action),
   saveFocusReview: (id, revision, review) => api().saveFocusReview(id, revision, review),
+  backupState: () => api().backupState(),
+  exportBackup: () => api().exportBackup(),
+  inspectBackup: () => api().inspectBackup(),
+  confirmRestore: (id) => api().confirmRestore(id),
+  discardRestore: (id) => api().discardRestore(id),
+  cancelBackup: () => api().cancelBackup(),
+  onBackupUpdate: (listener) => api().onBackupUpdate(listener),
 };
 
 export function errorMessage(error: unknown): string {

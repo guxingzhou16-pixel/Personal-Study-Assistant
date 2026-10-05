@@ -82,6 +82,9 @@ export class EmbeddingFiles {
   cancel(): void {
     this.active?.abort();
   }
+  get busy(): boolean {
+    return this.active !== undefined;
+  }
   async install(progress: (value: RetrievalProgress) => void): Promise<EmbeddingStatus> {
     if (this.active) throw new AppError('embeddingBusy', '检索模型正在下载，请先等待或取消。');
     const controller = new AbortController();

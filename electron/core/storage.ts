@@ -114,6 +114,15 @@ export class Storage {
     return Number(this.db.prepare('PRAGMA user_version').get()?.user_version);
   }
 
+  // Main/backup worker only: compare imported schemas with this version's migrations.
+  schemaDefinition(): string {
+    return JSON.stringify(
+      this.db
+        .prepare('SELECT type, name, tbl_name, sql FROM sqlite_schema ORDER BY type, name')
+        .all(),
+    );
+  }
+
   loadSettings(): Settings {
     const row = this.db.prepare('SELECT value FROM app_settings WHERE id = 1').get();
     if (!row) return structuredClone(defaultSettings);

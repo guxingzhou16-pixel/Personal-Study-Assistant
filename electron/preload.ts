@@ -33,6 +33,7 @@ import type {
   FocusOverview,
   FocusSession,
   FocusReviewResult,
+  BackupState,
 } from '../src/lib/types';
 
 async function call<T>(channel: string, ...args: unknown[]): Promise<T> {
@@ -142,5 +143,16 @@ const api: DesktopApi = {
     call<FocusOverview>('study:control-focus', id, revision, action),
   saveFocusReview: (id, revision, review) =>
     call<FocusReviewResult>('study:save-focus-review', id, revision, review),
+  backupState: () => call<BackupState>('study:backup-state'),
+  exportBackup: () => call<BackupState>('study:export-backup'),
+  inspectBackup: () => call<BackupState>('study:inspect-backup'),
+  confirmRestore: (id) => call<BackupState>('study:confirm-restore', id),
+  discardRestore: (id) => call<BackupState>('study:discard-restore', id),
+  cancelBackup: () => call<void>('study:cancel-backup'),
+  onBackupUpdate: (listener) => {
+    const receive = (_event: Electron.IpcRendererEvent, state: BackupState) => listener(state);
+    ipcRenderer.on('study:backup-update', receive);
+    return () => ipcRenderer.removeListener('study:backup-update', receive);
+  },
 };
 contextBridge.exposeInMainWorld('studyCompanion', api);

@@ -102,6 +102,9 @@ export class SearchService {
   cancel(): void {
     this.active?.();
   }
+  get busy(): boolean {
+    return this.active !== undefined;
+  }
   private run(
     question: string,
     scope: string | null,

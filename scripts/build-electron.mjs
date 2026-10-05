@@ -1,6 +1,15 @@
 import { build } from 'esbuild';
 
 await build({
+  entryPoints: ['electron/backup-worker.ts'],
+  outfile: 'dist-electron/backup-worker.mjs',
+  bundle: true,
+  platform: 'node',
+  format: 'esm',
+  target: 'node24',
+});
+
+await build({
   entryPoints: ['electron/main.ts'],
   outfile: 'dist-electron/main.cjs',
   bundle: true,
