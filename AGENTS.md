@@ -155,9 +155,19 @@
 - 最终 `npm run desktop:build`（双TypeScript/Vite/Electron）、13份本轮源码Prettier与暂存diff检查通过；TypeScript reviewer及code-reviewer静态批准。Vite已有大资源块警告保留，性能/安装包未验收。未改依赖/测试代码/配置，未运行功能测试、应用、个人DB或模型；实现 `7a4f44b` 在共享分支仅本地提交、不推送。
 - 功能测试按用户分工交其他对话，`docs/testing/task-proposal-acceptance.md` 全部待执行，记忆/项目清单当前门限同步v10/v11。无跨重启提议恢复、持久确认回执、批量任务拆分或新提议去重；不能称阶段4或首版已验收。
 
-### 3.13 仍待开发或验收的主要能力
+### 3.13 已实现、待独立验收的任务关联番茄钟
 
-笔记、AI反馈、路线、记忆管理/确认、手动项目/任务与Agent任务提议的独立验收，真实聊天/引用语义与规模验证；会话/路线管理、番茄钟、主题、备份、卡片/短测验、OCR、更多格式、安装包与展示网站待开发。
+- 2026-10-05：关联已保存todo任务，核对版本/时长后开始单轮专注，默认25分钟/整数5～120；暂停/继续/提前结束、计满/中断、最近20条、手动复盘及独立今日签到。入口不自动开始，不自动完成任务或推断掌握；任务预计分钟、专注elapsed、首页累计计时与签到分开，不叠加统计。
+- 主库v11只新增focus_sessions及索引，保留任务开始时ID/revision/名称/安排日期快照，无级联任务外键。v10升级前before-v11一致性备份，仍事务迁移；活动v1/派生v2不变。最多10000条，单running/paused部分唯一索引；启动恢复两种活动状态为interrupted/app-restart，不补时、不自动续计，恢复失败不继续启动。实际迁移待独立验收。
+- FocusTracker在主进程用单调时钟每秒保存，elapsed-only不增控制revision，状态/复盘才递增；overview.version防迟到快照。正常可靠心跳到预算才completed；>30秒缺失、睡眠、最终退出、主frame重载/renderer崩溃中断，仅保留最后durable时间，尾段可能丢约1秒。切页/最小化不停止，笔记关闭确认取消不误中断。
+- 条件事务/运行时恢复校验/参数化SQL，保存失败立即冻结到最后确认elapsed，恢复前先写interrupted/storage-error，失败继续报错不新开。五个具体IPC不接renderer时间/状态/原因或自造来源；复盘仅终止记录、1000字符/revision绑定。FocusPage保持挂载、明确开始/控制/保存；复盘成功返回FocusReviewResult的实际保存记录，按ID读取可核对滑出最近20条的旧复盘，脏稿不自动重绑定版本。失败应答先读取核对，不自动重发；脏复盘切记录先确认，关闭/重载可能丢未保存草稿。
+- 功能验证继续交测试对话，新增docs/testing/focus-acceptance.md全部未执行；其余清单当前迁移门限同步v11/v12。无休息连轮、系统通知、跨重启续计、删除或全量历史浏览，不能称阶段4/首版已验收。
+
+- 最终npm run desktop:build（双TypeScript/Vite/Electron）、14份本轮源码及新增番茄钟清单Prettier、diff检查通过；TypeScript reviewer与code-reviewer最终静态批准，包含按ID核对旧复盘及实际写入回执的修正。Vite已有大块警告仍在，未验性能/安装包，未运行功能测试、应用、个人DB或模型。实现c00fe4a仅本地提交、不推送；保留其他对话改动，下一步完整学习数据备份/恢复。
+
+### 3.14 仍待开发或验收的主要能力
+
+笔记、AI反馈、路线、记忆管理/确认、手动项目/任务、Agent任务提议与任务番茄钟的独立验收，真实聊天/引用语义与规模验证；会话/路线管理、主题、备份、卡片/短测验、OCR、更多格式、安装包与展示网站待开发。
 
 独立合成集 `synthetic-retrieval-v2`（`tests/fixtures/retrieval-independent-cases.ts`）与逐题引用位置校验已加入可重复评测；多锚点召回在独立集上仍有失败（`ind-symmetric-hash`），保留为失败案例。真实本地/云端聊天仍未验收：本机未安装 Ollama，无法据此验证真实生成与引用语义。
 
@@ -244,6 +254,7 @@
 | `src/components/PlanningPage.tsx`、`src/lib/planning.ts` | 指定日期任务/项目编辑、归档与完成/删除确认；集中限额/日期纯校验/空稿，页面保持挂载 |
 | `src/components/PlanningEditor.tsx` | 无状态项目/任务表单，接收实际记录与草稿；不读数据库/直接调用桌面接口 |
 | `src/components/TaskProposalPanel.tsx`、`TaskProposalPanel.css` | 单任务提议、编辑失效、项目加载、最终预览/确认/拒绝、实际结果与受控任务导航 |
+| `src/components/FocusPage.tsx`、`src/lib/focus.ts` | 单次任务专注、控制/最近记录/复盘/独立签到，集中限额与状态文案；页面保持挂载 |
 | `src/components/LibraryPage.tsx` | 文件选择、导入状态、失败、搜索/格式筛选与真实资料列表 |
 | `src/components/ReadingPage.tsx`、`PdfPage.tsx` | 原页/排版、引用复制、保存、受验证的出处跳转及资料问答入口 |
 | `src/components/RecentReadings.tsx` | 首页从主库读取实际最近阅读，不用示例数据 |
@@ -258,8 +269,9 @@
 | `electron/main.ts` | 应用与窗口生命周期、IPC 注册、调用方校验、数据目录；当前也有学习心跳及睡眠暂停接入 |
 | `electron/preload.ts` | 沙箱内通过 `contextBridge` 暴露明确的桌面方法 |
 | `electron/core/settings.ts` | 运行时设置、地址、服务类型与模型配置校验 |
-| `electron/core/storage.ts` | 主库版本 10、迁移前备份，保留旧数据并新增任务来源；不改活动库版本 |
+| `electron/core/storage.ts` | 主库版本 11、迁移前备份，保留旧数据并新增专注记录；不改活动库版本 |
 | `electron/core/planning-storage.ts` | 项目/任务CRUD、来源恢复校验、revision/归档/完成边界与提议确认创建事务；不调用模型/活动计时 |
+| `electron/core/focus-storage.ts`、`focus.ts` | 独立专注表/来源快照/条件事务/恢复校验及单调计时/中断/故障冻结，不写活动库或任务进度 |
 | `electron/core/task-proposals.ts` | 保存路线单任务提议缓存、来源/项目复核与单次确认，不解析模型输出或调用新模型请求 |
 | `electron/core/memory-storage.ts`、`memory-proposals.ts` | 记忆CRUD/恢复校验、来源/版本/使用复核，学习意向预览缓存与单次确认 |
 | `electron/core/note-storage.ts` | 笔记表/校验/CRUD、关联来源存在检查与 revision 冲突；不调用模型 |
@@ -341,13 +353,15 @@
 
 任务提议方法：`prepareTaskProposal(turnId, { day, projectId, edit?: { title, details, minutes } })`、`confirmTaskProposal(id)`、`discardTaskProposal(id)`。只接受受限字段、实际路线UUID与用户日期/项目选择，不收模型角色、来源版本/状态/完整项目快照。主进程读取来源及项目，缓存10份/10分钟的最终内容，确认只收UUID；同步复核并事务新增todo后消费。拒绝/过期/重复不写，修改重新预览，同路线新预览使旧ID失效；确认已发出不能靠切页撤回。实际成功结果供刷新/查看，跨重启预览无效，响应丢失不自动重发。
 
+专注方法：`focusOverview()`、`getFocusSession(id)`、`startFocus({taskId,taskRevision,minutes})`、`controlFocus(id,revision,action)`、`saveFocusReview(id,revision,review)`。仅实际保存todo/版本匹配可开始，action为pause/resume/stop；来源/时间/elapsed/状态/原因由主进程生成，不接受renderer自造。elapsed心跳不增控制revision，状态/复盘才增；有活动/未修复故障禁止新轮。读/控制返回实际FocusOverview与递增version，单条读取返回实际FocusSession，复盘返回FocusReviewResult{session,overview}供确认成功和恢复核对，不把读取或选择当开始/完成/签到。
+
 ## 8. 本地数据、迁移与密钥
 
 默认数据目录：`%APPDATA%\StudyCompanion\`。
 
 | 文件或目录 | 内容与约束 |
 | --- | --- |
-| `study-companion.sqlite3` | 主库版本 10：保留设置/阅读/聊天/笔记/反馈/路线/记忆与项目/任务，任务新增来源；v5～v10迁移待功能验收 |
+| `study-companion.sqlite3` | 主库版本 11：保留设置/阅读/聊天/笔记/反馈/路线/记忆与项目/任务及来源，新增专注记录；v5～v11迁移待功能验收 |
 | `study-activity.sqlite3` | 已验收的独立学习活动数据库，版本 1、`study_days` 表；备份须与主库一同导出 |
 | `search-index.sqlite3` | 关键词版 v1；首次向量使用事务升级 v2，新增 `chunk_vectors`/`embedded_sources`，可重建、不代替原文 |
 | `embedding-models/` | 固定版本模型/配置与下载暂存；摘要校验，只是可重新下载缓存，不进 Git/学习备份 |
@@ -362,6 +376,7 @@
 | `study-companion.sqlite3.before-v8-*.sqlite3` | 版本7增加记忆/所选快照前的一致性主库备份；失败不继续迁移，不自动删除 |
 | `study-companion.sqlite3.before-v9-*.sqlite3` | 版本8增加项目/任务前的一致性主库备份；失败不继续迁移，不自动删除 |
 | `study-companion.sqlite3.before-v10-*.sqlite3` | 版本9增加任务来源前的一致性主库备份；失败不继续迁移，不自动删除 |
+| `study-companion.sqlite3.before-v11-*.sqlite3` | 版本10增加专注记录前的一致性主库备份；失败不继续迁移，不自动删除 |
 | `credentials.enc.json` | 独立密钥密文文件，按规范化地址的 SHA-256 键索引，不是学习备份内容 |
 
 数据库规则：
@@ -371,14 +386,15 @@
 - 当前迁移只有前向升级，无逆向迁移/自动恢复；不通过手改user_version降级。故障恢复先关闭应用、保留完整当前数据，再核对一致性备份与兼容应用版本；旧备份不含升级后的新记录。独立验收验证备份可读与回滚，不能在主线运行个人库恢复。
 - 拒绝用旧版本应用打开更新的数据格式；损坏设置应报错，不能悄悄重置成默认值。
 - 启动探测 FTS5；首次检索才增量建派生索引。DDL 与内容写入用事务，重建在新文件完成；不可直接重建主库。源文字不可变，新哈希成为新资料。
-- 未来迁移先读保留/备份规格，不能把版本10当空库重建。旧断言/桥接清单交测试方同步；降user_version模拟旧格式须还原真实结构，包含v5表、v6列/索引/外键、v7用途/快照/部分索引，低于v8时去掉记忆表/列/索引、低于v9时去掉项目/任务表/索引、v9夹具去掉v10来源列/约束，不用IF NOT EXISTS掩盖错误夹具。
-- 当前已有资料/阅读/聊天/证据、笔记/反馈、学习路线、记忆/提议及ProjectDraft/StudyProject/ProjectSaveRequest/TaskDraft/DailyTask/TaskSaveRequest/PlanningOverview/TaskProposalEdit/TaskProposalRequest/TaskProposal。笔记/反馈/路线/记忆/手动项目任务/任务提议已实现待测试；FocusSession仍规划中。
+- 未来迁移先读保留/备份规格，不能把版本11当空库重建。旧断言/桥接清单交测试方同步；降user_version模拟旧格式须还原真实结构，包含v5表、v6列/索引/外键、v7用途/快照/部分索引，低于v8时去掉记忆表/列/索引、低于v9时去掉项目/任务表/索引、v9夹具去掉v10来源列/约束、v10及更低夹具去掉v11专注表/索引，不用IF NOT EXISTS掩盖错误夹具。
+- 当前已有资料/阅读/聊天/证据、笔记/反馈、学习路线、记忆/提议及ProjectDraft/StudyProject/ProjectSaveRequest/TaskDraft/DailyTask/TaskSaveRequest/PlanningOverview/TaskProposalEdit/TaskProposalRequest/TaskProposal。笔记/反馈/路线/记忆/手动项目任务/任务提议与FocusSession/FocusOverview/FocusStartRequest/FocusAction/FocusEndReason已实现待测试。
 - `notes` 保存 UUID、来源哈希、标题/四部分、revision 与创建/更新时间；关联来源采用外键，未来删除来源先设计笔记关联处理，不默默级联删除作品。导出读取保存快照，选址期间版本改变要拒绝导出。删除有确认、无回收站；原文依据为手动文字，不是可信检索证据。
 - v6 的 `conversations.note_id` 唯一且可空；普通/路线会话为 NULL，非空关联笔记并 `ON DELETE CASCADE`。`chat_turns.note_snapshot` 可空 JSON，按笔记边界运行时校验；不扩展旧 mode 的 CHECK，反馈仍 sources，普通旧轮次不伪装成反馈。删除笔记会连同其会话/轮次删除，主进程先拒绝活动反馈；删除来源仍不能静默删作品。
 - v7 的 `purpose` 明确三用途，普通列表/读取/发送仅 chat，反馈和路线各有主进程专用 getter；部分唯一索引限制单一路线会话。`learning_request` 非空必须有效 JSON、与 note_snapshot 互斥且 mode=sources，恢复复用输入校验。路线请求保存稳定来源 ID，不依赖后续用户表单，不向模型发送旧路线或推断已完成学习。用途权限不得改回一个绕过全部隔离的布尔值。
 - v8 `memories` 保存UUID、title/content/kind/scope、不可由renderer指定的origin/origin_turn_id、revision与时间。来源轮次ID是溯源标识，不级联删除记忆或回填当前内容。`learning_memories`非NULL须依附learning_request且经恢复校验最多5条；旧NULL不读当前表回填。历史只查看、不进新提示；删除阻止后续选择/缓存使用，既往快照/备份保留。
 - v9 `study_projects` 保存标题/目标/archived/revision/时间，`daily_tasks` 保存内容、project_id可空RESTRICT外键、安排日期/预计分钟、status/完成时刻与revision/时间。CHECK约束todo对应NULL、completed对应非NULL；归档不删除历史任务。普通save保留完成状态，另存创建todo；完成只表示用户标记，无实际时长或知识证明。
 - v10 `daily_tasks` 新增origin/manual或learning-route、origin_turn_id、origin_turn_revision；manual必须双NULL，路线必须UUID/有效正版本，SQL组合约束及恢复校验同时维护。旧行manual，新手动/另存manual，编辑不接来源。来源不设轮次外键或级联，缺失来源不删除任务。确认创建用BEGIN IMMEDIATE复核完整项目快照/归档与总数并插入；失败回滚，不拿预览当已保存结果，不使用任务来源或完成状态作为模型新上下文。
+- v11 focus_sessions保存任务ID/revision/标题/日期快照、预算/实际elapsed、状态/终止原因、复盘及自身revision/时间。taskId为溯源标识不级联，只有一个running/paused，恢复中断旧活动。正常心跳计满与睡眠/故障/退出中断分开；复盘不改状态/时长/任务。不要将专注加入首页study_ms，否则同时开启会重复计时；完整备份包含主库专注，排除密钥。
 - 聊天轮次状态为 `streaming/completed/stopped/error/interrupted`，保存部分回答与错误提示。主进程退出先取消聊天并保存，再关库；重启将残留的 streaming 标记为 interrupted。保存失败须向界面报告，不能冒充成功。单会话限 100 轮、会话总数限 500，未来会话管理/清理需保留恢复边界。
 - 来源锚点为 `page-N` 或 `md-line-N`，绑定内容哈希。资料问答轮次保存证据编号、资料名/类型、标题/页码/行号、UTF-16 偏移与原文；打开核对保存原文、元数据和副本哈希，不猜位置。复制 URI 尚未注册系统协议；应用内引用编号走受限 IPC，不依赖系统协议。
 - 当前分块最多 800 字符、重叠 120 字符，不拆开代理对；中文分词/汉字二元词入 FTS5。查询最多 24 个非停用词，BM25 前 40 候选经至少 50% 字面关键词覆盖过滤、排序/去重取最多 4 片段。阈值不证明证据充分，跨段落/同义表达可能遗漏；调整须保留固定评测失败案例。
@@ -386,7 +402,7 @@
 - 逐批事务提交，来源全部编码后才标记完成，取消后的增量任务可恢复；重建仍用新文件。线性余弦扫描当前模型；全局门槛 0.6，关键词支持资料内门槛 0.5，RRF 常数 60，最多 4 个去重片段。不混用模型，不自动切换云服务，不把门槛当证据充分概率。只有嵌入错误降级；SQL/磁盘失败仍报错。
 - 导入上限：20 文件/批；PDF 50 MB、1000 页、500 万提取字符；Markdown 5 MB、UTF-8；60 秒/文件。Markdown 原始 HTML/脚本和全部图片不加载，外链不自动打开。扫描件仅原页；密码 PDF 先解锁。新格式与更高限额先评估体验和内存。
 - PDF.js 对 utility 类型的 Node 识别需要 `document-worker.ts` 的进程内兼容提示；只影响解析子进程。升级 PDF.js/Electron 时实测此入口、资源路径、取消与正常打开，不能只运行 Node 单元测试。
-- 学习日历用本地日历日期，存储毫秒、对外展示秒；计时使用单调时钟，跨日分配，超过 30 秒心跳缺失视为中断。每秒保存；退出或睡眠时暂停，重启不自动计时。异常退出可能丢失最后约一秒。这些核心行为已做专项验证，不代表番茄钟或任务完成记录已实现。
+- 学习日历用本地日历日期，存储毫秒、对外展示秒；计时使用单调时钟，跨日分配，超过 30 秒心跳缺失视为中断。每秒保存；退出或睡眠时暂停，重启不自动计时。异常退出可能丢失最后约一秒。这些是累计计时的历史专项验证；当前任务完成与番茄钟另有实现及独立待验收清单，不继承此前通过结果。
 
 密钥规则：
 
@@ -458,7 +474,7 @@ React 界面支持热更新；修改 `electron/` 或 preload 后重启桌面开�
 
 ## 11. 验证方法与测试要求
 
-**当前分工（用户2026-10-04指定，本轮延续）：主线实现与类型/构建基础检查；功能测试及真实模型验收交其他对话。** 笔记/反馈/路线/记忆/项目任务/任务提议均未运行功能测试或改规格；2026-10-05新增 `docs/testing/memory-acceptance.md`、`docs/testing/planning-acceptance.md`、`docs/testing/task-proposal-acceptance.md` 详细清单（不是已执行测试）。测试方补齐v5～v10真实结构迁移/保留、CRUD/冲突/关联、导出/取消、协议/确认/恢复/引用、记忆隐私、提议单次确认/事务与任务状态和计时签到隔离，更新旧断言/桥接清单；构建成功不等于功能通过。
+**当前分工（用户2026-10-04指定，本轮延续）：主线实现与类型/构建基础检查；功能测试及真实模型验收交其他对话。** 笔记/反馈/路线/记忆/项目任务/任务提议/番茄钟均未运行功能测试或改规格；2026-10-05新增 `docs/testing/memory-acceptance.md`、`docs/testing/planning-acceptance.md`、`docs/testing/task-proposal-acceptance.md`、`docs/testing/focus-acceptance.md` 详细清单（不是已执行测试）。测试方补齐v5～v11真实结构迁移/保留、CRUD/冲突/关联、导出/取消、协议/确认/恢复/引用、记忆隐私、提议单次确认/事务与任务状态和计时签到隔离，更新旧断言/桥接清单；构建成功不等于功能通过。
 
 日常开发以当前功能的基础验证为准，选择最小但有效的检查。纯文档改动核对事实、路径、命令和 diff 即可，不启动桌面或完整测试。与代码无关的已有 RED 规格要记录，不借文档任务扩大范围修复。
 
@@ -512,13 +528,13 @@ npx playwright test tests/rag.spec.ts
 | 1 | PDF/Markdown 导入与阅读，基础版本已交付 | 去重、损坏反馈、原文件复制、原页/排版、重启位置恢复、扫描件提示、取消与引用复制 |
 | 2 | 聊天协议、可追溯 RAG、本地嵌入/混合检索与对比已交付；真实聊天质量待做 | 本地/云端真实同资料问答、引用语义质量、独立数据、规模与安装包 |
 | 3 | 笔记/反馈/固定路线/记忆管理与确认已实现，独立验收仍待完成 | 独立写笔记、有出处、取消不写入、删除不再新使用、本机记忆不外发 |
-| 4 | 手动项目/每日任务与Agent单任务确认已实现待验收；番茄钟、主题、备份待开发 | 数据重启恢复、确认才写/来源可追溯、任务不混签到时长、中断不误完成、备份往返且无密钥 |
+| 4 | 手动项目/每日任务、Agent单任务确认与任务番茄钟已实现待验收；主题、完整备份待开发 | 数据重启恢复、确认才写/来源可追溯、任务不混签到时长、中断不误完成、备份往返且无密钥 |
 | 5 | 全流程与异常验证、RAG 对比、安装包、发布文档 | 新用户按说明完成学习闭环、发布包对应 Git 标签、公开发布有授权 |
 | 6 | 静态展示网站 | 软件稳定后才建设，展示真实功能、评测与下载 |
 
 用户 2026-10-04 将测试安排到其他对话，主线进入阶段 3；阶段 2 的未验收项继续保留。测试对话可继续独立验收，不为机械阶段编号停止主线实现；不冒称整阶段或首版已完成。
 
-主线下一步是阶段4任务关联番茄钟：手动项目/任务与单任务提议确认已实现，先读study.ts的单调计时、心跳及睡眠规则，新增独立专注记录与任务关联，不能把睡眠/断心跳计为完成。结束复盘、手动任务完成、签到及累计学习计时保持不同状态，不自动推断掌握。测试对话继续笔记/反馈/路线/记忆/项目任务/任务提议与真实质量验收，使用README及三份docs/testing验收清单，保留既有失败。阶段3/4不能因构建通过勾为已验收；网站最后。
+主线下一步是阶段4完整学习数据备份/恢复：先界定主库/独立活动库/原资料一致性导出、排除密钥与可重建模型索引，恢复前预览并保留现有数据，不默认覆盖个人库。项目任务/提议/番茄钟已实现待验收；主线实现与类型构建，功能测试继续交其他对话，使用README及四份docs/testing清单。保留真实质量失败和确认边界，不因构建通过勾阶段3/4；网站最后。
 
 ## 14. Git、隐私与协作流程
 
