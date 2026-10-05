@@ -29,6 +29,7 @@ import type {
   PlanningOverview,
   StudyProject,
   DailyTask,
+  TaskProposal,
 } from '../src/lib/types';
 
 async function call<T>(channel: string, ...args: unknown[]): Promise<T> {
@@ -127,5 +128,9 @@ const api: DesktopApi = {
   setDailyTaskCompleted: (id, revision, completed) =>
     call<DailyTask>('study:set-task-completed', id, revision, completed),
   deleteDailyTask: (id, revision) => call<void>('study:delete-task', id, revision),
+  prepareTaskProposal: (turnId, request) =>
+    call<TaskProposal>('study:prepare-task-proposal', turnId, request),
+  confirmTaskProposal: (id) => call<DailyTask>('study:confirm-task-proposal', id),
+  discardTaskProposal: (id) => call<void>('study:discard-task-proposal', id),
 };
 contextBridge.exposeInMainWorld('studyCompanion', api);

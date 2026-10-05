@@ -30,6 +30,7 @@ import { noteMarkdown } from '../src/lib/notes';
 import { NoteFeedbackService } from './core/note-feedback';
 import { LearningAgentService } from './core/learning-agent';
 import { MemoryProposalService } from './core/memory-proposals';
+import { TaskProposalService } from './core/task-proposals';
 
 app.setName('StudyCompanion');
 const testDataDir = !app.isPackaged ? process.env.STUDY_COMPANION_DATA_DIR : undefined;
@@ -107,6 +108,7 @@ function registerHandlers(database: Storage, credentials: Credentials, tracker: 
   const feedback = new NoteFeedbackService(database, retrieval, chats);
   const learning = new LearningAgentService(database, retrieval, chats);
   const memoryProposals = new MemoryProposalService(database);
+  const taskProposals = new TaskProposalService(database);
   function handle(channel: string, work: (...args: unknown[]) => unknown) {
     ipcMain.handle(channel, async (event, ...args: unknown[]) => {
       const frameUrl = event.senderFrame?.url;
@@ -213,6 +215,11 @@ function registerHandlers(database: Storage, credentials: Credentials, tracker: 
     database.planning.setCompleted(id, revision, completed),
   );
   handle('study:delete-task', (id, revision) => database.planning.deleteTask(id, revision));
+  handle('study:prepare-task-proposal', (turnId, request) =>
+    taskProposals.prepare(turnId, request),
+  );
+  handle('study:confirm-task-proposal', (id) => taskProposals.confirm(id));
+  handle('study:discard-task-proposal', (id) => taskProposals.discard(id));
   handle('study:embedding-status', () => embeddings.status());
   handle('study:cancel-embedding-download', () => embeddings.cancel());
   handle('study:download-embedding', () => {

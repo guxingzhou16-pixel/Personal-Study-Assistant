@@ -34,6 +34,17 @@ export const PLANNING_MIGRATION = `
   PRAGMA user_version = 9;
 `;
 
+export const TASK_ORIGIN_MIGRATION = `
+  ALTER TABLE daily_tasks ADD COLUMN origin TEXT NOT NULL DEFAULT 'manual'
+    CHECK(origin IN ('manual', 'learning-route'));
+  ALTER TABLE daily_tasks ADD COLUMN origin_turn_id TEXT;
+  ALTER TABLE daily_tasks ADD COLUMN origin_turn_revision INTEGER
+    CHECK((origin = 'manual' AND origin_turn_id IS NULL AND origin_turn_revision IS NULL) OR
+      (origin = 'learning-route' AND origin_turn_id IS NOT NULL AND
+       origin_turn_revision IS NOT NULL AND origin_turn_revision > 0));
+  PRAGMA user_version = 10;
+`;
+
 function planningId(input: unknown): string {
   if (typeof input !== 'string' || !/^[a-f0-9]{8}(-[a-f0-9]{4}){3}-[a-f0-9]{12}$/.test(input))
     throw new AppError('planningId', '项目或任务标识无效，请重新加载。');
@@ -98,6 +109,10 @@ function taskDraft(data: Record<string, unknown>): TaskDraft {
   };
 }
 
+export function readTaskDraft(input: unknown): TaskDraft {
+  return taskDraft(fields(input, ['title', 'details', 'projectId', 'day', 'minutes']));
+}
+
 function timestamp(input: unknown): string {
   if (typeof input !== 'string' || !Number.isFinite(Date.parse(input)))
     throw new Error('invalid timestamp');
@@ -127,12 +142,21 @@ function decodeTask(row: Record<string, unknown>): DailyTask {
       (row.status === 'completed' && row.completed_at === null)
     )
       throw new Error('invalid completion state');
+    if (
+      (row.origin !== 'manual' && row.origin !== 'learning-route') ||
+      (row.origin === 'manual' &&
+        (row.origin_turn_id !== null || row.origin_turn_revision !== null))
+    )
+      throw new Error('invalid task origin');
     return {
       ...taskDraft({ ...row, projectId: row.project_id }),
       id: planningId(row.id),
       revision: revision(row.revision),
       status: row.status,
       completedAt: row.completed_at === null ? null : timestamp(row.completed_at),
+      origin: row.origin,
+      originTurnId: row.origin === 'manual' ? null : planningId(row.origin_turn_id),
+      originTurnRevision: row.origin === 'manual' ? null : revision(row.origin_turn_revision),
       createdAt: timestamp(row.created_at),
       updatedAt: timestamp(row.updated_at),
     };
@@ -163,7 +187,7 @@ export class PlanningStorage {
     return { day, projects, tasks };
   }
 
-  private getProject(input: unknown): StudyProject {
+  getProject(input: unknown): StudyProject {
     const row = this.db.prepare('SELECT * FROM study_projects WHERE id = ?').get(planningId(input));
     if (!row) throw new AppError('projectMissing', '项目不存在，请重新加载或解除关联。');
     return decodeProject(row);
@@ -254,8 +278,8 @@ export class PlanningStorage {
           .prepare(
             `INSERT INTO daily_tasks
             (id, title, details, project_id, day, minutes, status, completed_at,
-             revision, created_at, updated_at)
-            VALUES (?, ?, ?, ?, ?, ?, 'todo', NULL, 1, ?, ?) RETURNING *`,
+             revision, created_at, updated_at, origin, origin_turn_id, origin_turn_revision)
+            VALUES (?, ?, ?, ?, ?, ?, 'todo', NULL, 1, ?, ?, 'manual', NULL, NULL) RETURNING *`,
           )
           .get(randomUUID(), ...values, now, now)!,
       );
@@ -271,6 +295,62 @@ export class PlanningStorage {
       throw new AppError('taskConflict', '任务已更新，未覆盖新版本。请保留草稿并重新加载。');
     }
     return decodeTask(row);
+  }
+
+  createFromProposal(
+    input: TaskDraft,
+    projectSnapshot: StudyProject | null,
+    origin: { turnId: string; turnRevision: number },
+  ): DailyTask {
+    const draft = readTaskDraft(input);
+    const turnId = planningId(origin.turnId);
+    const turnRevision = revision(origin.turnRevision);
+    this.db.exec('BEGIN IMMEDIATE;');
+    try {
+      if (draft.projectId !== (projectSnapshot?.id ?? null))
+        throw new AppError('taskProposalProject', '任务关联项目与预览不一致，请重新预览。');
+      if (projectSnapshot !== null) {
+        const project = this.getProject(projectSnapshot.id);
+        if (project.archived || JSON.stringify(project) !== JSON.stringify(projectSnapshot))
+          throw new AppError('taskProposalProject', '关联项目已更新或归档，请重新预览任务提议。');
+      }
+      if (
+        Number(this.db.prepare('SELECT count(*) AS count FROM daily_tasks').get()?.count) >=
+        planningLimits.tasks
+      )
+        throw new AppError('taskLimit', '任务达到当前上限（5000），请整理并删除不再需要的任务。');
+      const now = new Date().toISOString();
+      const task = decodeTask(
+        this.db
+          .prepare(
+            `INSERT INTO daily_tasks
+            (id, title, details, project_id, day, minutes, status, completed_at,
+             revision, created_at, updated_at, origin, origin_turn_id, origin_turn_revision)
+            VALUES (?, ?, ?, ?, ?, ?, 'todo', NULL, 1, ?, ?, 'learning-route', ?, ?) RETURNING *`,
+          )
+          .get(
+            randomUUID(),
+            draft.title,
+            draft.details,
+            draft.projectId,
+            draft.day,
+            draft.minutes,
+            now,
+            now,
+            turnId,
+            turnRevision,
+          )!,
+      );
+      this.db.exec('COMMIT;');
+      return task;
+    } catch (error) {
+      try {
+        this.db.exec('ROLLBACK;');
+      } catch {
+        // SQLite may already have rolled back; keep the original write failure.
+      }
+      throw error;
+    }
   }
 
   setCompleted(input: unknown, revisionInput: unknown, completed: unknown): DailyTask {

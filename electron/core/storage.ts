@@ -19,9 +19,9 @@ import {
 } from './chat-storage';
 import { NOTES_MIGRATION, NoteStorage } from './note-storage';
 import { MEMORIES_MIGRATION, MemoryStorage } from './memory-storage';
-import { PLANNING_MIGRATION, PlanningStorage } from './planning-storage';
+import { PLANNING_MIGRATION, TASK_ORIGIN_MIGRATION, PlanningStorage } from './planning-storage';
 
-const SCHEMA_VERSION = 9;
+const SCHEMA_VERSION = 10;
 
 const INITIAL_MIGRATION = `
   CREATE TABLE app_settings (
@@ -86,6 +86,7 @@ export class Storage {
           if (version < 7) this.db.exec(LEARNING_AGENT_MIGRATION);
           if (version < 8) this.db.exec(MEMORIES_MIGRATION);
           if (version < 9) this.db.exec(PLANNING_MIGRATION);
+          if (version < 10) this.db.exec(TASK_ORIGIN_MIGRATION);
           this.db.exec('COMMIT;');
         } catch (error) {
           this.db.exec('ROLLBACK;');

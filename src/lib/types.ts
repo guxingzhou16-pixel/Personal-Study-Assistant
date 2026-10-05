@@ -285,6 +285,9 @@ export interface DailyTask extends TaskDraft {
   completedAt: string | null;
   createdAt: string;
   updatedAt: string;
+  origin: 'manual' | 'learning-route';
+  originTurnId: string | null;
+  originTurnRevision: number | null;
 }
 export interface TaskSaveRequest extends TaskDraft {
   id: string | null;
@@ -294,6 +297,24 @@ export interface PlanningOverview {
   day: string;
   projects: StudyProject[];
   tasks: DailyTask[];
+}
+export interface TaskProposalEdit {
+  title: string;
+  details: string;
+  minutes: number;
+}
+export interface TaskProposalRequest {
+  day: string;
+  projectId: string | null;
+  edit?: TaskProposalEdit;
+}
+export interface TaskProposal {
+  id: string;
+  turnId: string;
+  turnRevision: number;
+  expiresAt: string;
+  draft: TaskDraft;
+  project: StudyProject | null;
 }
 export interface DesktopApi {
   bootstrap(): Promise<Bootstrap>;
@@ -356,6 +377,9 @@ export interface DesktopApi {
   saveDailyTask(request: TaskSaveRequest): Promise<DailyTask>;
   setDailyTaskCompleted(id: string, revision: number, completed: boolean): Promise<DailyTask>;
   deleteDailyTask(id: string, revision: number): Promise<void>;
+  prepareTaskProposal(turnId: string, request: TaskProposalRequest): Promise<TaskProposal>;
+  confirmTaskProposal(id: string): Promise<DailyTask>;
+  discardTaskProposal(id: string): Promise<void>;
 }
 
 declare global {

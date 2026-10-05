@@ -29,7 +29,13 @@ import { AgentPage } from './components/AgentPage';
 import { MemoryPage } from './components/MemoryPage';
 import { PlanningPage } from './components/PlanningPage';
 import { desktop, errorMessage, isDesktop } from './lib/desktop';
-import { defaultSettings, type Bootstrap, type Settings, type CitationTarget } from './lib/types';
+import {
+  defaultSettings,
+  type Bootstrap,
+  type Settings,
+  type CitationTarget,
+  type DailyTask,
+} from './lib/types';
 
 type Page = 'home' | 'library' | 'chat' | 'notes' | 'agent' | 'memories' | 'planning' | 'settings';
 const pageLabels: Record<Page, string> = {
@@ -63,6 +69,13 @@ export default function App() {
   const [noteSource, setNoteSource] = useState<{ id: string | null; sequence: number } | null>(
     null,
   );
+  const [taskTarget, setTaskTarget] = useState<{
+    id: string;
+    day: string;
+    sequence: number;
+  } | null>(null);
+  const [routeTarget, setRouteTarget] = useState<{ id: string; sequence: number } | null>(null);
+  const [planningVersion, setPlanningVersion] = useState(0);
   const [boot, setBoot] = useState<Bootstrap | null>(null);
   const [failure, setFailure] = useState<string | null>(null);
   const [attempt, setAttempt] = useState(0);
@@ -138,6 +151,18 @@ export default function App() {
     setReaderReturn('notes');
     setSourceId(id);
     setPage('library');
+  }
+  function openTask(task: DailyTask) {
+    setTaskTarget((previous) => ({
+      id: task.id,
+      day: task.day,
+      sequence: (previous?.sequence ?? 0) + 1,
+    }));
+    navigate('planning');
+  }
+  function openLearningRoute(id: string) {
+    setRouteTarget((previous) => ({ id, sequence: (previous?.sequence ?? 0) + 1 }));
+    navigate('agent');
   }
 
   const settings = boot?.settings ?? defaultSettings;
@@ -380,6 +405,9 @@ export default function App() {
                 onSettings={() => navigate('settings')}
                 onOpenCitation={(turnId, number) => openCitation(turnId, number, 'agent')}
                 onTakeNote={startNote}
+                onTaskSaved={() => setPlanningVersion((previous) => previous + 1)}
+                onOpenTask={openTask}
+                presetTurn={routeTarget}
               />
             </div>
           )}
@@ -390,7 +418,12 @@ export default function App() {
           )}
           {boot && !failure && (
             <div hidden={page !== 'planning'}>
-              <PlanningPage visible={page === 'planning'} />
+              <PlanningPage
+                visible={page === 'planning'}
+                refreshVersion={planningVersion}
+                presetTask={taskTarget}
+                onOpenLearningRoute={openLearningRoute}
+              />
             </div>
           )}
           {boot && !failure && (

@@ -21,7 +21,8 @@ import './PlanningPage.css';
 type Action =
   | { kind: 'new-project' | 'new-task' | 'refresh' | 'close' | 'delete' }
   | { kind: 'project' | 'task'; id: string }
-  | { kind: 'day'; day: string };
+  | { kind: 'day'; day: string }
+  | { kind: 'open-task'; id: string; day: string };
 
 function projectDraft(project: ProjectDraft): ProjectDraft {
   return { title: project.title, goal: project.goal, archived: project.archived };
@@ -52,7 +53,17 @@ function sortTasks(items: DailyTask[]): DailyTask[] {
   );
 }
 
-export function PlanningPage({ visible }: { visible: boolean }) {
+export function PlanningPage({
+  visible,
+  refreshVersion,
+  presetTask,
+  onOpenLearningRoute,
+}: {
+  visible: boolean;
+  refreshVersion: number;
+  presetTask: { id: string; day: string; sequence: number } | null;
+  onOpenLearningRoute: (id: string) => void;
+}) {
   const [day, setDay] = useState(() => localDayKey(new Date()));
   const [overview, setOverview] = useState<PlanningOverview | null>(null);
   const [editor, setEditor] = useState<PlanningEditorState | null>(null);
@@ -67,6 +78,8 @@ export function PlanningPage({ visible }: { visible: boolean }) {
   const titleInput = useRef<HTMLInputElement>(null);
   const mounted = useRef(false);
   const loadVersion = useRef(0);
+  const refreshStamp = useRef<string | null>(null);
+  const handledTaskTarget = useRef(0);
   const dirty = Boolean(editor && JSON.stringify(editor.draft) !== JSON.stringify(editor.original));
   const projects = overview?.projects ?? [];
   const tasks = overview?.day === day ? overview.tasks : [];
@@ -102,8 +115,22 @@ export function PlanningPage({ visible }: { visible: boolean }) {
     };
   }, []);
   useEffect(() => {
-    if (visible && isDesktop && !busy) void refresh(false);
-  }, [visible, day]);
+    if (!visible) {
+      refreshStamp.current = null;
+      return;
+    }
+    if (!isDesktop || busy || loading) return;
+    const stamp = `${day}|${refreshVersion}`;
+    if (refreshStamp.current === stamp) return;
+    refreshStamp.current = stamp;
+    void refresh(false);
+  }, [visible, day, refreshVersion, busy, loading]);
+  useEffect(() => {
+    if (!visible || !presetTask || blocked || handledTaskTarget.current === presetTask.sequence)
+      return;
+    handledTaskTarget.current = presetTask.sequence;
+    request({ kind: 'open-task', id: presetTask.id, day: presetTask.day });
+  }, [visible, presetTask, busy, loading]);
   useEffect(() => {
     const element = dialog.current;
     if (!element) return;
@@ -150,7 +177,30 @@ export function PlanningPage({ visible }: { visible: boolean }) {
     setError('');
     setNotice('');
     if (action.kind === 'refresh') return refresh(true);
-    if (action.kind === 'day') {
+    if (action.kind === 'open-task') {
+      const version = ++loadVersion.current;
+      setLoading(true);
+      try {
+        const result = await desktop.planningOverview(action.day);
+        if (!mounted.current || version !== loadVersion.current) return;
+        const record = result.tasks.find((task) => task.id === action.id);
+        if (!record) {
+          setError('任务已改期或删除，请按安排日期查找最新任务。原编辑内容仍保留。');
+          return;
+        }
+        const draft = taskDraft(record);
+        refreshStamp.current = `${result.day}|${refreshVersion}`;
+        setOverview(result);
+        setDay(result.day);
+        setFilter('all');
+        setEditor({ kind: 'task', record, draft, original: draft });
+        setNotice('已打开任务的最新保存版本。');
+      } catch (reason) {
+        if (mounted.current && version === loadVersion.current) setError(errorMessage(reason));
+      } finally {
+        if (mounted.current && version === loadVersion.current) setLoading(false);
+      }
+    } else if (action.kind === 'day') {
       loadVersion.current += 1;
       setEditor(null);
       setDay(action.day);
@@ -504,6 +554,7 @@ export function PlanningPage({ visible }: { visible: boolean }) {
             setCompleted={setCompleted}
             changeProject={changeProject}
             changeTask={changeTask}
+            onOpenLearningRoute={onOpenLearningRoute}
           />
         ) : (
           <div className="planning-empty">

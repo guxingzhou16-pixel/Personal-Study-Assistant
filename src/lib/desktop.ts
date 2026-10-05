@@ -65,6 +65,9 @@ export const desktop: DesktopApi = {
   setDailyTaskCompleted: (id, revision, completed) =>
     api().setDailyTaskCompleted(id, revision, completed),
   deleteDailyTask: (id, revision) => api().deleteDailyTask(id, revision),
+  prepareTaskProposal: (turnId, request) => api().prepareTaskProposal(turnId, request),
+  confirmTaskProposal: (id) => api().confirmTaskProposal(id),
+  discardTaskProposal: (id) => api().discardTaskProposal(id),
 };
 
 export function errorMessage(error: unknown): string {

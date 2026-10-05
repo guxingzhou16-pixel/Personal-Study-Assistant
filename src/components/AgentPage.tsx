@@ -5,6 +5,7 @@ import { learningLimits, sameLearningRequest } from '../lib/learning';
 import { memoryAllowed, memoryKindLabels, memoryLimits, memoryScopeLabels } from '../lib/memories';
 import type {
   ChatTurn,
+  DailyTask,
   LearningPreview,
   LearningRequest,
   RetrievalProgress,
@@ -15,6 +16,7 @@ import type {
 import { EvidenceCards } from './EvidenceCards';
 import { ModelAnswer } from './ModelAnswer';
 import { MemoryProposalPanel } from './MemoryProposalPanel';
+import { TaskProposalPanel } from './TaskProposalPanel';
 import './AgentMemory.css';
 
 const statusLabels: Record<ChatTurn['status'], string> = {
@@ -81,12 +83,18 @@ export function AgentPage({
   onSettings,
   onOpenCitation,
   onTakeNote,
+  onTaskSaved,
+  onOpenTask,
+  presetTurn,
 }: {
   visible: boolean;
   settings: Settings;
   onSettings: () => void;
   onOpenCitation: (turnId: string, number: number) => Promise<void>;
   onTakeNote: (sourceId: string | null) => void;
+  onTaskSaved: () => void;
+  onOpenTask: (task: DailyTask) => void;
+  presetTurn?: { id: string; sequence: number } | null;
 }) {
   const [goal, setGoal] = useState('');
   const [query, setQuery] = useState('');
@@ -118,6 +126,7 @@ export function AgentPage({
   const searchVersion = useRef(0);
   const loadVersion = useRef(0);
   const memoryLoadVersion = useRef(0);
+  const handledPreset = useRef<number | null>(null);
   const request: LearningRequest = {
     goal,
     query,
@@ -293,6 +302,25 @@ export function AgentPage({
       cancelled = true;
     };
   }, [visible]);
+
+  useEffect(() => {
+    if (
+      !visible ||
+      !historyLoaded ||
+      loading ||
+      !presetTurn ||
+      handledPreset.current === presetTurn.sequence
+    )
+      return;
+    handledPreset.current = presetTurn.sequence;
+    const source = turns.find((turn) => turn.id === presetTurn.id);
+    if (!source?.learningRequest) {
+      setError('未找到这项任务的来源路线。任务仍保留来源标识，请刷新路线记录后再查看。');
+      return;
+    }
+    setSelectedId(source.id);
+    setError('');
+  }, [visible, historyLoaded, loading, presetTurn, turns]);
 
   function scopeName(id: string | null, hits: ChatTurn['evidence'] = []) {
     if (!id) return '全部已导入资料';
@@ -751,15 +779,27 @@ export function AgentPage({
             <p className="field-hint">
               打开空白笔记供你手动填写，不自动复制或保存模型内容。写完保存后，可在笔记中核对反馈。
             </p>
-            {selected.status === 'completed' && selected.evidence.length > 0 && (
-              <MemoryProposalPanel
-                key={selected.id}
-                turn={selected}
-                visible={visible}
-                onSaved={() => void refreshMemories()}
-                onCleanupError={setError}
-              />
-            )}
+            {selected.status === 'completed' &&
+              selected.evidence.length > 0 &&
+              Boolean(selected.answer.trim()) && (
+                <>
+                  <TaskProposalPanel
+                    key={`task-${selected.id}`}
+                    turn={selected}
+                    visible={visible}
+                    onSaved={onTaskSaved}
+                    onOpenTask={onOpenTask}
+                    onCleanupError={setError}
+                  />
+                  <MemoryProposalPanel
+                    key={selected.id}
+                    turn={selected}
+                    visible={visible}
+                    onSaved={() => void refreshMemories()}
+                    onCleanupError={setError}
+                  />
+                </>
+              )}
           </article>
         )}
       </section>

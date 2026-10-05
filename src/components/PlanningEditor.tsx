@@ -20,6 +20,7 @@ interface Props {
   setCompleted(): Promise<void>;
   changeProject<K extends keyof ProjectDraft>(key: K, value: ProjectDraft[K]): void;
   changeTask<K extends keyof TaskDraft>(key: K, value: TaskDraft[K]): void;
+  onOpenLearningRoute(id: string): void;
 }
 
 export function PlanningEditor({
@@ -35,7 +36,9 @@ export function PlanningEditor({
   setCompleted,
   changeProject,
   changeTask,
+  onOpenLearningRoute,
 }: Props) {
+  const originTurnId = editor.kind === 'task' ? editor.record?.originTurnId : null;
   return (
     <form
       className="planning-editor"
@@ -68,6 +71,27 @@ export function PlanningEditor({
         <p className="field-hint" role="status">
           列表中没有相同版本。草稿保留，保存时会核对版本；也可能已改期至其他日期。
         </p>
+      )}
+      {editor.kind === 'task' && editor.record && (
+        <div className="field-hint">
+          <p>
+            来源：
+            {editor.record.origin === 'manual'
+              ? '手动创建'
+              : `学习路线提议，经用户确认（来源版本 ${editor.record.originTurnRevision}）`}
+          </p>
+          {originTurnId && (
+            <button
+              type="button"
+              className="text-button"
+              disabled={blocked}
+              onClick={() => onOpenLearningRoute(originTurnId)}
+            >
+              查看来源路线
+            </button>
+          )}
+          <p>编辑保留来源，另存新任务标为手动创建。</p>
+        </div>
       )}
       <label className="planning-field">
         标题
