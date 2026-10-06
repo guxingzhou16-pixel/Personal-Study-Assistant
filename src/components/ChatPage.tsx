@@ -12,13 +12,17 @@ import type {
 } from '../lib/types';
 import { EvidenceCards } from './EvidenceCards';
 import { ModelAnswer } from './ModelAnswer';
+import { HistoryActions } from './HistoryActions';
 
 function withTurn(conversation: Conversation, turn: ChatTurn): Conversation {
   const existing = conversation.turns.find((item) => item.id === turn.id);
   if (existing && existing.revision > turn.revision) return conversation;
   return {
     ...conversation,
-    title: conversation.turns.length ? conversation.title : turn.question.slice(0, 40),
+    title:
+      conversation.turns.length || conversation.title !== '新会话'
+        ? conversation.title
+        : turn.question.slice(0, 40),
     turns: existing
       ? conversation.turns.map((item) => (item.id === turn.id ? turn : item))
       : [...conversation.turns, turn],
@@ -47,10 +51,14 @@ export function ChatPage({
 }) {
   const [conversations, setConversations] = useState<ConversationSummary[]>([]);
   const [conversation, setConversation] = useState<Conversation | null>(null);
+  const currentConversation = useRef(conversation);
+  currentConversation.current = conversation;
   const [active, setActive] = useState<ChatTurn | null>(null);
   const [question, setQuestion] = useState('');
   const [error, setError] = useState('');
   const [busy, setBusy] = useState(false);
+  const [historyBusy, setHistoryBusy] = useState(false);
+  const [historyQuery, setHistoryQuery] = useState('');
   const [loaded, setLoaded] = useState(false);
   const [mode, setMode] = useState<'chat' | 'sources'>('chat');
   const [scope, setScope] = useState('');
@@ -65,6 +73,8 @@ export function ChatPage({
   const turnRevisions = useRef(new Map<string, number>());
   const activityRevision = useRef(0);
   const loadVersion = useRef(0);
+  const listVersion = useRef(0);
+  const deletedConversations = useRef(new Set<string>());
   const transcript = useRef<HTMLDivElement>(null);
   const followOutput = useRef(true);
   const profile = settings[settings.provider];
@@ -78,6 +88,7 @@ export function ChatPage({
     preview.sourceId === (scope || null);
   const remote = !['localhost', '127.0.0.1', '[::1]'].includes(new URL(profile.baseUrl).hostname);
   const applyTurn = useCallback((turn: ChatTurn) => {
+    if (deletedConversations.current.has(turn.conversationId)) return;
     if ((turnRevisions.current.get(turn.id) ?? -1) > turn.revision) return;
     turnRevisions.current.set(turn.id, turn.revision);
     activityRevision.current++;
@@ -102,7 +113,16 @@ export function ChatPage({
     setActive(turn?.status === 'streaming' ? turn : null);
   }, []);
   const refresh = useCallback(async () => {
-    setConversations(await desktop.listConversations());
+    const version = ++listVersion.current;
+    const knownId = currentConversation.current?.id;
+    const items = await desktop.listConversations();
+    if (version !== listVersion.current) return;
+    if (knownId && !items.some((item) => item.id === knownId)) {
+      deletedConversations.current.add(knownId);
+      if (lastUpdate.current?.conversationId === knownId) lastUpdate.current = null;
+      setConversation((previous) => (previous?.id === knownId ? null : previous));
+    }
+    setConversations(items.filter((item) => !deletedConversations.current.has(item.id)));
   }, []);
   const openConversation = useCallback(
     async (id: string) => {
@@ -113,7 +133,7 @@ export function ChatPage({
         const saved = await desktop.getConversation(id);
         const activity = activityRevision.current;
         const running = await desktop.activeChat();
-        if (version !== loadVersion.current) return;
+        if (version !== loadVersion.current || deletedConversations.current.has(id)) return;
         setConversation((previous) => {
           let result = saved;
           if (previous?.id === saved.id)
@@ -183,6 +203,7 @@ export function ChatPage({
     setBusy(true);
     setError('');
     loadVersion.current++;
+    listVersion.current++;
     try {
       const created = await desktop.createConversation();
       setConversation(created);
@@ -244,7 +265,7 @@ export function ChatPage({
     }
   }
   async function send() {
-    if (busy || active || searching || !question.trim()) return;
+    if (busy || historyBusy || active || searching || !question.trim()) return;
     if (mode === 'sources' && !previewValid) {
       setError('请先检索当前问题的原文，再发送。');
       return;
@@ -253,6 +274,7 @@ export function ChatPage({
     setError('');
     followOutput.current = true;
     try {
+      if (!conversation) listVersion.current++;
       const current = conversation ?? (await desktop.createConversation());
       if (!conversation) setConversation(current);
       const turn = await desktop.sendChat({
@@ -296,6 +318,21 @@ export function ChatPage({
     }
   }
 
+  function renamed(saved: ConversationSummary) {
+    setConversation((previous) =>
+      previous?.id === saved.id ? { ...previous, ...saved } : previous,
+    );
+    setConversations((previous) => previous.map((item) => (item.id === saved.id ? saved : item)));
+    void refresh().catch((reason) => setError(errorMessage(reason)));
+  }
+  function deleted(id: string) {
+    deletedConversations.current.add(id);
+    setConversation((previous) => (previous?.id === id ? null : previous));
+    setConversations((previous) => previous.filter((item) => item.id !== id));
+    if (lastUpdate.current?.conversationId === id) lastUpdate.current = null;
+    void refresh().catch((reason) => setError(errorMessage(reason)));
+  }
+
   return (
     <section className="chat-page" aria-label="学习助手">
       <div className="chat-heading">
@@ -317,29 +354,63 @@ export function ChatPage({
         <aside className="chat-history" aria-label="会话记录">
           <button
             className="button secondary"
-            disabled={!isDesktop || !loaded || busy}
+            disabled={!isDesktop || !loaded || busy || historyBusy}
             onClick={() => void newConversation()}
           >
             <Plus size={16} />
             新会话
           </button>
+          <label className="history-search">
+            搜索会话标题
+            <input
+              value={historyQuery}
+              maxLength={120}
+              onChange={(event) => setHistoryQuery(event.target.value)}
+            />
+          </label>
+          <button
+            type="button"
+            className="text-button"
+            disabled={!isDesktop || busy || historyBusy}
+            onClick={() => void refresh().catch((reason) => setError(errorMessage(reason)))}
+          >
+            刷新会话
+          </button>
           <div className="chat-history-list">
-            {conversations.map((item) => (
-              <button
-                key={item.id}
-                aria-label={`会话：${item.title}`}
-                aria-current={conversation?.id === item.id ? 'true' : undefined}
-                disabled={busy}
-                onClick={() => void openConversation(item.id)}
-              >
-                <MessageCircle size={14} />
-                <span>{item.title}</span>
-              </button>
-            ))}
+            {conversations
+              .filter((item) =>
+                item.title.toLocaleLowerCase().includes(historyQuery.trim().toLocaleLowerCase()),
+              )
+              .map((item) => (
+                <button
+                  key={item.id}
+                  aria-label={`会话：${item.title}`}
+                  aria-current={conversation?.id === item.id ? 'true' : undefined}
+                  disabled={busy || historyBusy}
+                  onClick={() => void openConversation(item.id)}
+                >
+                  <MessageCircle size={14} />
+                  <span>{item.title}</span>
+                </button>
+              ))}
           </div>
+          {conversations.length > 0 &&
+            !conversations.some((item) =>
+              item.title.toLocaleLowerCase().includes(historyQuery.trim().toLocaleLowerCase()),
+            ) && <p className="field-hint">没有匹配的会话标题。</p>}
           <small>会话保存在本机</small>
         </aside>
         <div className="chat-content">
+          {conversation && (
+            <HistoryActions
+              key={conversation.id}
+              target={{ kind: 'conversation', id: conversation.id }}
+              disabled={busy || searching || active?.conversationId === conversation.id}
+              onRenamed={renamed}
+              onDeleted={deleted}
+              onBusyChange={setHistoryBusy}
+            />
+          )}
           <div className="chat-model">
             <span>{profile.model || '尚未选择模型'}</span>
             <small>{profile.baseUrl}</small>
@@ -587,6 +658,7 @@ export function ChatPage({
                     !isDesktop ||
                     !loaded ||
                     busy ||
+                    historyBusy ||
                     searching ||
                     (needsModel && !profile.model) ||
                     !question.trim() ||

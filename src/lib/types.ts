@@ -165,6 +165,21 @@ export interface ConversationSummary {
 export interface Conversation extends ConversationSummary {
   turns: ChatTurn[];
 }
+export interface HistoryTarget {
+  kind: 'conversation' | 'learning';
+  id: string;
+}
+export interface HistoryPreview {
+  target: HistoryTarget;
+  title: string;
+  updatedAt: string;
+  turnCount: number;
+  version: string;
+}
+export interface HistoryExportResult {
+  cancelled: boolean;
+  fileName?: string;
+}
 export interface ChatRequest {
   conversationId: string;
   question: string;
@@ -432,6 +447,10 @@ export interface DesktopApi {
   listConversations(): Promise<ConversationSummary[]>;
   createConversation(): Promise<Conversation>;
   getConversation(id: string): Promise<Conversation>;
+  previewHistory(target: HistoryTarget): Promise<HistoryPreview>;
+  renameConversation(id: string, version: string, title: string): Promise<ConversationSummary>;
+  deleteHistory(target: HistoryTarget, version: string): Promise<{ cancelled: boolean }>;
+  exportHistory(target: HistoryTarget, version: string): Promise<HistoryExportResult>;
   sendChat(request: ChatRequest): Promise<ChatTurn>;
   stopChat(id: string): Promise<void>;
   activeChat(): Promise<ChatTurn | null>;

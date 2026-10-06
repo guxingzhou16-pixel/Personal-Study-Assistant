@@ -27,6 +27,9 @@ import { EmbeddingFiles } from './core/embedding-files';
 import { noteRevision } from './core/note-storage';
 import { noteFileName, writeNoteExport } from './core/note-export';
 import { noteMarkdown } from '../src/lib/notes';
+import { HistoryService } from './core/history';
+import { historyMarkdown } from './core/history-markdown';
+import { markdownFileName, writeMarkdownExport } from './core/markdown-export';
 import { NoteFeedbackService } from './core/note-feedback';
 import { LearningAgentService } from './core/learning-agent';
 import { MemoryProposalService } from './core/memory-proposals';
@@ -328,7 +331,76 @@ function registerHandlers(
   handle('study:list-conversations', () => database.chat.list());
   handle('study:create-conversation', () => database.chat.create());
   handle('study:get-conversation', (id) => database.chat.get(id));
-  handle('study:send-chat', (request) => chats.send(request));
+  const history = new HistoryService(database.chat, () => chats.current());
+  let historyBusy = false;
+  let exportingNote = false;
+  function assertHistoryIdle() {
+    if (historyBusy) throw new AppError('historyBusy', '请完成当前历史记录操作后再试。');
+  }
+  async function historyDialog<T>(work: () => Promise<T>): Promise<T> {
+    assertHistoryIdle();
+    if (exportingNote) throw new AppError('historyBusy', '请完成笔记导出后再管理历史记录。');
+    historyBusy = true;
+    try {
+      return await work();
+    } finally {
+      historyBusy = false;
+    }
+  }
+  handle('study:preview-history', (target) => history.read(target).preview);
+  handle('study:rename-conversation', (id, version, title) => {
+    assertHistoryIdle();
+    return history.rename(id, version, title);
+  });
+  handle('study:delete-history', (target, version) =>
+    historyDialog(async () => {
+      if (!window) throw new AppError('window', '请在桌面窗口中管理记录。');
+      const saved = history.verify(target, version).preview;
+      const route = saved.target.kind === 'learning';
+      const choice = await dialog.showMessageBox(window, {
+        type: 'warning',
+        title: route ? '删除这份学习路线？' : '删除这个会话？',
+        message: saved.title,
+        detail: `将永久删除 ${saved.turnCount} 份已保存问答及其证据/快照，无回收站。\n${route ? '已生成的任务和记忆会保留来源标识，但不能再打开这份路线；尚未确认的来源提议将失效。' : '资料、阅读位置、笔记、任务和记忆不受影响。'}\n旧备份和已导出文件仍保留记录；删除不能撤回已经发送到远程服务的数据。`,
+        buttons: ['保留记录', '确认删除'],
+        defaultId: 0,
+        cancelId: 0,
+        noLink: true,
+      });
+      if (choice.response !== 1) return { cancelled: true };
+      history.delete(saved.target, version);
+      return { cancelled: false };
+    }),
+  );
+  handle('study:export-history', (target, version) =>
+    historyDialog(async () => {
+      if (!window) throw new AppError('window', '请在桌面窗口中导出记录。');
+      const saved = history.verify(target, version);
+      const selection = await dialog.showSaveDialog(window, {
+        title: '导出已保存记录（包含原文及所选记忆快照）',
+        defaultPath: markdownFileName(saved.preview.title, '学习记录'),
+        filters: [{ name: 'Markdown 记录', extensions: ['md'] }],
+        properties: ['showOverwriteConfirmation'],
+      });
+      if (selection.canceled || !selection.filePath) return { cancelled: true };
+      const current = history.verify(saved.preview.target, version);
+      await writeMarkdownExport(
+        selection.filePath,
+        historyMarkdown(current.preview, current.turns),
+        dataDir,
+        '记录',
+        'historyExport',
+        () => {
+          history.verify(saved.preview.target, version);
+        },
+      );
+      return { cancelled: false, fileName: basename(selection.filePath) };
+    }),
+  );
+  handle('study:send-chat', (request) => {
+    assertHistoryIdle();
+    return chats.send(request);
+  });
   handle('study:stop-chat', (id) => chats.stop(id));
   handle('study:active-chat', () => chats.current());
   const retrievalProgress = (progress: import('../src/lib/types').RetrievalProgress) => {
@@ -345,12 +417,18 @@ function registerHandlers(
   handle('study:prepare-note-feedback', (id, revision, question) =>
     feedback.prepare(id, revision, question, retrievalProgress),
   );
-  handle('study:send-note-feedback', (request) => feedback.send(request));
+  handle('study:send-note-feedback', (request) => {
+    assertHistoryIdle();
+    return feedback.send(request);
+  });
   handle('study:list-learning-drafts', () => learning.list());
   handle('study:prepare-learning-draft', (request, memoryIds) =>
     learning.prepare(request, retrievalProgress, memoryIds),
   );
-  handle('study:send-learning-draft', (request) => learning.send(request));
+  handle('study:send-learning-draft', (request) => {
+    assertHistoryIdle();
+    return learning.send(request);
+  });
   handle('study:list-memories', () => database.memories.list());
   handle('study:save-memory', (request) => database.memories.save(request));
   handle('study:delete-memory', (id, revision) => database.memories.delete(id, revision));
@@ -392,8 +470,8 @@ function registerHandlers(
     if (typeof dirty !== 'boolean') throw new AppError('validation', '笔记编辑状态无效。');
     noteDraftDirty = dirty;
   });
-  let exportingNote = false;
   handle('study:export-note', async (id, revisionInput) => {
+    assertHistoryIdle();
     if (!window) throw new AppError('window', '请在桌面窗口中导出笔记。');
     if (exportingNote) throw new AppError('noteBusy', '请完成当前导出后再试。');
     const revision = noteRevision(revisionInput);

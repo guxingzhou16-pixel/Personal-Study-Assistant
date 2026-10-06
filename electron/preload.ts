@@ -13,6 +13,8 @@ import type {
   OpenDocument,
   StudyOverview,
   ConversationSummary,
+  HistoryPreview,
+  HistoryExportResult,
   Conversation,
   ChatTurn,
   EvidencePreview,
@@ -71,6 +73,13 @@ const api: DesktopApi = {
   listConversations: () => call<ConversationSummary[]>('study:list-conversations'),
   createConversation: () => call<Conversation>('study:create-conversation'),
   getConversation: (id) => call<Conversation>('study:get-conversation', id),
+  previewHistory: (target) => call<HistoryPreview>('study:preview-history', target),
+  renameConversation: (id, version, title) =>
+    call<ConversationSummary>('study:rename-conversation', id, version, title),
+  deleteHistory: (target, version) =>
+    call<{ cancelled: boolean }>('study:delete-history', target, version),
+  exportHistory: (target, version) =>
+    call<HistoryExportResult>('study:export-history', target, version),
   sendChat: (request) => call<ChatTurn>('study:send-chat', request),
   stopChat: (id) => call<void>('study:stop-chat', id),
   activeChat: () => call<ChatTurn | null>('study:active-chat'),

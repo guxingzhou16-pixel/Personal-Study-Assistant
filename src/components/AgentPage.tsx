@@ -17,6 +17,7 @@ import { EvidenceCards } from './EvidenceCards';
 import { ModelAnswer } from './ModelAnswer';
 import { MemoryProposalPanel } from './MemoryProposalPanel';
 import { TaskProposalPanel } from './TaskProposalPanel';
+import { HistoryActions } from './HistoryActions';
 import './AgentMemory.css';
 
 const statusLabels: Record<ChatTurn['status'], string> = {
@@ -114,6 +115,7 @@ export function AgentPage({
   const [activeLoaded, setActiveLoaded] = useState(false);
   const [historyLoaded, setHistoryLoaded] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [historyBusy, setHistoryBusy] = useState(false);
   const [searching, setSearching] = useState(false);
   const [sending, setSending] = useState(false);
   const [error, setError] = useState('');
@@ -122,6 +124,7 @@ export function AgentPage({
   const mounted = useRef(true);
   const revisions = useRef(new Map<string, number>());
   const seenDrafts = useRef(new Map<string, ChatTurn>());
+  const deletedDrafts = useRef(new Set<string>());
   const activityVersion = useRef(0);
   const searchVersion = useRef(0);
   const loadVersion = useRef(0);
@@ -203,6 +206,7 @@ export function AgentPage({
   }, [invalidatePreview]);
 
   const applyTurn = useCallback((turn: ChatTurn) => {
+    if (deletedDrafts.current.has(turn.id)) return;
     if ((revisions.current.get(turn.id) ?? -1) > turn.revision) return;
     revisions.current.set(turn.id, turn.revision);
     activityVersion.current++;
@@ -220,6 +224,7 @@ export function AgentPage({
   const refreshHistory = useCallback(async () => {
     const version = ++loadVersion.current;
     const activity = activityVersion.current;
+    const knownIds = new Set(seenDrafts.current.keys());
     setLoading(true);
     setError('');
     const [saved, running] = await Promise.allSettled([
@@ -229,7 +234,16 @@ export function AgentPage({
     if (!mounted.current || version !== loadVersion.current) return;
     const failures: string[] = [];
     if (saved.status === 'fulfilled') {
-      let items = saved.value;
+      // An absent record known before the read is really gone, even if its delete reply was lost.
+      // Only new live drafts arriving during this read may supplement the saved list.
+      const savedIds = new Set(saved.value.map((turn) => turn.id));
+      for (const id of knownIds) {
+        if (savedIds.has(id)) continue;
+        deletedDrafts.current.add(id);
+        seenDrafts.current.delete(id);
+        revisions.current.delete(id);
+      }
+      let items = saved.value.filter((turn) => !deletedDrafts.current.has(turn.id));
       for (const turn of seenDrafts.current.values()) items = mergeDraft(items, turn);
       for (const turn of items) {
         revisions.current.set(
@@ -239,7 +253,9 @@ export function AgentPage({
         seenDrafts.current.set(turn.id, turn);
       }
       setTurns(items);
-      setSelectedId((previous) => previous ?? items.at(-1)?.id ?? null);
+      setSelectedId((previous) =>
+        items.some((turn) => turn.id === previous) ? previous : (items.at(-1)?.id ?? null),
+      );
       setHistoryLoaded(true);
     } else failures.push(errorMessage(saved.reason));
     if (running.status === 'fulfilled') {
@@ -315,7 +331,7 @@ export function AgentPage({
     handledPreset.current = presetTurn.sequence;
     const source = turns.find((turn) => turn.id === presetTurn.id);
     if (!source?.learningRequest) {
-      setError('未找到这项任务的来源路线。任务仍保留来源标识，请刷新路线记录后再查看。');
+      setError('未找到这项任务的来源路线，可能已删除。任务和来源标识仍保留，可刷新路线记录核对。');
       return;
     }
     setSelectedId(source.id);
@@ -335,6 +351,7 @@ export function AgentPage({
     if (
       searching ||
       sending ||
+      historyBusy ||
       memoriesLoading ||
       !requestValid ||
       selectedMemories.length !== memoryIds.length
@@ -380,6 +397,7 @@ export function AgentPage({
       active ||
       !activeLoaded ||
       sending ||
+      historyBusy ||
       searching ||
       (needsModel && !profile.model) ||
       (remote && needsModel && !consent)
@@ -436,6 +454,15 @@ export function AgentPage({
     } catch (reason) {
       if (mounted.current) setError(errorMessage(reason));
     }
+  }
+
+  function deletedDraft(id: string) {
+    deletedDrafts.current.add(id);
+    seenDrafts.current.delete(id);
+    revisions.current.delete(id);
+    setTurns((previous) => previous.filter((turn) => turn.id !== id));
+    setSelectedId((previous) => (previous === id ? null : previous));
+    void refreshHistory();
   }
 
   return (
@@ -658,6 +685,7 @@ export function AgentPage({
                 !activeLoaded ||
                 searching ||
                 sending ||
+                historyBusy ||
                 Boolean(active) ||
                 (needsModel && !profile.model) ||
                 (remote && needsModel && !consent)
@@ -692,7 +720,7 @@ export function AgentPage({
           <button
             type="button"
             className="text-button"
-            disabled={!isDesktop || loading}
+            disabled={!isDesktop || loading || historyBusy}
             onClick={() => void refreshHistory()}
           >
             刷新记录
@@ -709,6 +737,7 @@ export function AgentPage({
             选择草稿
             <select
               value={selectedId ?? ''}
+              disabled={historyBusy}
               onChange={(event) => setSelectedId(event.target.value)}
             >
               {turns
@@ -725,6 +754,13 @@ export function AgentPage({
         )}
         {selected?.learningRequest && (
           <article className="agent-result">
+            <HistoryActions
+              key={`history-${selected.id}`}
+              target={{ kind: 'learning', id: selected.id }}
+              disabled={loading || sending || searching || active?.id === selected.id}
+              onDeleted={deletedDraft}
+              onBusyChange={setHistoryBusy}
+            />
             <RequestSummary
               request={selected.learningRequest}
               scope={scopeName(selected.learningRequest.sourceId, selected.evidence)}

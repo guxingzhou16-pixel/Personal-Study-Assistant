@@ -72,7 +72,7 @@ export class ChatService {
         noteSnapshot
           ? '此笔记已达到 100 次反馈，当前版本暂不能继续生成。'
           : learningRequest
-            ? '学习路线已达到当前版本的 100 份草稿上限，请保留数据并等待记录管理升级。'
+            ? '学习路线已达到当前版本的 100 份草稿上限，可先导出并删除不再需要的草稿。'
             : '此会话已达到 100 次提问，请新建会话继续。',
       );
     const settings = this.storage.loadSettings();

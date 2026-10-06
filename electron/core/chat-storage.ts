@@ -86,7 +86,7 @@ export class ChatStorage {
     if (Number(this.db.prepare('SELECT count(*) AS count FROM conversations').get()?.count) >= 500)
       throw new AppError(
         'chatLimit',
-        '会话数量已达到当前版本上限（500，含笔记反馈和学习路线）。请保留数据并等待会话管理升级。',
+        '会话数量已达到当前版本上限（500，含笔记反馈和学习路线）。可先导出并删除不再需要的普通会话。',
       );
     const conversation = {
       id: randomUUID(),
@@ -142,6 +142,26 @@ export class ChatStorage {
     const { purpose: _purpose, ...summary } = row;
     return { ...(summary as unknown as ConversationSummary), turns };
   }
+  rename(id: string, title: string): ConversationSummary {
+    this.get(id);
+    const updatedAt = new Date().toISOString();
+    this.db
+      .prepare(
+        "UPDATE conversations SET title = ?, updated_at = ? WHERE id = ? AND purpose = 'chat'",
+      )
+      .run(title, updatedAt, id);
+    return { id, title, updatedAt };
+  }
+  deleteConversation(id: string): void {
+    this.get(id);
+    this.db.prepare("DELETE FROM conversations WHERE id = ? AND purpose = 'chat'").run(id);
+  }
+  deleteLearningTurn(id: string): void {
+    const turn = this.getTurn(id);
+    this.get(turn.conversationId, 'learning-agent');
+    if (!turn.learningRequest) throw new AppError('chatPurpose', '这不是学习路线记录。');
+    this.db.prepare('DELETE FROM chat_turns WHERE id = ?').run(id);
+  }
   addTurn(turn: ChatTurn): void {
     this.db.exec('BEGIN IMMEDIATE');
     try {
@@ -173,7 +193,7 @@ export class ChatStorage {
       this.db
         .prepare(
           `UPDATE conversations SET updated_at = ?, title = CASE
-        WHEN (SELECT count(*) FROM chat_turns WHERE conversation_id = ?) = 1 THEN ? ELSE title END WHERE id = ?`,
+        WHEN title = '新会话' AND (SELECT count(*) FROM chat_turns WHERE conversation_id = ?) = 1 THEN ? ELSE title END WHERE id = ?`,
         )
         .run(
           turn.createdAt,
