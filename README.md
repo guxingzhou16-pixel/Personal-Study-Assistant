@@ -1,6 +1,6 @@
 # 私人学习助手（Study Companion）
 
-> **项目状态：阅读、流式聊天、可追溯 RAG 与本地混合检索已完成；笔记、AI 反馈、学习路线、长期记忆、项目/每日任务、任务提议确认、任务关联番茄钟、完整学习数据备份/恢复及三种视觉主题已实现，待功能验收。** 已有月历、签到、计时和加密配置。路线可手选记忆辅助建议，记忆与任务提议经预览确认后保存；任务由用户实际执行和手动完成，Agent 不自动修改已有进度，也不推断知识掌握。真实生成质量由测试对话继续验收。展示网站最后建设。
+> **项目状态：阅读、流式聊天、可追溯 RAG 与本地混合检索已完成；笔记、AI 反馈、学习路线、长期记忆、项目/每日任务、任务提议确认、任务关联番茄钟、完整学习数据备份/恢复及三种视觉主题已实现，待功能验收。Windows x64 打包与候选构建已接入，安装、升级、卸载和正式发布仍待验收。** 已有月历、签到、计时和加密配置。路线可手选记忆辅助建议，记忆与任务提议经预览确认后保存；任务由用户实际执行和手动完成，Agent 不自动修改已有进度，也不推断知识掌握。真实生成质量由测试对话继续验收。展示网站最后建设。
 
 私人学习助手是一款以本地数据和个人学习体验为中心的学习软件。它将资料阅读、可追溯的 AI 问答、学习笔记、计划和专注记录连在一起，帮助用户提升注意力和学习效率、理解知识、看见进步，并保持学习动力。第一版以编程与技术学习为主要场景，后续逐步扩展到跨学科资料。
 
@@ -31,9 +31,10 @@
 | 每日签到与学习计时 | 日历下方左右为 4:5：左侧签到，右侧今日学习时间。当天签到只保存一次；手动开始／暂停计时，按本地日期累计，重启后保留，使用真实记录。 |
 | 模型连接配置 | Ollama 与兼容 OpenAI 的接口分别保存地址、模型名；检测服务、返回模型列表，区分鉴权、地址、限额、超时及响应格式错误。 |
 | 密钥管理 | 使用 Electron `safeStorage` 调用 Windows DPAPI 加密，密文单独保存在本机；可删除，按服务地址绑定，不写入学习数据库或 Git。 |
+| Windows 候选包（待安装验收） | Windows x64 目录包和 NSIS 构建、包内容检查、Git/锁文件来源及 SHA-256 清单；不会自动安装、启动或发布。当前未签名，实际资源运行和安装/升级/卸载由独立测试负责。 |
 | 验证与构建 | TypeScript 类型检查、生产桌面构建、Vitest 核心验证与真实 Electron 流程；具体本机验收记录见文末。已配置 Windows GitHub Actions，未声称远端通过。 |
 
-**连接检测只读取模型列表。** 真实 BGE 已在 Windows CPU 与 Electron 后台进程验证；聊天回答仍以模拟 Ollama/OpenAI 协议验收。用户真实聊天模型、复杂资料、服务商账户与安装包待验证；笔记、AI 反馈、学习路线、记忆、手动项目/任务、任务提议确认、番茄钟、备份/恢复和主题已实现但待测试，Agent 修改已有任务进度仍在规划中。
+**连接检测只读取模型列表。** 真实 BGE 已在 Windows CPU 与 Electron 后台进程验证；聊天回答仍以模拟 Ollama/OpenAI 协议验收。用户真实聊天模型、复杂资料、服务商账户与安装包运行仍待验证；笔记、AI 反馈、学习路线、记忆、手动项目/任务、任务提议确认、番茄钟、备份/恢复和主题已实现但待测试，Agent 修改已有任务进度仍在规划中。包文件检查不代替这些功能或真实模型验收。
 
 ## 本地运行
 
@@ -54,7 +55,42 @@ npm run desktop:build
 npm run desktop:start
 ```
 
-`npm run dev` 仅提供浏览器界面预览，不能导入本机资料、保存设置、签到或计时，也不能检测模型；这不是展示网站。当前尚未生成可分发的安装包，`desktop:build` 生成的是界面与桌面程序代码。构建/开发脚本自动从锁定的 PDF.js 依赖复制字库、CMap 与 WASM 到生成目录，阅读不使用 CDN。
+`npm run dev` 仅提供浏览器界面预览，不能导入本机资料、保存设置、签到或计时，也不能检测模型；这不是展示网站。`desktop:build` 生成界面与桌面程序代码，候选安装包使用下面的独立命令。构建/开发脚本自动从锁定的 PDF.js 依赖复制字库、CMap 与 WASM 到生成目录，阅读不使用 CDN。
+
+### Windows x64 候选构建与安装交接
+
+在 Windows x64、Node >=24.16、npm/Git 环境下，从固定提交的干净克隆构建；保留 `package-lock.json`，构建期间不并行修改源码。首次 Electron 或 NSIS 工具下载需要网络；使用现有预编译运行时，不要求 C++ 编译工具或聊天模型。
+
+```powershell
+npm ci
+npx install-electron --no
+npm run desktop:pack
+npm run desktop:dist
+```
+
+两个命令均先执行 `desktop:build`，随后只做打包、包内容检查和文件摘要，不启动应用、安装器或功能测试，也不读取学习数据。使用 electron-builder 26.15.3 与 `@electron/asar` 4.3.1；参考 [文件与解包规则](https://www.electron.build/v26/docs/contents/)、[Windows 配置](https://www.electron.build/v26/docs/win/) 与 [NSIS 配置](https://www.electron.build/v26/docs/nsis/)，实际支持字段以已安装版本的 schema 为准。
+
+| 命令/产物 | 范围 |
+| --- | --- |
+| `npm run desktop:pack` | `release/dir-UUID/win-unpacked/` 完整目录候选；不能只复制其中的 EXE。 |
+| `npm run desktop:dist` | `release/nsis-UUID/StudyCompanion-0.1.0-win-x64-setup.exe` NSIS 候选；版本取自 package.json。 |
+| `build-info.json` | 开始打包时的 Git HEAD、已追踪改动标志、锁文件 SHA-256、版本/工具/Node/架构/时间；同一份放入包的 resources。记录发生在代码编译之后，不证明此前编译期间源码没有改变。dirty 为 true 不能宣称纯提交构建。 |
+| `package-audit.json` | 静态包内容检查：限定顶层、入口、本地 PDF 资源和 Windows 原生文件；`functionalAcceptance` 仍为 pending。 |
+| `build-manifest.json`、`SHA256SUMS.txt` | 只有完整构建和检查成功才写；目录模式覆盖 win-unpacked 全部普通文件，含解包 worker、依赖/DLL；NSIS 模式散列整个安装器。哈希用于核对文件，不证明发布者身份或 AI 效果。 |
+
+每次生成新的 UUID 输出目录，失败不会沿用旧成功清单；失败可能留下部分文件，不自动清理旧候选。没有 `build-manifest.json` 与 `SHA256SUMS.txt` 不能当完成产物。`release/` 已忽略，不提交安装器和开发产物。固定依赖使构建过程可重复，时间和 UUID 等元数据使产物不保证逐字节相同。
+
+**使用上述 npm 包装命令构建。** 锁定的 builder 默认会运行临时安装 stub 写出卸载器；`package-desktop.mjs` 在独立打包进程中，仅对本次确切输出/空参数/单次调用改用它已有的 `UninstallerReader` 纯文件提取，成功或失败后还原。未知调用、提取失败或 app-builder-lib 不是 26.15.3 时直接失败，没有执行安装器的回退；不自写安装模板。此处使用已核对的内部接口，升级 builder 必须重新核对模板、提取器与包产物。直接运行 `npx electron-builder` 会绕过这一限制和来源清单。
+
+工具下载不一定读取 Windows 系统代理；网络失败时只为本次下载进程配置已有可用代理，不改仓库地址或关闭 TLS/摘要校验。如果工具缓存解包发生 EXDEV，先检查缓存位置，本轮用临时 `ELECTRON_BUILDER_CACHE` 指向仓库已忽略的 `artifacts/packaging-tool-cache` 后重试，未清空系统缓存或修改个人学习数据。其他机器按实际路径处理，不复制本机代理端口。
+
+`electron-builder.json` 只收 dist、main/preload/三个固定 worker、package.json 与生产依赖，不收仓库文档、测试、第三方下载、私人资料、两库、密钥、备份、检索索引或模型权重。main/preload/界面在 ASAR，三个 ESM worker 与外部依赖在 app.asar.unpacked，主进程通过实际文件位置启动。保留 PDF 字库/CMap/WASM、ONNX/Sharp x64 绑定；不重编译原生依赖、不放宽沙箱/CSP/IPC。文件存在不等于后台进程已运行。
+
+当前 NSIS 配置为当前用户的一次点击安装，开始菜单“拾知”、不默认创建桌面快捷方式，安装结束不自动运行；EXE 为 StudyCompanion.exe。稳定 appId/Windows appUserModelId 为 `io.github.guxingzhou16pixel.studycompanion`，数据目录仍为 `%APPDATA%\StudyCompanion`；卸载配置保留数据，**实际安装、升级与卸载行为尚未验证**。版本暂为 0.1.0，未签名、使用 Electron 默认图标、无自动更新、未发布。
+
+**正式包安装/启动验收使用独立 Windows 测试用户或可恢复 VM。** 打包模式忽略 `STUDY_COMPANION_DATA_DIR` 与开发 URL；仅设置临时数据目录不能隔离个人 APPDATA。测试方先核对 SHA-256，再在隔离用户安装、手动从开始菜单启动，完成下方 [安装验收清单](docs/testing/packaging-acceptance.md)。不在个人用户下运行候选来试错迁移、恢复或卸载。升级前先保存输入、结束活动、退出并保留完整备份；未保存内容不会因安装自动保存。
+
+手动 `.github/workflows/package-windows.yml` 配置 npm ci、生产/NSIS 构建、七日候选 artifact，contents 只读；没有推送/标签/Release 步骤，本机包装明确 `publish: never`。此工作流未在远端执行；推送与发布都仍需用户明确授权。阶段 3/4、真实模型/检索失败案例与安装清单验收完成后，再准备版本标签、发布说明和已验证的下载入口；展示网站最后建设。
 
 验证命令：
 
@@ -435,6 +471,7 @@ embedding-models/          仍在根目录，未导出
 
 - **桌面与界面：**Electron、React、TypeScript、Vite。主进程负责文件、SQLite、密钥/模型请求；界面只调用明确桥接。保持沙箱、上下文隔离和 CSP。固定 `utilityProcess` 解析入口为 256 MB V8 堆/60 秒，检索与嵌入入口为 512 MB/5 分钟，均有进度与取消；堆限制不是总内存上限，进程隔离不是文件权限沙箱。
 - **主题/偏好：**已有 `app_settings.value` JSON新增受限theme字段，不新增表/IPC或存第二份localStorage。旧记录缺字段默认modern、非法现值拒绝；`themes.ts`共用选项/校验，`themes.css`集中配色，App依据实际偏好设置根属性。语义变量回退保留默认颜色，原有布局与资料正文/护眼不复制或改写；视觉不影响模型配置/回应风格/确认权限。
+- **Windows 分发：**`electron-builder.json` 集中 x64/ASAR/原生资源与当前用户 NSIS 配置；`package-desktop.mjs` 管唯一输出、来源与全文件/安装器摘要，`verify-package.mjs` 只检查包内容。正式 worker 使用 app.asar.unpacked 实体目录，开发模式保留原位置；appId、appName 与 APPDATA 约定保持稳定。构建不启动应用、不运行功能测试、不创建 Release；安装验收独立隔离，源代码构建与完整打包命令分开。
 - **阅读：**PDF.js 渲染 PDF 原页并提取可选文字，引用锚点至少保存文档 ID、页码和引用片段；Markdown 按标题层级渲染，引用锚点保存标题位置。导入时将原文件复制到应用数据目录，避免原路径移动后资料失效。
 - **本地数据：**主库版本 11 保存设置、资料/阅读、会话/证据、笔记/反馈、学习路线、记忆/选择快照与项目/任务及任务来源与专注记录，活动库仍为独立版本 1。升级前备份并事务迁移，v5～v11 迁移待独立验收；派生索引版本 2，重建不覆盖主库。
 - **笔记：**`src/lib/notes.ts` 集中四部分模板、限额和导出格式；`note-storage.ts` 只负责校验/SQL/版本冲突，`note-export.ts` 负责路径保护/文件替换；native 对话框只在主进程。笔记关联稳定资料 ID，正文只作为用户作品，不自动授权 Agent 或变成 RAG 证据。保存、删除、导出绑定 revision，冲突不覆盖新版本。
@@ -529,6 +566,8 @@ electron/
   core/models.ts        模型列表检测、超时和错误映射
   core/*.test.ts        本地数据与模型异常路径测试
 scripts/                桌面构建、开发启动及 PDF 本地资源准备
+  package-desktop.mjs   Windows x64 目录/NSIS候选，唯一输出、来源与文件摘要
+  verify-package.mjs    afterPack静态包检查，不启动应用/数据库/模型
   eval-retrieval.mjs    关键词或真实本地嵌入的固定对比评测
   download-embedding.mjs 开发评测权重缓存，独立于真实用户数据
 tests/desktop.spec.ts   真实 Electron 端到端测试
@@ -547,6 +586,9 @@ docs/testing/task-proposal-acceptance.md 单任务提议独立清单，含v10来
 docs/testing/focus-acceptance.md 任务番茄钟独立清单，含v11/计时中断/故障冻结/复盘
 docs/testing/backup-acceptance.md 完整备份独立清单，含两库往返/故障/重启切换/旧数据回退
 docs/testing/themes-acceptance.md 主题独立清单，含旧设置/保存/启动/语义色/护眼/备份/键盘
+docs/testing/packaging-acceptance.md 安装包清单，含隔离用户/VM、资源运行/安装升级卸载/数据保护
+electron-builder.json  Windows x64、ASAR解包、当前用户NSIS与禁止自动发布配置
+.github/workflows/package-windows.yml 手动候选构建/七日artifact，不创建Release
 .github/workflows/      Windows 构建与验证流程
 ```
 
@@ -606,7 +648,9 @@ docs/testing/themes-acceptance.md 主题独立清单，含旧设置/保存/启�
 #### 阶段 5：评测、发布与文档
 
 - [ ] 扩充 RAG 评测集，给出关键词检索与混合检索的对比、失败分析和可复现命令。
-- [ ] 做完整学习流程测试、异常路径测试、依赖与密钥检查，完成 Windows 安装包。
+- [x] Windows x64 目录包/NSIS 配置、固定 worker 路径、静态包内容检查及 Git/锁文件/SHA-256 构建清单已实现；本轮构建记录见文末。
+- [ ] 在独立 Windows 用户/VM 验收候选安装、升级、卸载、实际 ESM/原生运行资源及数据保护；包文件存在和构建成功不代替验收。
+- [ ] 做完整学习流程测试、异常路径测试、依赖与密钥检查，补齐真实生成/引用质量和代表性规模结果。
 - [ ] README 更新实际安装步骤、截图、已实现能力、已知限制；用 GitHub Release 发布经验证的版本。
 
 **验收：**新用户按 README 能安装并完成“导入资料 → 提问 → 写笔记 → 专注 → 复盘 → 备份”流程；发布包与对应 Git 标签一致。仓库当前为私有，任何公开发布动作须先确认仓库和资料可见性。
@@ -632,7 +676,7 @@ docs/testing/themes-acceptance.md 主题独立清单，含旧设置/保存/启�
 - 不要提交本机资料或本机的 `邻家大姐姐型_AI_陪伴人格_v6.md`；该文件不属于仓库文档。新出现的本地数据路径和密钥格式要及时加入 `.gitignore`。
 - **交接文档（README）与代码同步维护。** 写代码的同时更新 README；每个任务结束后，在"最近交付与验证记录"写清本次做了什么、改了哪些文件与模块、如何验证、遗留问题与下一步。项目的定位、已实现功能、技术方案、目录结构、运行命令等完整信息都随改动保持在 README 中，保证新接手者只读 README 就能继续。
 - 每次完成阶段任务，更新对应复选框、实际运行命令、验证结果与遗留问题。失败或未验证的项保持未勾选；不要把下一阶段的设想写成已交付。
-- **当前主线下一步：阶段5 Windows安装包构建与发布准备。** 项目/任务、路线提议、单轮番茄钟、完整备份/恢复及三种主题已实现待验收；主线继续实现与基础检查，功能与真实模型测试交其他对话，使用README及六份docs/testing清单。先接打包配置/资源路径与私有仓库内可复现的构建说明，安装包验证和公开发布另有门禁，不自动推送、发布或更改可见性。阶段3/4仍待独立验收，展示网站最后。
+- **当前主线下一步：会话与学习路线历史管理。** Windows候选构建/包内容检查已接入，实际安装/升级/卸载交测试对话，使用README及七份docs/testing清单；不在个人用户下运行正式包。主线补齐长期使用所需的历史管理，仍以小功能实现与基础检查为准，不运行功能或真实模型测试。阶段3/4、真实质量和安装验收未完成，不自动推送/标签/Release或改变私有状态；展示网站最后。
 - 用户要求：**每完成一个可用功能，向用户报告实际结果和验证情况。** 报告与 README 都应说明真实服务、模拟服务以及尚未验证的部分。
 - **测试以简单基础验证为准。** 每次功能开发完成后只做与该功能相关的简单基础验证（该功能能跑通、不影响既有开发即可），不用每次都跑完整测试套件或全局测验；完整回归仅在阶段验收、发布前等明确要求时执行。
 
@@ -714,7 +758,7 @@ docs/testing/themes-acceptance.md 主题独立清单，含旧设置/保存/启�
 - **检查与交接：**`npm run desktop:build`（双TypeScript检查、Vite与Electron构建）、17份本轮源码Prettier检查、diff检查通过；TypeScript与代码审查均未发现高置信问题。Vite仍提示已有大资源块，性能/安装包未验收。未新增/修改/执行功能测试，未启动应用、打开个人数据库或调用模型/收费服务。[独立验收清单](docs/testing/memory-acceptance.md) 全部待执行，覆盖v8保留/回滚、来源/冲突、单次确认/取消、外发范围、恢复、跨页竞争及900×640。两份交接文档同步维护，阶段未勾为已验收。
 - **Git、限制与下一步：**实现提交 `ffd4815` 在共享 `codex/structured-notes` 仅本地保存，未推送，保留其他对话改动。无记忆自动合并/提取/导出；未保存记忆可能在关闭/重载时丢失。下一步项目/每日任务基础，再接任务提议确认；不提前实现无限工具循环或展示网站。
 
-尚待独立验收：笔记、AI反馈、学习路线、记忆管理/确认、项目/任务、Agent任务提议、番茄钟、完整备份/恢复、三种主题及真实RAG质量。尚待开发：卡片/短测验、安装包和展示网站。后续继续补充真实验收记录。
+尚待独立验收：笔记、AI反馈、学习路线、记忆管理/确认、项目/任务、Agent任务提议、番茄钟、完整备份/恢复、三种主题、Windows候选包安装/运行及真实RAG质量。尚待开发：会话/路线历史管理、卡片/短测验和展示网站。后续继续补充真实验收记录。
 
 #### 2026-10-05：阶段 4 第一部分——学习项目与每日任务（实现完成，待独立验收）
 
@@ -763,6 +807,17 @@ docs/testing/themes-acceptance.md 主题独立清单，含旧设置/保存/启�
 - **本轮实际检查：**`npm run typecheck`、最终`npm run desktop:build`（renderer/Electron双TypeScript、Vite、main/preload与worker）、10份本轮源码及两份验收清单Prettier、暂存diff检查通过；TypeScript reviewer与code-reviewer静态批准。静态CSS比较确认既有样式只替换颜色/焦点环、两套新增主题的16个颜色槽均有定义；选定九种背景组合中，书房/游戏化正文与次要文字最低比率分别为8.25/4.86、8.90/5.15，不能当作全界面WCAG或真实视觉验收。Vite仍有已有大资源块警告（主JS976.06kB/gzip292.73kB，PDF worker2228.48kB），性能/安装包未测。
 - **验收交接：**[主题独立清单](docs/testing/themes-acceptance.md)全部未执行，覆盖旧JSON/非法输入、保存/失败/九种独立组合、全页面配色/危险语义色/阅读护眼、键盘/900×640/缩放、重启/重载及完整备份往返；[备份清单](docs/testing/backup-acceptance.md)追加主题兼容样本。没有新增/修改/运行功能测试，没有启动应用、打开数据库或请求真实/模拟模型；阶段3/4和首版仍未验收。
 - **Git与下一步：**实现`4ae853a`在共享`codex/structured-notes`仅本地提交，未推送；保留测试对话的未提交文档/脚本/资料。主线下一步为阶段5 Windows安装包配置、资源路径与可复现构建/发布说明；独立功能测试继续交其他对话，实际发布须经过验收和用户明确授权，展示网站最后建设。
+
+#### 2026-10-06：阶段 5 第一部分——Windows x64 候选构建与安装交接（构建完成，待安装验收）
+
+- **实现：**新增 electron-builder 配置、目录/NSIS npm 命令、唯一输出目录、来源/锁文件记录、包内容检查及文件 SHA-256；新增手动只读候选 CI。主进程固定 appId，并在正式包用真实解包路径启动解析/检索/备份 worker；开发模式与原 IPC/沙箱/数据目录规则保持。主库v11/活动v1/派生v2/完整备份format1不变，没有数据库或功能测试代码改动。
+- **依赖与维护：**仅新增固定开发工具 electron-builder26.15.3、@electron/asar4.3.1，锁文件新增281个包路径，原有依赖版本未变、生产依赖未变。采用Electron44.5.1现有预编译运行时、npmRebuild=false；生产依赖真实解包，保留PDF/ONNX/Sharp文件，不将模型权重、文档、测试、私人物品或学习数据放进包。Windows ASAR查询改用normalize，Sharp入口按现版本dist/index.mjs/cjs检查。
+- **构建与真实产物：**`npm run desktop:build` 与最终 `npm run desktop:dist`（双TypeScript/Vite/main/preload/worker/NSIS）通过；目录模式在生产构建后运行 `node scripts/package-desktop.mjs dir` 通过。两种包均静态核对5242项ASAR条目、三个解包worker、本地PDF及x64原生资源。目录清单包含4510个运行文件，共684504762字节（约652.79MiB），全文件摘要已写入；首次目录回执的HEAD为ef9bc9e且dirty=true，含当时未提交实现。NSIS回执HEAD为b86496c，dirty=true，保留共享文档修改，不称干净发布版本。
+- **本机候选路径：**完整目录为 `release/dir-1c23e4e6-f987-4f29-9918-d91c483a804b/win-unpacked/`；安装器为 `release/nsis-08b2e483-aafb-4b35-9a5f-ad1c84d6eb15/StudyCompanion-0.1.0-win-x64-setup.exe`，152043677字节（约145.00MiB）。独立 `Get-FileHash` 与同目录manifest/SHA256SUMS一致：`793c74ebbebdece7abc01da56f1096652412284d68f72d7ad26b929eeb945731`。`Get-AuthenticodeSignature` 为NotSigned；文件产品名拾知、版本0.1.0。上述本机产物已忽略、未上传或发布，后续构建使用新的UUID，不沿用此路径当永久下载地址。
+- **过程修正与边界：**先修正与本地builder schema不符的字段、Sharp实际入口及Windows ASAR路径；官方工具直连超时后临时使用现有代理，默认工具缓存EXDEV后改用已忽略的本机工具缓存。发现默认NSIS流程会执行临时卸载器生成stub，在编译该stub之前停止构建；新增固定版本、确切路径/空参数/单次调用的纯文件提取适配，未知/失败没有执行回退。最终日志确认卸载器纯提取一次、未执行任何安装器或学习软件；保留默认安装模板与体积校验。未关闭TLS/工具摘要验证，不安装C++工具，不清空系统缓存或学习数据。
+- **静态检查：**两份打包脚本语法、修改源码/配置与新增清单Prettier、diff检查通过；TypeScript reviewer与code-reviewer对资源路径、摘要范围、纯提取适配及边界增量批准。Vite已有超过500kB提示仍在（主JS976.06kB/gzip292.73kB，PDF worker2228.48kB）；未测安装后性能、内存或其他机器，未做依赖漏洞/许可完整审计。
+- **验收交接：**新增 [Windows安装包清单](docs/testing/packaging-acceptance.md)，全部未执行；涵盖干净克隆、来源/失败/包内容、隔离用户/VM的实际ESM/native运行、安装升级卸载/数据保护、全学习流程/备份恢复、远端手动CI及发布门禁。没有新增/修改/运行功能测试，没有启动应用/安装器、打开任何数据库或调用真实/模拟模型。当前为未签名、默认图标、无自动更新的候选；阶段3/4/5与首版仍未验收。
+- **Git与下一步：**实现 `b5a8234`、纯提取修正 `b86496c`，在共享 `codex/structured-notes` 仅本地提交，不推送/标签/Release、不更改可见性；保留其他对话的文档、脚本和第三方目录。主线下一步会话与学习路线历史管理；功能、安装与真实模型验收继续交其他对话。公开发布须有实际验收和用户明确授权，展示网站最后建设。
 
 ## 开发原则
 
