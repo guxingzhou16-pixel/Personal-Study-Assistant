@@ -3,7 +3,8 @@ import { execFileSync } from 'node:child_process';
 import { createHash, randomUUID } from 'node:crypto';
 import { createReadStream } from 'node:fs';
 import { mkdir, readdir, readFile, stat, writeFile } from 'node:fs/promises';
-import { basename, join, relative } from 'node:path';
+import { createRequire } from 'node:module';
+import { basename, join, relative, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const root = fileURLToPath(new URL('../', import.meta.url));
@@ -41,15 +42,51 @@ const output = join('release', `${mode}-${randomUUID()}`);
 await mkdir(output, { recursive: true });
 const infoPath = join(output, 'build-info.json');
 await writeFile(infoPath, JSON.stringify(buildInfo, null, 2) + '\n');
-const artifacts = await build({
-  targets: Platform.WINDOWS.createTarget([mode], Arch.x64),
-  config: {
-    ...config,
-    directories: { ...config.directories, output },
-    extraResources: [{ from: infoPath, to: 'build-info.json' }],
-  },
-  publish: 'never',
-});
+let restoreNsisExecution;
+let uninstallerExtractions = 0;
+if (mode === 'nsis') {
+  const require = createRequire(import.meta.resolve('electron-builder'));
+  if (require('app-builder-lib/package.json').version !== '26.15.3')
+    throw new Error('NSIS 纯文件提取仅适用于已核对的 builder 26.15.3，请先审查升级。');
+  const { WineVmManager } = require('app-builder-lib/out/vm/WineVm.js');
+  const { UninstallerReader } = require('app-builder-lib/out/targets/nsis/nsisUtil.js');
+  const originalExec = WineVmManager.prototype.exec;
+  const installer = resolve(output, `StudyCompanion-${metadata.version}-win-x64-setup.exe`);
+  // The default Windows build runs a stub to write its uninstaller. Use the same
+  // pure file extractor that this pinned builder uses on macOS; never run that EXE.
+  WineVmManager.prototype.exec = async function (file, args) {
+    if (
+      uninstallerExtractions !== 0 ||
+      resolve(file) !== installer ||
+      !Array.isArray(args) ||
+      args.length !== 0
+    )
+      throw new Error('打包器请求了未核对的程序执行，拒绝构建。');
+    await UninstallerReader.exec(installer, installer.replace(/\.exe$/, '.__uninstaller.exe'));
+    uninstallerExtractions++;
+    console.log('已从编译文件提取卸载器，未执行临时安装程序。');
+    return '';
+  };
+  restoreNsisExecution = () => {
+    WineVmManager.prototype.exec = originalExec;
+  };
+}
+let artifacts;
+try {
+  artifacts = await build({
+    targets: Platform.WINDOWS.createTarget([mode], Arch.x64),
+    config: {
+      ...config,
+      directories: { ...config.directories, output },
+      extraResources: [{ from: infoPath, to: 'build-info.json' }],
+    },
+    publish: 'never',
+  });
+  if (mode === 'nsis' && uninstallerExtractions !== 1)
+    throw new Error('卸载器纯提取次数与预期不符，不生成成功清单。');
+} finally {
+  restoreNsisExecution?.();
+}
 if (git('rev-parse', 'HEAD') !== buildInfo.gitCommit)
   throw new Error('构建期间 Git 提交已改变，请重新构建以记录准确来源。');
 let targets;
