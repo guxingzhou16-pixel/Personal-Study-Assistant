@@ -206,9 +206,18 @@
 - 普通首问只在标题为“新会话”时自动命名，已有自定义标题保持；重命名成默认哨兵仍按自动规则。没有单轮聊天删改、批量、回收站、路线改名、正文搜索或自动清理。
 - 最终`npm run desktop:build`（双TypeScript/Vite/Electron）、14份源码及新增清单Prettier、diff检查通过，两reviewer最终静态批准；Vite已有大块警告保留，性能/安装未验。独立清单`docs/testing/history-acceptance.md`全部未执行，未新增/修改/运行功能测试或应用/安装器/任何数据库/模型。已有候选包早于本次代码，正式包验收需指定提交重新构建并隔离用户/VM；阶段3/4/5和首版仍未验收。实现192d48b仅本地提交、保留他人改动；下一步有资料证据的卡片/短测验，网站最后。
 
-### 3.18 仍待开发或验收的主要能力
+### 3.18 已实现、待独立验收的知识卡片与短测验
 
-笔记、AI反馈、路线、记忆管理/确认、手动项目/任务、Agent任务提议、任务番茄钟、完整备份/恢复、三种主题与历史管理的独立验收，Windows候选安装/运行/升级/卸载、真实聊天/引用语义与规模验证；卡片/短测验、OCR、更多格式与展示网站待开发。安装包构建已接入，正式发布仍待验收与授权。
+- 2026-10-06：学习助手cards/quiz模式，主题/范围→一次本地检索→原文预览/配置绑定/远程同意→一次生成固定3项→翻面或本地作答/参考答案/出处。只以资料为依据，不自动评分、记掌握、创建任务或联动签到/时间；普通sources轮次加practiceRequest识别，复用普通会话管理，不进普通上下文或读取笔记/记忆/计划。
+- 主库v12只新增chat_turns.practice_request JSON与mode/快照互斥CHECK，旧NULL不改行/重建；v11升级前before-v12一致性备份，仍事务。活动v1/派生v2/format1不变，完整备份严格当前12/1，旧11/1文件夹本版拒绝，用对应旧版隔离恢复后升级；直接打开旧学习目录能迁移不代表恢复包兼容。实际迁移待测试，主线已报告此限制。
+- practice.ts管输入/恢复/主缓存10份10分钟与配置复核，发送只收会话UUID/预览ID/签名/确认；提示只本次请求/证据，空证据不调用模型或读密钥。src/lib/practice.ts共享固定3项、question500/answer2000/output10000、确切字段/唯一问题/实际非重复编号校验，生成完成/显示/备份统一；截断/无效/停止/中断保留原文，不补题/重试/自动评分，编号存在不保证语义准确。
+- ChatService可信上下文新增practice判别项，沿用两协议/单活动请求/500ms保存/退出恢复。PracticeResult纯文本、不执行HTML或图片，卡片答案默认隐藏；简答仅界面作答，不存数据库/导出/备份/网络，换会话/重载/关闭可能丢失。ChatPage配置或输入/范围/类型/会话改变撤销预览/同意与晚请求，取消IPC和检索都收口前不新开；保存A→B→A旧确认不复活。后台未消费缓存仍只代表其原始请求，不接受新正文。
+- 完整备份含请求/原始结果/证据，completed有证据的练习必须合法结构。历史空证据说明completed/sources/空数组允许revision=0保持旧行，其他零版本拒绝；新说明revision=1。Markdown保留练习类型/主题/范围/原始结果与出处，不导出本地作答或翻面状态；删除普通会话不改学习资料/作品/任务/记忆/专注。
+- 最终npm run desktop:build（双TypeScript/Vite/Electron）、17份源码及新增清单Prettier、diff通过，两reviewer增量静态批准；Vite既有大块提示保留，未测运行性能/安装。未新增/修改/运行测试代码或应用/安装器/任何数据库/模型，九份清单全部待独立执行，不称阶段或首版验收。实现`ba927da`仅本地提交、不推送，保留他人改动；旧候选包早于本轮，安装QA需重新固定提交构建并隔离Windows用户/VM。主线下一步学习闭环使用路径与发布准备收口，网站最后。
+
+### 3.19 仍待开发或验收的主要能力
+
+笔记、AI反馈、路线、记忆管理/确认、手动项目/任务、Agent任务提议、任务番茄钟、完整备份/恢复、三种主题、历史管理及卡片/短测验的独立验收，Windows候选安装/运行/升级/卸载、真实聊天/引用语义与规模验证；OCR、更多格式与展示网站待开发。安装包构建已接入，正式发布仍待验收与授权。
 
 独立合成集 `synthetic-retrieval-v2`（`tests/fixtures/retrieval-independent-cases.ts`）与逐题引用位置校验已加入可重复评测；多锚点召回在独立集上仍有失败（`ind-symmetric-hash`），保留为失败案例。真实本地/云端聊天仍未验收：本机未安装 Ollama，无法据此验证真实生成与引用语义。
 
@@ -298,7 +307,8 @@
 | `src/lib/backup.ts`、`useBackupState.ts` | 版本/大小/数量限额，常驻状态订阅与revision/处理中轮询；不自动重发写入 |
 | `src/components/NotesPage.tsx` | 笔记列表/四部分编辑、保存/另存、资料关联、导出/删除及草稿确认；切换页面保持挂载 |
 | `src/components/NoteFeedbackPanel.tsx` | 保存版本/证据预览、远程确认、流式/停止与反馈历史，旧版本提示、引用及返回笔记 |
-| `src/components/ModelAnswer.tsx` | 聊天/反馈共用安全 Markdown、受限引用；无 HTML、图片、外链执行 |
+| `src/components/ModelAnswer.tsx` | 聊天/反馈共用安全 Markdown；练习转交纯文本视图，均无 HTML、图片、外链执行 |
+| `src/components/PracticeResult.tsx`、`PracticeResult.css`、`src/lib/practice.ts` | 三项结构/真实编号校验、卡片翻面/界面简答/参考答案，纯文本且不评分/保存作答 |
 | `src/components/AgentPage.tsx`、`src/lib/learning.ts` | 目标/范围/预算、预览/确认、路线历史与人工执行入口；共享输入限额和比较 |
 | `src/components/MemoryPage.tsx`、`MemoryProposalPanel.tsx` | 记忆编辑/版本/范围/删除确认，学习意向提议的编辑/最终预览/确认/拒绝与实际结果 |
 | `src/lib/memories.ts` | 记忆限额/类别/范围文案与本机地址政策，主进程复用纯函数 |
@@ -310,7 +320,7 @@
 | `src/components/ReadingPage.tsx`、`PdfPage.tsx` | 原页/排版、引用复制、保存、受验证的出处跳转及资料问答入口 |
 | `src/components/RecentReadings.tsx` | 首页从主库读取实际最近阅读，不用示例数据 |
 | `src/components/StudyCalendar.tsx` | 已验收的日历、签到及学习计时界面 |
-| `src/components/ChatPage.tsx` | 普通/资料问答、检索预览、停止、绑定配置及预览的远程确认；用 revision 拒绝迟到更新 |
+| `src/components/ChatPage.tsx` | 普通/资料问答/练习、检索预览、停止、绑定配置及预览的远程确认；撤销迟到预览，用 revision 拒绝迟到更新 |
 | `src/components/EvidenceCards.tsx`、`src/lib/citations.ts` | 折叠原文与出处按钮；把有效编号转换为受限跳转，未知编号及外链不跳转 |
 | `src/lib/types.ts` | 共享数据类型、`DesktopApi`、`Reply<T>`、默认设置 |
 | `src/lib/desktop.ts` | 界面调用桌面桥接的唯一入口、错误文本与地址比较 |
@@ -320,7 +330,7 @@
 | `electron/main.ts` | 应用与窗口生命周期、IPC 注册、调用方校验、数据目录；当前也有学习心跳及睡眠暂停接入 |
 | `electron/preload.ts` | 沙箱内通过 `contextBridge` 暴露明确的桌面方法 |
 | `electron/core/settings.ts` | 运行时设置、地址、服务类型与模型配置校验 |
-| `electron/core/storage.ts` | 主库版本 11、迁移前备份，保留旧数据并新增专注记录；不改活动库版本 |
+| `electron/core/storage.ts` | 主库版本 12、迁移前备份，保留旧数据并新增可空练习请求；不改活动库版本 |
 | `electron/core/planning-storage.ts` | 项目/任务CRUD、来源恢复校验、revision/归档/完成边界与提议确认创建事务；不调用模型/活动计时 |
 | `electron/core/focus-storage.ts`、`focus.ts` | 独立专注表/来源快照/条件事务/恢复校验及单调计时/中断/故障冻结，不写活动库或任务进度 |
 | `electron/core/backup.ts`、`backup-runner.ts` | 原生选址/确认、维护锁/预览缓存、固定进程/取消/超时/等待退出与恢复重启 |
@@ -334,6 +344,7 @@
 | `src/components/HistoryActions.tsx`、`HistoryActions.css` | 会话/路线共用管理，原生确认入口、标题草稿/失败/真实回包 |
 | `electron/core/note-feedback.ts` | 保存版本/预览缓存/受控发送与反馈提示，复用检索/聊天，不信任手写依据 |
 | `electron/core/learning-agent.ts`、`learning-input.ts` | 一次检索/一次起草编排、请求缓存/提示；IPC 和恢复共用运行时校验，不分派模型工具命令 |
+| `electron/core/practice.ts` | v12列迁移、输入/恢复校验、完整练习请求及配置缓存、证据提示与受控发送 |
 | `electron/core/chat-storage.ts` | 普通/笔记会话、轮次/快照与异常中断恢复；专用会话不允许普通入口打开；通过 `Storage.chat` 共用主数据库 |
 | `electron/core/chat-stream.ts` | Ollama NDJSON / 兼容 OpenAI SSE、UTF-8 拆包、大小/超时边界与错误映射 |
 | `electron/core/chat.ts` | 单活动请求、设置/密钥快照、上下文、远程确认、停止、定期保存与退出处理 |
@@ -401,9 +412,11 @@
 
 笔记方法：`listNotes`、`getNote`、`saveNote`、`deleteNote`、`exportNote`、`setNoteDraftDirty`、`onShowNotes`。只接受 UUID、校验过的四部分/标题/来源 ID 和 revision，不接受导出路径。新笔记为 `id = null, revision = 0`，已有笔记须匹配保存版本；标题/正文在主进程校验，SQL 参数化。导出主进程读取已保存内容与来源名、显示 native 保存对话框，只允许 `.md`，校验目录链接后禁止应用数据目录，暂存完成后替换目标。正常关闭时 dirty 笔记默认继续编辑，明确放弃才能退出；事件只通知回笔记，不暴露 Electron event。Agent 不得借这些接口默认修改用户笔记。
 
-反馈方法：`listNoteFeedback(noteId)`、`prepareNoteFeedback(noteId, revision, question)`、`sendNoteFeedback({ retrievalId, expectedProfile, consentEndpoint? })`。范围来自保存笔记关联资料，未关联则全库；不接受自造正文/证据/角色/路径。预览核对检索期间与发送时版本，确认绑定实际配置/预览。复用停止/进度/更新/引用，无任意工具入口。`ChatService.send` 可信第二参数为主进程判别联合 `{ kind: 'note', note } | { kind: 'learning', request, memories }`，不能桥接。专用会话不进入普通列表/get/send，ChatPage只显示活动状态。
+反馈方法：`listNoteFeedback(noteId)`、`prepareNoteFeedback(noteId, revision, question)`、`sendNoteFeedback({ retrievalId, expectedProfile, consentEndpoint? })`。范围来自保存笔记关联资料，未关联则全库；不接受自造正文/证据/角色/路径。预览核对检索期间与发送时版本，确认绑定实际配置/预览。复用停止/进度/更新/引用，无任意工具入口。`ChatService.send` 可信第二参数为主进程判别联合 `{ kind: 'note', note } | { kind: 'learning', request, memories } | { kind: 'practice', request }`，不能桥接。专用会话不进入普通列表/get/send，ChatPage只显示活动状态。
 
 路线方法：`listLearningDrafts()`、`prepareLearningDraft({ goal, query, sourceId, minutes }, memoryIds?)`、`sendLearningDraft({ retrievalId, expectedProfile, consentEndpoint? })`。运行时限制字段/文本/来源/预算与最多5条记忆ID；请求/证据/记忆只从主进程预览读。输入/范围/预算/记忆/模型变化重新准备，成功send后预览不可重用；空证据不调用模型。提示只含本次目标/时间/检索词/片段/所选记忆，无旧历史/笔记/日历。主进程绑定实际模型签名并核对记忆范围，不能仅靠renderer checkbox保证隐私。停止/进度/更新/引用共用，新笔记仅导航。
+
+练习方法：`preparePractice({kind,topic,sourceId})`、`sendPractice({conversationId,retrievalId,expectedProfile,consentEndpoint?})`。主进程只缓存自身检索的确切请求/证据及模型签名，10份/10分钟，发送复核且成功才消费；不收renderer提示/答案/工具。普通chat用途允许sources练习，反馈/路线用途拒绝，普通上下文排除。界面撤销配置/输入/范围/类型/会话变化的旧预览与同意，取消与迟到成功按searchVersion失效；独立inFlight/cancelPending保证操作收口前不新开检索。主缓存未消费时仍仅代表其原请求，不声称所有界面编辑都广播删除缓存。空证据只保存本地说明；共用单活动模型管线/停止/500ms保存/恢复，完整三项结构通过才completed。
 
 记忆方法：`listMemories()`、`saveMemory({ id, revision, title, content, kind, scope })`、`deleteMemory(id, revision)`、`prepareMemoryProposal(turnId, edit?)`、`confirmMemoryProposal(proposalId)`、`discardMemoryProposal(proposalId)`。手动创建来源manual，编辑保留来源、不接受origin字段。提议edit只允许title/content/scope，最终内容/来源由主进程缓存；确认只收UUID，同步复核/写入后消费，取消/过期/重复不写。提议不是模型工具调用，已发送数据不能通过取消或删除撤回。
 
@@ -421,7 +434,7 @@
 
 | 文件或目录 | 内容与约束 |
 | --- | --- |
-| `study-companion.sqlite3` | 主库版本 11：保留设置/阅读/聊天/笔记/反馈/路线/记忆与项目/任务及来源，新增专注记录；v5～v11迁移待功能验收 |
+| `study-companion.sqlite3` | 主库版本 12：保留设置/阅读/聊天/笔记/反馈/路线/记忆与项目/任务及来源和专注，新增练习请求；v5～v12迁移待功能验收 |
 | `study-activity.sqlite3` | 已验收的独立学习活动数据库，版本 1、`study_days` 表；备份须与主库一同导出 |
 | `search-index.sqlite3` | 关键词版 v1；首次向量使用事务升级 v2，新增 `chunk_vectors`/`embedded_sources`，可重建、不代替原文 |
 | `embedding-models/` | 固定版本模型/配置与下载暂存；摘要校验，只是可重新下载缓存，不进 Git/学习备份 |
@@ -437,11 +450,12 @@
 | `study-companion.sqlite3.before-v9-*.sqlite3` | 版本8增加项目/任务前的一致性主库备份；失败不继续迁移，不自动删除 |
 | `study-companion.sqlite3.before-v10-*.sqlite3` | 版本9增加任务来源前的一致性主库备份；失败不继续迁移，不自动删除 |
 | `study-companion.sqlite3.before-v11-*.sqlite3` | 版本10增加专注记录前的一致性主库备份；失败不继续迁移，不自动删除 |
+| `study-companion.sqlite3.before-v12-*.sqlite3` | 版本11增加练习请求前的一致性主库备份；失败不继续迁移，不自动删除 |
 | `credentials.enc.json` | 独立密钥密文文件，按规范化地址的 SHA-256 键索引，不是学习备份内容 |
 | `active-learning.json`、`pending-restore.json` | 当前学习位置与等待启动的恢复记录；JSON最多4096字节、严格字段/UUID，临时写入flush后rename，不等于备份正文 |
 | `before-restore-UUID.json` | 准确旧active对象或null，结合保留的旧目录供退出应用后的手动回退；不可在运行中修改 |
 | `learning-restores/UUID/` | 恢复隔离副本，校验与候选库成功打开后成为活动学习目录；拒绝链接/硬链接，不自动清理旧数据 |
-| 外部 `拾知备份-时间-标识/` | format1清单、独立两库与全部sources；主库v11/活动v1，只恢复完整目录，不含密钥/模型/索引；未加密 |
+| 外部 `拾知备份-时间-标识/` | format1清单、独立两库与全部sources；主库v12/活动v1，只恢复完整目录，不含密钥/模型/索引；未加密 |
 
 数据库规则：
 
@@ -450,7 +464,7 @@
 - 当前迁移只有前向升级，无逆向迁移/自动恢复；不通过手改user_version降级。故障恢复先关闭应用、保留完整当前数据，再核对一致性备份与兼容应用版本；旧备份不含升级后的新记录。独立验收验证备份可读与回滚，不能在主线运行个人库恢复。
 - 拒绝用旧版本应用打开更新的数据格式；损坏设置应报错，不能悄悄重置成默认值。
 - 启动探测 FTS5；首次检索才增量建派生索引。DDL 与内容写入用事务，重建在新文件完成；不可直接重建主库。源文字不可变，新哈希成为新资料。
-- 未来迁移先读保留/备份规格，不能把版本11当空库重建。旧断言/桥接清单交测试方同步；降user_version模拟旧格式须还原真实结构，包含v5表、v6列/索引/外键、v7用途/快照/部分索引，低于v8时去掉记忆表/列/索引、低于v9时去掉项目/任务表/索引、v9夹具去掉v10来源列/约束、v10及更低夹具去掉v11专注表/索引，不用IF NOT EXISTS掩盖错误夹具。
+- 未来迁移先读保留/备份规格，不能把版本12当空库重建。旧断言/桥接清单交测试方同步；降user_version模拟旧格式须还原真实结构，包含v5表、v6列/索引/外键、v7用途/快照/部分索引，低于v8时去掉记忆表/列/索引、低于v9时去掉项目/任务表/索引、v9夹具去掉v10来源列/约束、v10及更低夹具去掉v11专注表/索引，v11及更低夹具去掉v12 practice_request列/约束，不用IF NOT EXISTS掩盖错误夹具。
 - 当前已有资料/阅读/聊天/证据、笔记/反馈、学习路线、记忆/提议及ProjectDraft/StudyProject/ProjectSaveRequest/TaskDraft/DailyTask/TaskSaveRequest/PlanningOverview/TaskProposalEdit/TaskProposalRequest/TaskProposal。笔记/反馈/路线/记忆/手动项目任务/任务提议与FocusSession/FocusOverview/FocusStartRequest/FocusAction/FocusEndReason已实现待测试。
 - 偏好JSON中的theme只接受modern/study/playful，缺字段旧数据补modern但不自动回写；已有非法值报错，不连同其他设置重置。与responseStyle独立，沿用saveSettings/Storage及备份校验，无schema迁移。软件回退可能不识别新增字段，先保留完整数据；不要为单个可兼容的JSON偏好升级表或手改版本号。
 - `notes` 保存 UUID、来源哈希、标题/四部分、revision 与创建/更新时间；关联来源采用外键，未来删除来源先设计笔记关联处理，不默默级联删除作品。导出读取保存快照，选址期间版本改变要拒绝导出。删除有确认、无回收站；原文依据为手动文字，不是可信检索证据。
@@ -460,8 +474,9 @@
 - v9 `study_projects` 保存标题/目标/archived/revision/时间，`daily_tasks` 保存内容、project_id可空RESTRICT外键、安排日期/预计分钟、status/完成时刻与revision/时间。CHECK约束todo对应NULL、completed对应非NULL；归档不删除历史任务。普通save保留完成状态，另存创建todo；完成只表示用户标记，无实际时长或知识证明。
 - v10 `daily_tasks` 新增origin/manual或learning-route、origin_turn_id、origin_turn_revision；manual必须双NULL，路线必须UUID/有效正版本，SQL组合约束及恢复校验同时维护。旧行manual，新手动/另存manual，编辑不接来源。来源不设轮次外键或级联，缺失来源不删除任务。确认创建用BEGIN IMMEDIATE复核完整项目快照/归档与总数并插入；失败回滚，不拿预览当已保存结果，不使用任务来源或完成状态作为模型新上下文。
 - v11 focus_sessions保存任务ID/revision/标题/日期快照、预算/实际elapsed、状态/终止原因、复盘及自身revision/时间。taskId为溯源标识不级联，只有一个running/paused，恢复中断旧活动。正常心跳计满与睡眠/故障/退出中断分开；复盘不改状态/时长/任务。不要将专注加入首页study_ms，否则同时开启会重复计时；完整备份包含主库专注，排除密钥。
+- v12 practice_request可空JSON，非空必须sources且与笔记/路线/记忆快照互斥，旧行NULL不改写。仅普通purpose=chat会话可有练习；ChatStorage与备份恢复同步验用途。请求kind/topic/sourceId共用运行时校验，completed且有证据需共享严格三项/真实编号解析；停止/失败/中断保留原文。旧completed/sources/空证据说明可能revision=0，备份仅此窄例外接受，新终态写revision=1，其余零版本拒绝。
 - 完整备份是独立功能，不是仅主库的迁移前备份。业务暂停写入时SQLite backup API生成两库一致性快照、保留rowid；清单最后写。严格校验全sqlite_schema、版本/quick_check/外键、运行时记录与九类数量，不执行外部schema。每库2GiB/总50GiB/资料10000份/清单3MiB，资料仍受导入限额；复制分块256KiB、fsync，取消先等worker退出。散列只核对完整性，不证明来源可信。
-- `schemaDefinition()` 仅主进程/固定worker用于备份的当前schema对照，不暴露给renderer。未来数据库迁移必须同步备份版本/结构兼容政策与验收，不能只改backupLimits版本号来绕过校验或假称旧包兼容。已保存阅读位置只允许page/anchor/offset/zoom/tone五键，证据JSON须完整校验，不让成功恢复后正常读取/保存崩溃。
+- `schemaDefinition()` 仅主进程/固定worker用于备份的当前schema对照，不暴露给renderer。当前format1仅支持主库12/活动1；旧11/1文件夹由对应旧版在隔离环境恢复再升级，直接打开旧学习目录能迁移不代表恢复包兼容。未来数据库迁移必须同步备份版本/结构兼容政策与验收，不能只改backupLimits版本号来绕过校验或假称旧包兼容。已保存阅读位置只允许page/anchor/offset/zoom/tone五键，证据JSON须完整校验，不让成功恢复后正常读取/保存崩溃。
 - 恢复前再次验证隔离副本，原子pending为确认消费边界；启动先校验/打开候选两库，再保存准确旧active并原子切换。active提交成功后不能按旧位置初始化Files/Search；剩余pending与active同ID只清理，不重复。切换前失败保留旧目录且隔离pending，当前位置损坏/库缺失拒绝空库fallback。只能删除本次未活动/未等待的UUID子目录，不能递归移除根目录、用户选择父目录或历史活动目录。强退遗留和旧目录不自动删，手动回退见README。
 - 聊天轮次状态为 `streaming/completed/stopped/error/interrupted`，保存部分回答与错误提示。主进程退出先取消聊天并保存，再关库；重启将残留的 streaming 标记为 interrupted。保存失败须向界面报告，不能冒充成功。单会话限 100 轮、会话总数限 500，未来会话管理/清理需保留恢复边界。
 - 来源锚点为 `page-N` 或 `md-line-N`，绑定内容哈希。资料问答轮次保存证据编号、资料名/类型、标题/页码/行号、UTF-16 偏移与原文；打开核对保存原文、元数据和副本哈希，不猜位置。复制 URI 尚未注册系统协议；应用内引用编号走受限 IPC，不依赖系统协议。
@@ -544,7 +559,7 @@ React 界面支持热更新；修改 `electron/` 或 preload 后重启桌面开�
 
 ## 11. 验证方法与测试要求
 
-**当前分工（用户2026-10-04指定，本轮延续）：主线实现与类型/构建/包文件基础检查；功能、安装及真实模型验收交其他对话。** 笔记/反馈/路线/记忆/项目任务/任务提议/番茄钟/完整备份恢复/主题、历史管理与Windows包均未运行功能/安装测试或改规格；`docs/testing/`中的`memory-acceptance.md`、`planning-acceptance.md`、`task-proposal-acceptance.md`、`focus-acceptance.md`、`backup-acceptance.md`、`themes-acceptance.md`、`packaging-acceptance.md`、`history-acceptance.md`八份详细清单是交接，未执行。测试方补齐v5～v11真实结构迁移/保留、CRUD/冲突/关联、导出/取消、协议/确认/恢复/引用、记忆隐私、提议单次确认/事务与任务状态和计时签到隔离、两库完整往返/启动切换/磁盘故障/回退、主题旧JSON/保存/重启/配色/护眼/键盘/缩放以及隔离用户/VM内安装/原生资源运行/升级/卸载数据保护，更新旧断言/桥接清单；构建成功不等于功能通过。
+**当前分工（用户2026-10-04指定，本轮延续）：主线实现与类型/构建/包文件基础检查；功能、安装及真实模型验收交其他对话。** 笔记/反馈/路线/记忆/项目任务/任务提议/番茄钟/完整备份恢复/主题、历史管理、练习与Windows包均未运行功能/安装测试或改规格；`docs/testing/`中的`memory-acceptance.md`、`planning-acceptance.md`、`task-proposal-acceptance.md`、`focus-acceptance.md`、`backup-acceptance.md`、`themes-acceptance.md`、`packaging-acceptance.md`、`history-acceptance.md`、`practice-acceptance.md`九份详细清单是交接，未执行。测试方补齐v5～v12真实结构迁移/保留、CRUD/冲突/关联、导出/取消、协议/确认/恢复/引用、记忆隐私、提议单次确认/事务与任务状态和计时签到隔离、两库完整往返/启动切换/磁盘故障/回退、主题旧JSON/保存/重启/配色/护眼/键盘/缩放以及练习三项结构/真实编号/语义核对/翻面作答/迟到取消/12与11备份兼容，隔离用户/VM内安装/原生资源运行/升级/卸载数据保护，更新旧断言/桥接清单；构建成功不等于功能通过。
 
 日常开发以当前功能的基础验证为准，选择最小但有效的检查。纯文档改动核对事实、路径、命令和 diff 即可，不启动桌面或完整测试。与代码无关的已有 RED 规格要记录，不借文档任务扩大范围修复。
 
@@ -598,14 +613,14 @@ npx playwright test tests/rag.spec.ts
 | 0 | 桌面骨架、数据库、空资料库、偏好保存 | 历史验收已完成，新增改动按实际情况再验证 |
 | 1 | PDF/Markdown 导入与阅读，基础版本已交付 | 去重、损坏反馈、原文件复制、原页/排版、重启位置恢复、扫描件提示、取消与引用复制 |
 | 2 | 聊天协议、可追溯 RAG、本地嵌入/混合检索与对比已交付；真实聊天质量待做 | 本地/云端真实同资料问答、引用语义质量、独立数据、规模与安装包 |
-| 3 | 笔记/反馈/固定路线/记忆管理与确认已实现，独立验收仍待完成 | 独立写笔记、有出处、取消不写入、删除不再新使用、本机记忆不外发 |
+| 3 | 笔记/反馈/固定路线/记忆管理与确认、卡片/短测验及历史管理已实现，独立验收仍待完成 | 独立写笔记、有出处、取消不写入、删除不再新使用、本机记忆不外发 |
 | 4 | 手动项目/每日任务、Agent单任务确认、任务番茄钟、完整备份恢复及三种主题已实现待验收 | 数据重启恢复、确认才写/来源可追溯、任务不混签到时长、中断不误完成、备份往返且无密钥、主题对比/键盘/护眼 |
 | 5 | Windows候选构建/静态资源检查/来源摘要已实现；全流程、RAG质量和安装/发布待验收 | 隔离用户/VM验安装升级卸载和学习闭环、发布包对应 Git 标签、公开发布有授权 |
 | 6 | 静态展示网站 | 软件稳定后才建设，展示真实功能、评测与下载 |
 
 用户 2026-10-04 将测试安排到其他对话，主线进入阶段 3；阶段 2 的未验收项继续保留。测试对话可继续独立验收，不为机械阶段编号停止主线实现；不冒称整阶段或首版已完成。
 
-主线下一步为有资料证据的知识卡片与短测验。Windows候选构建已接入，实际安装/升级/卸载仍交独立测试；正式包必须隔离Windows用户/VM。项目任务/提议/番茄钟/完整备份恢复/主题/历史管理已实现待验收；主线实现与基础检查，功能/安装/真实模型测试继续交其他对话，使用README及八份docs/testing清单。发布须实际验收且对应Git版本，不自动推送/标签/Release或改变私有状态；保留质量失败与确认边界，不因构建通过勾阶段3/4/5或首版，网站最后。
+主线下一步为首版学习闭环的使用路径与发布准备收口，不默认扩展OCR/更多格式/无限工具循环。核心计划功能已接入不等于首版通过验收。Windows候选构建已接入，实际安装/升级/卸载仍交独立测试；正式包必须隔离Windows用户/VM。项目任务/提议/番茄钟/完整备份恢复/主题/历史管理/练习已实现待验收；主线实现与基础检查，功能/安装/真实模型测试继续交其他对话，使用README及九份docs/testing清单。发布须实际验收且对应Git版本，不自动推送/标签/Release或改变私有状态；保留质量失败与确认边界，不因构建通过勾阶段3/4/5或首版，网站最后。
 
 ## 14. Git、隐私与协作流程
 
