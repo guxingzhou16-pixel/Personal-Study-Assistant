@@ -196,9 +196,19 @@
 - `npm run desktop:build`与最终`npm run desktop:dist`、生产构建后的目录命令通过；两份包静态检查5242项条目，目录4510文件/684504762字节均有摘要，NSIS152043677字节/约145MiB，独立哈希与清单一致、签名NotSigned。纯提取实际执行一次且无运行回退，仍不证明安装或原生进程可用。候选UUID/来源/摘要见README，dir为提交前ef9bc9e+dirty、NSIS为b86496c+dirty，不冒称干净发布版本。
 - 实现 `b5a8234`、纯提取修正`b86496c`仅本地提交、不推送；脚本语法、修改源码/配置与新增清单格式、diff通过，两个reviewer增量静态批准。没有新增/修改/运行功能测试、启动应用或安装器、访问任何数据库/模型；既有Vite大块提示保留，运行性能/安装/真实质量/远端CI未验证。阶段3/4/5与首版不因此勾成已验收；保留其他对话的文档/脚本/资料，主线下一步会话与路线历史管理，网站最后。
 
-### 3.17 仍待开发或验收的主要能力
+### 3.17 已实现、待独立验收的会话与学习路线历史管理
 
-笔记、AI反馈、路线、记忆管理/确认、手动项目/任务、Agent任务提议、任务番茄钟、完整备份/恢复与三种主题的独立验收，Windows候选安装/运行/升级/卸载、真实聊天/引用语义与规模验证；会话/路线管理、卡片/短测验、OCR、更多格式与展示网站待开发。安装包构建已接入，正式发布仍待验收与授权。
+- 2026-10-06：普通/资料问答会话按标题搜索、改名、原生确认删除/Markdown导出；单份路线删除/导出，默认取消、无回收站。目标生成中拒绝，不停止其他活动回答；删除不改资料/阅读/笔记/任务/记忆/专注或已发远程数据，旧备份/导出仍保留记录。
+- 无迁移/依赖，主v11/活动v1/派生v2/备份format1保持。`HistoryService`运行时kind/UUID/用途/64位确切内容版本校验，普通管理只purpose=chat，路线只有learningRequest的learning-agent轮次；同步写入前重读。原生确认后、导出选址后/暂存后再次verify，历史锁双向排除笔记导出并临时阻止新生成；不桥接任意路径/SQL/消息正文。
+- 路线删除只删所选turn，保留单例会话/其他草稿；已有任务/记忆保留来源UUID/revision，旧来源入口明确缺失；尚未确认提议由现有服务重读来源拒绝写入，不拿组件隐藏当撤销已发确认。删除释放相应容量，不自动清理或修改其它进度。
+- `HistoryActions`共用操作，改名失败保留标题、重新核对版本不清草稿；按ID回报实际写入，即使切页仍通知父页面。Chat刷新核对读取前打开记录，Agent以真实列表清除读取前已知缺失ID；tombstone防迟到get/list/update/seen缓存复活，也允许当次新生成更新。应答丢失先刷新核对，不自动重发；未保存标题可能因换会话/重载丢弃。
+- `history-markdown.ts`只用保存快照：问题/部分回答/状态/模型/时间、原文/锚点/UTF16偏移、路线请求/记忆。用户/模型文本以足够长字面围栏导出，文件未加密、无应用密钥/密文、不代替恢复；正文中自写秘密不会被过滤。共用markdown-export保留note-export包装/错误规则，路径禁止数据根后代，不新增任意文件能力。
+- 普通首问只在标题为“新会话”时自动命名，已有自定义标题保持；重命名成默认哨兵仍按自动规则。没有单轮聊天删改、批量、回收站、路线改名、正文搜索或自动清理。
+- 最终`npm run desktop:build`（双TypeScript/Vite/Electron）、14份源码及新增清单Prettier、diff检查通过，两reviewer最终静态批准；Vite已有大块警告保留，性能/安装未验。独立清单`docs/testing/history-acceptance.md`全部未执行，未新增/修改/运行功能测试或应用/安装器/任何数据库/模型。已有候选包早于本次代码，正式包验收需指定提交重新构建并隔离用户/VM；阶段3/4/5和首版仍未验收。实现192d48b仅本地提交、保留他人改动；下一步有资料证据的卡片/短测验，网站最后。
+
+### 3.18 仍待开发或验收的主要能力
+
+笔记、AI反馈、路线、记忆管理/确认、手动项目/任务、Agent任务提议、任务番茄钟、完整备份/恢复、三种主题与历史管理的独立验收，Windows候选安装/运行/升级/卸载、真实聊天/引用语义与规模验证；卡片/短测验、OCR、更多格式与展示网站待开发。安装包构建已接入，正式发布仍待验收与授权。
 
 独立合成集 `synthetic-retrieval-v2`（`tests/fixtures/retrieval-independent-cases.ts`）与逐题引用位置校验已加入可重复评测；多锚点召回在独立集上仍有失败（`ind-symmetric-hash`），保留为失败案例。真实本地/云端聊天仍未验收：本机未安装 Ollama，无法据此验证真实生成与引用语义。
 
@@ -279,6 +289,7 @@
 | `scripts/package-desktop.mjs`、`verify-package.mjs` | 唯一候选目录/打包开始来源与全文件/安装器摘要、afterPack静态资源检查；不启动应用/安装器/数据库/模型 |
 | `.github/workflows/package-windows.yml` | 手动Windows候选构建和七日artifact，contents只读，不推送/标签/Release |
 | `docs/testing/packaging-acceptance.md` | 隔离Windows用户/VM的安装/运行/升级/卸载与发布门禁交接，全部待执行 |
+| `docs/testing/history-acceptance.md` | 历史权限/确切版本/删除影响/来源保留/应答丢失/导出交接，全部待执行 |
 | `src/App.tsx` | 工作台、导航、启动加载、页面切换和学习首页 |
 | `src/components/SettingsPage.tsx` | 偏好及模型表单、连接检测、密钥操作；输入密钥只作必要的临时传递 |
 | `src/lib/themes.ts`、`src/themes.css` | 三种主题ID/文案/枚举与配色/控件；Settings选择草稿，App依据实际保存偏好设置根属性，不存第二份数据 |
@@ -318,7 +329,9 @@
 | `electron/core/task-proposals.ts` | 保存路线单任务提议缓存、来源/项目复核与单次确认，不解析模型输出或调用新模型请求 |
 | `electron/core/memory-storage.ts`、`memory-proposals.ts` | 记忆CRUD/恢复校验、来源/版本/使用复核，学习意向预览缓存与单次确认 |
 | `electron/core/note-storage.ts` | 笔记表/校验/CRUD、关联来源存在检查与 revision 冲突；不调用模型 |
-| `electron/core/note-export.ts` | Markdown 选址后的路径保护/暂存替换，不给 renderer 任意路径能力 |
+| `electron/core/note-export.ts`、`markdown-export.ts` | 既有笔记包装及共用Markdown文件名/路径保护/暂存替换，不给 renderer 任意路径能力 |
+| `electron/core/history.ts`、`history-markdown.ts` | 保存历史用途/生成/确切版本守卫、改名/删除与字面快照导出 |
+| `src/components/HistoryActions.tsx`、`HistoryActions.css` | 会话/路线共用管理，原生确认入口、标题草稿/失败/真实回包 |
 | `electron/core/note-feedback.ts` | 保存版本/预览缓存/受控发送与反馈提示，复用检索/聊天，不信任手写依据 |
 | `electron/core/learning-agent.ts`、`learning-input.ts` | 一次检索/一次起草编排、请求缓存/提示；IPC 和恢复共用运行时校验，不分派模型工具命令 |
 | `electron/core/chat-storage.ts` | 普通/笔记会话、轮次/快照与异常中断恢复；专用会话不允许普通入口打开；通过 `Storage.chat` 共用主数据库 |
@@ -379,6 +392,8 @@
 资料方法：`listSources`、`importSources`、`cancelImport`、`onImportProgress`、`openSource`、`saveReadingPosition`、`copyCitation`。界面只能提供校验过的 SHA-256 资料 ID 和受限位置，导入路径由主进程原生对话框选择；不暴露任意路径、任意频道或剪贴板读取。preload 将进度事件只转换为数据，返回取消监听函数。
 
 聊天方法：`listConversations`、`createConversation`、`getConversation`、`sendChat`、`stopChat`、`activeChat`、`onChatUpdate`。请求只接受会话 UUID、问题、目标确认地址、模型配置签名和可选 `retrievalId`；实际设置、密钥、预览在主进程读取，界面不能传消息角色、系统提示或自造证据。`onChatUpdate` 只传轮次并提供取消监听；`revision` 单调增加，旧事件不得覆盖新文本/终止状态。页面切换时组件保持挂载；全应用只有一个活动模型请求。
+
+历史方法：`previewHistory({ kind, id })`、`renameConversation(id, version, title)`、`deleteHistory(target, version)`、`exportHistory(target, version)`。kind只有conversation/learning；version由主进程对完整保存内容生成，不能把renderer回传的标题/答案/证据当预览。操作复核用途与目标无活动生成；删除必须主进程原生默认取消确认并再次verify。删除来源不级联任务/记忆，缺失来源允许导出/备份。导出只有原生选址路径，返回取消/文件名，不暴露路径。新的数据库写入入口应维护历史锁和快照核对；重启恢复后UI删除tombstone重新建立，不持久污染恢复的历史。
 
 检索方法：`prepareQuestion(question, sourceId | null)`、`cancelRetrieval`、`rebuildIndex`、`onRetrievalProgress`、`resolveCitation(turnId, number)`。只接受受限问题、资料哈希、保存轮次 UUID 和整数编号；主进程持有实际范围/片段，缓存上限 10 份、10 分钟有效，问题变化须重新检索。取消只结束索引子进程，不修改原资料/主库；新索引完成后同步原子替换旧文件。引用解析从保存轮次查证，不接受 renderer 提供路径、锚点或原文。进度订阅只传数据并返回取消监听函数。
 
@@ -529,7 +544,7 @@ React 界面支持热更新；修改 `electron/` 或 preload 后重启桌面开�
 
 ## 11. 验证方法与测试要求
 
-**当前分工（用户2026-10-04指定，本轮延续）：主线实现与类型/构建/包文件基础检查；功能、安装及真实模型验收交其他对话。** 笔记/反馈/路线/记忆/项目任务/任务提议/番茄钟/完整备份恢复/主题与Windows包均未运行功能/安装测试或改规格；`docs/testing/`中的`memory-acceptance.md`、`planning-acceptance.md`、`task-proposal-acceptance.md`、`focus-acceptance.md`、`backup-acceptance.md`、`themes-acceptance.md`、`packaging-acceptance.md`七份详细清单是交接，未执行。测试方补齐v5～v11真实结构迁移/保留、CRUD/冲突/关联、导出/取消、协议/确认/恢复/引用、记忆隐私、提议单次确认/事务与任务状态和计时签到隔离、两库完整往返/启动切换/磁盘故障/回退、主题旧JSON/保存/重启/配色/护眼/键盘/缩放以及隔离用户/VM内安装/原生资源运行/升级/卸载数据保护，更新旧断言/桥接清单；构建成功不等于功能通过。
+**当前分工（用户2026-10-04指定，本轮延续）：主线实现与类型/构建/包文件基础检查；功能、安装及真实模型验收交其他对话。** 笔记/反馈/路线/记忆/项目任务/任务提议/番茄钟/完整备份恢复/主题、历史管理与Windows包均未运行功能/安装测试或改规格；`docs/testing/`中的`memory-acceptance.md`、`planning-acceptance.md`、`task-proposal-acceptance.md`、`focus-acceptance.md`、`backup-acceptance.md`、`themes-acceptance.md`、`packaging-acceptance.md`、`history-acceptance.md`八份详细清单是交接，未执行。测试方补齐v5～v11真实结构迁移/保留、CRUD/冲突/关联、导出/取消、协议/确认/恢复/引用、记忆隐私、提议单次确认/事务与任务状态和计时签到隔离、两库完整往返/启动切换/磁盘故障/回退、主题旧JSON/保存/重启/配色/护眼/键盘/缩放以及隔离用户/VM内安装/原生资源运行/升级/卸载数据保护，更新旧断言/桥接清单；构建成功不等于功能通过。
 
 日常开发以当前功能的基础验证为准，选择最小但有效的检查。纯文档改动核对事实、路径、命令和 diff 即可，不启动桌面或完整测试。与代码无关的已有 RED 规格要记录，不借文档任务扩大范围修复。
 
@@ -590,7 +605,7 @@ npx playwright test tests/rag.spec.ts
 
 用户 2026-10-04 将测试安排到其他对话，主线进入阶段 3；阶段 2 的未验收项继续保留。测试对话可继续独立验收，不为机械阶段编号停止主线实现；不冒称整阶段或首版已完成。
 
-主线下一步为会话与学习路线历史管理。Windows候选构建已接入，实际安装/升级/卸载仍交独立测试；正式包必须隔离Windows用户/VM。项目任务/提议/番茄钟/完整备份恢复/主题已实现待验收；主线实现与基础检查，功能/安装/真实模型测试继续交其他对话，使用README及七份docs/testing清单。发布须实际验收且对应Git版本，不自动推送/标签/Release或改变私有状态；保留质量失败与确认边界，不因构建通过勾阶段3/4/5或首版，网站最后。
+主线下一步为有资料证据的知识卡片与短测验。Windows候选构建已接入，实际安装/升级/卸载仍交独立测试；正式包必须隔离Windows用户/VM。项目任务/提议/番茄钟/完整备份恢复/主题/历史管理已实现待验收；主线实现与基础检查，功能/安装/真实模型测试继续交其他对话，使用README及八份docs/testing清单。发布须实际验收且对应Git版本，不自动推送/标签/Release或改变私有状态；保留质量失败与确认边界，不因构建通过勾阶段3/4/5或首版，网站最后。
 
 ## 14. Git、隐私与协作流程
 
