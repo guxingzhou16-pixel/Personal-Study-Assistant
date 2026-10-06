@@ -13,6 +13,7 @@ import { PlanningStorage } from './planning-storage';
 import { FocusStorage } from './focus-storage';
 import { ChatStorage, chatId } from './chat-storage';
 import { DOCUMENT_LIMITS, sourceId } from './documents';
+import { parsePractice } from '../../src/lib/practice';
 
 export const MAIN_DATABASE = 'study-companion.sqlite3';
 export const ACTIVITY_DATABASE = 'study-activity.sqlite3';
@@ -168,7 +169,14 @@ export function inspectDatabases(directory: string): {
       const turn = chat.getTurn(row.id);
       chatId(turn.id);
       chatId(turn.conversationId);
-      integer(turn.revision, 1, Number.MAX_SAFE_INTEGER - 1);
+      // Older releases saved local empty-evidence explanations with revision 0; preserve them.
+      const legacyExplanation =
+        turn.status === 'completed' &&
+        turn.mode === 'sources' &&
+        !turn.practiceRequest &&
+        Array.isArray(turn.evidence) &&
+        turn.evidence.length === 0;
+      integer(turn.revision, legacyExplanation ? 0 : 1, Number.MAX_SAFE_INTEGER - 1);
       text(turn.question, 4000, false);
       text(turn.answer, 64000);
       text(turn.notice, 64000);
@@ -186,11 +194,17 @@ export function inspectDatabases(directory: string): {
           (turn.mode !== 'sources' ||
             !turn.noteSnapshot ||
             turn.noteSnapshot.id !== parent.note_id ||
-            turn.learningRequest)) ||
+            turn.learningRequest ||
+            turn.practiceRequest)) ||
         (parent.purpose === 'learning-agent' &&
-          (turn.mode !== 'sources' || !turn.learningRequest || turn.noteSnapshot))
+          (turn.mode !== 'sources' ||
+            !turn.learningRequest ||
+            turn.noteSnapshot ||
+            turn.practiceRequest))
       )
         invalid('回答快照与所属会话用途不一致。');
+      if (turn.practiceRequest && turn.status === 'completed' && turn.evidence.length)
+        parsePractice(turn.answer, turn.evidence);
       validateProvider(turn.provider);
       validateProfile({ baseUrl: turn.baseUrl, model: turn.model });
     }

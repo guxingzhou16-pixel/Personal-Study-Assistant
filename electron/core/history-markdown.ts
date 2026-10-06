@@ -1,4 +1,5 @@
 import type { ChatTurn, HistoryPreview } from '../../src/lib/types';
+import { practiceLabels } from '../../src/lib/practice';
 
 const statusLabels: Record<ChatTurn['status'], string> = {
   streaming: '生成中',
@@ -32,9 +33,16 @@ export function historyMarkdown(preview: HistoryPreview, turns: ChatTurn[]): str
       literal(turn.answer),
       '### 模型与提示',
       literal(
-        `方式：${turn.mode === 'sources' ? '资料问答' : '普通聊天'}\n服务：${turn.provider}\n地址：${turn.baseUrl}\n模型：${turn.model}\n${turn.notice}`,
+        `方式：${turn.practiceRequest ? practiceLabels[turn.practiceRequest.kind] : turn.mode === 'sources' ? '资料问答' : '普通聊天'}\n服务：${turn.provider}\n地址：${turn.baseUrl}\n模型：${turn.model}\n${turn.notice}`,
       ),
     );
+    if (turn.practiceRequest)
+      parts.push(
+        '### 练习请求',
+        literal(
+          `类型：${practiceLabels[turn.practiceRequest.kind]}\n主题：${turn.practiceRequest.topic}\n资料标识：${turn.practiceRequest.sourceId ?? '全部资料'}\n每次3项，作答/翻面状态未保存，不代表知识掌握。`,
+        ),
+      );
     if (turn.learningRequest) {
       const request = turn.learningRequest;
       parts.push(

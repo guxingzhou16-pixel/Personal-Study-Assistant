@@ -5,6 +5,7 @@ import type {
   StudyNote,
   LearningRequest,
   StudyMemory,
+  PracticeRequest,
 } from '../../src/lib/types';
 import type { Storage } from './storage';
 import type { Credentials } from './credentials';
@@ -14,10 +15,13 @@ import { chatId } from './chat-storage';
 import { streamChat, type ChatMessage, type StreamRequest } from './chat-stream';
 import { noteFeedbackMessages } from './note-feedback';
 import { learningMessages } from './learning-agent';
+import { practiceMessages } from './practice';
+import { parsePractice } from '../../src/lib/practice';
 
 type LearningContext =
   | { kind: 'note'; note: StudyNote }
-  | { kind: 'learning'; request: LearningRequest; memories: StudyMemory[] };
+  | { kind: 'learning'; request: LearningRequest; memories: StudyMemory[] }
+  | { kind: 'practice'; request: PracticeRequest };
 
 interface ActiveChat {
   turn: ChatTurn;
@@ -38,7 +42,7 @@ export class ChatService {
     storage.chat.recover();
   }
 
-  // Trusted context comes only from the main-process feedback or learning workflow.
+  // Trusted context comes only from main-process feedback, learning or practice workflows.
   send(input: unknown, context?: LearningContext): ChatTurn {
     if (this.closed) throw new AppError('chatClosed', '聊天服务已关闭，请重启应用。');
     if (this.active) throw new AppError('chatBusy', '请先停止当前回答，再发送新问题。');
@@ -61,6 +65,7 @@ export class ChatService {
     const noteSnapshot = context?.kind === 'note' ? context.note : undefined;
     const learningRequest = context?.kind === 'learning' ? context.request : undefined;
     const learningMemories = context?.kind === 'learning' ? context.memories : undefined;
+    const practiceRequest = context?.kind === 'practice' ? context.request : undefined;
     const existing = noteSnapshot
       ? this.storage.chat.findNoteConversation(noteSnapshot.id)
       : learningRequest
@@ -84,7 +89,7 @@ export class ChatService {
       evidence = this.retrieval.consume(request.retrievalId, question);
     }
     if (context && !evidence)
-      throw new AppError('retrieval', '笔记反馈或学习路线必须先准备资料证据。');
+      throw new AppError('retrieval', '笔记反馈、学习路线或练习必须先准备资料证据。');
     const needsModel = !evidence || evidence.hits.length > 0;
     if (needsModel && !profile.model)
       throw new AppError('model', '请先在设置中选择并保存聊天模型。');
@@ -96,7 +101,9 @@ export class ChatService {
           ? '模型设置已变化，请重新确认当前模型后再生成反馈。'
           : learningRequest
             ? '模型设置已变化，请重新确认当前模型后再起草学习路线。'
-            : '模型设置已变化，请重新打开聊天页确认后再发送。',
+            : practiceRequest
+              ? '模型设置已变化，请重新准备练习证据。'
+              : '模型设置已变化，请重新打开聊天页确认后再发送。',
       );
     const remote = !['localhost', '127.0.0.1', '[::1]'].includes(new URL(profile.baseUrl).hostname);
     if (needsModel && remote && request.consentEndpoint !== profile.baseUrl)
@@ -106,9 +113,11 @@ export class ChatService {
           ? '请先确认将已保存笔记、本次问题和预览的检索片段发送至当前远程服务。'
           : learningRequest
             ? '请先确认将本次学习目标、时间预算、检索概念、预览片段和所选记忆发送至当前远程服务。'
-            : evidence
-              ? '请先确认将本次问题和预览的检索片段发送至当前远程服务。'
-              : '请先确认将本次问题和近期会话发送至当前远程服务。',
+            : practiceRequest
+              ? '请先确认将本次练习主题、类型和预览原文发送至当前远程服务。'
+              : evidence
+                ? '请先确认将本次问题和预览的检索片段发送至当前远程服务。'
+                : '请先确认将本次问题和近期会话发送至当前远程服务。',
       );
     const key =
       needsModel && settings.provider === 'openai'
@@ -177,6 +186,12 @@ export class ChatService {
           learningMemories,
         ),
       );
+    if (practiceRequest)
+      messages.splice(
+        0,
+        messages.length,
+        ...practiceMessages(practiceRequest, evidence!, styles[settings.responseStyle]),
+      );
     const turn: ChatTurn = {
       id: randomUUID(),
       conversationId: conversation.id,
@@ -194,14 +209,18 @@ export class ChatService {
       ...(noteSnapshot ? { noteSnapshot } : {}),
       ...(learningRequest ? { learningRequest } : {}),
       ...(learningMemories ? { learningMemories } : {}),
+      ...(practiceRequest ? { practiceRequest } : {}),
     };
     if (evidence && !evidence.hits.length) {
       turn.status = 'completed';
+      turn.revision = 1;
       turn.answer = noteSnapshot
         ? '在当前资料范围内没有找到匹配证据，无法据此判断笔记中的理解是否正确。请调整关注问题、关联资料或补充资料后重新准备反馈。未调用聊天模型，笔记正文保持原样。'
-        : learningRequest
-          ? '在本次资料范围内没有找到匹配证据，无法起草有出处的学习路线。请使用资料中的具体概念检索、调整资料范围或补充资料后重新准备。未调用聊天模型，未创建计划、任务或记忆。'
-          : '在所选资料范围内没有找到足够的资料证据，暂时无法据此回答。请换用资料中的概念、补充资料或调整范围。';
+        : practiceRequest
+          ? '本次资料范围内没有找到匹配证据，未生成知识卡片或短测验。请调整主题、范围或补充资料后重新准备。未调用模型，也没有记录作答或掌握程度。'
+          : learningRequest
+            ? '在本次资料范围内没有找到匹配证据，无法起草有出处的学习路线。请使用资料中的具体概念检索、调整资料范围或补充资料后重新准备。未调用聊天模型，未创建计划、任务或记忆。'
+            : '在所选资料范围内没有找到足够的资料证据，暂时无法据此回答。请换用资料中的概念、补充资料或调整范围。';
       turn.notice = evidence.notice;
       this.storage.chat.addTurn(turn);
       return turn;
@@ -257,13 +276,27 @@ export class ChatService {
         job.turn.revision++;
         if (Date.now() - job.lastEmission >= 40) this.emit(job);
       });
+      if (this.closed || job.turn.status !== 'streaming') return;
+      if (job.turn.practiceRequest) {
+        try {
+          if (result.truncated) throw new Error('模型输出被截断，练习未完成。');
+          parsePractice(job.turn.answer, job.turn.evidence);
+        } catch (error) {
+          throw new AppError(
+            'practiceOutput',
+            `练习未完成：${error instanceof Error ? error.message : '结构校验失败。'} 已保留原始输出，请核对证据后重新准备；不会自动重试。`,
+          );
+        }
+      }
       this.finish(
         job,
         'completed',
         [
-          job.turn.noteSnapshot || job.turn.learningRequest ? job.turn.notice : '',
+          job.turn.noteSnapshot || job.turn.learningRequest || job.turn.practiceRequest
+            ? job.turn.notice
+            : '',
           result.truncated ? '模型达到输出长度上限，回答可能尚未结束。可以继续提问。' : '',
-          job.turn.mode === 'sources' ? citationNotice(job.turn) : '',
+          job.turn.mode === 'sources' && !job.turn.practiceRequest ? citationNotice(job.turn) : '',
         ]
           .filter(Boolean)
           .join(' '),

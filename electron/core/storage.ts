@@ -21,8 +21,9 @@ import { NOTES_MIGRATION, NoteStorage } from './note-storage';
 import { MEMORIES_MIGRATION, MemoryStorage } from './memory-storage';
 import { PLANNING_MIGRATION, TASK_ORIGIN_MIGRATION, PlanningStorage } from './planning-storage';
 import { FOCUS_MIGRATION, FocusStorage } from './focus-storage';
+import { PRACTICE_MIGRATION } from './practice';
 
-const SCHEMA_VERSION = 11;
+const SCHEMA_VERSION = 12;
 
 const INITIAL_MIGRATION = `
   CREATE TABLE app_settings (
@@ -90,6 +91,7 @@ export class Storage {
           if (version < 9) this.db.exec(PLANNING_MIGRATION);
           if (version < 10) this.db.exec(TASK_ORIGIN_MIGRATION);
           if (version < 11) this.db.exec(FOCUS_MIGRATION);
+          if (version < 12) this.db.exec(PRACTICE_MIGRATION);
           this.db.exec('COMMIT;');
         } catch (error) {
           this.db.exec('ROLLBACK;');

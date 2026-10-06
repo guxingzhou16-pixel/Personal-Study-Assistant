@@ -117,6 +117,28 @@ export interface ChatTurn {
   noteSnapshot?: StudyNote;
   learningRequest?: LearningRequest;
   learningMemories?: StudyMemory[];
+  practiceRequest?: PracticeRequest;
+}
+export type PracticeKind = 'cards' | 'quiz';
+export interface PracticeRequest {
+  kind: PracticeKind;
+  topic: string;
+  sourceId: string | null;
+}
+export interface PracticeItem {
+  question: string;
+  answer: string;
+  citations: number[];
+}
+export interface PracticePreview {
+  request: PracticeRequest;
+  evidence: EvidencePreview;
+}
+export interface PracticeSendRequest {
+  conversationId: string;
+  retrievalId: string;
+  expectedProfile: string;
+  consentEndpoint?: string;
 }
 export interface Evidence {
   number: number;
@@ -456,6 +478,8 @@ export interface DesktopApi {
   activeChat(): Promise<ChatTurn | null>;
   onChatUpdate(listener: (turn: ChatTurn) => void): () => void;
   prepareQuestion(question: string, sourceId: string | null): Promise<EvidencePreview>;
+  preparePractice(request: PracticeRequest): Promise<PracticePreview>;
+  sendPractice(request: PracticeSendRequest): Promise<ChatTurn>;
   cancelRetrieval(): Promise<void>;
   rebuildIndex(): Promise<string>;
   onRetrievalProgress(listener: (progress: RetrievalProgress) => void): () => void;

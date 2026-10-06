@@ -32,6 +32,7 @@ import { historyMarkdown } from './core/history-markdown';
 import { markdownFileName, writeMarkdownExport } from './core/markdown-export';
 import { NoteFeedbackService } from './core/note-feedback';
 import { LearningAgentService } from './core/learning-agent';
+import { PracticeService } from './core/practice';
 import { MemoryProposalService } from './core/memory-proposals';
 import { TaskProposalService } from './core/task-proposals';
 import { FocusTracker } from './core/focus';
@@ -149,6 +150,7 @@ function registerHandlers(
   chat = chats;
   const feedback = new NoteFeedbackService(database, retrieval, chats);
   const learning = new LearningAgentService(database, retrieval, chats);
+  const practice = new PracticeService(database, retrieval, chats);
   const memoryProposals = new MemoryProposalService(database);
   const taskProposals = new TaskProposalService(database);
   let runningOperations = 0;
@@ -410,6 +412,11 @@ function registerHandlers(
   handle('study:prepare-question', (question, id) =>
     retrieval.prepare(question, id, retrievalProgress),
   );
+  handle('study:prepare-practice', (request) => practice.prepare(request, retrievalProgress));
+  handle('study:send-practice', (request) => {
+    assertHistoryIdle();
+    return practice.send(request);
+  });
   handle('study:cancel-retrieval', () => retrieval.cancel());
   handle('study:rebuild-index', () => retrieval.rebuild(retrievalProgress));
   handle('study:resolve-citation', (turnId, number) => retrieval.resolveCitation(turnId, number));

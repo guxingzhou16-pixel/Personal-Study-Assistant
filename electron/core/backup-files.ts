@@ -43,7 +43,9 @@ export function readManifest(input: unknown): BackupManifest {
     value.mainVersion !== backupLimits.mainVersion ||
     value.activityVersion !== backupLimits.activityVersion
   )
-    invalid('备份的数据库版本不兼容；当前支持主库 11、学习记录库 1。请使用对应版本的应用导出。');
+    invalid(
+      `备份的数据库版本不兼容；当前支持主库 ${backupLimits.mainVersion}、学习记录库 ${backupLimits.activityVersion}。旧备份请先用对应版本恢复，再升级应用。`,
+    );
   if (
     typeof value.createdAt !== 'string' ||
     !Number.isFinite(Date.parse(value.createdAt)) ||

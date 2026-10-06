@@ -4,17 +4,17 @@
 
 本轮实现普通/资料问答会话的标题搜索、重命名、删除、Markdown 导出，以及单份学习路线删除/导出。**以下功能验证全部未执行。** 主线仅类型检查、生产构建、源码格式/diff 与静态审查；测试对话补充必要的行为测试，不引用以前通过的数量作为本轮结果。
 
-主库 v11、活动库 v1、派生索引 v2、完整备份 format1 不变，无迁移或新依赖。保留现有聊天/资料问答/反馈/路线/提议的失败案例及测试断言；不要为通过而移除权限或迟到更新检查。
+当前主库 v12、活动库 v1、派生索引 v2、完整备份 format1。历史管理自身无迁移或新依赖；v12 练习轮次也纳入普通会话管理，迁移及严格 12/1 备份政策参阅 [练习清单](practice-acceptance.md)。保留现有聊天/资料问答/反馈/路线/提议的失败案例及测试断言；不要为通过而移除权限或迟到更新检查。
 
 开发版使用全新临时学习目录、合成资料、模拟接口和假密钥，避免访问个人数据。正式包忽略开发数据目录覆盖，安装/启动须用独立 Windows 用户或可恢复 VM，沿用 [安装验收](packaging-acceptance.md)。当前已有候选安装器早于本次历史管理代码，测试此功能的正式包须先从指定提交重新构建，不可声称旧包包含本轮功能。
 
 ## 一、数据与接口权限
 
-- [ ] 原有 v11 数据直接打开，schema/全部旧记录保持；不会新增迁移备份、重建表或调整 user_version。
+- [ ] 原有 v12 数据直接打开，schema/全部旧记录保持；不会重复迁移或重建表。v11→v12 新增 practice_request 与升级前备份另按练习清单验，旧历史不改写。
 - [ ] 四个新增桥接为 `previewHistory(target)`、`renameConversation(id, version, title)`、`deleteHistory(target, version)`、`exportHistory(target, version)`；preload 解包后的成功值/错误契约正确，旧桥接方法列表断言由测试方同步。
 - [ ] `target` 只接受 `{ kind: 'conversation' | 'learning', id: UUID }`；拒绝空值、数组、非字符串/畸形 UUID、不支持 kind、多余字段，以及损坏/缺失记录，不访问路径或 SQL。
 - [ ] version 只接受 64 位小写 SHA-256；伪造值/旧值拒绝，失败不写入。散列用于确切内容比较，不是用户授权或备份真实性证明。
-- [ ] conversation 接口只接普通与资料问答的 purpose=chat；猜测笔记反馈或 learning-agent 会话 ID，读取管理预览/改名/删除/导出均拒绝。
+- [ ] conversation 接口只接普通、资料问答与练习的 purpose=chat；猜测笔记反馈或 learning-agent 会话 ID，读取管理预览/改名/删除/导出均拒绝。
 - [ ] learning 接口只接具有 learningRequest 的 learning-agent 轮次；普通问答、笔记反馈、错误用途/快照均拒绝，不借 getTurn 绕过用途隔离。
 - [ ] 目标记录有 streaming 状态，或目标仍是 ChatService 活动记录时，管理/导出拒绝；先停止后才允许。其他记录正在生成时可管理已有终止历史，不停止那次生成。
 

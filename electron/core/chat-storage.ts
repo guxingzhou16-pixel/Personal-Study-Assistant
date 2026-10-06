@@ -5,6 +5,7 @@ import { AppError } from './errors';
 import { readNoteSnapshot } from './note-storage';
 import { readLearningRequest } from './learning-input';
 import { readLearningMemories } from './memory-storage';
+import { readPracticeRequest } from './practice';
 
 type ConversationPurpose = 'chat' | 'note-feedback' | 'learning-agent';
 
@@ -40,11 +41,19 @@ export const LEARNING_AGENT_MIGRATION = `
 
 function decodeTurn(row: Record<string, unknown>): ChatTurn {
   try {
-    const { noteSnapshot, learningRequest, learningMemories, ...fields } = row;
+    const { noteSnapshot, learningRequest, learningMemories, practiceRequest, ...fields } = row;
     if (learningRequest !== null && (noteSnapshot !== null || row.mode !== 'sources'))
       throw new Error('Conflicting learning snapshots');
     if (learningMemories !== null && learningRequest === null)
       throw new Error('Memory snapshot outside learning route');
+    if (
+      practiceRequest !== null &&
+      (row.mode !== 'sources' ||
+        noteSnapshot !== null ||
+        learningRequest !== null ||
+        learningMemories !== null)
+    )
+      throw new Error('Conflicting practice snapshot');
     return {
       ...fields,
       evidence: JSON.parse(String(row.evidence)),
@@ -56,6 +65,9 @@ function decodeTurn(row: Record<string, unknown>): ChatTurn {
         : {}),
       ...(learningMemories !== null
         ? { learningMemories: readLearningMemories(JSON.parse(String(learningMemories))) }
+        : {}),
+      ...(practiceRequest !== null
+        ? { practiceRequest: readPracticeRequest(JSON.parse(String(practiceRequest))) }
         : {}),
     } as unknown as ChatTurn;
   } catch {
@@ -134,7 +146,7 @@ export class ChatStorage {
       .prepare(
         `SELECT id, conversation_id AS conversationId, question, answer, status,
       notice, provider, base_url AS baseUrl, model, created_at AS createdAt, revision, mode, evidence,
-      note_snapshot AS noteSnapshot, learning_request AS learningRequest, learning_memories AS learningMemories
+      note_snapshot AS noteSnapshot, learning_request AS learningRequest, learning_memories AS learningMemories, practice_request AS practiceRequest
       FROM chat_turns WHERE conversation_id = ? ORDER BY rowid`,
       )
       .all(id)
@@ -169,8 +181,8 @@ export class ChatStorage {
         .prepare(
           `INSERT INTO chat_turns
           (id, conversation_id, question, answer, status, notice, provider, base_url, model,
-           created_at, revision, mode, evidence, note_snapshot, learning_request, learning_memories)
-          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+           created_at, revision, mode, evidence, note_snapshot, learning_request, learning_memories, practice_request)
+          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
         )
         .run(
           turn.id,
@@ -189,6 +201,7 @@ export class ChatStorage {
           turn.noteSnapshot ? JSON.stringify(turn.noteSnapshot) : null,
           turn.learningRequest ? JSON.stringify(turn.learningRequest) : null,
           turn.learningMemories ? JSON.stringify(turn.learningMemories) : null,
+          turn.practiceRequest ? JSON.stringify(turn.practiceRequest) : null,
         );
       this.db
         .prepare(
@@ -202,7 +215,10 @@ export class ChatStorage {
             ? '笔记反馈：' + turn.noteSnapshot.title.slice(0, 34)
             : turn.learningRequest
               ? '学习路线：' + turn.learningRequest.goal.slice(0, 34)
-              : turn.question.slice(0, 40),
+              : turn.practiceRequest
+                ? (turn.practiceRequest.kind === 'cards' ? '知识卡片：' : '短测验：') +
+                  turn.practiceRequest.topic.slice(0, 34)
+                : turn.question.slice(0, 40),
           turn.conversationId,
         );
       this.db.exec('COMMIT');
@@ -216,7 +232,7 @@ export class ChatStorage {
       .prepare(
         `SELECT id, conversation_id AS conversationId, question, answer, status,
       notice, provider, base_url AS baseUrl, model, created_at AS createdAt, revision, mode, evidence,
-      note_snapshot AS noteSnapshot, learning_request AS learningRequest, learning_memories AS learningMemories
+      note_snapshot AS noteSnapshot, learning_request AS learningRequest, learning_memories AS learningMemories, practice_request AS practiceRequest
       FROM chat_turns WHERE id = ?`,
       )
       .get(chatId(input));

@@ -18,6 +18,7 @@ import type {
   Conversation,
   ChatTurn,
   EvidencePreview,
+  PracticePreview,
   RetrievalProgress,
   CitationTarget,
   EmbeddingStatus,
@@ -90,6 +91,8 @@ const api: DesktopApi = {
   },
   prepareQuestion: (question, sourceId) =>
     call<EvidencePreview>('study:prepare-question', question, sourceId),
+  preparePractice: (request) => call<PracticePreview>('study:prepare-practice', request),
+  sendPractice: (request) => call<ChatTurn>('study:send-practice', request),
   cancelRetrieval: () => call<void>('study:cancel-retrieval'),
   rebuildIndex: () => call<string>('study:rebuild-index'),
   onRetrievalProgress: (listener) => {

@@ -2,6 +2,7 @@ import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import type { ChatTurn } from '../lib/types';
 import { citationNumber, remarkEvidence } from '../lib/citations';
+import { PracticeResult } from './PracticeResult';
 
 export function ModelAnswer({
   turn,
@@ -10,6 +11,8 @@ export function ModelAnswer({
   turn: ChatTurn;
   onOpenCitation: (number: number) => void;
 }) {
+  if (turn.practiceRequest)
+    return <PracticeResult key={turn.id} turn={turn} onOpenCitation={onOpenCitation} />;
   return (
     <ReactMarkdown
       remarkPlugins={turn.mode === 'sources' ? [remarkGfm, remarkEvidence] : [remarkGfm]}

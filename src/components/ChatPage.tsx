@@ -9,10 +9,13 @@ import type {
   Source,
   EvidencePreview,
   RetrievalProgress,
+  PracticeKind,
+  PracticePreview,
 } from '../lib/types';
 import { EvidenceCards } from './EvidenceCards';
 import { ModelAnswer } from './ModelAnswer';
 import { HistoryActions } from './HistoryActions';
+import { practiceLabels, practiceLimits } from '../lib/practice';
 
 function withTurn(conversation: Conversation, turn: ChatTurn): Conversation {
   const existing = conversation.turns.find((item) => item.id === turn.id);
@@ -22,7 +25,9 @@ function withTurn(conversation: Conversation, turn: ChatTurn): Conversation {
     title:
       conversation.turns.length || conversation.title !== '新会话'
         ? conversation.title
-        : turn.question.slice(0, 40),
+        : turn.practiceRequest
+          ? `${practiceLabels[turn.practiceRequest.kind]}：${turn.practiceRequest.topic.slice(0, 34)}`
+          : turn.question.slice(0, 40),
     turns: existing
       ? conversation.turns.map((item) => (item.id === turn.id ? turn : item))
       : [...conversation.turns, turn],
@@ -60,14 +65,18 @@ export function ChatPage({
   const [historyBusy, setHistoryBusy] = useState(false);
   const [historyQuery, setHistoryQuery] = useState('');
   const [loaded, setLoaded] = useState(false);
-  const [mode, setMode] = useState<'chat' | 'sources'>('chat');
+  const [mode, setMode] = useState<'chat' | 'sources' | PracticeKind>('chat');
   const [scope, setScope] = useState('');
   const [sources, setSources] = useState<Source[]>([]);
   const [preview, setPreview] = useState<EvidencePreview | null>(null);
+  const [practicePreview, setPracticePreview] = useState<PracticePreview | null>(null);
+  const [practiceProfile, setPracticeProfile] = useState<string | null>(null);
   const [searching, setSearching] = useState(false);
   const [progress, setProgress] = useState<RetrievalProgress | null>(null);
   const [indexNotice, setIndexNotice] = useState('');
   const searchVersion = useRef(0);
+  const searchInFlight = useRef<number | null>(null);
+  const cancelPending = useRef(false);
   const [consentProfile, setConsentProfile] = useState<string | null>(null);
   const lastUpdate = useRef<ChatTurn | null>(null);
   const turnRevisions = useRef(new Map<string, number>());
@@ -79,14 +88,29 @@ export function ChatPage({
   const followOutput = useRef(true);
   const profile = settings[settings.provider];
   const signature = `${settings.provider}|${profile.baseUrl}|${profile.model}`;
-  const consentSignature = `${signature}|${mode}|${mode === 'sources' ? (preview?.id ?? '') : ''}`;
+  const practicing = mode === 'cards' || mode === 'quiz';
+  const consentSignature = `${signature}|${mode}|${mode !== 'chat' ? (preview?.id ?? '') : ''}`;
   const consent = consentProfile === consentSignature;
   const needsModel = mode === 'chat' || Boolean(preview?.hits.length);
   const previewValid =
     preview !== null &&
     preview.question === question.trim() &&
-    preview.sourceId === (scope || null);
+    preview.sourceId === (scope || null) &&
+    (!practicing ||
+      (practicePreview?.evidence.id === preview.id &&
+        practicePreview.request.kind === mode &&
+        practiceProfile === signature));
   const remote = !['localhost', '127.0.0.1', '[::1]'].includes(new URL(profile.baseUrl).hostname);
+  const invalidatePreview = useCallback(() => {
+    searchVersion.current++;
+    setPreview(null);
+    setPracticePreview(null);
+    setPracticeProfile(null);
+    setConsentProfile(null);
+  }, []);
+  useEffect(() => {
+    invalidatePreview();
+  }, [signature, invalidatePreview]);
   const applyTurn = useCallback((turn: ChatTurn) => {
     if (deletedConversations.current.has(turn.conversationId)) return;
     if ((turnRevisions.current.get(turn.id) ?? -1) > turn.revision) return;
@@ -126,6 +150,7 @@ export function ChatPage({
   }, []);
   const openConversation = useCallback(
     async (id: string) => {
+      invalidatePreview();
       const version = ++loadVersion.current;
       setBusy(true);
       setError('');
@@ -151,7 +176,7 @@ export function ChatPage({
         if (version === loadVersion.current) setBusy(false);
       }
     },
-    [restoreActive],
+    [restoreActive, invalidatePreview],
   );
   useEffect(() => {
     if (!isDesktop) return;
@@ -200,6 +225,7 @@ export function ChatPage({
   }, []);
 
   const newConversation = useCallback(async () => {
+    invalidatePreview();
     setBusy(true);
     setError('');
     loadVersion.current++;
@@ -216,7 +242,7 @@ export function ChatPage({
     } finally {
       setBusy(false);
     }
-  }, [refresh]);
+  }, [refresh, invalidatePreview]);
   useEffect(() => {
     if (!presetSource) return;
     setMode('sources');
@@ -225,7 +251,10 @@ export function ChatPage({
     void newConversation();
   }, [presetSource, newConversation]);
   async function retrieve(rebuild = false) {
+    if (searchInFlight.current !== null || cancelPending.current) return;
+    invalidatePreview();
     const version = ++searchVersion.current;
+    searchInFlight.current = version;
     setSearching(true);
     setError('');
     setPreview(null);
@@ -237,23 +266,45 @@ export function ChatPage({
         const notice = await desktop.rebuildIndex();
         if (version === searchVersion.current) setIndexNotice(`检索索引已重建。${notice}`);
       } else {
-        const result = await desktop.prepareQuestion(question, scope || null);
-        if (version === searchVersion.current) setPreview(result);
+        if (mode === 'cards' || mode === 'quiz') {
+          const result = await desktop.preparePractice({
+            kind: mode,
+            topic: question,
+            sourceId: scope || null,
+          });
+          if (version === searchVersion.current) {
+            setPracticePreview(result);
+            setPracticeProfile(signature);
+            setPreview(result.evidence);
+          }
+        } else {
+          const result = await desktop.prepareQuestion(question, scope || null);
+          if (version === searchVersion.current) setPreview(result);
+        }
       }
     } catch (failure) {
       if (version === searchVersion.current) setError(errorMessage(failure));
     } finally {
-      if (version === searchVersion.current) {
-        setSearching(false);
+      // Invalidating results must still release this request's busy state.
+      if (searchInFlight.current === version) {
+        searchInFlight.current = null;
+        setSearching(cancelPending.current);
         setProgress(null);
       }
     }
   }
   async function cancelRetrieval() {
+    if (cancelPending.current) return;
+    cancelPending.current = true;
+    invalidatePreview();
+    setSearching(true);
     try {
       await desktop.cancelRetrieval();
     } catch (failure) {
       setError(errorMessage(failure));
+    } finally {
+      cancelPending.current = false;
+      setSearching(searchInFlight.current !== null);
     }
   }
   async function openEvidence(turnId: string, number: number) {
@@ -266,7 +317,7 @@ export function ChatPage({
   }
   async function send() {
     if (busy || historyBusy || active || searching || !question.trim()) return;
-    if (mode === 'sources' && !previewValid) {
+    if (mode !== 'chat' && !previewValid) {
       setError('请先检索当前问题的原文，再发送。');
       return;
     }
@@ -277,17 +328,26 @@ export function ChatPage({
       if (!conversation) listVersion.current++;
       const current = conversation ?? (await desktop.createConversation());
       if (!conversation) setConversation(current);
-      const turn = await desktop.sendChat({
-        conversationId: current.id,
-        question,
-        expectedProfile: signature,
-        ...(remote && consent ? { consentEndpoint: profile.baseUrl } : {}),
-        ...(mode === 'sources' && preview ? { retrievalId: preview.id } : {}),
-      });
+      const turn =
+        practicing && preview
+          ? await desktop.sendPractice({
+              conversationId: current.id,
+              retrievalId: preview.id,
+              expectedProfile: signature,
+              ...(remote && consent ? { consentEndpoint: profile.baseUrl } : {}),
+            })
+          : await desktop.sendChat({
+              conversationId: current.id,
+              question,
+              expectedProfile: signature,
+              ...(remote && consent ? { consentEndpoint: profile.baseUrl } : {}),
+              ...(mode === 'sources' && preview ? { retrievalId: preview.id } : {}),
+            });
       // The first stream event can arrive before the invoke reply; revision guards preserve it.
       applyTurn(turn);
       setQuestion('');
       setPreview(null);
+      setPracticePreview(null);
       const latest = await desktop.getConversation(current.id);
       setConversation((previous) => {
         let result = latest;
@@ -346,9 +406,11 @@ export function ChatPage({
         </button>
       </div>
       <p className="chat-scope">
-        {mode === 'sources'
-          ? '资料问答 · 先查看检索原文，再让拾知依据证据回答。每次问题独立检索，请写清具体概念。'
-          : '普通聊天 · 不检索资料库。回答请结合原文核对。'}
+        {practicing
+          ? `${practiceLabels[mode]} · 先预览原文，再生成 3 项练习。参考答案由你对照出处核查，不自动评分或记录掌握。`
+          : mode === 'sources'
+            ? '资料问答 · 先查看检索原文，再让拾知依据证据回答。每次问题独立检索，请写清具体概念。'
+            : '普通聊天 · 不检索资料库。回答请结合原文核对。'}
       </p>
       <div className="chat-workspace">
         <aside className="chat-history" aria-label="会话记录">
@@ -421,17 +483,19 @@ export function ChatPage({
               <select
                 aria-label="问答方式"
                 value={mode}
-                disabled={searching}
+                disabled={searching || busy || historyBusy}
                 onChange={(event) => {
-                  setMode(event.target.value as 'chat' | 'sources');
-                  setPreview(null);
+                  setMode(event.target.value as 'chat' | 'sources' | PracticeKind);
+                  invalidatePreview();
                 }}
               >
                 <option value="chat">普通聊天</option>
                 <option value="sources">资料问答</option>
+                <option value="cards">知识卡片</option>
+                <option value="quiz">短测验</option>
               </select>
             </label>
-            {mode === 'sources' && (
+            {mode !== 'chat' && (
               <>
                 <label className="scope-select">
                   资料范围
@@ -441,7 +505,7 @@ export function ChatPage({
                     disabled={searching}
                     onChange={(event) => {
                       setScope(event.target.value);
-                      setPreview(null);
+                      invalidatePreview();
                     }}
                   >
                     <option value="">全部已导入资料</option>
@@ -494,7 +558,13 @@ export function ChatPage({
                 </div>
                 <div className="chat-response">
                   <span>
-                    拾知 · {turn.mode === 'sources' ? '资料问答' : '普通聊天'} ·{' '}
+                    拾知 ·{' '}
+                    {turn.practiceRequest
+                      ? practiceLabels[turn.practiceRequest.kind]
+                      : turn.mode === 'sources'
+                        ? '资料问答'
+                        : '普通聊天'}{' '}
+                    ·{' '}
                     {turn.mode === 'sources' && !turn.evidence.length
                       ? '未调用模型'
                       : turn.model || '未选择模型'}
@@ -574,8 +644,13 @@ export function ChatPage({
                     setConsentProfile(event.target.checked ? consentSignature : null)
                   }
                 />
-                允许将{mode === 'sources' ? '问题及本次预览的原文' : '问题及近期完整对话'}发送至{' '}
-                {profile.baseUrl}；服务费用由我承担。
+                允许将
+                {practicing
+                  ? '练习主题、类型及本次预览原文（不包含我的作答）'
+                  : mode === 'sources'
+                    ? '问题及本次预览的原文'
+                    : '问题及近期完整对话'}
+                发送至 {profile.baseUrl}；服务费用由我承担。
               </label>
             )}
             {active?.noteSnapshot && (
@@ -601,16 +676,18 @@ export function ChatPage({
                 </button>
               )}
             <label className="sr-only" htmlFor="chat-question">
-              输入学习问题
+              {practicing ? '输入练习主题' : '输入学习问题'}
             </label>
             <textarea
               id="chat-question"
               value={question}
-              maxLength={4000}
-              placeholder="写下你想弄明白的问题…"
+              maxLength={practicing ? practiceLimits.topic : 4000}
+              placeholder={
+                practicing ? '写下资料中的具体概念，用于查找练习依据…' : '写下你想弄明白的问题…'
+              }
               onChange={(event) => {
                 setQuestion(event.target.value);
-                setPreview(null);
+                invalidatePreview();
               }}
               disabled={searching}
               onKeyDown={(event) => {
@@ -626,11 +703,11 @@ export function ChatPage({
             />
             <div className="chat-actions">
               <small>
-                {mode === 'sources'
+                {mode !== 'chat'
                   ? '先检索原文，Ctrl + Enter 发送 · 引用编号可打开出处'
                   : 'Ctrl + Enter 发送 · 仅携带最近 6 轮完整回答，超长历史会截断'}
               </small>
-              {mode === 'sources' && (
+              {mode !== 'chat' && (
                 <button
                   type="button"
                   className="button secondary"
@@ -662,12 +739,12 @@ export function ChatPage({
                     searching ||
                     (needsModel && !profile.model) ||
                     !question.trim() ||
-                    (mode === 'sources' && !previewValid) ||
+                    (mode !== 'chat' && !previewValid) ||
                     (remote && needsModel && !consent)
                   }
                 >
                   <Send size={15} />
-                  发送问题
+                  {practicing ? (needsModel ? '生成 3 项练习' : '保存证据不足说明') : '发送问题'}
                 </button>
               )}
             </div>
