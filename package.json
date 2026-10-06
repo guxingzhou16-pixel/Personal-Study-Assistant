@@ -1,6 +1,10 @@
 {
   "name": "personal-study-assistant",
   "version": "0.1.0",
+  "description": "拾知：本地模型优先的学习助手，支持资料阅读、可追溯问答与学习计划。",
+  "author": {
+    "name": "guxingzhou16-pixel"
+  },
   "private": true,
   "type": "module",
   "main": "dist-electron/main.cjs",
@@ -19,6 +23,8 @@
     "build:electron": "node scripts/build-electron.mjs",
     "desktop:dev": "npm run build:electron && node scripts/dev.mjs",
     "desktop:build": "npm run build && npm run build:electron",
+    "desktop:pack": "npm run desktop:build && node scripts/package-desktop.mjs dir",
+    "desktop:dist": "npm run desktop:build && node scripts/package-desktop.mjs nsis",
     "desktop:start": "electron .",
     "test:e2e": "npm run desktop:build && playwright test",
     "format": "prettier --write src electron scripts tests *.json *.ts .github index.html",
@@ -37,6 +43,7 @@
     "unified": "^11.0.5"
   },
   "devDependencies": {
+    "@electron/asar": "4.3.1",
     "@playwright/test": "1.63.0",
     "@types/node": "^24.12.0",
     "@types/react": "^19.2.0",
@@ -44,6 +51,7 @@
     "@vitejs/plugin-react": "6.1.1",
     "@vitest/coverage-v8": "^4.1.11",
     "electron": "44.5.1",
+    "electron-builder": "26.15.3",
     "esbuild": "0.28.2",
     "pdf-lib": "^1.17.1",
     "prettier": "^3.8.1",

@@ -36,6 +36,7 @@ build/
 target/
 *.log
 /dist-electron/
+/release/
 credentials.enc.json*
 /test-results/
 /playwright-report/

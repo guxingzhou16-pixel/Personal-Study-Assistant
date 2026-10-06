@@ -46,6 +46,8 @@ import {
 } from './core/data-location';
 
 app.setName('StudyCompanion');
+if (process.platform === 'win32')
+  app.setAppUserModelId('io.github.guxingzhou16pixel.studycompanion');
 const testDataDir = !app.isPackaged ? process.env.STUDY_COMPANION_DATA_DIR : undefined;
 const dataDir = testDataDir ? resolve(testDataDir) : join(app.getPath('appData'), 'StudyCompanion');
 let startupError: AppError | undefined;
@@ -60,6 +62,10 @@ const devUrl =
     ? process.env.STUDY_COMPANION_DEV_URL
     : undefined;
 const rendererPath = join(__dirname, '../dist/index.html');
+// ESM workers and their external native dependencies are shipped as real files.
+const workerDirectory = app.isPackaged
+  ? join(process.resourcesPath, 'app.asar.unpacked', 'dist-electron')
+  : __dirname;
 const rendererUrl = devUrl ? new URL(devUrl).href : pathToFileURL(rendererPath).href;
 let window: BrowserWindow | null = null;
 let storage: Storage | undefined;
@@ -100,7 +106,7 @@ function registerHandlers(
   const files = new Documents(
     database,
     join(location.directory, 'sources'),
-    join(__dirname, 'document-worker.mjs'),
+    join(workerDirectory, 'document-worker.mjs'),
     (modulePath, args) =>
       utilityProcess.fork(modulePath, args, {
         stdio: 'ignore',
@@ -116,7 +122,7 @@ function registerHandlers(
   const retrieval = new SearchService(
     database,
     location.directory,
-    join(__dirname, 'search-worker.mjs'),
+    join(workerDirectory, 'search-worker.mjs'),
     (modulePath, args) =>
       utilityProcess.fork(modulePath, args, {
         stdio: 'ignore',
@@ -508,12 +514,14 @@ else {
     .whenReady()
     .then(async () => {
       if (startupError) throw startupError;
-      const backupRunner = new BackupRunner(join(__dirname, 'backup-worker.mjs'), (path, args) =>
-        utilityProcess.fork(path, args, {
-          stdio: 'ignore',
-          serviceName: 'Study data backup',
-          execArgv: ['--max-old-space-size=256'],
-        }),
+      const backupRunner = new BackupRunner(
+        join(workerDirectory, 'backup-worker.mjs'),
+        (path, args) =>
+          utilityProcess.fork(path, args, {
+            stdio: 'ignore',
+            serviceName: 'Study data backup',
+            execArgv: ['--max-old-space-size=256'],
+          }),
       );
       let location = await learningLocation(dataDir);
       const openData = (directory: string) => {

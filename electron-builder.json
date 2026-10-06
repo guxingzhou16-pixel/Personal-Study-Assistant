@@ -1,0 +1,39 @@
+{
+  "appId": "io.github.guxingzhou16pixel.studycompanion",
+  "productName": "拾知",
+  "directories": { "output": "release" },
+  "electronDist": "node_modules/electron/dist",
+  "asar": true,
+  "asarUnpack": ["dist-electron/*-worker.mjs", "node_modules/**/*"],
+  "files": [
+    "dist/**/*",
+    "dist-electron/main.cjs",
+    "dist-electron/preload.cjs",
+    "dist-electron/*-worker.mjs",
+    "package.json",
+    "!**/*.map",
+    "!node_modules/onnxruntime-node/bin/napi-v6/{darwin,linux}/**/*",
+    "!node_modules/onnxruntime-node/bin/napi-v6/win32/arm64/**/*"
+  ],
+  "npmRebuild": false,
+  "publish": null,
+  "afterPack": "scripts/verify-package.mjs",
+  "win": {
+    "target": [{ "target": "nsis", "arch": ["x64"] }],
+    "executableName": "StudyCompanion",
+    "signExecutable": false,
+    "requestedExecutionLevel": "asInvoker"
+  },
+  "nsis": {
+    "artifactName": "StudyCompanion-${version}-win-${arch}-setup.${ext}",
+    "oneClick": true,
+    "perMachine": false,
+    "packElevateHelper": false,
+    "deleteAppDataOnUninstall": false,
+    "createDesktopShortcut": false,
+    "createStartMenuShortcut": true,
+    "shortcutName": "拾知",
+    "runAfterFinish": false,
+    "differentialPackage": false
+  }
+}
