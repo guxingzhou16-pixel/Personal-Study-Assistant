@@ -66,9 +66,9 @@
   display: grid;
   gap: 10px;
   padding: 16px;
-  border: 1px solid #ceddca;
+  border: 1px solid var(--theme-line, #ceddca);
   border-radius: 9px;
-  background: #f2f6ee;
+  background: var(--theme-surface-muted, #f2f6ee);
 }
 .focus-preview h3 {
   font-size: 13px;

@@ -1,5 +1,6 @@
 export type Provider = 'ollama' | 'openai';
 export type ResponseStyle = 'gentle' | 'game' | 'coach';
+export type Theme = 'modern' | 'study' | 'playful';
 
 export interface ModelProfile {
   baseUrl: string;
@@ -10,6 +11,7 @@ export interface Settings {
   displayName: string;
   dailyGoalMinutes: number;
   responseStyle: ResponseStyle;
+  theme: Theme;
   provider: Provider;
   ollama: ModelProfile;
   openai: ModelProfile;
@@ -494,6 +496,7 @@ export const defaultSettings: Settings = {
   displayName: '',
   dailyGoalMinutes: 45,
   responseStyle: 'gentle',
+  theme: 'modern',
   provider: 'ollama',
   ollama: { baseUrl: 'http://127.0.0.1:11434', model: '' },
   openai: { baseUrl: 'https://api.openai.com/v1', model: '' },

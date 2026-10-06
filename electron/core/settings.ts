@@ -5,6 +5,7 @@ import {
   type Settings,
 } from '../../src/lib/types';
 import { AppError } from './errors';
+import { isTheme } from '../../src/lib/themes';
 
 export function record(value: unknown): Record<string, unknown> {
   if (typeof value !== 'object' || value === null || Array.isArray(value)) {
@@ -76,10 +77,14 @@ export function validateSettings(value: unknown): Settings {
   if (responseStyle !== 'gentle' && responseStyle !== 'game' && responseStyle !== 'coach') {
     throw new AppError('validation', '请选择受支持的回应风格。');
   }
+  // Only an absent field is a legacy setting; invalid supplied values must be rejected.
+  const theme = Object.hasOwn(data, 'theme') ? data.theme : defaultSettings.theme;
+  if (!isTheme(theme)) throw new AppError('validation', '请选择受支持的界面主题。');
   return {
     displayName,
     dailyGoalMinutes: data.dailyGoalMinutes,
     responseStyle,
+    theme,
     provider: validateProvider(data.provider),
     ollama: validateProfile(data.ollama),
     openai: validateProfile(data.openai),

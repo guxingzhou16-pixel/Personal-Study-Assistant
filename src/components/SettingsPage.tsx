@@ -12,6 +12,7 @@ import {
 } from 'lucide-react';
 import { desktop, errorMessage, isDesktop, sameEndpoint } from '../lib/desktop';
 import type { Bootstrap, ConnectionReport, Provider, Settings } from '../lib/types';
+import { themeOptions } from '../lib/themes';
 import { EmbeddingSettings } from './EmbeddingSettings';
 
 interface Props {
@@ -198,6 +199,36 @@ export function SettingsPage({ boot, onSaved }: Props) {
               </select>
             </label>
             <p className="field-hint">保存后用于学习助手的新回答，实际表达由所选模型决定。</p>
+            <fieldset className="theme-options" aria-describedby="theme-hint">
+              <legend>界面主题</legend>
+              <div className="theme-grid">
+                {themeOptions.map((theme) => (
+                  <label
+                    className={`theme-option ${draft.theme === theme.id ? 'selected' : ''}`}
+                    key={theme.id}
+                  >
+                    <input
+                      type="radio"
+                      name="theme"
+                      value={theme.id}
+                      checked={draft.theme === theme.id}
+                      onChange={() => {
+                        setDraft((previous) => ({ ...previous, theme: theme.id }));
+                        setNotice(null);
+                      }}
+                    />
+                    <span className="theme-swatch" data-theme={theme.id} aria-hidden="true" />
+                    <span className="theme-option-text">
+                      <strong>{theme.name}</strong>
+                      <small>{theme.description}</small>
+                    </span>
+                  </label>
+                ))}
+              </div>
+            </fieldset>
+            <p className="field-hint" id="theme-hint">
+              点击“保存设置”后应用主题。界面主题与助手回应风格分别选择，阅读护眼仍在阅读器中设置。
+            </p>
           </section>
           <section className="settings-section" aria-labelledby="models-heading">
             <div className="section-heading">

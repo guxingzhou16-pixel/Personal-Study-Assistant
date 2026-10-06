@@ -76,7 +76,7 @@
 }
 .memory-list-item.selected {
   border-color: var(--accent);
-  background: #f2f6ee;
+  background: var(--theme-surface-muted, #f2f6ee);
 }
 .memory-list-item strong {
   font-size: 13px;

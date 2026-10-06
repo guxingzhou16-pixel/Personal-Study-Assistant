@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import {
   ArrowRight,
   BookOpen,
@@ -90,6 +90,13 @@ export default function App() {
   const [failure, setFailure] = useState<string | null>(null);
   const [attempt, setAttempt] = useState(0);
   const backup = useBackupState(true);
+  const theme = boot?.settings.theme ?? defaultSettings.theme;
+  useLayoutEffect(() => {
+    document.documentElement.dataset.theme = theme;
+    return () => {
+      delete document.documentElement.dataset.theme;
+    };
+  }, [theme]);
   useEffect(() => {
     mainRef.current?.scrollTo(0, 0);
   }, [page]);
