@@ -39,7 +39,7 @@
 
 ## 3. 当前状态与接手快照
 
-本节核对日期：**2026-10-06**。接手时重新检查，不将下面的提交号、测试数量或工作区状态写成实时结果。
+本节核对日期：**2026-10-07**。接手时重新检查，不将下面的提交号、测试数量或工作区状态写成实时结果。
 
 ### 3.1 已交付并有历史验收记录
 
@@ -215,9 +215,18 @@
 - 完整备份含请求/原始结果/证据，completed有证据的练习必须合法结构。历史空证据说明completed/sources/空数组允许revision=0保持旧行，其他零版本拒绝；新说明revision=1。Markdown保留练习类型/主题/范围/原始结果与出处，不导出本地作答或翻面状态；删除普通会话不改学习资料/作品/任务/记忆/专注。
 - 最终npm run desktop:build（双TypeScript/Vite/Electron）、17份源码及新增清单Prettier、diff通过，两reviewer增量静态批准；Vite既有大块提示保留，未测运行性能/安装。未新增/修改/运行测试代码或应用/安装器/任何数据库/模型，九份清单全部待独立执行，不称阶段或首版验收。实现`ba927da`仅本地提交、不推送，保留他人改动；旧候选包早于本轮，安装QA需重新固定提交构建并隔离Windows用户/VM。主线下一步学习闭环使用路径与发布准备收口，网站最后。
 
-### 3.19 仍待开发或验收的主要能力
+### 3.19 已实现、待独立验收的首页学习闭环入口
 
-笔记、AI反馈、路线、记忆管理/确认、手动项目/任务、Agent任务提议、任务番茄钟、完整备份/恢复、三种主题、历史管理及卡片/短测验的独立验收，Windows候选安装/运行/升级/卸载、真实聊天/引用语义与规模验证；OCR、更多格式与展示网站待开发。安装包构建已接入，正式发布仍待验收与授权。
+- 2026-10-07：首页读取真实今日任务总数与前5项，可刷新、按日期查看全部/单项或准备专注；六步学习流程、已保存模型说明、路线和备份设置入口接入。只读和导航，不自动创建/完成任务、开始计时、签到或请求模型，不把预计时间/模型名称当实际学习或连接成功。
+- `TodayTasks`复用planningOverview，30秒只检查本地日期；跨日、聚焦、重新可见或手动刷新才触发读取。取消标记和返回时日期复核拒收旧应答，失败不显示空列表；备份维护期间暂停读取/入口，退出维护后重读。显示全部数量、前5项沿用真实排序，任务快照在目标页再次复核。
+- `HomeStudyFlow`为纯导航和实际保存配置说明，`HomeStudy.css`复用主题变量与3/2/1列；保留原日历/签到/累计计时4:5。App只在页面改变且焦点退回body时聚焦主内容，不抢控件/弹窗或改变首次Tab路径；真实键盘、缩放与视觉仍待验证。
+- PlanningPage内部PlanningTarget为day/task联合、共用序列，待入站目标优先于旧日期自动刷新，沿用脏稿放弃/取消与版本化读取。按日入口成功后选择实际日期并清旧过滤，单项重读保存记录，失败保留原记录/稿并报错；侧栏普通导航保留日期和编辑。准备专注只选任务，不自动开始，也不覆盖活动状态/复盘稿。
+- 无新依赖、IPC、迁移或写入能力，主v12/活动v1/派生v2/备份format1不变。最终npm run desktop:build（双TypeScript/Vite/Electron）、6份源码及新增首页清单Prettier、diff通过，两reviewer静态批准；Vite已有大块提示保留，性能/安装未测。未新增/改/运行测试代码，未启动应用/安装器、打开任何数据库或请求模型，不能称功能或首版验收。
+- 新增docs/testing/home-workflow-acceptance.md并补充planning清单，十份交接清单全部待独立执行；实现`1fc7fa5`仅本地提交、不推送，保留他人改动。旧候选包早于本轮，安装QA须固定提交重新构建并隔离Windows用户/VM；主线下一步汇总发布门禁与固定版本候选，功能/安装/真实质量交测试对话，网站最后。
+
+### 3.20 仍待开发或验收的主要能力
+
+笔记、AI反馈、路线、记忆管理/确认、手动项目/任务、Agent任务提议、任务番茄钟、完整备份/恢复、三种主题、历史管理、卡片/短测验及首页学习闭环的独立验收，Windows候选安装/运行/升级/卸载、真实聊天/引用语义与规模验证；OCR、更多格式与展示网站待开发。安装包构建已接入，正式发布仍待验收与授权。
 
 独立合成集 `synthetic-retrieval-v2`（`tests/fixtures/retrieval-independent-cases.ts`）与逐题引用位置校验已加入可重复评测；多锚点召回在独立集上仍有失败（`ind-symmetric-hash`），保留为失败案例。真实本地/云端聊天仍未验收：本机未安装 Ollama，无法据此验证真实生成与引用语义。
 
@@ -299,7 +308,9 @@
 | `.github/workflows/package-windows.yml` | 手动Windows候选构建和七日artifact，contents只读，不推送/标签/Release |
 | `docs/testing/packaging-acceptance.md` | 隔离Windows用户/VM的安装/运行/升级/卸载与发布门禁交接，全部待执行 |
 | `docs/testing/history-acceptance.md` | 历史权限/确切版本/删除影响/来源保留/应答丢失/导出交接，全部待执行 |
-| `src/App.tsx` | 工作台、导航、启动加载、页面切换和学习首页 |
+| `src/App.tsx` | 工作台/首页、启动/导航、内部day/task目标及移除入口后的主区焦点，保持已有页面挂载 |
+| `src/components/TodayTasks.tsx`、`HomeStudyFlow.tsx`、`HomeStudy.css` | 只读今日任务/日期刷新/计划或专注准备、六步纯导航与模型配置提示；不生成或自动写学习数据 |
+| `docs/testing/home-workflow-acceptance.md` | 今日任务/按日目标/脏稿/跨日/维护/键盘及完整学习闭环交接，全部待执行 |
 | `src/components/SettingsPage.tsx` | 偏好及模型表单、连接检测、密钥操作；输入密钥只作必要的临时传递 |
 | `src/lib/themes.ts`、`src/themes.css` | 三种主题ID/文案/枚举与配色/控件；Settings选择草稿，App依据实际保存偏好设置根属性，不存第二份数据 |
 | `src/components/EmbeddingSettings.tsx` | 独立模型下载/取消、进度和文件状态；不改变聊天配置 |
@@ -312,7 +323,7 @@
 | `src/components/AgentPage.tsx`、`src/lib/learning.ts` | 目标/范围/预算、预览/确认、路线历史与人工执行入口；共享输入限额和比较 |
 | `src/components/MemoryPage.tsx`、`MemoryProposalPanel.tsx` | 记忆编辑/版本/范围/删除确认，学习意向提议的编辑/最终预览/确认/拒绝与实际结果 |
 | `src/lib/memories.ts` | 记忆限额/类别/范围文案与本机地址政策，主进程复用纯函数 |
-| `src/components/PlanningPage.tsx`、`src/lib/planning.ts` | 指定日期任务/项目编辑、归档与完成/删除确认；集中限额/日期纯校验/空稿，页面保持挂载 |
+| `src/components/PlanningPage.tsx`、`src/lib/planning.ts` | 指定日期任务/项目编辑、归档与完成/删除确认；内部PlanningTarget day/task共用序列，入站优先/脏稿确认/最新记录读取，页面保持挂载 |
 | `src/components/PlanningEditor.tsx` | 无状态项目/任务表单，接收实际记录与草稿；不读数据库/直接调用桌面接口 |
 | `src/components/TaskProposalPanel.tsx`、`TaskProposalPanel.css` | 单任务提议、编辑失效、项目加载、最终预览/确认/拒绝、实际结果与受控任务导航 |
 | `src/components/FocusPage.tsx`、`src/lib/focus.ts` | 单次任务专注、控制/最近记录/复盘/独立签到，集中限额与状态文案；页面保持挂载 |
@@ -387,6 +398,8 @@
 
 调用链：**React 界面 → `src/lib/desktop.ts` → `window.studyCompanion` → preload → IPC → 主进程业务模块 → 文件/SQLite/模型服务。**
 
+- 首页TodayTasks复用planningOverview只读，按本机日期显示完整数量/前5项（待完成优先），明确预计分钟与手动状态，不写任务/计时/签到。挂载/恢复/手动刷新/日期变化读取；30秒定时只检查日期，不持续查询DB，effect清理拒迟到/离页结果，备份非idle暂停。任务点击跨日先刷新，计划/专注目标重读实际记录。HomeStudyFlow只是推荐步骤导航及已保存模型说明，无模型检测/生成/新建或掌握推断。
+- PlanningPage的内部PlanningTarget为day/task与单个递增sequence；最新入站先于自动旧日期刷新，open-day和open-task复用实际读取/版本/脏稿确认，成功再应用日期/清filter/编辑器。普通侧栏保留原草稿，取消保留当前编辑；不新增桌面桥接或主进程工具权限。首页按钮移除后且activeElement为body时才focus主区，不抢目标页主动控件/确认的焦点，也不改首次Tab起点。
 - 主进程承担有权限的本地操作；React 不直接访问文件系统、SQLite 或系统密钥，也不直接请求模型服务。
 - 保持 `contextIsolation: true`、`sandbox: true`、`nodeIntegration: false`，不要为方便读取资料而解除隔离。
 - preload 只暴露具体方法，不能提供任意频道调用、任意 SQL、任意路径读取或系统命令执行入口。
@@ -559,7 +572,7 @@ React 界面支持热更新；修改 `electron/` 或 preload 后重启桌面开�
 
 ## 11. 验证方法与测试要求
 
-**当前分工（用户2026-10-04指定，本轮延续）：主线实现与类型/构建/包文件基础检查；功能、安装及真实模型验收交其他对话。** 笔记/反馈/路线/记忆/项目任务/任务提议/番茄钟/完整备份恢复/主题、历史管理、练习与Windows包均未运行功能/安装测试或改规格；`docs/testing/`中的`memory-acceptance.md`、`planning-acceptance.md`、`task-proposal-acceptance.md`、`focus-acceptance.md`、`backup-acceptance.md`、`themes-acceptance.md`、`packaging-acceptance.md`、`history-acceptance.md`、`practice-acceptance.md`九份详细清单是交接，未执行。测试方补齐v5～v12真实结构迁移/保留、CRUD/冲突/关联、导出/取消、协议/确认/恢复/引用、记忆隐私、提议单次确认/事务与任务状态和计时签到隔离、两库完整往返/启动切换/磁盘故障/回退、主题旧JSON/保存/重启/配色/护眼/键盘/缩放以及练习三项结构/真实编号/语义核对/翻面作答/迟到取消/12与11备份兼容，隔离用户/VM内安装/原生资源运行/升级/卸载数据保护，更新旧断言/桥接清单；构建成功不等于功能通过。
+**当前分工（用户2026-10-04指定，本轮延续）：主线实现与类型/构建/包文件基础检查；功能、安装及真实模型验收交其他对话。** 笔记/反馈/路线/记忆/项目任务/任务提议/番茄钟/完整备份恢复/主题、历史管理、练习、首页闭环与Windows包均未运行功能/安装测试或改规格；`docs/testing/`中的`memory-acceptance.md`、`planning-acceptance.md`、`task-proposal-acceptance.md`、`focus-acceptance.md`、`backup-acceptance.md`、`themes-acceptance.md`、`packaging-acceptance.md`、`history-acceptance.md`、`practice-acceptance.md`、`home-workflow-acceptance.md`十份详细清单是交接，未执行。测试方补齐v5～v12真实结构迁移/保留、CRUD/冲突/关联、导出/取消、协议/确认/恢复/引用、记忆隐私、提议单次确认/事务与任务状态和计时签到隔离、两库完整往返/启动切换/磁盘故障/回退、主题旧JSON/保存/重启/配色/护眼/键盘/缩放以及练习三项结构/真实编号/语义核对/翻面作答/迟到取消/12与11备份兼容、首页真实今日/按日目标/脏稿/跨日/迟到/维护/焦点/无模型完整闭环，隔离用户/VM内安装/原生资源运行/升级/卸载数据保护，更新旧断言/桥接清单；构建成功不等于功能通过。
 
 日常开发以当前功能的基础验证为准，选择最小但有效的检查。纯文档改动核对事实、路径、命令和 diff 即可，不启动桌面或完整测试。与代码无关的已有 RED 规格要记录，不借文档任务扩大范围修复。
 
@@ -620,7 +633,7 @@ npx playwright test tests/rag.spec.ts
 
 用户 2026-10-04 将测试安排到其他对话，主线进入阶段 3；阶段 2 的未验收项继续保留。测试对话可继续独立验收，不为机械阶段编号停止主线实现；不冒称整阶段或首版已完成。
 
-主线下一步为首版学习闭环的使用路径与发布准备收口，不默认扩展OCR/更多格式/无限工具循环。核心计划功能已接入不等于首版通过验收。Windows候选构建已接入，实际安装/升级/卸载仍交独立测试；正式包必须隔离Windows用户/VM。项目任务/提议/番茄钟/完整备份恢复/主题/历史管理/练习已实现待验收；主线实现与基础检查，功能/安装/真实模型测试继续交其他对话，使用README及九份docs/testing清单。发布须实际验收且对应Git版本，不自动推送/标签/Release或改变私有状态；保留质量失败与确认边界，不因构建通过勾阶段3/4/5或首版，网站最后。
+主线下一步为汇总首版发布门禁与准备固定版本候选，不默认扩展OCR/更多格式/无限工具循环。核心计划功能已接入不等于首版通过验收。Windows候选构建已接入，实际安装/升级/卸载仍交独立测试；正式包必须隔离Windows用户/VM。项目任务/提议/番茄钟/完整备份恢复/主题/历史管理/练习/首页闭环已实现待验收；主线实现与基础检查，功能/安装/真实模型测试继续交其他对话，使用README及十份docs/testing清单。发布须实际验收且对应Git版本，不自动推送/标签/Release或改变私有状态；保留质量失败与确认边界，不因构建通过勾阶段3/4/5或首版，网站最后。
 
 ## 14. Git、隐私与协作流程
 
