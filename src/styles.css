@@ -1601,10 +1601,6 @@ h2 {
   border-top: 1px solid var(--line);
   padding-top: 19px;
 }
-.journey .small-label {
-  font-size: 9px;
-  letter-spacing: 0.7px;
-}
 .journey ol {
   display: grid;
   grid-template-columns: repeat(4, 1fr);

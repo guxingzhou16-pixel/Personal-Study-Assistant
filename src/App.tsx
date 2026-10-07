@@ -22,12 +22,14 @@ import { SettingsPage } from './components/SettingsPage';
 import { LibraryPage } from './components/LibraryPage';
 import { ReadingPage } from './components/ReadingPage';
 import { RecentReadings } from './components/RecentReadings';
+import { TodayTasks } from './components/TodayTasks';
+import { HomeStudyFlow } from './components/HomeStudyFlow';
 import { StudyCalendar } from './components/StudyCalendar';
 import { ChatPage } from './components/ChatPage';
 import { NotesPage } from './components/NotesPage';
 import { AgentPage } from './components/AgentPage';
 import { MemoryPage } from './components/MemoryPage';
-import { PlanningPage } from './components/PlanningPage';
+import { PlanningPage, type PlanningTarget } from './components/PlanningPage';
 import { FocusPage } from './components/FocusPage';
 import { BackupPanel, BackupBusyDialog } from './components/BackupPanel';
 import { useBackupState } from './lib/useBackupState';
@@ -74,11 +76,7 @@ export default function App() {
   const [noteSource, setNoteSource] = useState<{ id: string | null; sequence: number } | null>(
     null,
   );
-  const [taskTarget, setTaskTarget] = useState<{
-    id: string;
-    day: string;
-    sequence: number;
-  } | null>(null);
+  const [planningTarget, setPlanningTarget] = useState<PlanningTarget | null>(null);
   const [routeTarget, setRouteTarget] = useState<{ id: string; sequence: number } | null>(null);
   const [planningVersion, setPlanningVersion] = useState(0);
   const [focusTarget, setFocusTarget] = useState<{
@@ -91,6 +89,7 @@ export default function App() {
   const [attempt, setAttempt] = useState(0);
   const backup = useBackupState(true);
   const theme = boot?.settings.theme ?? defaultSettings.theme;
+  const previousPage = useRef(page);
   useLayoutEffect(() => {
     document.documentElement.dataset.theme = theme;
     return () => {
@@ -99,6 +98,9 @@ export default function App() {
   }, [theme]);
   useEffect(() => {
     mainRef.current?.scrollTo(0, 0);
+    if (previousPage.current !== page && document.activeElement === document.body)
+      mainRef.current?.focus({ preventScroll: true });
+    previousPage.current = page;
   }, [page]);
   useEffect(() => {
     if (isDesktop) return desktop.onShowNotes(() => navigate('notes'));
@@ -174,8 +176,17 @@ export default function App() {
     openTaskReference(task.id, task.day);
   }
   function openTaskReference(id: string, day: string) {
-    setTaskTarget((previous) => ({
+    setPlanningTarget((previous) => ({
+      kind: 'task',
       id,
+      day,
+      sequence: (previous?.sequence ?? 0) + 1,
+    }));
+    navigate('planning');
+  }
+  function openPlanningDay(day: string) {
+    setPlanningTarget((previous) => ({
+      kind: 'day',
       day,
       sequence: (previous?.sequence ?? 0) + 1,
     }));
@@ -325,7 +336,7 @@ export default function App() {
                 </div>
                 <span className="status-pill">
                   <span />
-                  刚刚启程
+                  按自己的节奏
                 </span>
               </div>
               <section className="welcome-panel" aria-labelledby="welcome-title">
@@ -344,7 +355,7 @@ export default function App() {
                     <br />
                     你的学习空间已经准备好了。
                   </p>
-                  <button className="button primary" onClick={() => setPage('library')}>
+                  <button className="button primary" onClick={() => navigate('library')}>
                     打开我的资料库
                     <ArrowRight size={16} />
                   </button>
@@ -368,11 +379,18 @@ export default function App() {
                   </span>
                 </div>
               </section>
+              <TodayTasks
+                refreshVersion={planningVersion}
+                paused={Boolean(backup.state && backup.state.operation !== 'idle')}
+                onOpenDay={openPlanningDay}
+                onOpenTask={openTask}
+                onFocusTask={focusTask}
+              />
               <div className="home-columns">
                 <section className="recent-section">
                   <div className="section-heading">
                     <h2>最近阅读</h2>
-                    <button className="text-button" onClick={() => setPage('library')}>
+                    <button className="text-button" onClick={() => navigate('library')}>
                       查看资料库
                       <ArrowRight size={14} />
                     </button>
@@ -384,19 +402,7 @@ export default function App() {
                   encouragement={encouragement}
                 />
               </div>
-              <div className="journey">
-                <span className="small-label">让学习留下痕迹</span>
-                <ol>
-                  {['读一段资料', '问一个问题', '写下自己的理解', '回看今天的收获'].map(
-                    (step, index) => (
-                      <li key={step}>
-                        <span>{String(index + 1).padStart(2, '0')}</span>
-                        {step}
-                      </li>
-                    ),
-                  )}
-                </ol>
-              </div>
+              <HomeStudyFlow settings={settings} onNavigate={navigate} />
             </div>
           )}
           {boot && !failure && page === 'library' && !sourceId && (
@@ -463,7 +469,7 @@ export default function App() {
               <PlanningPage
                 visible={page === 'planning'}
                 refreshVersion={planningVersion}
-                presetTask={taskTarget}
+                presetTarget={planningTarget}
                 onOpenLearningRoute={openLearningRoute}
                 onFocusTask={focusTask}
               />

@@ -22,7 +22,12 @@ type Action =
   | { kind: 'new-project' | 'new-task' | 'refresh' | 'close' | 'delete' }
   | { kind: 'project' | 'task'; id: string }
   | { kind: 'day'; day: string }
-  | { kind: 'open-task'; id: string; day: string };
+  | { kind: 'open-task'; id: string; day: string }
+  | { kind: 'open-day'; day: string };
+
+export type PlanningTarget = { day: string; sequence: number } & (
+  { kind: 'day' } | { kind: 'task'; id: string }
+);
 
 function projectDraft(project: ProjectDraft): ProjectDraft {
   return { title: project.title, goal: project.goal, archived: project.archived };
@@ -56,13 +61,13 @@ function sortTasks(items: DailyTask[]): DailyTask[] {
 export function PlanningPage({
   visible,
   refreshVersion,
-  presetTask,
+  presetTarget,
   onOpenLearningRoute,
   onFocusTask,
 }: {
   visible: boolean;
   refreshVersion: number;
-  presetTask: { id: string; day: string; sequence: number } | null;
+  presetTarget: PlanningTarget | null;
   onOpenLearningRoute: (id: string) => void;
   onFocusTask: (task: DailyTask) => void;
 }) {
@@ -81,7 +86,7 @@ export function PlanningPage({
   const mounted = useRef(false);
   const loadVersion = useRef(0);
   const refreshStamp = useRef<string | null>(null);
-  const handledTaskTarget = useRef(0);
+  const handledTarget = useRef(0);
   const dirty = Boolean(editor && JSON.stringify(editor.draft) !== JSON.stringify(editor.original));
   const projects = overview?.projects ?? [];
   const tasks = overview?.day === day ? overview.tasks : [];
@@ -122,17 +127,23 @@ export function PlanningPage({
       return;
     }
     if (!isDesktop || busy || loading) return;
+    // A navigation request loads its own day; do not launch a competing stale-day refresh.
+    if (presetTarget && handledTarget.current !== presetTarget.sequence) return;
     const stamp = `${day}|${refreshVersion}`;
     if (refreshStamp.current === stamp) return;
     refreshStamp.current = stamp;
     void refresh(false);
-  }, [visible, day, refreshVersion, busy, loading]);
+  }, [visible, day, refreshVersion, busy, loading, presetTarget]);
   useEffect(() => {
-    if (!visible || !presetTask || blocked || handledTaskTarget.current === presetTask.sequence)
+    if (!visible || !presetTarget || blocked || handledTarget.current === presetTarget.sequence)
       return;
-    handledTaskTarget.current = presetTask.sequence;
-    request({ kind: 'open-task', id: presetTask.id, day: presetTask.day });
-  }, [visible, presetTask, busy, loading]);
+    handledTarget.current = presetTarget.sequence;
+    request(
+      presetTarget.kind === 'task'
+        ? { kind: 'open-task', id: presetTarget.id, day: presetTarget.day }
+        : { kind: 'open-day', day: presetTarget.day },
+    );
+  }, [visible, presetTarget, busy, loading]);
   useEffect(() => {
     const element = dialog.current;
     if (!element) return;
@@ -179,24 +190,30 @@ export function PlanningPage({
     setError('');
     setNotice('');
     if (action.kind === 'refresh') return refresh(true);
-    if (action.kind === 'open-task') {
+    if (action.kind === 'open-task' || action.kind === 'open-day') {
       const version = ++loadVersion.current;
       setLoading(true);
       try {
         const result = await desktop.planningOverview(action.day);
         if (!mounted.current || version !== loadVersion.current) return;
-        const record = result.tasks.find((task) => task.id === action.id);
-        if (!record) {
+        const record =
+          action.kind === 'open-task' ? result.tasks.find((task) => task.id === action.id) : null;
+        if (action.kind === 'open-task' && !record) {
           setError('任务已改期或删除，请按安排日期查找最新任务。原编辑内容仍保留。');
           return;
         }
-        const draft = taskDraft(record);
         refreshStamp.current = `${result.day}|${refreshVersion}`;
         setOverview(result);
         setDay(result.day);
         setFilter('all');
-        setEditor({ kind: 'task', record, draft, original: draft });
-        setNotice('已打开任务的最新保存版本。');
+        if (record) {
+          const draft = taskDraft(record);
+          setEditor({ kind: 'task', record, draft, original: draft });
+          setNotice('已打开任务的最新保存版本。');
+        } else {
+          setEditor(null);
+          setNotice('已读取这一天的全部任务。');
+        }
       } catch (reason) {
         if (mounted.current && version === loadVersion.current) setError(errorMessage(reason));
       } finally {

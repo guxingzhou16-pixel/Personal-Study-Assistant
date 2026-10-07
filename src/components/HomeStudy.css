@@ -1,0 +1,118 @@
+.today-tasks {
+  margin-top: 24px;
+  padding: 18px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--surface);
+}
+.today-tasks .section-heading {
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+.today-tasks time {
+  display: block;
+  margin-top: 4px;
+  font-size: 12px;
+  color: var(--muted);
+}
+.home-study-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+}
+.today-task-list {
+  list-style: none;
+  padding: 0;
+  margin: 12px 0;
+}
+.today-task-list li {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+  padding-block: 12px;
+  border-bottom: 1px solid var(--line);
+}
+.today-task-list li > div:first-child {
+  flex: 1;
+  min-width: min(100%, 220px);
+  overflow-wrap: anywhere;
+}
+.today-task-list strong {
+  font-size: 14px;
+}
+.today-task-list p,
+.today-tasks-empty,
+.home-study-flow > p,
+.home-model-hint p {
+  font-size: 12px;
+  line-height: 1.8;
+  color: var(--muted);
+  overflow-wrap: anywhere;
+}
+.today-tasks-empty {
+  margin-block: 16px;
+}
+.home-study-flow > p {
+  margin-top: 8px;
+}
+.journey.home-study-flow ol {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+.journey.home-study-flow li {
+  min-width: 0;
+  align-items: stretch;
+}
+.home-study-flow li button {
+  width: 100%;
+  display: grid;
+  grid-template-columns: 24px minmax(0, 1fr);
+  gap: 8px;
+  padding: 14px;
+  text-align: left;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--surface);
+  color: inherit;
+  overflow-wrap: anywhere;
+}
+.home-study-flow li button:hover {
+  border-color: var(--accent);
+}
+.home-study-flow li strong {
+  align-self: center;
+  color: var(--theme-text, #26362d);
+  font-size: 14px;
+}
+.home-study-flow li small {
+  grid-column: 2;
+  font-size: 12px;
+  line-height: 1.8;
+}
+.home-model-hint {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+  margin-block: 16px;
+  padding: 12px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--surface);
+}
+.home-model-hint p {
+  flex: 1;
+  min-width: min(100%, 240px);
+}
+@media (max-width: 1100px) {
+  .journey.home-study-flow ol {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+@media (max-width: 700px) {
+  .journey.home-study-flow ol {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
