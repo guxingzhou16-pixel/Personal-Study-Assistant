@@ -224,7 +224,15 @@
 - 无新依赖、IPC、迁移或写入能力，主v12/活动v1/派生v2/备份format1不变。最终npm run desktop:build（双TypeScript/Vite/Electron）、6份源码及新增首页清单Prettier、diff通过，两reviewer静态批准；Vite已有大块提示保留，性能/安装未测。未新增/改/运行测试代码，未启动应用/安装器、打开任何数据库或请求模型，不能称功能或首版验收。
 - 新增docs/testing/home-workflow-acceptance.md并补充planning清单，十份交接清单全部待独立执行；实现`1fc7fa5`仅本地提交、不推送，保留他人改动。旧候选包早于本轮，安装QA须固定提交重新构建并隔离Windows用户/VM；主线下一步汇总发布门禁与固定版本候选，功能/安装/真实质量交测试对话，网站最后。
 
-### 3.20 仍待开发或验收的主要能力
+### 3.20 已完成、待独立验收的固定版本候选与发布交接
+
+- 2026-10-07：从完整提交471e0a73ddc57ab355477b1daab0b8065067efa2创建detached干净worktree，独立npm ci --no-audit --no-fund及锁定Electron install.js安装预编译运行时，不复用主目录node_modules/dist，不运行应用/安装器/测试/数据库/模型。保留他人文档/脚本/第三方目录，构建工具缓存仅当前进程复用已忽略路径。
+- 新增docs/testing/release-readiness.md汇总固定源码/产物回执、十份既有清单、门槛/执行顺序/失败证据与回退边界；docs/releases/0.1.0-candidate.md为未发布说明草稿，保留模型准备、未签名、strict12/1、未保存稿/降级与许可限制。未添加功能、依赖、IPC、迁移或测试规格；主v12/活动v1/派生v2/备份format1不变。
+- **本轮实际检查：**独立源码的npm run desktop:pack与desktop:dist均通过（双TypeScript/Vite/Electron/包内容/摘要），两种包各检查5242项ASAR条目及三个worker/PDF/ONNX/Sharp资源。目录候选4510个运行文件、684555443字节，复制到主release后逐文件独立SHA-256与清单全部一致；安装器152047222字节（约145.00MiB），Get-FileHash与manifest/SHA256SUMS一致，实际签名NotSigned、版本0.1.0。卸载器纯提取一次，无执行安装器回退；Vite已有大块提示保留（主JS993.07kB/gzip297.66kB、PDF worker2228.48kB），性能未测。新增两份文档及修改安装清单Prettier、本地链接和diff检查通过；未运行功能/安装测试。
+- 产物复制到主目录release的新UUID输出，旧候选/失败文件与冻结源码工作区均保留、不自动清理。包和manifest不进入Git，0.1.0只是元数据版本，同名安装器不等于同一候选；功能修复必须新提交/新候选/相关复验。源码dirty=false不等于安全/功能/安装通过，不由哈希保证发布者身份。
+- 使用production-audit按本地证据整理发布条件；未向外部审计器上传仓库或执行远端扫描。数据迁移/恢复、全流程、安装升级卸载、真实模型语义/规模、项目/第三方许可与远端CI仍待完成，项目根无LICENSE/NOTICE，未替用户选择许可。不推送/标签/Release或改变私有状态，网站最后；主线下一步根据测试对话结果修复发布阻断项。
+
+### 3.21 仍待开发或验收的主要能力
 
 笔记、AI反馈、路线、记忆管理/确认、手动项目/任务、Agent任务提议、任务番茄钟、完整备份/恢复、三种主题、历史管理、卡片/短测验及首页学习闭环的独立验收，Windows候选安装/运行/升级/卸载、真实聊天/引用语义与规模验证；OCR、更多格式与展示网站待开发。安装包构建已接入，正式发布仍待验收与授权。
 
@@ -307,6 +315,8 @@
 | `scripts/package-desktop.mjs`、`verify-package.mjs` | 唯一候选目录/打包开始来源与全文件/安装器摘要、afterPack静态资源检查；不启动应用/安装器/数据库/模型 |
 | `.github/workflows/package-windows.yml` | 手动Windows候选构建和七日artifact，contents只读，不推送/标签/Release |
 | `docs/testing/packaging-acceptance.md` | 隔离Windows用户/VM的安装/运行/升级/卸载与发布门禁交接，全部待执行 |
+| `docs/testing/release-readiness.md` | 固定候选来源/摘要与十份详细清单汇总、未通过门槛、证据和回退边界，不自动验收/发布 |
+| `docs/releases/0.1.0-candidate.md` | 候选说明草稿，功能是实现范围；无下载公告、验收或公开分发许可承诺 |
 | `docs/testing/history-acceptance.md` | 历史权限/确切版本/删除影响/来源保留/应答丢失/导出交接，全部待执行 |
 | `src/App.tsx` | 工作台/首页、启动/导航、内部day/task目标及移除入口后的主区焦点，保持已有页面挂载 |
 | `src/components/TodayTasks.tsx`、`HomeStudyFlow.tsx`、`HomeStudy.css` | 只读今日任务/日期刷新/计划或专注准备、六步纯导航与模型配置提示；不生成或自动写学习数据 |
@@ -633,7 +643,7 @@ npx playwright test tests/rag.spec.ts
 
 用户 2026-10-04 将测试安排到其他对话，主线进入阶段 3；阶段 2 的未验收项继续保留。测试对话可继续独立验收，不为机械阶段编号停止主线实现；不冒称整阶段或首版已完成。
 
-主线下一步为汇总首版发布门禁与准备固定版本候选，不默认扩展OCR/更多格式/无限工具循环。核心计划功能已接入不等于首版通过验收。Windows候选构建已接入，实际安装/升级/卸载仍交独立测试；正式包必须隔离Windows用户/VM。项目任务/提议/番茄钟/完整备份恢复/主题/历史管理/练习/首页闭环已实现待验收；主线实现与基础检查，功能/安装/真实模型测试继续交其他对话，使用README及十份docs/testing清单。发布须实际验收且对应Git版本，不自动推送/标签/Release或改变私有状态；保留质量失败与确认边界，不因构建通过勾阶段3/4/5或首版，网站最后。
+主线下一步根据固定候选的独立验收结果修复发布阻断项，不默认扩展OCR/更多格式/无限工具循环。docs/testing/release-readiness.md汇总固定来源/产物摘要、十份详细清单及未通过门槛，候选说明在docs/releases/0.1.0-candidate.md。核心功能已接入不等于首版验收，主线必要修复与基础检查，功能/安装/真实模型仍交其他对话；正式包测试须隔离Windows用户/VM。修复后新提交/新候选/相关复验，不混用旧包和新代码。项目及第三方许可、远端CI与发布授权仍待核对，不自动推送/标签/Release或改变私有状态，不因构建通过勾阶段3/4/5或首版，网站最后。
 
 ## 14. Git、隐私与协作流程
 
@@ -642,6 +652,7 @@ npx playwright test tests/rag.spec.ts
 - 查看 `git status --short --branch`、近期提交、README 的阶段状态和本任务涉及的文件。
 - 分清已提交代码、未提交实现、未追踪资料和测试规格；工作区不干净不代表可以丢弃或重做。
 - 只在任务需要时创建新分支；当前分支有其他工作时不擅自切换、变基、合并或清理。
+- 发布候选从明确提交的独立干净checkout/worktree安装锁定依赖和编译，不复用共享目录node_modules/dist；可复用下载工具缓存。保留完整HEAD/前后Git状态/锁摘要与包内来源，主目录的新文档提交不改变冻结源码；修改候选功能后须重新构建和相关复验。输出不自动清理，不因安装器存在默认执行它。
 - 搜索优先使用 `rg` / `rg --files`。Windows 下给 `rg` 的文件匹配使用 `-g '*.test.ts'` 等方式，不假定 shell 会展开所有通配路径。
 
 ### 实现与提交

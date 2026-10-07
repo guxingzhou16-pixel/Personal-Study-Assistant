@@ -95,6 +95,8 @@ npm run desktop:dist
 
 手动 `.github/workflows/package-windows.yml` 配置 npm ci、生产/NSIS 构建、七日候选 artifact，contents 只读；没有推送/标签/Release 步骤，本机包装明确 `publish: never`。此工作流未在远端执行；推送与发布都仍需用户明确授权。阶段 3/4、真实模型/检索失败案例与安装清单验收完成后，再准备版本标签、发布说明和已验证的下载入口；展示网站最后建设。
 
+2026-10-07从固定提交 `471e0a7` 的独立干净工作区重新准备0.1.0候选，包含历史管理、练习和首页入口；不复用共享开发目录的依赖或旧编译产物。具体构建回执、产物位置和发布条件集中在 [首版发布验收总表](docs/testing/release-readiness.md)，测试方由此进入十份详细清单；[候选版说明草稿](docs/releases/0.1.0-candidate.md) 保存模型准备、数据兼容、安装隔离和限制。候选构建不是首版验收，未签名、许可与正式发布授权仍待核对。
+
 验证命令：
 
 ```powershell
@@ -629,6 +631,8 @@ docs/testing/packaging-acceptance.md 安装包清单，含隔离用户/VM、资�
 docs/testing/history-acceptance.md 历史管理清单，含确切版本/用途/删除影响/应答丢失/导出
 docs/testing/practice-acceptance.md 练习清单，含v12保留/三项输出/翻面作答/取消竞争/备份兼容/语义核对
 docs/testing/home-workflow-acceptance.md 首页闭环清单，含真实今日/按日导航/脏稿/迟到/备份/键盘/无模型及AI路径
+docs/testing/release-readiness.md 固定候选/来源回执、十份清单汇总、发布门槛/失败与回退边界
+docs/releases/0.1.0-candidate.md 候选版说明草稿；非下载公告，保留未验收、数据兼容和分发限制
 electron-builder.json  Windows x64、ASAR解包、当前用户NSIS与禁止自动发布配置
 .github/workflows/package-windows.yml 手动候选构建/七日artifact，不创建Release
 .github/workflows/      Windows 构建与验证流程
@@ -721,7 +725,7 @@ electron-builder.json  Windows x64、ASAR解包、当前用户NSIS与禁止自�
 - 不要提交本机资料或本机的 `邻家大姐姐型_AI_陪伴人格_v6.md`；该文件不属于仓库文档。新出现的本地数据路径和密钥格式要及时加入 `.gitignore`。
 - **交接文档（README）与代码同步维护。** 写代码的同时更新 README；每个任务结束后，在"最近交付与验证记录"写清本次做了什么、改了哪些文件与模块、如何验证、遗留问题与下一步。项目的定位、已实现功能、技术方案、目录结构、运行命令等完整信息都随改动保持在 README 中，保证新接手者只读 README 就能继续。
 - 每次完成阶段任务，更新对应复选框、实际运行命令、验证结果与遗留问题。失败或未验证的项保持未勾选；不要把下一阶段的设想写成已交付。
-- **当前主线下一步：汇总首版发布门禁与准备固定版本候选。** 核心计划功能已接入，但笔记/Agent/任务/番茄钟/备份/主题/历史/练习/首页闭环及安装与真实质量仍待独立验收，使用README及十份docs/testing清单；不继续默认扩展OCR/更多格式/无限工具循环。主线仍负责小功能实现与基础检查，不运行功能或真实模型测试。Windows候选包早于本轮代码，安装验收前重新构建并用隔离Windows用户/VM；阶段3/4/5、真实质量与安装仍待验收，不自动推送/标签/Release或改变私有状态，展示网站最后。
+- **当前主线下一步：根据固定候选的独立验收结果修复发布阻断问题。** 使用[发布验收总表](docs/testing/release-readiness.md)进入README及十份详细清单，记录对应提交/产物摘要与失败；核心功能已接入但阶段3/4/5、安装和真实质量仍待验收。主线负责必要修复和基础检查，不运行功能或真实模型测试；修复后需新提交/新候选及相关复验，不混用旧包和新代码。不默认扩展OCR/更多格式/无限工具循环，不自动推送/标签/Release或改变私有状态，展示网站最后。
 - 用户要求：**每完成一个可用功能，向用户报告实际结果和验证情况。** 报告与 README 都应说明真实服务、模拟服务以及尚未验证的部分。
 - **测试以简单基础验证为准。** 每次功能开发完成后只做与该功能相关的简单基础验证（该功能能跑通、不影响既有开发即可），不用每次都跑完整测试套件或全局测验；完整回归仅在阶段验收、发布前等明确要求时执行。
 
@@ -891,6 +895,16 @@ electron-builder.json  Windows x64、ASAR解包、当前用户NSIS与禁止自�
 - **交互与限制：**准备专注只选择任务，实际开始仍须专注页核对版本/状态；已完成任务不提供该入口。页面切换后仅在焦点退回body时聚焦主内容，不抢目标控件或对话框焦点；保留首页日历及签到/累计计时两列4:5，三种主题复用语义变量。模型名称不代表连通或回答质量；任务列表是读取时快照，外部变化需刷新或在目标页复核。实际键盘、布局、日期竞争及无模型完整学习流程仍待独立验证。
 - **本轮实际检查：**最终 `npm run desktop:build`（renderer/Electron双TypeScript、Vite及main/preload/worker构建）、6份修改源码与新增首页清单Prettier、diff检查通过；TypeScript reviewer和code-reviewer静态批准。已有Vite大块提示仍在（主JS993.07kB/gzip297.66kB、PDF worker2228.48kB），未测运行性能或安装包。未新增/修改/执行测试代码，未启动应用/安装器、打开任何数据库或调用模型。
 - **交接与Git：**新增 [首页学习闭环清单](docs/testing/home-workflow-acceptance.md)，计划清单追加按日/单任务导航、脏稿和竞争边界，全部待执行。实现提交 `1fc7fa5` 在共享 `codex/structured-notes` 仅本地保存，未推送；保留其他对话的文档、脚本和第三方资料。旧候选包不含本轮改动，安装验收须固定提交重新构建并隔离Windows用户/VM；主线下一步汇总首版发布门禁与准备固定版本候选，功能/安装/真实模型验收继续交测试对话，网站最后。
+
+#### 2026-10-07：首版固定候选与发布验收交接（本地构建，待独立验收）
+
+- **范围：**汇总首版发布门槛并重新准备包含历史管理、练习和首页入口的0.1.0候选；没有新增软件功能、依赖、IPC、迁移或测试规格。主库v12/活动v1/派生v2/完整备份format1保持，当前完整备份严格12/1。
+- **固定来源：**完整提交 `471e0a73ddc57ab355477b1daab0b8065067efa2` 的独立detached工作区，`npm ci --no-audit --no-fund`重新安装515个包；用该锁定Electron的install.js安装预编译运行时，未运行Electron。构建前后核对HEAD/Git状态，包来源dirty=false；共享目录中的其他文档/脚本/资料未加入源码或候选。
+- **本轮实际检查：**独立源码的npm run desktop:pack与desktop:dist均通过（双TypeScript/Vite/Electron/包内容/摘要），两种包各检查5242项ASAR条目及三个worker/PDF/ONNX/Sharp资源。目录候选4510个运行文件、684555443字节，复制到主release后逐文件独立SHA-256与清单全部一致；安装器152047222字节（约145.00MiB），Get-FileHash与manifest/SHA256SUMS一致，实际签名NotSigned、版本0.1.0。卸载器纯提取一次，无执行安装器回退；Vite已有大块提示保留（主JS993.07kB/gzip297.66kB、PDF worker2228.48kB），性能未测。新增两份文档及修改安装清单Prettier、本地链接和diff检查通过；未运行功能/安装测试。
+- **本机产物：**完整目录 `release/dir-ab52aefe-9df1-4dec-b05b-c3f0d34fe834/win-unpacked/`；安装器 `release/nsis-adf42f23-3d69-4eac-a6f5-be3079af0f17/StudyCompanion-0.1.0-win-x64-setup.exe`，SHA-256 `33137e5c06b502b8160e8a5b5e626dcda4ab1b62c53e8f72ed29e464a6a181ca`。两份旁置build-info/build-manifest/package-audit/SHA256SUMS保持，构建来源dirty=false；包内容检查仅证明静态文件。锁摘要与候选来源见总表，未上传/发布，后续修复重新生成UUID和回执。
+- **交接文档：**新增 [发布验收总表](docs/testing/release-readiness.md) 和 [候选版说明草稿](docs/releases/0.1.0-candidate.md)，连接十份详细清单，规定同候选证据、失败/修复复验、隔离安装及旧版本回退；安装清单加入总表入口。README/AGENTS同步固定来源、目录职责与后续工作；文档本地保存，不提交安装包/依赖/冻结工作区。
+- **待验收与发布条件：**没有新增/修改/运行测试代码，未启动应用/安装器、打开任何数据库或请求真实/模拟/收费模型。未向外部审计器上传仓库或执行远端扫描；production-audit只按本地代码/配置/包记录整理证据。数据迁移/恢复、安装版运行/升级/卸载、完整学习流程、真实生成/引用语义、代表性规模及项目/第三方许可仍未验收，根目录无LICENSE/NOTICE，远端CI未核对。不得把构建/摘要当首版通过或发布者身份校验。
+- **Git与下一步：**保留共享目录其他改动和全部旧候选；只本地提交，不推送/标签/Release、不改可见性。冻结源码、失败/成功产物可能占磁盘，不自动清理；本版仍未签名、默认图标、无自动更新、未发布。主线下一步依据测试对话结果修复发布阻断项，新提交重新构建并相关复验，展示网站最后。
 
 ## 开发原则
 
