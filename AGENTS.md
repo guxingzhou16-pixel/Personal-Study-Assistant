@@ -238,9 +238,17 @@
 - 仅修改electron/core/backup.ts，无依赖/IPC/迁移/格式变化，主v12/活动v1/派生v2/format1不变。备份清单追加可控时钟与延迟校验、精确期限/取消/有效提交复验，仍全部待测试对话执行；不新增/修改/运行功能测试、应用/安装器、任何SQLite或模型。
 - 类型/生产桌面构建、修改源码/清单Prettier与diff检查通过，TypeScript reviewer与code-reviewer静态批准，已有Vite大块提示保留；修复/清单提交493af2a仅本地、未推送。冻结471e0a7旧目录包/安装器未更新，不含此修复；新源码复验后固定新提交重新构建、使用新摘要，旧候选保留。保留其他对话修改，不推送/标签/Release，网站最后。
 
-### 3.22 仍待开发或验收的主要能力
+### 3.22 已实现、待独立验收的专注历史与复盘回看
 
-笔记、AI反馈、路线、记忆管理/确认、手动项目/任务、Agent任务提议、任务番茄钟、完整备份/恢复、三种主题、历史管理、卡片/短测验及首页学习闭环的独立验收，Windows候选安装/运行/升级/卸载、真实聊天/引用语义与规模验证；OCR、更多格式与展示网站待开发。安装包构建已接入，正式发布仍待验收与授权。
+- 2026-10-08用户选择本功能。默认折叠，展开后只读取已计满/提前结束/中断记录，按实际开始日期或全部筛选、固定20条分页，显示真实数量/状态/elapsed/复盘摘录；原最近20条入口保留。不新增AI、掌握评价、统计或任何自动写入。
+- FocusStorage.history受限day/page、日期0001～9999或null、整数页1～500；终态元数据有10001条读取上限，超过10000/损坏报错，按真实开始毫秒倒序/ID升序，日期按设备当前时区而非taskDay，只完整解码当页。直接Storage只读，不调用tracker.overview/checkpoint/故障恢复；focusWork/调用方/主frame和维护锁沿用。
+- FocusHistoryPanel管理折叠/筛选/分页/刷新、代次与可见/busy/查询/refreshKey绑定，切离/新查询迟到拒收，不每秒轮询；FocusPage按ID重读详情、另绑隐藏代次，沿用脏稿确认/实际保存/任务查看与版本冲突。显式选中的旧复盘在新专注结束时保持，载入后焦点转到复盘标题，取消不覆盖稿；未保存关闭/重载仍可能丢失。
+- 新具体IPC study:focus-history/共享FocusHistoryQuery与FocusHistoryPage/desktop.focusHistory，无依赖/迁移/格式变化，主v12/活动v1/派生v2/format1保持。新增docs/testing/focus-history-acceptance.md并同步原focus清单/发布总表，十一份清单均待独立执行；主线未写/改/运行功能测试、应用/安装器、任何SQLite或模型。最终desktop:build（双TypeScript/Vite/Electron）、10份源码/3份验收文档Prettier与diff通过，两reviewer静态批准；包含时钟回拨/未来记录导致recent首项未变的刷新修正，按活动ID转为终态触发一次历史读取，不每秒poll。实现c9fe47f仅本地提交、未推送，已有Vite大块提示保留。
+- 无跨请求列表冻结、原时区快照、全量导出/删除/统计；实际界面/10000条规模待测。旧471e0a7目录包/安装器未更新，不含本功能或493af2a恢复过期修复；源码复验/必要修复后固定新提交重构建候选，旧产物保留。仅本地Git，保留他人修改，不推送/标签/Release，网站最后。
+
+### 3.23 仍待开发或验收的主要能力
+
+笔记、AI反馈、路线、记忆管理/确认、手动项目/任务、Agent任务提议、任务番茄钟/全量专注历史、完整备份/恢复、三种主题、历史管理、卡片/短测验及首页学习闭环的独立验收，Windows候选安装/运行/升级/卸载、真实聊天/引用语义与规模验证；OCR、更多格式与展示网站待开发。安装包构建已接入，正式发布仍待验收与授权。
 
 独立合成集 `synthetic-retrieval-v2`（`tests/fixtures/retrieval-independent-cases.ts`）与逐题引用位置校验已加入可重复评测；多锚点召回在独立集上仍有失败（`ind-symmetric-hash`），保留为失败案例。真实本地/云端聊天仍未验收：本机未安装 Ollama，无法据此验证真实生成与引用语义。
 
@@ -321,7 +329,8 @@
 | `scripts/package-desktop.mjs`、`verify-package.mjs` | 唯一候选目录/打包开始来源与全文件/安装器摘要、afterPack静态资源检查；不启动应用/安装器/数据库/模型 |
 | `.github/workflows/package-windows.yml` | 手动Windows候选构建和七日artifact，contents只读，不推送/标签/Release |
 | `docs/testing/packaging-acceptance.md` | 隔离Windows用户/VM的安装/运行/升级/卸载与发布门禁交接，全部待执行 |
-| `docs/testing/release-readiness.md` | 固定候选来源/摘要与十份详细清单汇总、未通过门槛、证据和回退边界，不自动验收/发布 |
+| `docs/testing/release-readiness.md` | 固定候选来源/摘要与十一份详细清单汇总、未通过门槛、证据和回退边界，不自动验收/发布 |
+| `docs/testing/focus-history-acceptance.md` | 只读终态分页/开始日期时区/旧复盘草稿/迟到状态与原计时回归，全部待独立执行 |
 | `docs/releases/0.1.0-candidate.md` | 候选说明草稿，功能是实现范围；无下载公告、验收或公开分发许可承诺 |
 | `docs/testing/history-acceptance.md` | 历史权限/确切版本/删除影响/来源保留/应答丢失/导出交接，全部待执行 |
 | `src/App.tsx` | 工作台/首页、启动/导航、内部day/task目标及移除入口后的主区焦点，保持已有页面挂载 |
@@ -342,7 +351,8 @@
 | `src/components/PlanningPage.tsx`、`src/lib/planning.ts` | 指定日期任务/项目编辑、归档与完成/删除确认；内部PlanningTarget day/task共用序列，入站优先/脏稿确认/最新记录读取，页面保持挂载 |
 | `src/components/PlanningEditor.tsx` | 无状态项目/任务表单，接收实际记录与草稿；不读数据库/直接调用桌面接口 |
 | `src/components/TaskProposalPanel.tsx`、`TaskProposalPanel.css` | 单任务提议、编辑失效、项目加载、最终预览/确认/拒绝、实际结果与受控任务导航 |
-| `src/components/FocusPage.tsx`、`src/lib/focus.ts` | 单次任务专注、控制/最近记录/复盘/独立签到，集中限额与状态文案；页面保持挂载 |
+| `src/components/FocusPage.tsx`、`src/lib/focus.ts` | 单次任务专注、控制/最近记录/旧复盘载入/独立签到，集中限额与状态文案；页面保持挂载 |
+| `src/components/FocusHistoryPanel.tsx`、`FocusHistoryPanel.css` | 默认折叠的终态历史、开始日期/20条分页、真实数量/摘录、只读选择、迟到与可见状态保护 |
 | `src/components/LibraryPage.tsx` | 文件选择、导入状态、失败、搜索/格式筛选与真实资料列表 |
 | `src/components/ReadingPage.tsx`、`PdfPage.tsx` | 原页/排版、引用复制、保存、受验证的出处跳转及资料问答入口 |
 | `src/components/RecentReadings.tsx` | 首页从主库读取实际最近阅读，不用示例数据 |
@@ -454,6 +464,8 @@
 任务提议方法：`prepareTaskProposal(turnId, { day, projectId, edit?: { title, details, minutes } })`、`confirmTaskProposal(id)`、`discardTaskProposal(id)`。只接受受限字段、实际路线UUID与用户日期/项目选择，不收模型角色、来源版本/状态/完整项目快照。主进程读取来源及项目，缓存10份/10分钟的最终内容，确认只收UUID；同步复核并事务新增todo后消费。拒绝/过期/重复不写，修改重新预览，同路线新预览使旧ID失效；确认已发出不能靠切页撤回。实际成功结果供刷新/查看，跨重启预览无效，响应丢失不自动重发。
 
 专注方法：`focusOverview()`、`getFocusSession(id)`、`startFocus({taskId,taskRevision,minutes})`、`controlFocus(id,revision,action)`、`saveFocusReview(id,revision,review)`。仅实际保存todo/版本匹配可开始，action为pause/resume/stop；来源/时间/elapsed/状态/原因由主进程生成，不接受renderer自造。elapsed心跳不增控制revision，状态/复盘才增；有活动/未修复故障禁止新轮。读/控制返回实际FocusOverview与递增version，单条读取返回实际FocusSession，复盘返回FocusReviewResult{session,overview}供确认成功和恢复核对，不把读取或选择当开始/完成/签到。
+
+历史方法：`focusHistory({day, page})`，只有显式day(null或合法YYYY-MM-DD)/page(当前整数1～500)，固定historyPageSize=20，返回FocusHistoryPage的实际day/page/pageSize/total/sessions。主进程有界扫描终态ID/规范startedAt，按真实时刻与ID排序/按当前设备日期筛选，完整解码最多20条；不发SQL/limit/renderer时间、不调用tracker.overview或写记录。分页为每次读取快照，不能声称跨请求冻结或保存开始时原时区；列表刷新不覆盖筛选输入/父页旧复盘，详情按ID再次读取并沿用原revision/脏稿确认。新增接口后测试方补精确preload列表断言。
 
 备份方法：`backupState()`、`exportBackup()`、`inspectBackup()`、`confirmRestore(id)`、`discardRestore(id)`、`cancelBackup()`、`onBackupUpdate(listener)`。选址/原生确认由主进程做，恢复只接本进程缓存UUID；不接路径、清单、数据库正文或新数据位置。处理时普通IPC全部拒绝，只允许backup-state/cancel-backup；业务必须空闲，focus暂停也不能开始备份。状态带revision，界面早到/迟到事件按版本合并；不能把pending准备当已恢复成功。预览期限在确认入口、原生批准后和文件校验后/commit前复核，expiresAt <= 当前时间即拒绝，不延长期限。最终commit/restart不取消，也不因随后到期撤销；失败或丢失应答先读取实际状态；事件只传数据并返回取消监听。正常退出清理未确认预览不能受计时/模型busy阻止，清理失败明确报告且不中断已确认结果。
 
@@ -588,7 +600,7 @@ React 界面支持热更新；修改 `electron/` 或 preload 后重启桌面开�
 
 ## 11. 验证方法与测试要求
 
-**当前分工（用户2026-10-04指定，本轮延续）：主线实现与类型/构建/包文件基础检查；功能、安装及真实模型验收交其他对话。** 笔记/反馈/路线/记忆/项目任务/任务提议/番茄钟/完整备份恢复/主题、历史管理、练习、首页闭环与Windows包均未运行功能/安装测试或改规格；`docs/testing/`中的`memory-acceptance.md`、`planning-acceptance.md`、`task-proposal-acceptance.md`、`focus-acceptance.md`、`backup-acceptance.md`、`themes-acceptance.md`、`packaging-acceptance.md`、`history-acceptance.md`、`practice-acceptance.md`、`home-workflow-acceptance.md`十份详细清单是交接，未执行。测试方补齐v5～v12真实结构迁移/保留、CRUD/冲突/关联、导出/取消、协议/确认/恢复/引用、记忆隐私、提议单次确认/事务与任务状态和计时签到隔离、两库完整往返/启动切换/磁盘故障/回退、主题旧JSON/保存/重启/配色/护眼/键盘/缩放以及练习三项结构/真实编号/语义核对/翻面作答/迟到取消/12与11备份兼容、首页真实今日/按日目标/脏稿/跨日/迟到/维护/焦点/无模型完整闭环，隔离用户/VM内安装/原生资源运行/升级/卸载数据保护，更新旧断言/桥接清单；构建成功不等于功能通过。
+**当前分工（用户2026-10-04指定，本轮延续）：主线实现与类型/构建/包文件基础检查；功能、安装及真实模型验收交其他对话。** 笔记/反馈/路线/记忆/项目任务/任务提议/番茄钟/完整备份恢复/主题、历史管理、练习、首页闭环、专注历史与Windows包均未运行功能/安装测试或改规格；`docs/testing/`中的`memory-acceptance.md`、`planning-acceptance.md`、`task-proposal-acceptance.md`、`focus-acceptance.md`、`backup-acceptance.md`、`themes-acceptance.md`、`packaging-acceptance.md`、`history-acceptance.md`、`practice-acceptance.md`、`home-workflow-acceptance.md`、`focus-history-acceptance.md`十一份详细清单是交接，未执行。测试方补齐v5～v12真实结构迁移/保留、CRUD/冲突/关联、导出/取消、协议/确认/恢复/引用、记忆隐私、提议单次确认/事务与任务状态和计时签到隔离、两库完整往返/启动切换/磁盘故障/回退、主题旧JSON/保存/重启/配色/护眼/键盘/缩放以及练习三项结构/真实编号/语义核对/翻面作答/迟到取消/12与11备份兼容、首页真实今日/按日目标/脏稿/跨日/迟到/维护/焦点/无模型完整闭环、专注历史只读分页/本机时区/旧复盘脏稿/活动结束刷新与乱序，隔离用户/VM内安装/原生资源运行/升级/卸载数据保护，更新旧断言/桥接清单；构建成功不等于功能通过。
 
 日常开发以当前功能的基础验证为准，选择最小但有效的检查。纯文档改动核对事实、路径、命令和 diff 即可，不启动桌面或完整测试。与代码无关的已有 RED 规格要记录，不借文档任务扩大范围修复。
 
@@ -643,13 +655,13 @@ npx playwright test tests/rag.spec.ts
 | 1 | PDF/Markdown 导入与阅读，基础版本已交付 | 去重、损坏反馈、原文件复制、原页/排版、重启位置恢复、扫描件提示、取消与引用复制 |
 | 2 | 聊天协议、可追溯 RAG、本地嵌入/混合检索与对比已交付；真实聊天质量待做 | 本地/云端真实同资料问答、引用语义质量、独立数据、规模与安装包 |
 | 3 | 笔记/反馈/固定路线/记忆管理与确认、卡片/短测验及历史管理已实现，独立验收仍待完成 | 独立写笔记、有出处、取消不写入、删除不再新使用、本机记忆不外发 |
-| 4 | 手动项目/每日任务、Agent单任务确认、任务番茄钟、完整备份恢复及三种主题已实现待验收 | 数据重启恢复、确认才写/来源可追溯、任务不混签到时长、中断不误完成、备份往返且无密钥、主题对比/键盘/护眼 |
+| 4 | 手动项目/每日任务、Agent单任务确认、任务番茄钟/全量专注历史、完整备份恢复及三种主题已实现待验收 | 数据重启恢复、确认才写/来源可追溯、任务不混签到时长、中断不误完成、只读历史/旧复盘草稿、备份往返且无密钥、主题对比/键盘/护眼 |
 | 5 | Windows候选构建/静态资源检查/来源摘要已实现；全流程、RAG质量和安装/发布待验收 | 隔离用户/VM验安装升级卸载和学习闭环、发布包对应 Git 标签、公开发布有授权 |
 | 6 | 静态展示网站 | 软件稳定后才建设，展示真实功能、评测与下载 |
 
 用户 2026-10-04 将测试安排到其他对话，主线进入阶段 3；阶段 2 的未验收项继续保留。测试对话可继续独立验收，不为机械阶段编号停止主线实现；不冒称整阶段或首版已完成。
 
-主线下一步根据固定候选的独立验收结果修复发布阻断项，不默认扩展OCR/更多格式/无限工具循环。docs/testing/release-readiness.md汇总固定来源/产物摘要、十份详细清单及未通过门槛，候选说明在docs/releases/0.1.0-candidate.md。核心功能已接入不等于首版验收，主线必要修复与基础检查，功能/安装/真实模型仍交其他对话；正式包测试须隔离Windows用户/VM。修复后新提交/新候选/相关复验，不混用旧包和新代码。项目及第三方许可、远端CI与发布授权仍待核对，不自动推送/标签/Release或改变私有状态，不因构建通过勾阶段3/4/5或首版，网站最后。
+用户2026-10-08选择补充的专注历史已实现待验收，下一步汇总独立问题、必要修复后固定新提交准备更新候选，不默认扩展OCR/更多格式/无限工具循环。docs/testing/release-readiness.md汇总固定来源/产物摘要、十一份详细清单及未通过门槛，候选说明在docs/releases/0.1.0-candidate.md。旧471e0a7候选不含恢复过期修复或全量专注历史，保留旧产物/摘要，不能拿旧包验新源码。核心功能已接入不等于首版验收，主线实现/修复与基础检查，功能/安装/真实模型仍交其他对话；正式包测试须隔离Windows用户/VM。新候选重新固定来源构建并相关复验，不混用旧包和新代码。项目及第三方许可、远端CI与发布授权仍待核对，不自动推送/标签/Release或改变私有状态，不因构建通过勾阶段3/4/5或首版，网站最后。
 
 ## 14. Git、隐私与协作流程
 

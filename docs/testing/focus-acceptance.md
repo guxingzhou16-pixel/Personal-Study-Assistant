@@ -9,7 +9,7 @@
 - 使用临时目录、人工项目/任务和可控制的单调时钟；Electron 使用 `STUDY_COMPANION_DATA_DIR`，不读取、修改或清空 `%APPDATA%\StudyCompanion`。
 - 本功能不需要模型、密钥、网络下载或 AI。建议补充 `electron/core/focus.test.ts`、`focus-storage.test.ts` 和 `tests/focus.spec.ts`；主线未新增、修改或执行这些测试。
 - 当前主库 v12，活动库 v1，派生索引 v2。其余笔记/反馈/路线/记忆/项目/提议未验收项仍有效，先核对对应提交和真实 schema，不能只降低 user_version 模拟旧库。
-- 更新现有迁移规格及精确桥接列表断言，保留原隔离检查和失败断言。新增桥接仅 `focusOverview/getFocusSession/startFocus/controlFocus/saveFocusReview`。
+- 更新现有迁移规格及精确桥接列表断言，保留原隔离检查和失败断言。原阶段桥接为 `focusOverview/getFocusSession/startFocus/controlFocus/saveFocusReview`；2026-10-08新增受限只读`focusHistory`，详见[专注历史清单](focus-history-acceptance.md)，全部待执行，不增加迁移。
 
 v12 练习迁移及校验见 [练习清单](practice-acceptance.md)；构造 v11 及更低夹具须去掉 `practice_request` 列/约束，不只降低版本。完整备份当前只支持 12/1，旧 11/1 文件夹由对应旧版在隔离环境恢复后再升级。
 
