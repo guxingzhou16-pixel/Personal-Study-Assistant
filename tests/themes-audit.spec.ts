@@ -332,6 +332,30 @@ test('all navigation remains keyboard and mouse accessible across themes and 100
           const button = page.getByRole('button', { name, exact: true });
           await button.focus();
           await expect(button).toBeInViewport({ ratio: 1 });
+          await page.keyboard.press('ArrowDown');
+          const focus = await button.evaluate((button) => {
+            const nav = button.closest('nav');
+            if (!nav) return null;
+            const rect = button.getBoundingClientRect(),
+              clip = nav.getBoundingClientRect();
+            const css = getComputedStyle(button);
+            const extent = Math.max(
+              0,
+              parseFloat(css.outlineWidth) + parseFloat(css.outlineOffset),
+            );
+            return {
+              visible: button.matches(':focus-visible'),
+              left: rect.left - extent,
+              right: rect.right + extent,
+              clipLeft: clip.left,
+              clipRight: clip.right,
+            };
+          });
+          if (focus) {
+            expect(focus.visible).toBe(true);
+            expect(focus.left).toBeGreaterThanOrEqual(focus.clipLeft);
+            expect(focus.right).toBeLessThanOrEqual(focus.clipRight);
+          }
           await page.keyboard.press('Enter');
           await expect(button).toHaveClass(/selected/);
           await button.click();
