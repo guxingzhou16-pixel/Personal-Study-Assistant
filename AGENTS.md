@@ -39,7 +39,7 @@
 
 ## 3. 当前状态与接手快照
 
-本节核对日期：**2026-10-07**。接手时重新检查，不将下面的提交号、测试数量或工作区状态写成实时结果。
+本节核对日期：**2026-10-08**。接手时重新检查，不将下面的提交号、测试数量或工作区状态写成实时结果。
 
 ### 3.1 已交付并有历史验收记录
 
@@ -232,7 +232,13 @@
 - 产物复制到主目录release的新UUID输出，旧候选/失败文件与冻结源码工作区均保留、不自动清理。包和manifest不进入Git，0.1.0只是元数据版本，同名安装器不等于同一候选；功能修复必须新提交/新候选/相关复验。源码dirty=false不等于安全/功能/安装通过，不由哈希保证发布者身份。
 - 使用production-audit按本地证据整理发布条件；未向外部审计器上传仓库或执行远端扫描。数据迁移/恢复、全流程、安装升级卸载、真实模型语义/规模、项目/第三方许可与远端CI仍待完成，项目根无LICENSE/NOTICE，未替用户选择许可。不推送/标签/Release或改变私有状态，网站最后；主线下一步根据测试对话结果修复发布阻断项。
 
-### 3.21 仍待开发或验收的主要能力
+### 3.21 已修复、待独立复验的恢复预览期限
+
+- 2026-10-08静态检查发现：原生确认后的校验可能耗时超过预览十分钟有效期，旧实现不在校验结束后复核，会接受已过期预览。BackupService.confirm现于verify成功/清单一致后、进入commit前再检查expiresAt；三个检查点均在恰好到期时拒绝。过期回到idle、保留可放弃的预览和旧数据，不调用scheduleRestore/restart；commit已经开始后到期不撤销。
+- 仅修改electron/core/backup.ts，无依赖/IPC/迁移/格式变化，主v12/活动v1/派生v2/format1不变。备份清单追加可控时钟与延迟校验、精确期限/取消/有效提交复验，仍全部待测试对话执行；不新增/修改/运行功能测试、应用/安装器、任何SQLite或模型。
+- 类型/生产桌面构建、修改源码/清单Prettier与diff检查通过，TypeScript reviewer与code-reviewer静态批准，已有Vite大块提示保留；修复/清单提交493af2a仅本地、未推送。冻结471e0a7旧目录包/安装器未更新，不含此修复；新源码复验后固定新提交重新构建、使用新摘要，旧候选保留。保留其他对话修改，不推送/标签/Release，网站最后。
+
+### 3.22 仍待开发或验收的主要能力
 
 笔记、AI反馈、路线、记忆管理/确认、手动项目/任务、Agent任务提议、任务番茄钟、完整备份/恢复、三种主题、历史管理、卡片/短测验及首页学习闭环的独立验收，Windows候选安装/运行/升级/卸载、真实聊天/引用语义与规模验证；OCR、更多格式与展示网站待开发。安装包构建已接入，正式发布仍待验收与授权。
 
@@ -449,7 +455,7 @@
 
 专注方法：`focusOverview()`、`getFocusSession(id)`、`startFocus({taskId,taskRevision,minutes})`、`controlFocus(id,revision,action)`、`saveFocusReview(id,revision,review)`。仅实际保存todo/版本匹配可开始，action为pause/resume/stop；来源/时间/elapsed/状态/原因由主进程生成，不接受renderer自造。elapsed心跳不增控制revision，状态/复盘才增；有活动/未修复故障禁止新轮。读/控制返回实际FocusOverview与递增version，单条读取返回实际FocusSession，复盘返回FocusReviewResult{session,overview}供确认成功和恢复核对，不把读取或选择当开始/完成/签到。
 
-备份方法：`backupState()`、`exportBackup()`、`inspectBackup()`、`confirmRestore(id)`、`discardRestore(id)`、`cancelBackup()`、`onBackupUpdate(listener)`。选址/原生确认由主进程做，恢复只接本进程缓存UUID；不接路径、清单、数据库正文或新数据位置。处理时普通IPC全部拒绝，只允许backup-state/cancel-backup；业务必须空闲，focus暂停也不能开始备份。状态带revision，界面早到/迟到事件按版本合并；不能把pending准备当已恢复成功。最终commit/restart不取消，失败或丢失应答先读取实际状态；事件只传数据并返回取消监听。正常退出清理未确认预览不能受计时/模型busy阻止，清理失败明确报告且不中断已确认结果。
+备份方法：`backupState()`、`exportBackup()`、`inspectBackup()`、`confirmRestore(id)`、`discardRestore(id)`、`cancelBackup()`、`onBackupUpdate(listener)`。选址/原生确认由主进程做，恢复只接本进程缓存UUID；不接路径、清单、数据库正文或新数据位置。处理时普通IPC全部拒绝，只允许backup-state/cancel-backup；业务必须空闲，focus暂停也不能开始备份。状态带revision，界面早到/迟到事件按版本合并；不能把pending准备当已恢复成功。预览期限在确认入口、原生批准后和文件校验后/commit前复核，expiresAt <= 当前时间即拒绝，不延长期限。最终commit/restart不取消，也不因随后到期撤销；失败或丢失应答先读取实际状态；事件只传数据并返回取消监听。正常退出清理未确认预览不能受计时/模型busy阻止，清理失败明确报告且不中断已确认结果。
 
 ## 8. 本地数据、迁移与密钥
 
