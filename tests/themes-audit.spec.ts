@@ -291,3 +291,54 @@ test('modern theme keeps the learning goal unit readable at normal text contrast
     await app.close();
   }
 });
+
+test('all navigation remains keyboard and mouse accessible across themes and 100–200% zoom', async () => {
+  test.setTimeout(90_000);
+  const root = mkdtempSync(join(tmpdir(), 'study-navigation-fix-'));
+  const { ELECTRON_RUN_AS_NODE: _ignored, ...env } = process.env;
+  const app = await electron.launch({
+    args: ['.'],
+    env: { ...env, STUDY_COMPANION_DATA_DIR: root },
+  });
+  try {
+    const page = await app.firstWindow();
+    await expect(page.getByRole('heading', { name: '开始今天的小进步' })).toBeVisible();
+    for (const theme of ['modern', 'study', 'playful'] as const) {
+      await page.evaluate(async (theme) => {
+        const { settings } = await window.studyCompanion!.bootstrap();
+        await window.studyCompanion!.saveSettings({ ...settings, theme });
+      }, theme);
+      await page.reload();
+      await expect
+        .poll(() => page.evaluate(() => document.documentElement.dataset.theme))
+        .toBe(theme);
+      for (const zoom of [1, 1.25, 1.5, 2]) {
+        await app.evaluate(({ BrowserWindow }, zoom) => {
+          const window = BrowserWindow.getAllWindows()[0];
+          window.setContentSize(900, 640);
+          window.webContents.setZoomFactor(zoom);
+        }, zoom);
+        for (const name of [
+          '学习首页',
+          '资料库',
+          '学习助手',
+          '学习笔记',
+          '学习路线',
+          '长期记忆',
+          '学习计划',
+          '专注时光',
+          '设置',
+        ]) {
+          const button = page.getByRole('button', { name, exact: true });
+          await button.focus();
+          await expect(button).toBeInViewport({ ratio: 1 });
+          await page.keyboard.press('Enter');
+          await expect(button).toHaveClass(/selected/);
+          await button.click();
+        }
+      }
+    }
+  } finally {
+    await app.close();
+  }
+});

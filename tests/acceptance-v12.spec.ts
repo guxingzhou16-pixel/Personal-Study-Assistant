@@ -395,6 +395,7 @@ test('rejects array-valued reading tone through real IPC without making complete
       2,
     ),
   );
-  expect(result.error).toBe('validation');
+  expect(result.error).toBe('readingPosition');
+  expect(result.position.tone).toBe('paper');
   expect(backupError).toBeNull();
 });

@@ -61,6 +61,66 @@ function setup(answer = '全部提交或回滚。[1]') {
     },
   };
 }
+it.each(['尚待核对', '   '])(
+  'sends explicit saved-section presence for feedback: %j',
+  async (text) => {
+    const { store, chat, search, transport } = setup();
+    const note = store.notes.save({
+      ...emptyNoteDraft(),
+      id: null,
+      revision: 0,
+      title: '事务',
+      understanding: '自己的理解',
+      evidence: text,
+    });
+    const service = new NoteFeedbackService(store, search, chat);
+    const preview = await service.prepare(note.id, note.revision, '事务', () => {});
+    const turn = service.send({
+      retrievalId: preview.evidence.id,
+      expectedProfile: 'ollama|http://127.0.0.1:11434|fixture',
+    });
+    await expect.poll(() => store.chat.getTurn(turn.id).status).toBe('completed');
+    const message = transport.mock.calls[0][0].messages.find((m) =>
+      m.content.startsWith('待核对的已保存笔记'),
+    )!;
+    const snapshot = JSON.parse(message.content.slice(message.content.indexOf('\n') + 1));
+    expect(snapshot.sections.find((s: { key: string }) => s.key === 'evidence')).toMatchObject({
+      text: note.evidence,
+      filled: !!note.evidence.trim(),
+    });
+    expect(store.notes.get(note.id)).toEqual(note);
+  },
+);
+it.each([10, 30, 179, 180])(
+  'sends a four-step allocation totaling the requested %i minutes',
+  async (minutes) => {
+    const { store, chat, search, transport } = setup();
+    const service = new LearningAgentService(store, search, chat);
+    const preview = await service.prepare({ ...fixtureRequest, minutes }, () => {});
+    const turn = service.send({
+      retrievalId: preview.evidence.id,
+      expectedProfile: 'ollama|http://127.0.0.1:11434|fixture',
+    });
+    await expect.poll(() => store.chat.getTurn(turn.id).status).toBe('completed');
+    const message = transport.mock.calls[0][0].messages.find((m) =>
+      m.content.startsWith('本次学习请求'),
+    )!;
+    const request = JSON.parse(message.content.slice(message.content.indexOf('\n') + 1));
+    expect(request.timeAllocation).toHaveLength(4);
+    expect(
+      request.timeAllocation.reduce(
+        (sum: number, step: { minutes: number }) => sum + step.minutes,
+        0,
+      ),
+    ).toBe(minutes);
+    expect(
+      request.timeAllocation.every(
+        (step: { minutes: number }) => Number.isInteger(step.minutes) && step.minutes > 0,
+      ),
+    ).toBe(true);
+    expect(store.planning.overview('2026-10-08').tasks).toEqual([]);
+  },
+);
 it('prepares only the saved note, binds revision during retrieval and sending, isolates feedback and cascades deletion', async () => {
   const { store, chat, search, transport } = setup();
   const note = store.notes.save({

@@ -87,6 +87,46 @@ it('enforces the selected source scope and returns no evidence for unsupported t
   expect(retrieve(mainPath, indexPath, '什么是？').hits).toEqual([]);
   expect(() => retrieve(mainPath, indexPath, '" OR * - NEAR(closure)')).not.toThrow();
 });
+it('keeps separate evidence for both named concepts in a comparison without admitting unrelated scope', () => {
+  const { mainPath, indexPath } = fixture();
+  const store = new Storage(mainPath);
+  const id = 'c'.repeat(64);
+  store.addSource({
+    id,
+    name: '自然观察.md',
+    kind: 'markdown',
+    bytes: 100,
+    pageCount: 1,
+    textStatus: 'ready',
+    outline: [],
+    segments: [
+      {
+        anchor: 'md-line-1',
+        title: '蜻蜓',
+        depth: 1,
+        line: 1,
+        text: '蜻蜓能悬停，捕食飞行中的小昆虫。',
+      },
+      {
+        anchor: 'md-line-5',
+        title: '蝴蝶',
+        depth: 1,
+        line: 5,
+        text: '蝴蝶拍动翅膀飞行，用口器吸取花蜜。',
+      },
+      { anchor: 'md-line-9', title: '捕食', depth: 1, line: 9, text: '捕食是一种获得食物的方式。' },
+    ],
+  });
+  store.close();
+  const question = '蜻蜓和蝴蝶分别在飞行与进食上有什么特点？';
+  const hits = retrieve(mainPath, indexPath, question, id).hits;
+  expect(hits.map((hit) => hit.anchor)).toEqual(expect.arrayContaining(['md-line-1', 'md-line-5']));
+  expect(hits.map((hit) => hit.sourceId)).toEqual(hits.map(() => id));
+  expect(hits.map((hit) => hit.anchor)).not.toContain('md-line-9');
+  for (const hit of hits) expect(hit.text.length).toBe(hit.end - hit.start);
+  expect(retrieve(mainPath, indexPath, question, 'a'.repeat(64)).hits).toEqual([]);
+  expect(retrieve(mainPath, indexPath, '鲸鱼和海豚分别有什么特点？', id).hits).toEqual([]);
+});
 it('chunks long text without losing Unicode characters, offsets, or the end of a section', () => {
   const text = '事务🙂隔离。'.repeat(1000);
   const parts = [...chunks(text)];
