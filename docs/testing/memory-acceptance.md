@@ -2,7 +2,7 @@
 
 日期：2026-10-05。对应 v8 引入的记忆管理、学习路线记忆选择与提议确认；当前主库已演进到 v12，迁移验收同时参阅 `planning-acceptance.md`、`task-proposal-acceptance.md`。
 
-**状态：实现待验收，以下项目均未执行。** 主线对话只做类型、构建、格式与静态审查，不运行功能测试；测试对话负责补充规格并记录实际结果。本文件是测试清单，不是已通过的测试报告。
+**状态：2026-10-08 已执行独立源码验收，范围和剩余条件见末尾执行记录。** 主线对话只做类型、构建、格式与静态审查，不运行功能测试；测试对话负责补充规格并记录实际结果。本文件是测试清单，不是已通过的测试报告。
 
 v12 练习迁移及校验见 [练习清单](practice-acceptance.md)；构造 v11 及更低夹具须去掉 `practice_request` 列/约束，不只降低版本。完整备份当前只支持 12/1，旧 11/1 文件夹由对应旧版在隔离环境恢复后再升级。
 
@@ -80,11 +80,14 @@ v11 引入的专注表/迁移/计时中断另参阅 `focus-acceptance.md`；构�
 
 | 项目 | 结果 | 证据/提交/失败说明 |
 | --- | --- | --- |
-| 迁移与保留 | 未执行 | 测试对话填写 |
-| CRUD/来源/冲突 | 未执行 | 测试对话填写 |
-| 提议确认/拒绝/幂等 | 未执行 | 测试对话填写 |
-| 本机/远程范围与预览失效 | 未执行 | 测试对话填写 |
-| 双协议/恢复/界面 | 未执行 | 测试对话填写 |
-| 真实模型质量 | 未执行 | 测试对话填写 |
+| 迁移与保留 | 通过 | 71c2c25 / Windows隔离源码；C1：npx vitest run electron/core/migrations-v12.test.ts；19项；旧行/快照/备份/回滚；证据：migrations.log/json |
+| CRUD/来源/冲突 | 通过 | 71c2c25 / Windows隔离源码；C2＋acceptance-v12.spec.ts：范围/限额/来源/乐观锁、脏稿取消/冲突/确认删除；证据：planning-memory-focus.log；desktop-final.log |
+| 提议确认/拒绝/幂等 | 通过 | 71c2c25 / Windows隔离源码；C2＋ai-desktop-audit.spec.ts：拒绝零写、确认一次、来源删除失效、过期；证据：ai-desktop.json |
+| 本机/远程范围与预览失效 | 通过 | 71c2c25 / Windows隔离源码；C4＋C7：npx playwright test tests/privacy-audit.spec.ts；local拒绝外发、只发选择快照、当前确认/配置、单次请求；真实TLS未验；证据：privacy-desktop.json |
+| 双协议/恢复/界面 | 通过（部分） | 71c2c25 / Windows隔离源码；C6：chat/notes/记忆桌面及C3快照恢复；记忆面板全乱序/应答丢失未验，最小窗口F2失败；证据：desktop-final.log；F2 |
+| 真实模型质量 | 失败（M1～M3） | 71c2c25 / Windows隔离源码；C9：真实qwen3.5:9b路线/记忆注入样本，未自动写；语义/预算失败；无记忆/偏好/意向完整对照未执行；证据：real-quality.json；real-chat-injection.json |
 
 测试方按具体风险选择规格与命令；验收通过后在 README/AGENTS 记录实际范围，不填写估计指标或自动勾选本清单。
+
+
+本轮执行依据：[2026-10-08独立验收报告](independent-acceptance-2026-10-08.md)。C编号对应报告的实际命令；原始证据在独立验收工作区 artifacts/acceptance-v12-20261008。通过仅限列明操作，复合项其余条件未执行，因此不按组勾选。生产F1～F3未修复，正式包未运行。
