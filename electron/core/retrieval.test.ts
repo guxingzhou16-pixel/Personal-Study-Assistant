@@ -138,6 +138,11 @@ it('chunks long text without losing Unicode characters, offsets, or the end of a
   }
   expect(parts.at(-1)?.end).toBe(text.length);
 });
+it('retains evidence for each subject in a bare conjunction with unequal token counts', () => {
+  const { mainPath, indexPath } = fixture();
+  expect(retrieve(mainPath, indexPath, 'JavaScript promises 和 closure').hits.map((hit) => hit.anchor))
+    .toEqual(expect.arrayContaining(['page-1', 'page-2']));
+});
 it('indexes newly imported sources and preserves the old index when a rebuild fails', () => {
   const { mainPath, indexPath } = fixture();
   retrieve(mainPath, indexPath, 'closure');
