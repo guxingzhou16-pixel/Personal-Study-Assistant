@@ -233,7 +233,7 @@ export class BackupService {
     if (
       !this.cached ||
       this.cached.preview.id !== id ||
-      Date.parse(this.cached.preview.expiresAt) < Date.now()
+      Date.parse(this.cached.preview.expiresAt) <= Date.now()
     )
       throw new AppError('restoreExpired', '恢复预览已过期，请重新选择备份。');
     this.begin('confirm');
@@ -242,12 +242,14 @@ export class BackupService {
       if (!(await this.host.approveRestore(cached.preview)))
         throw new AppError('cancelled', '已取消确认。');
       this.checkCancelled();
-      if (Date.parse(cached.preview.expiresAt) < Date.now())
+      if (Date.parse(cached.preview.expiresAt) <= Date.now())
         throw new AppError('restoreExpired', '确认期间预览已过期，请重新选择备份。');
       const actual = await this.runner.run('verify', cached.directory, '', this.progress);
       this.checkCancelled();
       if (JSON.stringify(actual) !== JSON.stringify(cached.manifest))
         throw new AppError('restoreChanged', '暂存备份在预览后被修改，请重新选择备份。');
+      if (Date.parse(cached.preview.expiresAt) <= Date.now())
+        throw new AppError('restoreExpired', '校验期间预览已过期，请重新选择备份。');
       this.update({
         operation: 'commit',
         progress: { current: 0, total: 0, message: '正在提交恢复记录，请等待应用重启…' },
