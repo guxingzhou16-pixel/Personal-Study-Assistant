@@ -40,7 +40,7 @@ test('desktop navigation, persistent preferences, encrypted keys and model check
     await page.keyboard.press('Tab');
     await expect(page.getByRole('link', { name: '跳到主要内容' })).toBeFocused();
     await page.keyboard.press('Enter');
-    await expect(page.getByRole('button', { name: '学习笔记 规划中' })).toBeDisabled();
+    await expect(page.getByRole('button', { name: '学习笔记', exact: true })).toBeEnabled();
     await page.getByRole('button', { name: '打开我的资料库' }).click();
     await expect(page.getByRole('heading', { name: '我的资料库' })).toBeVisible();
     await expect(page.getByRole('button', { name: '导入资料', exact: true })).toBeEnabled();
@@ -111,11 +111,17 @@ test('desktop navigation, persistent preferences, encrypted keys and model check
       'listConversations',
       'createConversation',
       'getConversation',
+      'previewHistory',
+      'renameConversation',
+      'deleteHistory',
+      'exportHistory',
       'sendChat',
       'stopChat',
       'activeChat',
       'onChatUpdate',
       'prepareQuestion',
+      'preparePractice',
+      'sendPractice',
       'cancelRetrieval',
       'rebuildIndex',
       'onRetrievalProgress',
@@ -124,6 +130,45 @@ test('desktop navigation, persistent preferences, encrypted keys and model check
       'downloadEmbedding',
       'cancelEmbeddingDownload',
       'onEmbeddingProgress',
+      'listNotes',
+      'getNote',
+      'saveNote',
+      'deleteNote',
+      'exportNote',
+      'setNoteDraftDirty',
+      'onShowNotes',
+      'listNoteFeedback',
+      'prepareNoteFeedback',
+      'sendNoteFeedback',
+      'listLearningDrafts',
+      'prepareLearningDraft',
+      'sendLearningDraft',
+      'listMemories',
+      'saveMemory',
+      'deleteMemory',
+      'prepareMemoryProposal',
+      'confirmMemoryProposal',
+      'discardMemoryProposal',
+      'planningOverview',
+      'saveStudyProject',
+      'saveDailyTask',
+      'setDailyTaskCompleted',
+      'deleteDailyTask',
+      'prepareTaskProposal',
+      'confirmTaskProposal',
+      'discardTaskProposal',
+      'focusOverview',
+      'getFocusSession',
+      'startFocus',
+      'controlFocus',
+      'saveFocusReview',
+      'backupState',
+      'exportBackup',
+      'inspectBackup',
+      'confirmRestore',
+      'discardRestore',
+      'cancelBackup',
+      'onBackupUpdate',
     ]);
     await page.getByRole('button', { name: '删除密钥' }).click();
     await expect(page.getByText('此地址未保存密钥', { exact: true })).toBeVisible();

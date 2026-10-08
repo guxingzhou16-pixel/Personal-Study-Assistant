@@ -4,6 +4,7 @@ import { tmpdir } from 'node:os';
 import { DatabaseSync } from 'node:sqlite';
 import { afterEach, expect, it } from 'vitest';
 import { Storage } from './storage';
+import { copyIntoLegacy } from '../../tests/fixtures/legacy-databases';
 import { retrieve, chunks } from './retrieval';
 import { defaultSettings } from '../../src/lib/types';
 
@@ -149,13 +150,10 @@ it('upgrades v3 with a recoverable backup, preserving existing conversations and
     evidence: [],
   });
   store.close();
-  const old = new DatabaseSync(mainPath);
-  old.exec(
-    'ALTER TABLE chat_turns DROP COLUMN mode; ALTER TABLE chat_turns DROP COLUMN evidence; PRAGMA user_version = 3;',
-  );
-  old.close();
-  store = new Storage(mainPath);
-  expect(store.schemaVersion).toBe(4);
+  const legacyPath = mainPath + '.v3';
+  copyIntoLegacy(mainPath, legacyPath, 3);
+  store = new Storage(legacyPath);
+  expect(store.schemaVersion).toBe(12);
   expect(store.loadSettings().displayName).toBe('保留我');
   expect(store.chat.get(conversation.id).turns).toEqual([
     expect.objectContaining({
