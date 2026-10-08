@@ -982,6 +982,9 @@ button:disabled {
   overflow-y: auto;
   padding: 3px;
 }
+.sidebar > nav .nav-item:focus-visible {
+  outline-offset: -3px;
+}
 .sidebar > .brand,
 .sidebar > .nav-caption,
 .sidebar-bottom {
