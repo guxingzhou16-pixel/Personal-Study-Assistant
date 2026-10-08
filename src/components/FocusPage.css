@@ -39,6 +39,10 @@
   gap: 8px;
   font-size: 16px;
 }
+.focus-card h2[tabindex='-1']:focus {
+  outline: 3px solid var(--accent);
+  outline-offset: 3px;
+}
 .focus-field {
   display: grid;
   gap: 7px;

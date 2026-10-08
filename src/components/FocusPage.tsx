@@ -11,6 +11,7 @@ import type {
   FocusSession,
   PlanningOverview,
 } from '../lib/types';
+import { FocusHistoryPanel } from './FocusHistoryPanel';
 import './FocusPage.css';
 
 interface Props {
@@ -39,7 +40,14 @@ export function FocusPage({ visible, presetTask, onOpenTask }: Props) {
   const [review, setReview] = useState<ReviewEditor | null>(null);
   const [reviewLookup, setReviewLookup] = useState<FocusSession | null>(null);
   const [pendingReview, setPendingReview] = useState<FocusSession | null>(null);
+  const [historyRevision, setHistoryRevision] = useState(0);
   const dialog = useRef<HTMLDialogElement>(null);
+  const reviewTitle = useRef<HTMLHeadingElement>(null);
+  const requestedReviewFocus = useRef<string | null>(null);
+  const pinnedReviewId = useRef<string | null>(null);
+  const historySelection = useRef(0);
+  const visibleRef = useRef(visible);
+  visibleRef.current = visible;
   const mounted = useRef(false);
   const busyRef = useRef(false);
   const polling = useRef(false);
@@ -73,6 +81,8 @@ export function FocusPage({ visible, presetTask, onOpenTask }: Props) {
   function accept(result: FocusOverview): boolean {
     if (!mounted.current || result.version < acceptedVersion.current) return false;
     acceptedVersion.current = result.version;
+    if (lastActiveId.current && lastActiveId.current !== (result.current?.id ?? null))
+      setHistoryRevision((value) => value + 1);
     const ended = result.current
       ? undefined
       : result.recent.find((item) => item.id === lastActiveId.current);
@@ -84,7 +94,9 @@ export function FocusPage({ visible, presetTask, onOpenTask }: Props) {
       );
     setReview((previous) => {
       if (previous && previous.draft !== previous.record.review) return previous;
-      const newRecord = ended ?? (!previous ? result.recent[0] : undefined);
+      const newRecord =
+        (previous && pinnedReviewId.current === previous.record.id ? undefined : ended) ??
+        (!previous ? result.recent[0] : undefined);
       if (newRecord) return { record: newRecord, draft: newRecord.review };
       if (!previous) return null;
       const record = result.recent.find((item) => item.id === previous.record.id);
@@ -142,6 +154,15 @@ export function FocusPage({ visible, presetTask, onOpenTask }: Props) {
     if (pendingReview && visible && !element.open) element.showModal();
     else if ((!pendingReview || !visible) && element.open) element.close();
   }, [pendingReview, visible]);
+  useEffect(() => {
+    if (!visible) historySelection.current += 1;
+  }, [visible]);
+  useEffect(() => {
+    if (visible && review?.record.id === requestedReviewFocus.current) {
+      reviewTitle.current?.focus();
+      requestedReviewFocus.current = null;
+    }
+  }, [visible, review?.record.id]);
 
   async function loadTasks(day: string) {
     const version = ++taskVersion.current;
@@ -185,6 +206,7 @@ export function FocusPage({ visible, presetTask, onOpenTask }: Props) {
         setUncertain(false);
         setActionError('');
         setReadError('');
+        setHistoryRevision((value) => value + 1);
         setNotice('已重新读取实际专注记录。请核对当前状态和最近记录后继续。');
       }
     } catch (reason) {
@@ -218,6 +240,7 @@ export function FocusPage({ visible, presetTask, onOpenTask }: Props) {
         setReview((previous) =>
           previous?.record.id === saved.id ? { record: saved, draft: saved.review } : previous,
         );
+        setHistoryRevision((value) => value + 1);
       }
       setNotice(typeof message === 'function' ? message(result) : message);
     } catch (reason) {
@@ -260,9 +283,55 @@ export function FocusPage({ visible, presetTask, onOpenTask }: Props) {
     );
   }
   function chooseReview(record: FocusSession) {
-    if (blocked || review?.record.id === record.id) return;
+    if (blocked) return;
+    if (review?.record.id === record.id) {
+      pinnedReviewId.current = record.id;
+      if (!dirtyReview) setReview({ record, draft: record.review });
+      return;
+    }
     if (dirtyReview) setPendingReview(record);
-    else setReview({ record, draft: record.review });
+    else {
+      pinnedReviewId.current = record.id;
+      setReview({ record, draft: record.review });
+    }
+  }
+  async function openHistoryReview(record: FocusSession) {
+    if (busyRef.current || !isDesktop) return;
+    busyRef.current = true;
+    setBusy(true);
+    setActionError('');
+    const version = ++operation.current;
+    const selection = ++historySelection.current;
+    try {
+      const saved = await desktop.getFocusSession(record.id);
+      if (
+        !mounted.current ||
+        version !== operation.current ||
+        selection !== historySelection.current ||
+        !visibleRef.current
+      )
+        return;
+      setReviewLookup(saved);
+      requestedReviewFocus.current = saved.id;
+      chooseReview(saved);
+      if (review?.record.id === saved.id) {
+        reviewTitle.current?.focus();
+        requestedReviewFocus.current = null;
+      }
+    } catch (reason) {
+      if (
+        mounted.current &&
+        version === operation.current &&
+        selection === historySelection.current &&
+        visibleRef.current
+      )
+        setActionError(errorMessage(reason));
+    } finally {
+      if (mounted.current && version === operation.current) {
+        busyRef.current = false;
+        setBusy(false);
+      }
+    }
   }
   async function checkInToday() {
     if (busyRef.current || !isDesktop) return;
@@ -464,7 +533,9 @@ export function FocusPage({ visible, presetTask, onOpenTask }: Props) {
           )}
           {review && (
             <section className="focus-card" aria-labelledby="focus-review-title">
-              <h2 id="focus-review-title">本轮复盘</h2>
+              <h2 id="focus-review-title" ref={reviewTitle} tabIndex={-1}>
+                专注复盘
+              </h2>
               <strong>{review.record.taskTitle}</strong>
               <p>
                 {focusStatusLabels[review.record.status]} · 实际计时
@@ -585,13 +656,23 @@ export function FocusPage({ visible, presetTask, onOpenTask }: Props) {
           )}
         </aside>
       </div>
+      <FocusHistoryPanel
+        visible={visible}
+        disabled={blocked}
+        selectedId={review?.record.id ?? null}
+        refreshKey={`${overview?.recent[0]?.id ?? ''}:${historyRevision}`}
+        onSelect={(record) => void openHistoryReview(record)}
+      />
       <dialog
         ref={dialog}
         className="focus-confirmation"
         aria-labelledby="focus-discard-title"
         onCancel={(event) => {
           if (busy) event.preventDefault();
-          else setPendingReview(null);
+          else {
+            requestedReviewFocus.current = null;
+            setPendingReview(null);
+          }
         }}
       >
         <h2 id="focus-discard-title">放弃未保存的复盘？</h2>
@@ -601,7 +682,10 @@ export function FocusPage({ visible, presetTask, onOpenTask }: Props) {
             className="button secondary"
             autoFocus
             disabled={blocked}
-            onClick={() => setPendingReview(null)}
+            onClick={() => {
+              requestedReviewFocus.current = null;
+              setPendingReview(null);
+            }}
           >
             继续编辑
           </button>
@@ -609,7 +693,10 @@ export function FocusPage({ visible, presetTask, onOpenTask }: Props) {
             className="button primary"
             disabled={blocked}
             onClick={() => {
-              if (pendingReview) setReview({ record: pendingReview, draft: pendingReview.review });
+              if (pendingReview) {
+                pinnedReviewId.current = pendingReview.id;
+                setReview({ record: pendingReview, draft: pendingReview.review });
+              }
               setPendingReview(null);
             }}
           >

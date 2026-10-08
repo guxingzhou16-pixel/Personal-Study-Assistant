@@ -34,6 +34,7 @@ import type {
   DailyTask,
   TaskProposal,
   FocusOverview,
+  FocusHistoryPage,
   FocusSession,
   FocusReviewResult,
   BackupState,
@@ -149,6 +150,7 @@ const api: DesktopApi = {
   confirmTaskProposal: (id) => call<DailyTask>('study:confirm-task-proposal', id),
   discardTaskProposal: (id) => call<void>('study:discard-task-proposal', id),
   focusOverview: () => call<FocusOverview>('study:focus-overview'),
+  focusHistory: (query) => call<FocusHistoryPage>('study:focus-history', query),
   getFocusSession: (id) => call<FocusSession>('study:get-focus-session', id),
   startFocus: (request) => call<FocusOverview>('study:start-focus', request),
   controlFocus: (id, revision, action) =>

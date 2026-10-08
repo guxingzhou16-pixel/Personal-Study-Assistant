@@ -392,6 +392,17 @@ export interface FocusOverview {
   recent: FocusSession[];
   version: number;
 }
+export interface FocusHistoryQuery {
+  day: string | null;
+  page: number;
+}
+export interface FocusHistoryPage {
+  day: string | null;
+  page: number;
+  pageSize: number;
+  total: number;
+  sessions: FocusSession[];
+}
 export interface FocusReviewResult {
   session: FocusSession;
   overview: FocusOverview;
@@ -516,6 +527,7 @@ export interface DesktopApi {
   confirmTaskProposal(id: string): Promise<DailyTask>;
   discardTaskProposal(id: string): Promise<void>;
   focusOverview(): Promise<FocusOverview>;
+  focusHistory(query: FocusHistoryQuery): Promise<FocusHistoryPage>;
   getFocusSession(id: string): Promise<FocusSession>;
   startFocus(request: FocusStartRequest): Promise<FocusOverview>;
   controlFocus(id: string, revision: number, action: FocusAction): Promise<FocusOverview>;

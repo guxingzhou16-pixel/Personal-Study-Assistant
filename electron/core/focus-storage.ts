@@ -1,9 +1,16 @@
 import { randomUUID } from 'node:crypto';
 import type { DatabaseSync } from 'node:sqlite';
-import type { DailyTask, FocusEndReason, FocusSession } from '../../src/lib/types';
+import type {
+  DailyTask,
+  FocusEndReason,
+  FocusHistoryPage,
+  FocusHistoryQuery,
+  FocusSession,
+} from '../../src/lib/types';
 import { focusLimits } from '../../src/lib/focus';
 import { planningLimits, validPlanningDay } from '../../src/lib/planning';
 import { AppError } from './errors';
+import { record } from './settings';
 
 export const FOCUS_MIGRATION = `
   CREATE TABLE focus_sessions (
@@ -65,6 +72,23 @@ function timestamp(input: unknown): string {
     throw new Error('invalid timestamp');
   if (new Date(input).toISOString() !== input) throw new Error('noncanonical timestamp');
   return input;
+}
+
+function historyQuery(input: unknown): FocusHistoryQuery {
+  const data = record(input);
+  const maxPage = Math.ceil(focusLimits.sessions / focusLimits.historyPageSize);
+  if (Object.keys(data).some((key) => !['day', 'page'].includes(key)))
+    throw new AppError('validation', '专注历史请求包含不支持的字段。');
+  if (data.day !== null && !validPlanningDay(data.day))
+    throw new AppError('focusHistoryDay', '请选择合法日期，格式为 YYYY-MM-DD，或查看全部日期。');
+  if (
+    typeof data.page !== 'number' ||
+    !Number.isInteger(data.page) ||
+    data.page < 1 ||
+    data.page > maxPage
+  )
+    throw new AppError('focusHistoryPage', `专注历史页码应为 1 到 ${maxPage} 之间的整数。`);
+  return { day: data.day, page: data.page };
 }
 
 function decode(row: Record<string, unknown>): FocusSession {
@@ -166,6 +190,43 @@ export class FocusStorage {
       )
       .all(focusLimits.recent)
       .map(decode);
+  }
+
+  history(input: unknown): FocusHistoryPage {
+    const query = historyQuery(input);
+    const rows = this.db
+      .prepare(
+        `SELECT id, started_at FROM focus_sessions
+         WHERE status IN ('completed', 'stopped', 'interrupted') LIMIT ?`,
+      )
+      .all(focusLimits.sessions + 1);
+    if (rows.length > focusLimits.sessions)
+      throw new AppError('focusCorrupt', '专注记录超过当前上限，请保留数据目录并检查备份。');
+    const entries = rows.map((row) => {
+      try {
+        const id = focusId(row.id);
+        const date = new Date(timestamp(row.started_at));
+        const day = `${String(date.getFullYear()).padStart(4, '0')}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+        return { id, day, startedMs: date.getTime() };
+      } catch {
+        throw new AppError('focusCorrupt', '专注记录格式损坏，请保留数据目录并检查备份。');
+      }
+    });
+    // Compare real instants, including extended ISO years, then use the device's current local day.
+    const matching = entries
+      .filter((entry) => query.day === null || entry.day === query.day)
+      .sort(
+        (left, right) =>
+          right.startedMs - left.startedMs ||
+          (left.id < right.id ? -1 : left.id > right.id ? 1 : 0),
+      );
+    const total = matching.length;
+    const pageSize = focusLimits.historyPageSize;
+    const page = Math.min(query.page, Math.max(1, Math.ceil(total / pageSize)));
+    const sessions = matching
+      .slice((page - 1) * pageSize, page * pageSize)
+      .map((entry) => this.get(entry.id));
+    return { day: query.day, page, pageSize, total, sessions };
   }
 
   get(input: unknown): FocusSession {

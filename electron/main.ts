@@ -292,6 +292,7 @@ function registerHandlers(
     return work();
   }
   handle('study:focus-overview', () => focusWork(() => focusTracker.overview()));
+  handle('study:focus-history', (query) => focusWork(() => database.focus.history(query)));
   handle('study:get-focus-session', (id) => focusWork(() => database.focus.get(id)));
   handle('study:start-focus', (request) => focusWork(() => focusTracker.start(request)));
   handle('study:control-focus', (id, revision, action) =>

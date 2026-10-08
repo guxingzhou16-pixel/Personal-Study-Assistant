@@ -75,6 +75,7 @@ export const desktop: DesktopApi = {
   confirmTaskProposal: (id) => api().confirmTaskProposal(id),
   discardTaskProposal: (id) => api().discardTaskProposal(id),
   focusOverview: () => api().focusOverview(),
+  focusHistory: (query) => api().focusHistory(query),
   getFocusSession: (id) => api().getFocusSession(id),
   startFocus: (request) => api().startFocus(request),
   controlFocus: (id, revision, action) => api().controlFocus(id, revision, action),

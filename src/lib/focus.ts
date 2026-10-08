@@ -7,6 +7,7 @@ export const focusLimits = {
   review: 1000,
   sessions: 10000,
   recent: 20,
+  historyPageSize: 20,
   heartbeatMs: 30000,
 } as const;
 
