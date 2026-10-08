@@ -368,6 +368,7 @@ test('rejects array-valued reading tone through real IPC without making complete
     }
     return {
       error,
+      before: source.position,
       position: (await api.listSources()).find((source) => source.id === id)!.position,
     };
   }, fixtureSourceId);
@@ -396,6 +397,6 @@ test('rejects array-valued reading tone through real IPC without making complete
     ),
   );
   expect(result.error).toBe('readingPosition');
-  expect(result.position.tone).toBe('paper');
+  expect(result.position).toEqual(result.before);
   expect(backupError).toBeNull();
 });
