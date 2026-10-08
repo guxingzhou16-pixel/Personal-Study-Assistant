@@ -114,7 +114,13 @@ it('keeps separate evidence for both named concepts in a comparison without admi
         line: 5,
         text: '蝴蝶拍动翅膀飞行，用口器吸取花蜜。',
       },
-      { anchor: 'md-line-9', title: '捕食', depth: 1, line: 9, text: '蝴蝶出现在照片旁边，照片没有解释它的特点。' },
+      {
+        anchor: 'md-line-9',
+        title: '捕食',
+        depth: 1,
+        line: 9,
+        text: '蝴蝶出现在照片旁边，照片没有解释它的特点。',
+      },
     ],
   });
   store.close();
@@ -140,8 +146,9 @@ it('chunks long text without losing Unicode characters, offsets, or the end of a
 });
 it('retains evidence for each subject in a bare conjunction with unequal token counts', () => {
   const { mainPath, indexPath } = fixture();
-  expect(retrieve(mainPath, indexPath, 'JavaScript promises 和 closure').hits.map((hit) => hit.anchor))
-    .toEqual(expect.arrayContaining(['page-1', 'page-2']));
+  expect(
+    retrieve(mainPath, indexPath, 'JavaScript promises 和 closure').hits.map((hit) => hit.anchor),
+  ).toEqual(expect.arrayContaining(['page-1', 'page-2']));
 });
 it('indexes newly imported sources and preserves the old index when a rebuild fails', () => {
   const { mainPath, indexPath } = fixture();

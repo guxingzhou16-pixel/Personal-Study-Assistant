@@ -30,7 +30,8 @@ function indexTerms(text: string): string {
   return [...new Set(result)].join(' ');
 }
 function comparisonTerms(question: string): string[][] {
-  if (!/比较|对比|分别|区别|不同/.test(question)) return [];
+  if (!/比较|对比|分别|区别|不同/.test(question) && /什么|怎么|为什么|如何|[？?]/.test(question))
+    return [];
   const match = question
     .normalize('NFKC')
     .match(/^(.+?)(?:和|与|及|\band\b)(.+?)(?=分别|在|有(?:什么|哪些)|的?(?:区别|不同)|[？?]|$)/i);
@@ -152,8 +153,14 @@ export function retrieve(
     }
     const terms = words(question, true).slice(0, 24);
     const groups = comparisonTerms(question);
-    const candidates: { evidence: Evidence; coverage: number; rank: number; groups: number[] }[] =
-      [];
+    const candidates: {
+      evidence: Evidence;
+      coverage: number;
+      fullCoverage: number;
+      rank: number;
+      groups: number[];
+      titleGroups: number[];
+    }[] = [];
     if (terms.length) {
       const expression = terms.map((term) => `"${term.replaceAll('"', '""')}"`).join(' OR ');
       const rows = index
@@ -168,13 +175,16 @@ export function retrieve(
       for (const row of rows) {
         const text = String(row.excerpt);
         const normalized = `${row.title}\n${text}`.normalize('NFKC').toLowerCase();
+        const normalizedTitle = String(row.title).normalize('NFKC').toLowerCase();
         const matchedGroups = groups.flatMap((group, index) =>
           group.filter((term) => normalized.includes(term)).length / group.length >= 0.5
             ? [index]
             : [],
         );
+        const fullCoverage =
+          terms.filter((term) => normalized.includes(term)).length / terms.length;
         const coverage = Math.max(
-          terms.filter((term) => normalized.includes(term)).length / terms.length,
+          fullCoverage,
           ...matchedGroups.map(
             (index) =>
               groups[index].filter((term) => normalized.includes(term)).length /
@@ -184,7 +194,14 @@ export function retrieve(
         if (coverage < 0.5) continue;
         candidates.push({
           coverage,
+          fullCoverage,
           groups: matchedGroups,
+          titleGroups: matchedGroups.filter(
+            (index) =>
+              groups[index].filter((term) => normalizedTitle.includes(term)).length /
+                groups[index].length >=
+              0.5,
+          ),
           rank: Number(row.score),
           evidence: {
             number: 0,
@@ -205,11 +222,16 @@ export function retrieve(
     candidates.sort((left, right) => right.coverage - left.coverage || left.rank - right.rank);
     // Reserve one best candidate per comparison subject before filling the remaining slots.
     const reserved = groups.flatMap((_, index) => {
-      const candidate = candidates.find((entry) => entry.groups.includes(index));
+      const candidate =
+        candidates.find((entry) => entry.titleGroups.includes(index)) ??
+        candidates.find((entry) => entry.groups.includes(index));
       return candidate ? [candidate] : [];
     });
     const hits: Evidence[] = [];
-    for (const { evidence } of [...reserved, ...candidates]) {
+    for (const { evidence } of [
+      ...reserved,
+      ...candidates.filter((entry) => entry.fullCoverage >= 0.5),
+    ]) {
       if (
         hits.some(
           (hit) =>

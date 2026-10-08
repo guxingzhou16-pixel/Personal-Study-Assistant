@@ -60,9 +60,7 @@ for (const dataset of report.datasets) {
     `数据集：${dataset.dataset}，${dataset.sourceCount} 份合成资料，${dataset.caseCount} 个固定问题`,
   );
   for (const [name, value] of Object.entries(dataset.metrics)) console.log(`  ${name}: ${value}`);
-  console.log(
-    `  未完整命中：${dataset.failures.map((entry) => entry.id).join(', ') || '无'}`,
-  );
+  console.log(`  未完整命中：${dataset.failures.map((entry) => entry.id).join(', ') || '无'}`);
   console.log(
     `  引用位置错误：${dataset.citationFailures.map((entry) => entry.id).join(', ') || '无'}`,
   );

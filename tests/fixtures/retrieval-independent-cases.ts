@@ -4,6 +4,8 @@ import type { SourceSegment } from '../../src/lib/types';
 // A held-out set that did not participate in development or parameter tuning.
 // It adds new topics, a distractor source that shares terminology with the
 // real answers, and questions that are never read by the production UI.
+// Since 2026-10-08 the v12 fixes use these unchanged cases as regression data;
+// they no longer constitute a new held-out quality set for the fixed revision.
 export const independentRetrievalSources: {
   key: string;
   name: string;
@@ -187,7 +189,12 @@ export const independentRetrievalCases: IndependentRetrievalCase[] = [
     question: 'TCP 和 UDP 在可靠性和实时性上有什么区别？',
     expected: expected('networking', 'md-line-1', 'md-line-6'),
   },
-  { id: 'ind-unanswerable', category: 'unanswerable', question: '傅里叶变换的数学公式是什么？', expected: [] },
+  {
+    id: 'ind-unanswerable',
+    category: 'unanswerable',
+    question: '傅里叶变换的数学公式是什么？',
+    expected: [],
+  },
   {
     id: 'ind-wrong-scope',
     category: 'unanswerable',

@@ -186,6 +186,8 @@ test('audits real local Ollama generation on synthetic evidence without any paid
       expect(planning.tasks).toEqual([]);
     }
     expect(results).toHaveLength(6);
+    for (const result of results)
+      expect((result.turn as ChatTurn).status, String(result.kind)).toBe('completed');
   } finally {
     persist();
     await app.close();
