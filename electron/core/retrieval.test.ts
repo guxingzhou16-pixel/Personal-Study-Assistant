@@ -114,7 +114,7 @@ it('keeps separate evidence for both named concepts in a comparison without admi
         line: 5,
         text: '蝴蝶拍动翅膀飞行，用口器吸取花蜜。',
       },
-      { anchor: 'md-line-9', title: '捕食', depth: 1, line: 9, text: '捕食是一种获得食物的方式。' },
+      { anchor: 'md-line-9', title: '捕食', depth: 1, line: 9, text: '蝴蝶出现在照片旁边，照片没有解释它的特点。' },
     ],
   });
   store.close();
