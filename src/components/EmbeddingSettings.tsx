@@ -64,9 +64,21 @@ export function EmbeddingSettings() {
       </p>
       <p className="field-hint">
         {status
-          ? `${status.name} · ${Math.ceil(status.bytes / 1024 / 1024)} MB · MIT 许可证 · 下载来源 Hugging Face`
+          ? `${status.name} · ${Math.ceil(status.bytes / 1024 / 1024)} MB · 下载来源 Hugging Face`
           : '中文 BGE-small 量化模型 · 约 24 MB · 下载来源 Hugging Face'}
       </p>
+      <details>
+        <summary>检索模型来源与许可</summary>
+        <p className="field-hint">
+          本应用使用 Xenova/bge-small-zh-v1.5 的固定量化版本，来源于
+          BAAI/bge-small-zh-v1.5。原始模型卡标注
+          MIT；量化版本的完整版权通知仍待核对，不能把运行库的许可当作模型许可。
+        </p>
+        <p className="field-hint">
+          安装目录的 resources/third-party
+          中保留当前已取得的许可全文、来源和待核对事项。聊天模型由你另行配置，适用各自的条款。
+        </p>
+      </details>
       <p className="field-hint">
         点击下载只获取模型文件，不上传资料。首次检索会在后台建立向量索引，可能需要等待；可取消，模型不可用时仍能关键词检索。
       </p>

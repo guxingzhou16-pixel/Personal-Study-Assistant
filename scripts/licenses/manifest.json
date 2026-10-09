@@ -1,0 +1,383 @@
+{
+  "format": 1,
+  "supplements": [
+    {
+      "packages": [
+        {
+          "name": "@img/sharp-win32-x64",
+          "version": "0.35.5"
+        }
+      ],
+      "assets": [
+        {
+          "file": "assets/sharp-libvips-1.3.4-THIRD-PARTY-NOTICES.md",
+          "sha256": "6f0d5086e3bcbee12bcdacf5878b31d1104002aeecaeb241d3fff466108082fe",
+          "source": "https://raw.githubusercontent.com/lovell/sharp-libvips/ebb95f8add54eee8bed840e3fb587e4cbec857d7/THIRD-PARTY-NOTICES.md",
+          "description": "Original upstream license/notice bytes for sharp-libvips-1.3.4-THIRD-PARTY-NOTICES.md. Exact source URL and SHA-256 are retained."
+        },
+        {
+          "file": "assets/libvips-8.18.7-LICENSE.txt",
+          "sha256": "dc626520dcd53a22f727af3ee42c770e56c97a64fe3adb063799d8ab032fe551",
+          "source": "https://raw.githubusercontent.com/libvips/libvips/24ad4d042940e6bf99a68871ba886ca8847c9c82/LICENSE",
+          "description": "Original upstream license/notice bytes for libvips-8.18.7-LICENSE.txt. Exact source URL and SHA-256 are retained."
+        },
+        {
+          "file": "assets/GNU-LGPL-2.1.txt",
+          "sha256": "20e50fe7aae3e56378ebf0417d9de904f55a0e61e4df315333e632a4d3555d95",
+          "source": "https://raw.githubusercontent.com/coreutils/gnulib/42dd0e518e06e55e4629710bff94790fe8b9aec9/doc/COPYING.LESSERv2",
+          "description": "GNU gnulib development mirror; gnu.org text endpoint returned 403 during retrieval"
+        },
+        {
+          "file": "assets/GNU-LGPL-3.0.txt",
+          "sha256": "e3a994d82e644b03a792a930f574002658412f62407f5fee083f2555c5f23118",
+          "source": "https://raw.githubusercontent.com/coreutils/gnulib/42dd0e518e06e55e4629710bff94790fe8b9aec9/doc/COPYING.LESSERv3",
+          "description": "GNU gnulib development mirror; gnu.org text endpoint returned 403 during retrieval"
+        },
+        {
+          "file": "assets/GNU-GPL-3.0.txt",
+          "sha256": "3972dc9744f6499f0f9b2dbf76696f2ae7ad8af9b23dde66d6af86c9dfb36986",
+          "source": "https://raw.githubusercontent.com/coreutils/gnulib/42dd0e518e06e55e4629710bff94790fe8b9aec9/doc/COPYINGv3",
+          "description": "GNU gnulib development mirror; gnu.org text endpoint returned 403 during retrieval"
+        },
+        {
+          "file": "assets/sharp-win32-x64-0.35.5-README.md",
+          "sha256": "3d083ada5ebafe1e6c227daa7b061d4254b61df4a3901c359ffdeac817ce5866",
+          "source": "https://registry.npmjs.org/@img/sharp-win32-x64/-/sharp-win32-x64-0.35.5.tgz",
+          "description": "Exact bytes copied from lock-installed local package; package version checked; not re-downloaded or compared with registry archive"
+        },
+        {
+          "file": "assets/sharp-win32-x64-0.35.5-versions.json",
+          "sha256": "e2611d5d854815a8b33c8a3d2ec649511a9596ccf16844e8eae7cf81e79881c4",
+          "source": "https://registry.npmjs.org/@img/sharp-win32-x64/-/sharp-win32-x64-0.35.5.tgz",
+          "description": "Exact bytes copied from lock-installed local package; package version checked; not re-downloaded or compared with registry archive"
+        }
+      ]
+    },
+    {
+      "packages": [
+        {
+          "name": "@napi-rs/canvas-win32-x64-msvc",
+          "version": "1.0.9"
+        }
+      ],
+      "assets": [
+        {
+          "file": "assets/canvas-1.0.9-LICENSE.txt",
+          "sha256": "8802fecf9da4367bc23bcf20b21cc143785fc6c92b152f3fa7fbe6ce08d344d6",
+          "source": "https://raw.githubusercontent.com/Brooooooklyn/canvas/b2723ffae4e74e8c9df752902b137ec4061530e9/LICENSE",
+          "description": "Original upstream license/notice bytes for canvas-1.0.9-LICENSE.txt. Exact source URL and SHA-256 are retained."
+        },
+        {
+          "file": "assets/skia-a9c42c9-LICENSE.txt",
+          "sha256": "5f787c1dee3c56547f09ccc2906ab5f5293c4d8dd6c8654e573216c38e908dbd",
+          "source": "https://raw.githubusercontent.com/google/skia/a9c42c9fce77cd748805df0ec67ef5718800b1e9/LICENSE",
+          "description": "Original upstream license/notice bytes for skia-a9c42c9-LICENSE.txt. Exact source URL and SHA-256 are retained."
+        },
+        {
+          "file": "assets/icu-d578f2e-LICENSE.txt",
+          "sha256": "e55522d81edc687a341a4411e0776e54ca654e90147f354a90458aaced4116af",
+          "source": "https://raw.githubusercontent.com/unicode-org/icu/4b444321f255076d6576e6d435ffe2589bde6f18/LICENSE",
+          "description": "Git blob hash identical to pinned Chromium ICU LICENSE shown by official Gitiles"
+        },
+        {
+          "file": "assets/skia-a9c42c9-modules-skcms-LICENSE.txt",
+          "sha256": "e59bb5c5c6ba426a9ac4ba9fe667ad14c5166b12aa25be8af1d122b14fbe2e36",
+          "source": "https://raw.githubusercontent.com/google/skia/a9c42c9fce77cd748805df0ec67ef5718800b1e9/modules/skcms/LICENSE",
+          "description": "Skia in-tree module/glue license; does not replace external dependency license"
+        },
+        {
+          "file": "assets/skia-a9c42c9-third_party-etc1-LICENSE.txt",
+          "sha256": "5366e97b4478f15a1e2fd7e6094337426597df28de50cd9fed3f2e7e87f1229e",
+          "source": "https://raw.githubusercontent.com/google/skia/a9c42c9fce77cd748805df0ec67ef5718800b1e9/third_party/etc1/LICENSE",
+          "description": "Skia in-tree module/glue license; does not replace external dependency license"
+        },
+        {
+          "file": "assets/skia-a9c42c9-third_party-expat-LICENSE.txt",
+          "sha256": "cca48bacd6e7ed63f00b42a346bcc8549a460b41efe75d93db350fc882f54dca",
+          "source": "https://raw.githubusercontent.com/google/skia/a9c42c9fce77cd748805df0ec67ef5718800b1e9/third_party/expat/LICENSE",
+          "description": "Skia in-tree module/glue license; does not replace external dependency license"
+        },
+        {
+          "file": "assets/skia-a9c42c9-third_party-harfbuzz-LICENSE.txt",
+          "sha256": "cca48bacd6e7ed63f00b42a346bcc8549a460b41efe75d93db350fc882f54dca",
+          "source": "https://raw.githubusercontent.com/google/skia/a9c42c9fce77cd748805df0ec67ef5718800b1e9/third_party/harfbuzz/LICENSE",
+          "description": "Skia in-tree module/glue license; does not replace external dependency license"
+        },
+        {
+          "file": "assets/skia-a9c42c9-third_party-wuffs-LICENSE.txt",
+          "sha256": "e59bb5c5c6ba426a9ac4ba9fe667ad14c5166b12aa25be8af1d122b14fbe2e36",
+          "source": "https://raw.githubusercontent.com/google/skia/a9c42c9fce77cd748805df0ec67ef5718800b1e9/third_party/wuffs/LICENSE",
+          "description": "Skia in-tree module/glue license; does not replace external dependency license"
+        },
+        {
+          "file": "assets/skia-deps-expat-6154446-LICENSE.txt",
+          "sha256": "31b15de82aa19a845156169a17a5488bf597e561b2c318d159ed583139b25e87",
+          "source": "https://raw.githubusercontent.com/libexpat/libexpat/6154446fccefbf3ca644894f598969113b0c7bcd/expat/COPYING",
+          "description": "Exact revision pinned by Skia a9c42c9 DEPS; subdependency notices not asserted complete"
+        },
+        {
+          "file": "assets/skia-deps-harfbuzz-9cb1fee-LICENSE.txt",
+          "sha256": "ba8f810f2455c2f08e2d56bb49b72f37fcf68f1f4fade38977cfd7372050ad64",
+          "source": "https://raw.githubusercontent.com/harfbuzz/harfbuzz/9cb1fee51069b206effb4736e443b038d230789d/COPYING",
+          "description": "Exact revision pinned by Skia a9c42c9 DEPS; subdependency notices not asserted complete"
+        },
+        {
+          "file": "assets/skia-deps-wuffs-e3f919c-LICENSE.txt",
+          "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30",
+          "source": "https://raw.githubusercontent.com/google/wuffs-mirror-release-c/e3f919ccfe3ef542cfc983a82146070258fb57f8/LICENSE",
+          "description": "Exact revision pinned by Skia a9c42c9 DEPS; subdependency notices not asserted complete"
+        },
+        {
+          "file": "assets/skia-deps-webp-845d547-LICENSE.txt",
+          "sha256": "5aec868f669e384a22372a4e8a1a6cd7d44c64cd451f960ca69cc170d1e13acf",
+          "source": "https://raw.githubusercontent.com/webmproject/libwebp/845d5476a866141ba35ac133f856fa62f0b7445f/COPYING",
+          "description": "Exact revision pinned by Skia a9c42c9 DEPS; subdependency notices not asserted complete"
+        },
+        {
+          "file": "assets/skia-deps-jxl-332feb1-LICENSE.txt",
+          "sha256": "8405932022a556380c2d8c272eff154a923feb197233f348ce5f7334fb0a5ede",
+          "source": "https://raw.githubusercontent.com/libjxl/libjxl/332feb17d17311c748445f7ee75c4fb55cc38530/LICENSE",
+          "description": "Exact revision pinned by Skia a9c42c9 DEPS; subdependency notices not asserted complete"
+        },
+        {
+          "file": "assets/skia-deps-highway-457c891-LICENSE.txt",
+          "sha256": "43070e2d4e532684de521b885f385d0841030efa2b1a20bafb76133a5e1379c1",
+          "source": "https://raw.githubusercontent.com/google/highway/457c891775a7397bdb0376bb1031e6e027af1c48/LICENSE",
+          "description": "Exact revision pinned by Skia a9c42c9 DEPS; subdependency notices not asserted complete"
+        },
+        {
+          "file": "assets/skia-deps-brotli-6d03dfb-LICENSE.txt",
+          "sha256": "3d180008e36922a4e8daec11c34c7af264fed5962d07924aea928c38e8663c94",
+          "source": "https://raw.githubusercontent.com/google/brotli/6d03dfbedda1615c4cba1211f8d81735575209c8/LICENSE",
+          "description": "Exact revision pinned by Skia a9c42c9 DEPS; subdependency notices not asserted complete"
+        },
+        {
+          "file": "assets/skia-deps-freetype-264b5fb-LICENSE.txt",
+          "sha256": "bd36c8b474855fa294c2ec5c184544478ef3720aad37d65a6296a4f264fd2d3b",
+          "source": "https://chromium.googlesource.com/chromium/src/third_party/freetype2.git/+/264b5fbf5b912b39f98d038bf75d39be0a73f21b/LICENSE.TXT?format=TEXT",
+          "description": "Exact Chromium/Skia dependency revision pinned by Skia a9c42c9 DEPS; version taken from the exact revision README; actual Canvas binary and secondary notice coverage remain to be reviewed"
+        },
+        {
+          "file": "assets/skia-deps-freetype-264b5fb-FTL.txt",
+          "sha256": "5a5ee54c5001bbad1cdc1a57cc3dd4c42199b2da09d39c7ee41fab002d02967f",
+          "source": "https://chromium.googlesource.com/chromium/src/third_party/freetype2.git/+/264b5fbf5b912b39f98d038bf75d39be0a73f21b/docs/FTL.TXT?format=TEXT",
+          "description": "Exact Chromium/Skia dependency revision pinned by Skia a9c42c9 DEPS; version taken from the exact revision README; actual Canvas binary and secondary notice coverage remain to be reviewed"
+        },
+        {
+          "file": "assets/skia-deps-freetype-264b5fb-GPLv2.txt",
+          "sha256": "c4120c6752c910c299e3bd9cb3a46ff262c268303ca2069b61f92f10a5656c18",
+          "source": "https://chromium.googlesource.com/chromium/src/third_party/freetype2.git/+/264b5fbf5b912b39f98d038bf75d39be0a73f21b/docs/GPLv2.TXT?format=TEXT",
+          "description": "Exact Chromium/Skia dependency revision pinned by Skia a9c42c9 DEPS; version taken from the exact revision README; actual Canvas binary and secondary notice coverage remain to be reviewed"
+        },
+        {
+          "file": "assets/skia-deps-freetype-264b5fb-bdf-README.txt",
+          "sha256": "7984455e7e5a9faba3797c8bf095fbe10cc846316b7320aff8c58402e22b82fe",
+          "source": "https://chromium.googlesource.com/chromium/src/third_party/freetype2.git/+/264b5fbf5b912b39f98d038bf75d39be0a73f21b/src/bdf/README?format=TEXT",
+          "description": "Exact Chromium/Skia dependency revision pinned by Skia a9c42c9 DEPS; version taken from the exact revision README; actual Canvas binary and secondary notice coverage remain to be reviewed"
+        },
+        {
+          "file": "assets/skia-deps-freetype-264b5fb-pcf-README.txt",
+          "sha256": "18d9782898d9eac04476e2f744678137b2a889689ed3e923e052fc396a86f86b",
+          "source": "https://chromium.googlesource.com/chromium/src/third_party/freetype2.git/+/264b5fbf5b912b39f98d038bf75d39be0a73f21b/src/pcf/README?format=TEXT",
+          "description": "Exact Chromium/Skia dependency revision pinned by Skia a9c42c9 DEPS; version taken from the exact revision README; actual Canvas binary and secondary notice coverage remain to be reviewed"
+        },
+        {
+          "file": "assets/skia-deps-freetype-264b5fb-README.txt",
+          "sha256": "e1cc7d381da9654eaefb3bfc0bf2ed7c295136934a1efacfe17eb68145420807",
+          "source": "https://chromium.googlesource.com/chromium/src/third_party/freetype2.git/+/264b5fbf5b912b39f98d038bf75d39be0a73f21b/README?format=TEXT",
+          "description": "Exact Chromium/Skia dependency revision pinned by Skia a9c42c9 DEPS; version taken from the exact revision README; actual Canvas binary and secondary notice coverage remain to be reviewed"
+        },
+        {
+          "file": "assets/skia-deps-jpeg-e14cbfa-LICENSE.md",
+          "sha256": "96f5b328adbb78eeaaec6980d73fd558cb1e4d62560ed615646bc3cf5e532430",
+          "source": "https://chromium.googlesource.com/chromium/deps/libjpeg_turbo.git/+/e14cbfaa85529d47f9f55b0f104a579c1061f9ad/LICENSE.md?format=TEXT",
+          "description": "Exact Chromium/Skia dependency revision pinned by Skia a9c42c9 DEPS; version taken from the exact revision README.chromium; actual Canvas binary and secondary notice coverage remain to be reviewed"
+        },
+        {
+          "file": "assets/skia-deps-jpeg-e14cbfa-README.ijg",
+          "sha256": "75815e3bf6484201a3c3d17a1bbf10f2e8e3237f84df10a2357ea896db2a81d6",
+          "source": "https://chromium.googlesource.com/chromium/deps/libjpeg_turbo.git/+/e14cbfaa85529d47f9f55b0f104a579c1061f9ad/README.ijg?format=TEXT",
+          "description": "Exact Chromium/Skia dependency revision pinned by Skia a9c42c9 DEPS; version taken from the exact revision README.chromium; actual Canvas binary and secondary notice coverage remain to be reviewed"
+        },
+        {
+          "file": "assets/skia-deps-jpeg-e14cbfa-README.md",
+          "sha256": "c553459fc4ea1f69526f0edf0c8ff6c4002fda5b76094abefabdc3de1ee62c10",
+          "source": "https://chromium.googlesource.com/chromium/deps/libjpeg_turbo.git/+/e14cbfaa85529d47f9f55b0f104a579c1061f9ad/README.md?format=TEXT",
+          "description": "Exact Chromium/Skia dependency revision pinned by Skia a9c42c9 DEPS; version taken from the exact revision README.chromium; actual Canvas binary and secondary notice coverage remain to be reviewed"
+        },
+        {
+          "file": "assets/skia-deps-jpeg-e14cbfa-README.chromium",
+          "sha256": "7c064a8163041cef3d41727794c4deb97bd23354f065b471b9634405c494ff27",
+          "source": "https://chromium.googlesource.com/chromium/deps/libjpeg_turbo.git/+/e14cbfaa85529d47f9f55b0f104a579c1061f9ad/README.chromium?format=TEXT",
+          "description": "Exact Chromium/Skia dependency revision pinned by Skia a9c42c9 DEPS; version taken from the exact revision README.chromium; actual Canvas binary and secondary notice coverage remain to be reviewed"
+        },
+        {
+          "file": "assets/skia-deps-libpng-d5515b5-LICENSE.txt",
+          "sha256": "bdb0a645ea18c60507d0368379b1ac5474b92255fcc2d115e07486a7672ba526",
+          "source": "https://skia.googlesource.com/third_party/libpng.git/+/d5515b5b8be3901aac04e5bd8bd5c89f287bcd33/LICENSE?format=TEXT",
+          "description": "Exact Chromium/Skia dependency revision pinned by Skia a9c42c9 DEPS; version taken from the exact revision README; actual Canvas binary and secondary notice coverage remain to be reviewed"
+        },
+        {
+          "file": "assets/skia-deps-libpng-d5515b5-README.txt",
+          "sha256": "a31ab03b9c50040fa6894e19a4968df64f3c7a3b118efe7bc24d2b4dd7b4c007",
+          "source": "https://skia.googlesource.com/third_party/libpng.git/+/d5515b5b8be3901aac04e5bd8bd5c89f287bcd33/README?format=TEXT",
+          "description": "Exact Chromium/Skia dependency revision pinned by Skia a9c42c9 DEPS; version taken from the exact revision README; actual Canvas binary and secondary notice coverage remain to be reviewed"
+        },
+        {
+          "file": "assets/skia-deps-zlib-646b7f5-LICENSE.txt",
+          "sha256": "e1cfcc55c325b3f78cf55df9664abaa066e2271dffe8213347d9fccdfbac8f2c",
+          "source": "https://chromium.googlesource.com/chromium/src/third_party/zlib/+/646b7f569718921d7d4b5b8e22572ff6c76f2596/LICENSE?format=TEXT",
+          "description": "Exact Chromium/Skia dependency revision pinned by Skia a9c42c9 DEPS; version taken from the exact revision README.chromium; actual Canvas binary and secondary notice coverage remain to be reviewed"
+        },
+        {
+          "file": "assets/skia-deps-zlib-646b7f5-README.chromium",
+          "sha256": "fe9fe30ca3776e4ed9e2bdde015e0cb03f26f32c42640955d213de2df7ff8669",
+          "source": "https://chromium.googlesource.com/chromium/src/third_party/zlib/+/646b7f569718921d7d4b5b8e22572ff6c76f2596/README.chromium?format=TEXT",
+          "description": "Exact Chromium/Skia dependency revision pinned by Skia a9c42c9 DEPS; version taken from the exact revision README.chromium; actual Canvas binary and secondary notice coverage remain to be reviewed"
+        }
+      ]
+    },
+    {
+      "packages": [
+        {
+          "name": "onnxruntime-common",
+          "version": "1.30.0"
+        },
+        {
+          "name": "onnxruntime-node",
+          "version": "1.30.0"
+        }
+      ],
+      "assets": [
+        {
+          "file": "assets/onnxruntime-1.30.0-LICENSE.txt",
+          "sha256": "2f07c72751aed99790b8a4869cf2311df85a860b22ded05fa22803587a48922c",
+          "source": "https://raw.githubusercontent.com/microsoft/onnxruntime/f2c39fe2f838cf35ce7da92824f5a5e3ee6e88a7/LICENSE",
+          "description": "Original upstream license/notice bytes for onnxruntime-1.30.0-LICENSE.txt. Exact source URL and SHA-256 are retained."
+        },
+        {
+          "file": "assets/onnxruntime-1.30.0-ThirdPartyNotices.txt",
+          "sha256": "143764b952fdb1a7c69ce653bfba74a7744d6a8a573bfb73e235fba356c83de3",
+          "source": "https://raw.githubusercontent.com/microsoft/onnxruntime/f2c39fe2f838cf35ce7da92824f5a5e3ee6e88a7/ThirdPartyNotices.txt",
+          "description": "Original upstream license/notice bytes for onnxruntime-1.30.0-ThirdPartyNotices.txt. Exact source URL and SHA-256 are retained."
+        }
+      ]
+    },
+    {
+      "packages": [
+        {
+          "name": "onnxruntime-node",
+          "version": "1.30.0"
+        }
+      ],
+      "assets": [
+        {
+          "file": "assets/dxc-1.8.2502-LICENSE.txt",
+          "sha256": "27a49e35d1da96eba18fba54bc882667ff0ff8c0254f16f2b6e165d605ba7df8",
+          "source": "https://raw.githubusercontent.com/microsoft/DirectXShaderCompiler/b4711839eb9a87da7c3436d9b212e0492359fbbd/LICENSE.TXT",
+          "description": "Original upstream license/notice bytes for dxc-1.8.2502-LICENSE.txt. Exact source URL and SHA-256 are retained."
+        },
+        {
+          "file": "assets/dxc-1.8.2502-ThirdPartyNotices.txt",
+          "sha256": "19512a5d0a015ef16d167272c164da49a604614a786206212a80ad486ed0be6d",
+          "source": "https://raw.githubusercontent.com/microsoft/DirectXShaderCompiler/b4711839eb9a87da7c3436d9b212e0492359fbbd/ThirdPartyNotices.txt",
+          "description": "Original upstream license/notice bytes for dxc-1.8.2502-ThirdPartyNotices.txt. Exact source URL and SHA-256 are retained."
+        },
+        {
+          "file": "assets/DirectML-1.15.4-LICENSE.txt",
+          "sha256": "a05138e3a085ff60a44881eedfa58dccb03ecc1d7b1f6ae888418e8c2fec4b8d",
+          "source": "https://www.nuget.org/packages/Microsoft.AI.DirectML/1.15.4/license",
+          "description": "Original upstream license/notice bytes for DirectML-1.15.4-LICENSE.txt. Exact source URL and SHA-256 are retained."
+        },
+        {
+          "file": "assets/DirectML-1.15.4-NOTICE.txt",
+          "sha256": "d242ef970d0c2af30a2c6407d371ec916de5a0ddd2de636e4dc3a816d169311b",
+          "source": "https://raw.githubusercontent.com/microsoft/DirectML/a2b2dd2d15652b1a597cd6eb4855b5c952ced6a1/NOTICE",
+          "description": "Repository revision explicitly releasing DirectML 1.15.4; NuGet archive notices not separately compared"
+        }
+      ]
+    },
+    {
+      "packages": [
+        {
+          "name": "onnxruntime-web",
+          "version": "1.31.0-dev.20260914-8d85527a0"
+        }
+      ],
+      "assets": [
+        {
+          "file": "assets/onnxruntime-web-8d85527-LICENSE.txt",
+          "sha256": "2f07c72751aed99790b8a4869cf2311df85a860b22ded05fa22803587a48922c",
+          "source": "https://raw.githubusercontent.com/microsoft/onnxruntime/8d85527a010e294a26b274749f74294b2a32cec5/LICENSE",
+          "description": "Original upstream license/notice bytes for onnxruntime-web-8d85527-LICENSE.txt. Exact source URL and SHA-256 are retained."
+        },
+        {
+          "file": "assets/onnxruntime-web-8d85527-ThirdPartyNotices.txt",
+          "sha256": "143764b952fdb1a7c69ce653bfba74a7744d6a8a573bfb73e235fba356c83de3",
+          "source": "https://raw.githubusercontent.com/microsoft/onnxruntime/8d85527a010e294a26b274749f74294b2a32cec5/ThirdPartyNotices.txt",
+          "description": "Original upstream license/notice bytes for onnxruntime-web-8d85527-ThirdPartyNotices.txt. Exact source URL and SHA-256 are retained."
+        }
+      ]
+    },
+    {
+      "packages": [
+        {
+          "name": "onnxruntime-common",
+          "version": "1.31.0-dev.20260911-2a43ec07e"
+        }
+      ],
+      "assets": [
+        {
+          "file": "assets/onnxruntime-common-2a43ec0-LICENSE.txt",
+          "sha256": "2f07c72751aed99790b8a4869cf2311df85a860b22ded05fa22803587a48922c",
+          "source": "https://raw.githubusercontent.com/microsoft/onnxruntime/2a43ec07e67df9263c7c56c15da76cc7f74d7b32/LICENSE",
+          "description": "Original upstream license/notice bytes for onnxruntime-common-2a43ec0-LICENSE.txt. Exact source URL and SHA-256 are retained."
+        },
+        {
+          "file": "assets/onnxruntime-common-2a43ec0-ThirdPartyNotices.txt",
+          "sha256": "143764b952fdb1a7c69ce653bfba74a7744d6a8a573bfb73e235fba356c83de3",
+          "source": "https://raw.githubusercontent.com/microsoft/onnxruntime/2a43ec07e67df9263c7c56c15da76cc7f74d7b32/ThirdPartyNotices.txt",
+          "description": "Original upstream license/notice bytes for onnxruntime-common-2a43ec0-ThirdPartyNotices.txt. Exact source URL and SHA-256 are retained."
+        }
+      ]
+    },
+    {
+      "packages": [
+        {
+          "name": "guid-typescript",
+          "version": "1.0.9"
+        }
+      ],
+      "assets": [
+        {
+          "file": "assets/spdx-ISC-reference-31ba1a5.txt",
+          "sha256": "521c6f0ed8e64736684f89843d16a4df6b4b7449acbcfc6ca6630a3037ca8c53",
+          "source": "https://raw.githubusercontent.com/spdx/license-list-data/31ba1a50e5397e00a304dbadc76531740e89ee48/text/ISC.txt",
+          "description": "ISC standard template with original placeholders; not guid-typescript upstream copyright notice"
+        },
+        {
+          "file": "assets/guid-typescript-1.0.9-upstream-metadata.json",
+          "sha256": "6378c2ba06b0a41e033140a30359ba77fbf8706e46a2c9913d9ffff318c3d23a",
+          "source": "https://registry.npmjs.org/guid-typescript/1.0.9",
+          "description": "Original npm metadata declares ISC and author nicolas; gitHead not found in redirected upstream repository"
+        }
+      ]
+    }
+  ],
+  "additional": [
+    {
+      "file": "assets/FlagEmbedding-fd1a2bd-LICENSE.txt",
+      "sha256": "587a673933425dbc36ec61268d3b954051b2d3ef3c9b322ede357976055ffdd5",
+      "source": "https://raw.githubusercontent.com/FlagOpen/FlagEmbedding/fd1a2bdf69488ffebe0327999d4400d8c8058a0b/LICENSE",
+      "description": "Original code repository MIT license; not verified as the license asset of fixed Xenova quantized weights"
+    }
+  ],
+  "reviewIssues": [
+    "guid-typescript@1.0.9 upstream metadata declares ISC and author nicolas, but upstream license/copyright file is absent and pinned gitHead unavailable. SPDX ISC template is reference only; it does not complete upstream attribution.",
+    "Canvas pinned FreeType, libjpeg-turbo, libpng and zlib root licenses and referenced FreeType/JPEG texts are retained. Actual binary/build coverage and secondary headers (FreeType embedded zlib/HarfBuzz/fthash; Chromium zlib SIMD/Intel/contrib) remain pending; glue-code notices are not external library licenses.",
+    "Sharp native dependencies: preserve the 29-library table and LGPL texts; matching complete source/build notices and replacement/redistribution conditions still need review before public distribution.",
+    "Fixed Xenova/bge-small-zh-v1.5 revision 75c43b069aac4d136ba6bc1122f995fedcfd2781 model-card/license assets could not be obtained. FlagEmbedding code MIT text is not a grant for quantized model weights.",
+    "DirectML 1.15.4 EULA and release-commit NOTICE retained; the full NuGet package was not compared for additional notices.",
+    "Project code license is unselected; private:true is not a license. Public release is not authorized."
+  ]
+}

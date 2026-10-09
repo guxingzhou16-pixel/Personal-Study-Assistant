@@ -2,3 +2,5 @@
 *.png binary
 *.jpg binary
 *.ico binary
+# Preserve upstream notice bytes: their recorded SHA-256 must survive Git checkout.
+scripts/licenses/assets/** -text

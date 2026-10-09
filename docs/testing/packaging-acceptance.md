@@ -14,6 +14,8 @@
 
 ## 1. 构建、来源与失败
 
+2026-10-09分发收尾补充：[第三方说明](../third-party-licenses.md)记录按实际包生成的全文/元数据/来源及未完成条件；[隔离流程](isolated-installation-acceptance.md)提供离线Sandbox材料和真实保存/替换/卸载/重装步骤。用户已明确要求本对话完成这一范围的验收；本机未启用Sandbox或提供VM前，实际运行仍保持未执行。材料准备、许可摘要和同版替换不代替安装业务值、完整分发核对或跨版本升级。
+
 - [ ] 记录提交、工作区状态、Windows/Node/Electron 版本、CPU 架构、具体命令和输出目录。在 Windows x64、Node >=24.16 的干净克隆中用 `npm ci` 重建，不复用开发目录的旧 node_modules 或旧 dist。
 - [ ] `npm run desktop:pack` 和 `npm run desktop:dist` 分别先做生产构建，再生成完整目录包或 NSIS。无需 C++ 工具、源码重编译或聊天模型；首次依赖/NSIS 工具下载需要网络，缺失/失败明确报错，不自动换下载来源。
 - [ ] 每次输出 `release/dir-UUID/` 或 `release/nsis-UUID/`，不会覆盖旧成功回执。失败目录可能残留，仅有 build-info 或 package-audit 不能当完成安装包；没有成功的 build-manifest/SHA256SUMS 时保持失败状态。
@@ -60,7 +62,7 @@
 - [ ] 干净 Git 提交/标签与构建来源一致，锁文件及产物散列对应；构建过程可重复，不宣称带时间/UUID的 installer 必定逐字节一致。候选 manifest 不作为功能验收证明。
 - [ ] 完成阶段3/4清单、安装/升级/卸载、真实生成/引用质量和代表性规模的必要验收，保留已有检索失败案例；不能靠构建或历史测试次数宣布首版完成。
 - [ ] 发布说明列出实际功能、兼容平台、未签名/图标/无自动更新限制、模型准备、APPDATA及备份恢复方法；截图与日志只用合成资料。公开前核对第三方与项目许可。
-- [ ] 按包内metadata和实际原生载荷核对第三方说明/版本对应许可，补齐Sharp原生README许可表、Canvas/GUID/ONNX及BGE下载许可核对，保留Electron/Chromium与PDF资源许可；见收尾清单第4节的已确认文件缺口。许可资产与静态存在检查进入新固定提交/新包，不手改旧产物及摘要，不以package.private或单一license字段代替分发核对。
+- [ ] 按包内metadata和实际原生载荷核对第三方说明/版本对应许可；文件生成检查已接入，详细资产/来源和剩余GUID版权、原生条件、固定BGE及项目许可见[第三方说明](../third-party-licenses.md)。核对新固定候选内完整输出及 `package-audit.notices`；不把 `static-copies-verified` 当法律审阅或安装通过，不手改旧产物及摘要，不以package.private或单一license字段代替分发核对。
 - [ ] 获得用户明确的推送/发布和仓库可见性授权后才创建/推送版本标签或 GitHub Release；本清单和手动工作流不自动执行发布。展示网站最后建设。
 
 ## 执行记录模板

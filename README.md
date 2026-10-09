@@ -8,6 +8,8 @@
 
 ## 功能实现与验收状态
 
+**分发收尾进展（2026-10-09）：**已接入按实际包版本生成的许可全文/来源/待办与离线Sandbox验收材料工具，见[第三方说明](docs/third-party-licenses.md)、[隔离验收流程](docs/testing/isolated-installation-acceptance.md)。本机尚未准备可用隔离环境，安装、升级、卸载未执行；许可原文的复制/摘要核对不代表所有原生分发条件通过。软件功能与模型质量继续由测试对话验收，本对话负责本轮明确要求的分发收尾；候选与回执以[发布总表](docs/testing/release-readiness.md)为准。
+
 | 功能 | 当前可用范围 |
 | --- | --- |
 | Windows 桌面工作台 | 首页、真实资料库、最近阅读、设置和基础导航；规划中的入口会明确标注，不展示虚构学习记录。 |
@@ -81,7 +83,7 @@ npm run desktop:dist
 | `npm run desktop:pack` | `release/dir-UUID/win-unpacked/` 完整目录候选；不能只复制其中的 EXE。 |
 | `npm run desktop:dist` | `release/nsis-UUID/StudyCompanion-0.1.0-win-x64-setup.exe` NSIS 候选；版本取自 package.json。 |
 | `build-info.json` | 开始打包时的 Git HEAD、已追踪改动标志、锁文件 SHA-256、版本/工具/Node/架构/时间；同一份放入包的 resources。记录发生在代码编译之后，不证明此前编译期间源码没有改变。dirty 为 true 不能宣称纯提交构建。 |
-| `package-audit.json` | 静态包内容检查：限定顶层、入口、本地 PDF 资源和 Windows 原生文件；`functionalAcceptance` 仍为 pending。 |
+| `package-audit.json` | 静态包内容检查：限定顶层、入口、本地 PDF 资源和 Windows 原生文件；`notices` 记录实际依赖许可全文/摘要与审阅待办，`functionalAcceptance` 仍为 pending。 |
 | `build-manifest.json`、`SHA256SUMS.txt` | 只有完整构建和检查成功才写；目录模式覆盖 win-unpacked 全部普通文件，含解包 worker、依赖/DLL；NSIS 模式散列整个安装器。哈希用于核对文件，不证明发布者身份或 AI 效果。 |
 
 每次生成新的 UUID 输出目录，失败不会沿用旧成功清单；失败可能留下部分文件，不自动清理旧候选。没有 `build-manifest.json` 与 `SHA256SUMS.txt` 不能当完成产物。`release/` 已忽略，不提交安装器和开发产物。固定依赖使构建过程可重复，时间和 UUID 等元数据使产物不保证逐字节相同。
@@ -948,6 +950,13 @@ electron-builder.json  Windows x64、ASAR解包、当前用户NSIS与禁止自�
 - **增量审查：**补严共享词不能认领另一比较主题、相邻片段贡献新主题时不被去重、领域安全知识仍可引用而应用权限规则不借资料背书；这三项功能复验仍待执行，未把提示当作语义保证。主库v12/活动v1/派生v2/备份format1及权限/依赖不变。
 - **验证与证据：**本轮生产桌面构建（双TypeScript/Vite/Electron）、九份源码Prettier、diff与TypeScript reviewer/code-reviewer静态批准；已有Vite大块警告保留。原独立报告及修复报告原样保存，旧分支232/232核心、30/30桌面和焦点7/7只作各版本的限定历史记录，本轮未执行功能测试、程序、安装器、任何数据库或模型。
 - **候选与交接：**源码修复本地提交`ce9caae`；从完整提交的独立干净worktree使用锁定依赖构建目录/NSIS，静态5242项资源及独立摘要通过；目录4510文件/684575008字节，安装器152048630字节、实际NotSigned，固定来源/路径/摘要记录在[发布总表](docs/testing/release-readiness.md)。新增[收尾复验清单](docs/testing/first-release-closeout-2026-10-09.md)，README/AGENTS同步，不改旧失败、旧包或他人文档/脚本/资料。新候选未安装/发布，安装环境、整合功能复验、真实质量/规模、许可/远端CI和用户发布授权仍待完成；不推送/标签/Release，展示网站最后。
+
+#### 2026-10-09：分发收尾，许可文件与隔离验收材料
+
+- **实现：**afterPack根据实际ASAR的顶层/嵌套依赖生成 `resources/third-party`，保留原始元数据及许可/通知，固定官方补充来源与SHA-256。文件缺失、版本不符、危险路径/链接会阻止成功回执；原候选不手工补文件或改摘要。设置页准确说明量化检索模型的来源及待核对许可。
+- **维护命令：**`node --test scripts/package-notices.test.mjs` 运行相关纯文件规格；`node scripts/prepare-installation-acceptance.mjs --previous <NSIS目录> --current <NSIS目录>` 核对两份输出并准备材料，占位路径需替换。二者均不启动应用/数据库/模型；实际许可与安装结果以详细清单及发布总表为准。
+- **验收材料：**两份干净NSIS候选经来源/实物摘要/签名校验后，生成本次UUID的离线Sandbox输入与日志映射。默认只检查真实沙盒身份，明确操作才安装/替换/卸载；结果须核对真实界面保存值。关闭Sandbox不是Windows重启，同版0.1.0替换不是跨版本升级。
+- **边界：**项目授权方式尚未选定；GUID版权、原生完整分发材料及固定量化模型等余项如实记录。安装环境未准备前不能执行正式包验收，文件检查和材料准备不自动勾选功能或安装清单。本轮无数据库版本、IPC或依赖变更，仅本地提交、不推送或公开发布，展示网站最后。
 
 ## 开发原则
 

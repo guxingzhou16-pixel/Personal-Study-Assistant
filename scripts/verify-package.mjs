@@ -1,8 +1,9 @@
 import { extractFile, listPackage, statFile } from '@electron/asar';
 import { readFile, stat, writeFile } from 'node:fs/promises';
 import { dirname, join, normalize } from 'node:path';
+import { generatePackageNotices } from './package-notices.mjs';
 
-// This build hook only reads package files. It never starts Electron, SQLite or a model.
+// This hook checks package files and writes notices. It never starts an app, SQLite or a model.
 export default async function verifyPackage(context) {
   if (context.electronPlatformName !== 'win32')
     throw new Error('Only Windows packages are supported.');
@@ -89,12 +90,19 @@ export default async function verifyPackage(context) {
     info.arch !== 'x64'
   )
     throw new Error('Package metadata does not match its build record.');
+  const notices = await generatePackageNotices({
+    archive,
+    appOutDir: context.appOutDir,
+    projectDir: context.packager.projectDir,
+    entries,
+  });
   const result = {
     status: 'passed',
     kind: 'static-package-contents',
     archiveEntries: entries.length,
     workers: 3,
     nativeRuntime: 'win32-x64',
+    notices,
     functionalAcceptance: 'pending',
   };
   await writeFile(

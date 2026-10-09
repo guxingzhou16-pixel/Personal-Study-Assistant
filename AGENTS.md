@@ -254,7 +254,15 @@
 - 本轮仅双TypeScript/生产桌面构建、九份源码格式/diff及两reviewer静态批准，不写/改/运行功能测试、不启动应用/安装器、不打开任何SQLite或调用模型。独立worktree从完整ce9caae构建的新目录/NSIS均通过双构建、5242项静态资源与独立摘要核对，目录4510文件/684575008字节、安装器152048630字节/实际NotSigned，源码前后HEAD相同/状态为空；路径/摘要见发布总表，旧包保留不冒充新版本。新增docs/testing/first-release-closeout-2026-10-09.md供测试方对齐旧规格/新增focusHistory契约和逐项复验；原始证据留在ce74下拾知-v12验收/拾知-v12修复工作区的artifacts。
 - 当前整合版功能复验/正式包运行/安装升级卸载、许可/通知、远端CI和发布授权仍未完成。原报告中未修复/未安装Ollama/接口数量均有版本边界，不替换当前状态；不在个人APPDATA运行正式包测试，不自动推送/标签/Release或公开仓库，网站最后。
 
-### 3.24 仍待开发或验收的主要能力
+### 3.24 分发许可与隔离安装验收准备（2026-10-09）
+
+- 用户明确要求本对话完成隔离安装/升级/卸载验收与第三方说明；只在该范围调整原测试分工，不扩大到个人账户试运行、软件全量回归或模型质量测试。本机只读检查未发现已启用的Windows Sandbox或可用VM，实际安装仍待环境准备，不能把材料生成或语法检查写成安装通过。
+- `scripts/package-notices.mjs` 在 afterPack 按实际ASAR读取顶层/嵌套包，保留原始package.json及许可/通知全文，严格匹配补充版本和SHA-256，写入本次 `resources/third-party`；缺失、旧版本、链接或危险路径拒绝成功。不联网补许可、不改旧包。`package-audit.notices` 的文件核对与法律/运行验收分别记录；资产保持原始字节，不做全局格式化。
+- 来源及分发待办见 `docs/third-party-licenses.md` 和 `scripts/licenses/manifest.json`。GUID版权、原生完整构建/分发条件、固定量化BGE来源、DirectML包内通知与项目许可按实际证据保留未完成项；不替用户选择许可证或把MIT代码许可当量化权重授权。设置页已去除未经完整核对的无条件MIT标记。
+- `scripts/prepare-installation-acceptance.mjs` 只核对两个固定干净NSIS候选的来源/摘要/签名并生成离线 `.wsb`；只映射本次UUID只读input和可写logs。沙盒脚本验证真实Windows身份/profile，默认Inspect不安装；明确动作才运行安装器/精确当前用户卸载器，记录实际安装来源。同版0.1.0替换不是跨版本升级，文件摘要不能代替真实业务值。流程及全部未执行项见 `docs/testing/isolated-installation-acceptance.md`。
+- 主v12/活动v1/派生v2/备份format1/12/1保持，无新依赖、迁移或IPC。候选从新增固定提交重构建，原包及摘要保留；仍仅本地Git，不推送/标签/Release或改变可见性，展示网站最后。
+
+### 3.25 仍待开发或验收的主要能力
 
 当前整合版的恢复期限/专注历史及相关回归、Windows候选安装/运行/升级/卸载、真实质量/规模余项、许可与发布授权仍待完成。旧独立报告已覆盖笔记/反馈/路线/记忆/项目任务/提议/番茄钟/备份/主题/历史/练习/闭环的限定操作，不沿用到所有新代码或未执行条件。OCR、更多格式与展示网站待开发。
 
@@ -337,6 +345,8 @@
 | `AGENTS.md` | 面向 AI 开发者的项目约定、模块边界、工作流程与接手信息 |
 | `electron-builder.json` | appId、Windows x64/ASAR解包/本机Electron/当前用户NSIS，禁发布/自启，不收个人内容 |
 | `scripts/package-desktop.mjs`、`verify-package.mjs` | 唯一候选目录/打包开始来源与全文件/安装器摘要、afterPack静态资源检查；不启动应用/安装器/数据库/模型 |
+| `scripts/package-notices.mjs`、`scripts/licenses/` | 实际顶层/嵌套包元数据、许可全文与固定官方资产生成；缺失/版本/摘要/链接检查，法律审阅状态另记 |
+| `scripts/prepare-installation-acceptance.mjs` | 两个干净NSIS候选来源/摘要核对，生成限定input/logs映射的离线Sandbox材料；不自动执行验收 |
 | `.github/workflows/package-windows.yml` | 手动Windows候选构建和七日artifact，contents只读，不推送/标签/Release |
 | `docs/testing/packaging-acceptance.md` | 隔离Windows用户/VM的安装/运行/升级/卸载与发布门禁交接，全部待执行 |
 | `docs/testing/release-readiness.md` | 固定候选来源/摘要与十一份详细清单汇总、未通过门槛、证据和回退边界，不自动验收/发布 |
@@ -598,6 +608,8 @@ npm run desktop:start
 | `npm run desktop:build` | 构建界面和 Electron 代码，尚不生成安装包 |
 | `npm run desktop:pack` | 先生产构建，再Windows x64目录候选/包检查/全部运行文件SHA-256；不启动应用 |
 | `npm run desktop:dist` | 先生产构建，再Windows x64 NSIS候选/包检查/安装器SHA-256；不安装/启动/发布 |
+| `node --test scripts/package-notices.test.mjs` | 纯文件许可生成规格，不运行应用/SQLite/模型；不代表法律或安装验收 |
+| `node scripts/prepare-installation-acceptance.mjs --previous <NSIS目录> --current <NSIS目录>` | 核对两候选并生成离线Sandbox材料；替换占位路径，不自动启动或安装 |
 | `npm run desktop:start` | 打开已经构建的桌面版本，不自动构建 |
 | `npm run preview` | Vite 构建产物的浏览器预览 |
 | `npm run format:check` | 检查项目配置、源码和测试的格式 |
@@ -613,7 +625,7 @@ React 界面支持热更新；修改 `electron/` 或 preload 后重启桌面开�
 
 ## 11. 验证方法与测试要求
 
-**当前分工（用户2026-10-04指定，2026-10-09收尾延续）：主线只做实现/修复、类型/构建/包文件基础检查；功能、安装与真实模型验收仍交测试对话。** 已收到原独立及修复报告，旧版本限定覆盖见3.23，不再一概说所有历史功能都未执行。当前ce9caae整合版、493af2a恢复期限、c9fe47f专注历史及本轮三项审查补严未作功能复验；十一份详细清单的未执行条件保持，按docs/testing/first-release-closeout-2026-10-09.md在独立工作区对齐已有测试与新增focusHistory接口。主线未合并/改写测试代码、未运行应用/安装器/任何SQLite/模型；旧232/30/7数量不等于新版本通过，包静态检查不等于安装通过。
+**当前分工：软件功能和真实模型质量继续按用户2026-10-04安排交测试对话；用户2026-10-09另行要求本对话完成隔离安装/升级/卸载与许可说明。** 安装只能在真实独立Windows用户/VM/Sandbox进行，本机环境准备前保持未执行，不使用个人APPDATA或仅改环境变量。已收到原独立及修复报告，旧版本限定覆盖见3.23；当前整合版及恢复期限/专注历史/三项审查补严仍须按docs/testing/first-release-closeout-2026-10-09.md独立复验，不借旧232/30/7成绩宣称通过。许可生成仅允许相关纯文件规格；不扩大到软件核心测试或模型调用。具体候选、已执行检查和剩余门槛以发布总表为准。
 
 日常开发以当前功能的基础验证为准，选择最小但有效的检查。纯文档改动核对事实、路径、命令和 diff 即可，不启动桌面或完整测试。与代码无关的已有 RED 规格要记录，不借文档任务扩大范围修复。
 
