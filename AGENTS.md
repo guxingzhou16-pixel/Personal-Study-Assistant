@@ -261,6 +261,7 @@
 - 来源及分发待办见 `docs/third-party-licenses.md` 和 `scripts/licenses/manifest.json`。GUID版权、原生完整构建/分发条件、固定量化BGE来源、DirectML包内通知与项目许可按实际证据保留未完成项；不替用户选择许可证或把MIT代码许可当量化权重授权。设置页已去除未经完整核对的无条件MIT标记。
 - `scripts/prepare-installation-acceptance.mjs` 只核对两个固定干净NSIS候选的来源/摘要/签名并生成离线 `.wsb`；只映射本次UUID只读input和可写logs。沙盒脚本验证真实Windows身份/profile，默认Inspect不安装；明确动作才运行安装器/精确当前用户卸载器，记录实际安装来源。同版0.1.0替换不是跨版本升级，文件摘要不能代替真实业务值。流程及全部未执行项见 `docs/testing/isolated-installation-acceptance.md`。
 - 主v12/活动v1/派生v2/备份format1/12/1保持，无新依赖、迁移或IPC。候选从新增固定提交重构建，原包及摘要保留；仍仅本地Git，不推送/标签/Release或改变可见性，展示网站最后。
+- 应用候选3955e01；许可纯文件5项规格、类型/目录与NSIS生产构建、修改源码/新文档格式及两reviewer静态批准。49官方资产暂存/干净checkout大小与SHA-256保持；原文不格式化，版权文件原始空白不做清理。新目录150包/150元数据/158许可通知/49补充，4869文件/707248266字节独立Get-FileHash全量核对；NSIS152316458字节/实际NotSigned/独立摘要一致。准备工具实际CLI复现PS7模块继承导致PS5Security加载失败，单独修复4b3d25d只限定子进程内置模块路径，不改宿主策略/环境/签名要求；脚本不进入应用包，无需重构建3955候选。真实材料生成/限定XML/guest语法通过，未启动沙盒或安装器，路径/回执见发布总表。实际安装与完整分发条件仍待完成。
 
 ### 3.25 仍待开发或验收的主要能力
 

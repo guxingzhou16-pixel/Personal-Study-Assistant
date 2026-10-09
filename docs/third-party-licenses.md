@@ -26,7 +26,7 @@
 4. 将原文写入本次新输出并重新读取核对大小/摘要，不修改旧 ASAR、旧安装包或旧回执。
 5. 将文件核对结果及 `reviewStatus` / `reviewIssues` 写入 `package-audit`，由最终目录/安装器清单覆盖这些文件。`static-copies-verified` 仅说明文件复制与摘要核对，不是合规认证。
 
-当前 `ce9caae` ASAR 基线有150个实际依赖：147个顶层加3个嵌套包，其中 ONNX common 的稳定版和开发版分别记录。初次只读集成在新的忽略产物目录中通过，包含150份元数据、158份原始许可/通知与 Electron/Chromium；未改旧候选。最终新候选及摘要以 [发布验收总表](testing/release-readiness.md) 为准。
+原 `ce9caae` ASAR 基线与新 `3955e01` 均有150个实际依赖：147个顶层加3个嵌套包，其中 ONNX common 的稳定版和开发版分别记录。新目录包包含150份元数据、158份原始许可/通知（含Electron/Chromium）及49补充；359输出文件和引用摘要已独立核对，六项审阅待办保留。未改旧候选；完整产物及摘要以 [发布验收总表](testing/release-readiness.md) 为准。
 
 更新依赖时同步更新版本对应的资产/清单；不要放宽校验以接收旧版本通知。`.gitattributes` 禁止资产换行转换，`.prettierignore` 排除该目录，确保Git checkout与格式化保留上游原始字节和摘要。打包时不联网获取新的许可，网络失败不会偷偷换成其它版本。
 
