@@ -25,7 +25,18 @@ const powershell = (command, env = {}) =>
       encoding: 'utf8',
       windowsHide: true,
       timeout: 30_000,
-      env: { ...process.env, ...env },
+      // Windows PowerShell 5 must not load inherited PowerShell 7 modules.
+      env: {
+        ...process.env,
+        ...env,
+        PSModulePath: join(
+          process.env.SystemRoot,
+          'System32',
+          'WindowsPowerShell',
+          'v1.0',
+          'Modules',
+        ),
+      },
     }).trim(),
   );
 const signature = (path) =>
