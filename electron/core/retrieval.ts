@@ -29,6 +29,18 @@ function indexTerms(text: string): string {
   }
   return [...new Set(result)].join(' ');
 }
+function comparisonTerms(question: string): string[][] {
+  if (!/比较|对比|分别|区别|不同/.test(question) && /什么|怎么|为什么|如何|[？?]/.test(question))
+    return [];
+  const match = question
+    .normalize('NFKC')
+    .match(/^(.+?)(?:和|与|及|\band\b)(.+?)(?=分别|在|有(?:什么|哪些)|的?(?:区别|不同)|[？?]|$)/i);
+  if (!match) return [];
+  const groups = match
+    .slice(1)
+    .map((part) => words(part.replace(/^(?:请)?(?:比较|对比)/, ''), true));
+  return groups.every((group) => group.length > 0 && group.length <= 6) ? groups : [];
+}
 export function* chunks(
   text: string,
   size = 800,
@@ -140,7 +152,23 @@ export function retrieve(
       throw error;
     }
     const terms = words(question, true).slice(0, 24);
-    const candidates: { evidence: Evidence; coverage: number; rank: number }[] = [];
+    const groups = comparisonTerms(question);
+    const distinctTerms = groups.map((group, index) =>
+      group.filter((term) => groups.every((other, i) => i === index || !other.includes(term))),
+    );
+    // A shared word alone must not stand in for a different comparison subject.
+    const matchesGroup = (text: string, index: number) =>
+      groups[index].filter((term) => text.includes(term)).length / groups[index].length >= 0.5 &&
+      (distinctTerms[index].length === 0 ||
+        distinctTerms[index].some((term) => text.includes(term)));
+    const candidates: {
+      evidence: Evidence;
+      coverage: number;
+      fullCoverage: number;
+      rank: number;
+      groups: number[];
+      titleGroups: number[];
+    }[] = [];
     if (terms.length) {
       const expression = terms.map((term) => `"${term.replaceAll('"', '""')}"`).join(' OR ');
       const rows = index
@@ -155,10 +183,26 @@ export function retrieve(
       for (const row of rows) {
         const text = String(row.excerpt);
         const normalized = `${row.title}\n${text}`.normalize('NFKC').toLowerCase();
-        const coverage = terms.filter((term) => normalized.includes(term)).length / terms.length;
+        const normalizedTitle = String(row.title).normalize('NFKC').toLowerCase();
+        const matchedGroups = groups.flatMap((_, index) =>
+          matchesGroup(normalized, index) ? [index] : [],
+        );
+        const fullCoverage =
+          terms.filter((term) => normalized.includes(term)).length / terms.length;
+        const coverage = Math.max(
+          fullCoverage,
+          ...matchedGroups.map(
+            (index) =>
+              groups[index].filter((term) => normalized.includes(term)).length /
+              groups[index].length,
+          ),
+        );
         if (coverage < 0.5) continue;
         candidates.push({
           coverage,
+          fullCoverage,
+          groups: matchedGroups,
+          titleGroups: matchedGroups.filter((index) => matchesGroup(normalizedTitle, index)),
           rank: Number(row.score),
           evidence: {
             number: 0,
@@ -177,18 +221,32 @@ export function retrieve(
       }
     }
     candidates.sort((left, right) => right.coverage - left.coverage || left.rank - right.rank);
+    // Reserve one best candidate per comparison subject before filling the remaining slots.
+    const reserved = groups.flatMap((_, index) => {
+      const candidate =
+        candidates.find((entry) => entry.titleGroups.includes(index)) ??
+        candidates.find((entry) => entry.groups.includes(index));
+      return candidate ? [candidate] : [];
+    });
     const hits: Evidence[] = [];
-    for (const { evidence } of candidates) {
+    const coveredGroups = new Set<number>();
+    for (const candidate of [
+      ...reserved,
+      ...candidates.filter((entry) => entry.fullCoverage >= 0.5),
+    ]) {
+      const { evidence } = candidate;
       if (
         hits.some(
           (hit) =>
             hit.sourceId === evidence.sourceId &&
             hit.anchor === evidence.anchor &&
             Math.abs(hit.start - evidence.start) < 800,
-        )
+        ) &&
+        !candidate.groups.some((group) => !coveredGroups.has(group))
       )
         continue;
       hits.push({ ...evidence, number: hits.length + 1 });
+      candidate.groups.forEach((group) => coveredGroups.add(group));
       if (hits.length === 4) break;
     }
     const scanCount = sources.filter(

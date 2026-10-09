@@ -1,4 +1,8 @@
-/* Modern keeps the existing colors through fallbacks in the component styles. */
+:root[data-theme='modern'],
+.theme-swatch[data-theme='modern'] {
+  --muted: #58675b;
+  --theme-muted: var(--muted);
+}
 :root[data-theme='study'],
 .theme-swatch[data-theme='study'] {
   --accent: #73512d;

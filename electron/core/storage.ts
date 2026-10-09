@@ -235,7 +235,8 @@ export class Storage {
       position.offset > 10_000_000 ||
       typeof position.zoom !== 'number' ||
       ![0.75, 1, 1.25, 1.5, 2].includes(position.zoom) ||
-      !['paper', 'warm'].includes(String(position.tone)) ||
+      typeof position.tone !== 'string' ||
+      !['paper', 'warm'].includes(position.tone) ||
       typeof position.anchor !== 'string' ||
       (position.anchor !== '' &&
         !source.outline.some((entry) => entry.anchor === position.anchor) &&
