@@ -6,6 +6,8 @@ import { createServer } from 'node:http';
 import type { AddressInfo } from 'node:net';
 import { randomUUID } from 'node:crypto';
 
+const packageVersion: string = JSON.parse(readFileSync('package.json', 'utf8')).version;
+
 test('desktop navigation, persistent preferences, encrypted keys and model checks', async () => {
   const dataDir = mkdtempSync(join(tmpdir(), 'study-desktop-'));
   const fakeKey = 'e2e-fake-key-never-a-real-secret';
@@ -38,6 +40,7 @@ test('desktop navigation, persistent preferences, encrypted keys and model check
   try {
     let page = await launch();
     await expect(page.getByRole('heading', { name: '开始今天的小进步' })).toBeVisible();
+    await expect(page.getByText(`v${packageVersion}`, { exact: true })).toBeVisible();
     await page.keyboard.press('Tab');
     await expect(page.getByRole('link', { name: '跳到主要内容' })).toBeFocused();
     await page.keyboard.press('Enter');
