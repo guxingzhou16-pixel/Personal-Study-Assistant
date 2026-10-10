@@ -3,7 +3,8 @@
 import assert from 'node:assert/strict';
 import { execFileSync } from 'node:child_process';
 import { randomUUID, createHash } from 'node:crypto';
-import { readFile, writeFile, mkdir, lstat } from 'node:fs/promises';
+import { constants } from 'node:fs';
+import { readFile, writeFile, mkdir, lstat, readdir, copyFile } from 'node:fs/promises';
 import { createServer } from 'node:http';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
@@ -14,6 +15,7 @@ const stages = [
   'verify-replacement',
   'verify-reinstall',
   'verify-os-restart',
+  'verify-native-resources',
 ];
 assert.equal(process.platform, 'win32', 'Windows Sandbox is required.');
 assert.equal(process.argv.length, 4, 'Usage: node installed-acceptance-smoke.mjs --stage <stage>');
@@ -134,6 +136,7 @@ let page;
 let server;
 let expected;
 let createdSnapshot;
+let relaunchedProcessProof;
 const consoleErrors = [];
 const networkRequests = [];
 const fakeKey = 'sandbox-acceptance-fake-key-not-a-secret';
@@ -152,6 +155,144 @@ const fixture = {
     下一步练习: '写一个例子，并返回资料核对。',
   },
 };
+// These pins match electron/core/embedding-model.ts. Never accept a path or digest
+// from an arbitrary receipt as authority for copying into the guest app profile.
+const embedding = {
+  directory: 'Xenova--bge-small-zh-v1.5-75c43b069aac4d136ba6bc1122f995fedcfd2781',
+  revision: '75c43b069aac4d136ba6bc1122f995fedcfd2781',
+  files: [
+    ['config.json', 716, 'd4193ead3a810fd694fa8a31d7fc72fbaebc0668b603e398734bf2f6538ff42f'],
+    ['tokenizer.json', 439125, '48cea5d44424912a6fd1ea647bf4fe50b55ab8b1e5879c3275f80e339e8fae26'],
+    [
+      'tokenizer_config.json',
+      367,
+      'e6f3b96db926a37d4039995fbf5ad17de158dfb8f6343d607e4dbaad18d75f5a',
+    ],
+    [
+      'special_tokens_map.json',
+      125,
+      'b6d346be366a7d1d48332dbc9fdf3bf8960b5d879522b7799ddba59e76237ee3',
+    ],
+    [
+      'onnx/model_quantized.onnx',
+      24010842,
+      '15b717c382bcb518ba457b93ea6850ede7f4f1cd8937454aa06972366cd19bcc',
+    ],
+  ],
+};
+
+function powershell(body) {
+  return execFileSync(
+    join(process.env.SystemRoot, 'System32', 'WindowsPowerShell', 'v1.0', 'powershell.exe'),
+    [
+      '-NoProfile',
+      '-NonInteractive',
+      '-EncodedCommand',
+      Buffer.from(body, 'utf16le').toString('base64'),
+    ],
+    {
+      encoding: 'utf8',
+      windowsHide: true,
+      env: {
+        ...process.env,
+        PSModulePath: join(
+          process.env.SystemRoot,
+          'System32',
+          'WindowsPowerShell',
+          'v1.0',
+          'Modules',
+        ),
+      },
+    },
+  ).trim();
+}
+function psLiteral(text) {
+  return "'" + text.replaceAll("'", "''") + "'";
+}
+function closeRelaunched(processProof) {
+  powershell(
+    `$ErrorActionPreference='Stop'; $p=Get-Process -Id ${processProof.pid}; if ($p.Path -ine ${psLiteral(identity.exe)} -or $p.StartTime.ToUniversalTime().ToString('o') -cne ${psLiteral(processProof.createdAt)} -or $p.MainWindowHandle -eq 0) {throw 'Relaunched process identity changed.'}; $null=$p.Handle; if (-not $p.CloseMainWindow()) {throw 'Normal close request failed.'}; if (-not $p.WaitForExit(30000)) {throw 'Relaunched app did not close normally.'}; if ($p.ExitCode -ne 0) {throw ('Relaunched app exit code: ' + $p.ExitCode)}`,
+  );
+}
+async function fixedFiles(directory) {
+  const receipts = [];
+  for (const [name, bytes, sha256] of embedding.files) {
+    const path = join(directory, name);
+    let cursor = path;
+    while (cursor.toLowerCase() !== dirname(cursor).toLowerCase()) {
+      assert.equal((await lstat(cursor)).isSymbolicLink(), false, 'Linked model path refused.');
+      cursor = dirname(cursor);
+    }
+    const info = await lstat(path);
+    assert.ok(info.isFile() && info.nlink === 1, 'Model must be an ordinary single-link file.');
+    assert.equal(info.size, bytes, `Model file size: ${name}`);
+    const actual = createHash('sha256')
+      .update(await readFile(path))
+      .digest('hex');
+    assert.equal(actual, sha256, `Pinned model digest: ${name}`);
+    receipts.push({ path: name, bytes, sha256: actual });
+  }
+  return receipts;
+}
+
+async function launch() {
+  const { _electron } = await import(
+    pathToFileURL(join(input, 'tools', 'playwright-core', 'index.mjs')).href
+  );
+  const {
+    ELECTRON_RUN_AS_NODE: _node,
+    STUDY_COMPANION_DATA_DIR: _data,
+    STUDY_COMPANION_DEV_URL: _dev,
+    ...environment
+  } = process.env;
+  application = await _electron.launch({
+    executablePath: identity.exe,
+    args: [],
+    cwd: identity.profile,
+    env: environment,
+    timeout: 60_000,
+  });
+  page = await application.firstWindow({ timeout: 60_000 });
+  page.setDefaultTimeout(30_000);
+  page.on('pageerror', (error) => consoleErrors.push(error.message));
+  page.on('request', (request) => {
+    if (/^https?:/.test(request.url())) networkRequests.push(request.url());
+  });
+  const runtime = await application.evaluate(({ app }) => ({
+    packaged: app.isPackaged,
+    appPath: app.getAppPath(),
+    appData: app.getPath('appData'),
+    dataDir: app.getPath('userData'),
+    version: app.getVersion(),
+  }));
+  assert.equal(runtime.packaged, true, 'Must run the formal packaged application.');
+  assert.equal(runtime.appData.toLowerCase(), identity.appData.toLowerCase());
+  assert.equal(
+    runtime.dataDir.toLowerCase(),
+    join(identity.appData, 'StudyCompanion').toLowerCase(),
+  );
+  assert.equal(
+    runtime.appPath.toLowerCase(),
+    join(dirname(identity.exe), 'resources', 'app.asar').toLowerCase(),
+  );
+  assert.equal(runtime.version, identity.source.version);
+  await until(
+    () => page.evaluate(() => Boolean(window.studyCompanion)),
+    Boolean,
+    'real preload bridge',
+  );
+  assert.equal((await api('bootstrap')).dataDir.toLowerCase(), runtime.dataDir.toLowerCase());
+  return runtime;
+}
+
+async function closeServer() {
+  if (!server) return;
+  await new Promise((done) => {
+    server.closeAllConnections();
+    server.close(done);
+  });
+  server = undefined;
+}
 
 async function until(read, predicate, description, timeout = 20_000) {
   const deadline = Date.now() + timeout;
@@ -551,6 +692,316 @@ async function verify() {
   );
 }
 
+async function verifyNativeResources() {
+  await verify();
+  const root = join(identity.appData, 'StudyCompanion');
+  const previousLocation = await api('backupState');
+  assert.equal(previousLocation.learningDirectory.toLowerCase(), root.toLowerCase());
+  assert.equal(
+    previousLocation.restoreReceipt,
+    null,
+    'Native resource stage requires an unrestored baseline.',
+  );
+  await assert.rejects(lstat(join(root, 'active-learning.json')), { code: 'ENOENT' });
+  await assert.rejects(lstat(join(root, 'pending-restore.json')), { code: 'ENOENT' });
+  const credentialSha256 = createHash('sha256')
+    .update(await readFile(join(root, 'credentials.enc.json')))
+    .digest('hex');
+
+  const modelInput = join(input, 'embedding-model');
+  const modelDirectory = join(root, 'embedding-models', embedding.directory);
+  const inputModels = await fixedFiles(modelInput);
+  let cursor = join(root, 'embedding-models');
+  while (cursor.toLowerCase() !== dirname(cursor).toLowerCase()) {
+    try {
+      assert.equal(
+        (await lstat(cursor)).isSymbolicLink(),
+        false,
+        'Linked model destination refused.',
+      );
+    } catch (error) {
+      if (error.code !== 'ENOENT') throw error;
+    }
+    cursor = dirname(cursor);
+  }
+  await mkdir(join(root, 'embedding-models')).catch(async (error) => {
+    if (error.code !== 'EEXIST' || !(await lstat(join(root, 'embedding-models'))).isDirectory())
+      throw error;
+  });
+  await mkdir(modelDirectory);
+  await mkdir(join(modelDirectory, 'onnx'));
+  for (const [name] of embedding.files)
+    await copyFile(join(modelInput, name), join(modelDirectory, name), constants.COPYFILE_EXCL);
+  assert.deepEqual(await fixedFiles(modelDirectory), inputModels);
+  const modelStatus = await api('embeddingStatus');
+  assert.equal(modelStatus.state, 'ready');
+  assert.equal(modelStatus.revision, embedding.revision);
+  result.preseededModel = { directory: modelDirectory, downloaded: false, files: inputModels };
+  result.checks.push(
+    'five pinned offline model files preseeded into real guest root cache; size/SHA verified independently and by installed app',
+  );
+
+  const resources = join(input, 'native-resources');
+  for (const [name, kind] of [
+    ['Learning Notes', 'pdf'],
+    ['语义检索验收', 'markdown'],
+  ]) {
+    const path = join(resources, name + (kind === 'pdf' ? '.pdf' : '.md'));
+    const info = await lstat(path);
+    assert.ok(
+      info.isFile() &&
+        !info.isSymbolicLink() &&
+        info.nlink === 1 &&
+        info.size > 0 &&
+        info.size < 1024 * 1024,
+    );
+    await navigate('资料库');
+    result.dialogSubstitutions.push(
+      `open-file selection for generated ${kind} native resource fixture`,
+    );
+    await choose(path);
+    try {
+      await page.getByRole('button', { name: '导入资料', exact: true }).click();
+      await until(
+        () => api('listSources'),
+        (sources) => sources.some((source) => source.name === name && source.kind === kind),
+        `installed ${kind} parser import`,
+        60_000,
+      );
+    } finally {
+      await restoreDialog();
+    }
+  }
+  const sources = await api('listSources');
+  assert.equal(sources.length, expected.snapshot.sources.length + 2);
+  const pdf = sources.find((source) => source.name === 'Learning Notes');
+  assert.equal(pdf.pageCount, 2);
+  assert.equal(pdf.textStatus, 'ready');
+  await page.getByRole('button', { name: '阅读 Learning Notes', exact: true }).click();
+  await until(
+    () => page.getByTestId('pdf-text-layer').textContent(),
+    (text) => text.includes('Active recall'),
+    'installed PDF first text layer',
+    60_000,
+  );
+  await page.getByRole('button', { name: '下一页', exact: true }).click();
+  await until(
+    () => page.getByTestId('pdf-text-layer').textContent(),
+    (text) => text.includes('Evidence matters'),
+    'installed PDF second text layer',
+  );
+  await page.getByRole('combobox', { name: 'PDF 缩放', exact: true }).selectOption('1.25');
+  await value(page.getByRole('spinbutton', { name: 'PDF 页码', exact: true }), '2');
+  await visible(page.getByText('阅读位置已保存', { exact: true }));
+  const canvas = await until(
+    () =>
+      page.locator('canvas[aria-label="PDF 第 2 页原始版式"]').evaluate((element) => {
+        const data = element
+          .getContext('2d')
+          .getImageData(0, 0, element.width, element.height).data;
+        return {
+          width: element.width,
+          height: element.height,
+          pixels: data.some(
+            (channel, index) => index % 4 === 0 && data[index + 3] > 0 && channel < 240,
+          ),
+        };
+      }),
+    (value) => value.pixels,
+    'actual PDF canvas paint',
+  );
+  assert.ok(
+    canvas.width > 0 && canvas.height > 0 && canvas.pixels,
+    'Installed PDF canvas must contain rendered page content.',
+  );
+  await until(
+    () => api('listSources'),
+    (items) => items.find((item) => item.id === pdf.id)?.position.zoom === 1.25,
+    'saved PDF zoom',
+  );
+  result.pdf = {
+    id: pdf.id,
+    pageCount: pdf.pageCount,
+    textStatus: pdf.textStatus,
+    page: 2,
+    zoom: 1.25,
+    canvas,
+  };
+  await screenshot('installed-pdf-page2');
+  result.checks.push(
+    'installed PDF utility parser and packaged renderer assets produced two-page text layers and visible page-2 canvas at 125% zoom',
+  );
+  await page.getByRole('button', { name: '返回资料库', exact: true }).click();
+  const semantic = sources.find((source) => source.name === '语义检索验收');
+  const evidence = await api('prepareQuestion', '怎样让查找更迅速？', semantic.id);
+  assert.match(evidence.notice, /混合检索/);
+  assert.doesNotMatch(evidence.notice, /已使用关键词检索|未完成|进程退出|超时/);
+  assert.ok(
+    evidence.hits.some(
+      (hit) =>
+        hit.sourceId === semantic.id &&
+        hit.anchor === 'md-line-5' &&
+        hit.text.includes('数据库索引使查询更快。'),
+    ),
+    'Real installed CPU embedding must retrieve the fixed synonym target.',
+  );
+  result.hybridRetrieval = evidence;
+  result.checks.push(
+    'real packaged ONNX CPU worker returned pinned semantic md-line-5 evidence with hybrid notice and no fallback; no model generation requested',
+  );
+
+  const creates = [];
+  for (const entry of await readdir(logs, { withFileTypes: true })) {
+    if (!entry.isDirectory() || !/^ui-create-[a-f0-9-]{36}$/.test(entry.name)) continue;
+    try {
+      const receipt = JSON.parse(await readFile(join(logs, entry.name, 'result.json'), 'utf8'));
+      if (
+        receipt.format === 1 &&
+        receipt.stage === 'create' &&
+        receipt.status === 'passed' &&
+        receipt.source.gitCommit === expected.source.gitCommit &&
+        receipt.sandboxProfile === identity.profile
+      )
+        creates.push(receipt);
+    } catch (error) {
+      if (error.code !== 'ENOENT') throw error;
+    }
+  }
+  assert.equal(creates.length, 1, 'Require the unique successful baseline create backup receipt.');
+  const backupDirectory = resolve(creates[0].backup.directory);
+  assert.ok(
+    backupDirectory.toLowerCase().startsWith(resolve(logs).toLowerCase() + '\\') &&
+      /\\ui-create-[a-f0-9-]{36}\\backup-export\\/i.test(backupDirectory),
+    'Restore may use only this Sandbox baseline backup.',
+  );
+  const manifest = JSON.parse(await readFile(join(backupDirectory, 'manifest.json'), 'utf8'));
+  assert.equal(manifest.counts.sources, expected.snapshot.sources.length);
+  assert.equal(manifest.counts.notes, expected.snapshot.notes.length);
+  assert.equal(manifest.counts.tasks, expected.snapshot.tasks.length);
+  await navigate('设置');
+  result.dialogSubstitutions.push('restore baseline backup folder selection');
+  await choose(backupDirectory);
+  try {
+    await page.getByRole('button', { name: '选择备份并预览', exact: true }).click();
+    await visible(page.getByRole('heading', { name: '恢复内容预览', exact: true }));
+  } finally {
+    await restoreDialog();
+  }
+  const preview = (await api('backupState')).preview;
+  assert.ok(preview && /^[a-f0-9]{8}(-[a-f0-9]{4}){3}-[a-f0-9]{12}$/.test(preview.id));
+  assert.deepEqual(preview.counts, manifest.counts);
+  assert.equal(
+    (await api('listSources')).length,
+    sources.length,
+    'Preview must not replace live records.',
+  );
+  await page
+    .getByRole('checkbox', {
+      name: '我已保存需要保留的输入，理解应用会重启，尚未保存的内容会丢失。',
+      exact: true,
+    })
+    .check();
+  await screenshot('installed-restore-preview');
+  const previousPid = application.process().pid;
+  result.dialogSubstitutions.push(
+    'restore final native confirmation: response 1; app.relaunch/app.quit unchanged',
+  );
+  await application.evaluate(({ dialog }) => {
+    const original = dialog.showMessageBox;
+    dialog.showMessageBox = async (...args) => {
+      const options = args.at(-1);
+      if (options.title === '恢复学习数据并重启' && options.buttons[1] === '恢复并重启') {
+        dialog.showMessageBox = original;
+        return { response: 1, checkboxChecked: false };
+      }
+      return original.apply(dialog, args);
+    };
+  });
+  const confirmedAt = new Date().toISOString();
+  await page.getByRole('button', { name: '恢复并重启', exact: true }).click();
+  await until(
+    () => application.process().exitCode,
+    (code) => code === 0,
+    'actual restore-triggered original app exit',
+    60_000,
+  );
+  application = undefined;
+  const processes = () =>
+    JSON.parse(
+      powershell(
+        `$ErrorActionPreference='Stop'; $rows=@(Get-Process -Name StudyCompanion -ErrorAction SilentlyContinue | Where-Object { $_.Path -ieq ${psLiteral(identity.exe)} -and $_.Id -ne ${previousPid} -and $_.MainWindowHandle -ne 0 } | ForEach-Object { [pscustomobject]@{pid=$_.Id; path=$_.Path; createdAt=$_.StartTime.ToUniversalTime().ToString('o'); mainWindowHandle=$_.MainWindowHandle.ToString()} }); ConvertTo-Json -InputObject $rows -Compress`,
+      ),
+    );
+  const relaunched = await until(
+    processes,
+    (rows) => rows.length === 1,
+    'actual relaunched installed app PID and window',
+    60_000,
+  );
+  relaunchedProcessProof = relaunched[0];
+  result.relaunch = { previousPid, confirmedAt, process: relaunchedProcessProof };
+  assert.ok(
+    Date.parse(relaunchedProcessProof.createdAt) >= Date.parse(confirmedAt),
+    'Replacement process must have started after restore confirmation.',
+  );
+  const active = await until(
+    async () => {
+      try {
+        return JSON.parse(await readFile(join(root, 'active-learning.json'), 'utf8'));
+      } catch (error) {
+        if (error.code === 'ENOENT') return null;
+        throw error;
+      }
+    },
+    (value) => value?.id === preview.id,
+    'actual restore startup activated the copied learning directory',
+  );
+  assert.equal(active.format, 1);
+  assert.equal(active.previousId, null);
+  assert.ok(Number.isFinite(Date.parse(active.restoredAt)));
+  await assert.rejects(lstat(join(root, 'pending-restore.json')), { code: 'ENOENT' });
+  result.relaunch.active = active;
+  closeRelaunched(relaunchedProcessProof);
+  relaunchedProcessProof = undefined;
+  await closeServer();
+  result.restoredRuntime = await launch();
+  await verify();
+  const restored = await api('backupState');
+  assert.equal(
+    restored.learningDirectory.toLowerCase(),
+    join(root, 'learning-restores', preview.id).toLowerCase(),
+  );
+  assert.equal(restored.restoreReceipt.preservedDirectory.toLowerCase(), root.toLowerCase());
+  assert.equal(restored.restoreReceipt.restoredAt, active.restoredAt);
+  assert.equal(
+    (await api('bootstrap')).dataDir.toLowerCase(),
+    root.toLowerCase(),
+    'Bootstrap stays bound to root credentials/model profile after restore.',
+  );
+  assert.equal(
+    createHash('sha256')
+      .update(await readFile(join(root, 'credentials.enc.json')))
+      .digest('hex'),
+    credentialSha256,
+  );
+  assert.deepEqual(await fixedFiles(modelDirectory), inputModels);
+  assert.equal((await api('embeddingStatus')).state, 'ready');
+  result.restore = {
+    backupDirectory,
+    previewId: preview.id,
+    state: restored,
+    credentialSha256,
+    modelFiles: inputModels,
+  };
+  result.excluded = result.excluded.filter((item) => item !== 'restore execution');
+  result.checks.push(
+    'real installed backup workers restored baseline with actual app relaunch/new PID/window/active UUID/pending cleanup; old directory retained and all business values, credentials/model hashes unchanged',
+  );
+  await navigate('设置');
+  await visible(page.getByText('已恢复学习数据', { exact: true }));
+  await screenshot('installed-restored-data');
+}
+
 try {
   if (stage === 'create') {
     await assert.rejects(
@@ -559,55 +1010,9 @@ try {
       'Expected snapshot already exists; refusing overwrite.',
     );
   }
-  const { _electron } = await import(
-    pathToFileURL(join(input, 'tools', 'playwright-core', 'index.mjs')).href
-  );
-  const {
-    ELECTRON_RUN_AS_NODE: _node,
-    STUDY_COMPANION_DATA_DIR: _data,
-    STUDY_COMPANION_DEV_URL: _dev,
-    ...environment
-  } = process.env;
-  application = await _electron.launch({
-    executablePath: identity.exe,
-    args: [],
-    cwd: identity.profile,
-    env: environment,
-    timeout: 60_000,
-  });
-  page = await application.firstWindow({ timeout: 60_000 });
-  page.setDefaultTimeout(30_000);
-  page.on('pageerror', (error) => consoleErrors.push(error.message));
-  page.on('request', (request) => {
-    if (/^https?:/.test(request.url())) networkRequests.push(request.url());
-  });
-  const runtime = await application.evaluate(({ app }) => ({
-    packaged: app.isPackaged,
-    appPath: app.getAppPath(),
-    appData: app.getPath('appData'),
-    dataDir: app.getPath('userData'),
-    version: app.getVersion(),
-  }));
-  assert.equal(runtime.packaged, true, 'Must run the formal packaged application.');
-  assert.equal(runtime.appData.toLowerCase(), identity.appData.toLowerCase());
-  assert.equal(
-    runtime.dataDir.toLowerCase(),
-    join(identity.appData, 'StudyCompanion').toLowerCase(),
-  );
-  assert.equal(
-    runtime.appPath.toLowerCase(),
-    join(dirname(identity.exe), 'resources', 'app.asar').toLowerCase(),
-  );
-  assert.equal(runtime.version, identity.source.version);
-  result.runtime = runtime;
-  await until(
-    () => page.evaluate(() => Boolean(window.studyCompanion)),
-    Boolean,
-    'real preload bridge',
-  );
-  const boot = await api('bootstrap');
-  assert.equal(boot.dataDir.toLowerCase(), runtime.dataDir.toLowerCase());
+  result.runtime = await launch();
   if (stage === 'create') await create();
+  else if (stage === 'verify-native-resources') await verifyNativeResources();
   else await verify();
   assert.deepEqual(consoleErrors, [], 'Renderer reported an uncaught error.');
   assert.deepEqual(networkRequests, [], 'Unexpected renderer HTTP request.');
@@ -628,6 +1033,14 @@ try {
     });
   process.exitCode = 1;
 } finally {
+  if (relaunchedProcessProof) {
+    try {
+      closeRelaunched(relaunchedProcessProof);
+      result.relaunchedFailureCleanup = 'verified replacement process closed with exit code 0';
+    } catch (error) {
+      result.relaunchedFailureCleanupError = error.message;
+    }
+  }
   if (application) {
     try {
       if (result.status === 'failed') {
@@ -645,11 +1058,7 @@ try {
       process.exitCode = 1;
     }
   }
-  if (server)
-    await new Promise((done) => {
-      server.closeAllConnections();
-      server.close(done);
-    });
+  await closeServer();
   try {
     if (result.status === 'passed') {
       const credentials = await readFile(
