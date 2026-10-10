@@ -16,6 +16,7 @@ const stages = [
   'verify-reinstall',
   'verify-os-restart',
   'verify-native-resources',
+  'verify-restore',
 ];
 assert.equal(process.platform, 'win32', 'Windows Sandbox is required.');
 assert.equal(process.argv.length, 4, 'Usage: node installed-acceptance-smoke.mjs --stage <stage>');
@@ -870,6 +871,27 @@ async function verifyNativeResources() {
     'real packaged ONNX CPU worker returned pinned semantic md-line-5 evidence with hybrid notice and no fallback; no model generation requested',
   );
 
+  await restoreBaseline(root, credentialSha256, inputModels);
+}
+
+async function restoreBaseline(root, credentialSha256, inputModels) {
+  const modelDirectory = join(root, 'embedding-models', embedding.directory);
+  const before = await api('backupState');
+  let previousId = null;
+  try {
+    const previous = JSON.parse(await readFile(join(root, 'active-learning.json'), 'utf8'));
+    assert.equal(previous.format, 1);
+    assert.match(previous.id, /^[a-f0-9]{8}(-[a-f0-9]{4}){3}-[a-f0-9]{12}$/);
+    previousId = previous.id;
+  } catch (error) {
+    if (error.code !== 'ENOENT') throw error;
+  }
+  assert.equal(
+    before.learningDirectory.toLowerCase(),
+    (previousId ? join(root, 'learning-restores', previousId) : root).toLowerCase(),
+  );
+  const sourcesBeforePreview = await api('listSources');
+
   const creates = [];
   for (const entry of await readdir(logs, { withFileTypes: true })) {
     if (!entry.isDirectory() || !/^ui-create-[a-f0-9-]{36}$/.test(entry.name)) continue;
@@ -910,9 +932,9 @@ async function verifyNativeResources() {
   const preview = (await api('backupState')).preview;
   assert.ok(preview && /^[a-f0-9]{8}(-[a-f0-9]{4}){3}-[a-f0-9]{12}$/.test(preview.id));
   assert.deepEqual(preview.counts, manifest.counts);
-  assert.equal(
-    (await api('listSources')).length,
-    sources.length,
+  assert.deepEqual(
+    await api('listSources'),
+    sourcesBeforePreview,
     'Preview must not replace live records.',
   );
   await page
@@ -922,7 +944,8 @@ async function verifyNativeResources() {
     })
     .check();
   await screenshot('installed-restore-preview');
-  const previousPid = application.process().pid;
+  const originalProcess = application.process();
+  const previousPid = originalProcess.pid;
   result.dialogSubstitutions.push(
     'restore final native confirmation: response 1; app.relaunch/app.quit unchanged',
   );
@@ -938,13 +961,15 @@ async function verifyNativeResources() {
     };
   });
   const confirmedAt = new Date().toISOString();
+  result.relaunch = { previousPid, confirmedAt };
   await page.getByRole('button', { name: '恢复并重启', exact: true }).click();
   await until(
-    () => application.process().exitCode,
+    () => originalProcess.exitCode,
     (code) => code === 0,
     'actual restore-triggered original app exit',
     60_000,
   );
+  result.relaunch.originalExitCode = originalProcess.exitCode;
   application = undefined;
   const processes = () =>
     JSON.parse(
@@ -959,7 +984,7 @@ async function verifyNativeResources() {
     60_000,
   );
   relaunchedProcessProof = relaunched[0];
-  result.relaunch = { previousPid, confirmedAt, process: relaunchedProcessProof };
+  result.relaunch.process = relaunchedProcessProof;
   assert.ok(
     Date.parse(relaunchedProcessProof.createdAt) >= Date.parse(confirmedAt),
     'Replacement process must have started after restore confirmation.',
@@ -977,7 +1002,7 @@ async function verifyNativeResources() {
     'actual restore startup activated the copied learning directory',
   );
   assert.equal(active.format, 1);
-  assert.equal(active.previousId, null);
+  assert.equal(active.previousId, previousId);
   assert.ok(Number.isFinite(Date.parse(active.restoredAt)));
   await assert.rejects(lstat(join(root, 'pending-restore.json')), { code: 'ENOENT' });
   result.relaunch.active = active;
@@ -991,7 +1016,10 @@ async function verifyNativeResources() {
     restored.learningDirectory.toLowerCase(),
     join(root, 'learning-restores', preview.id).toLowerCase(),
   );
-  assert.equal(restored.restoreReceipt.preservedDirectory.toLowerCase(), root.toLowerCase());
+  assert.equal(
+    restored.restoreReceipt.preservedDirectory.toLowerCase(),
+    before.learningDirectory.toLowerCase(),
+  );
   assert.equal(restored.restoreReceipt.restoredAt, active.restoredAt);
   assert.equal(
     (await api('bootstrap')).dataDir.toLowerCase(),
@@ -1022,6 +1050,18 @@ async function verifyNativeResources() {
   await screenshot('installed-restored-data');
 }
 
+async function verifyRestore() {
+  await verify();
+  const root = join(identity.appData, 'StudyCompanion');
+  const modelDirectory = join(root, 'embedding-models', embedding.directory);
+  const files = await fixedFiles(modelDirectory);
+  assert.equal((await api('embeddingStatus')).state, 'ready');
+  const credentialSha256 = createHash('sha256')
+    .update(await readFile(join(root, 'credentials.enc.json')))
+    .digest('hex');
+  await restoreBaseline(root, credentialSha256, files);
+}
+
 try {
   if (stage === 'create') {
     await assert.rejects(
@@ -1033,6 +1073,7 @@ try {
   result.runtime = await launch();
   if (stage === 'create') await create();
   else if (stage === 'verify-native-resources') await verifyNativeResources();
+  else if (stage === 'verify-restore') await verifyRestore();
   else await verify();
   assert.deepEqual(consoleErrors, [], 'Renderer reported an uncaught error.');
   assert.deepEqual(networkRequests, [], 'Unexpected renderer HTTP request.');
