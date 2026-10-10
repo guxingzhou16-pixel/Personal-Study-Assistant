@@ -7,6 +7,7 @@ import { defaultSettings, type ChatTurn } from '../../src/lib/types';
 import { Storage } from './storage';
 import { ChatService } from './chat';
 import { AppError } from './errors';
+import { copyIntoLegacy } from '../../tests/fixtures/legacy-databases';
 
 const stores: Storage[] = [];
 const directories: string[] = [];
@@ -41,12 +42,11 @@ it('migrates v2 without losing settings or source anchors and makes a readable b
   });
   storage.close();
   stores.pop();
-  const legacy = new DatabaseSync(path);
-  legacy.exec('DROP TABLE chat_turns; DROP TABLE conversations; PRAGMA user_version = 2;');
-  legacy.close();
-  const upgraded = new Storage(path);
+  const legacyPath = path + '.v2';
+  copyIntoLegacy(path, legacyPath, 2);
+  const upgraded = new Storage(legacyPath);
   stores.push(upgraded);
-  expect(upgraded.schemaVersion).toBe(4);
+  expect(upgraded.schemaVersion).toBe(12);
   expect(upgraded.loadSettings().ollama.model).toBe('local');
   expect(upgraded.getSegment('a'.repeat(64), 'md-line-1')?.text).toBe('保留原文');
   const backupName = readdirSync(directory).find((name) => name.includes('before-v3'))!;

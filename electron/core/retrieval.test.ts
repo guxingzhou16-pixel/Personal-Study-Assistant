@@ -4,6 +4,7 @@ import { tmpdir } from 'node:os';
 import { DatabaseSync } from 'node:sqlite';
 import { afterEach, expect, it } from 'vitest';
 import { Storage } from './storage';
+import { copyIntoLegacy } from '../../tests/fixtures/legacy-databases';
 import { retrieve, chunks } from './retrieval';
 import { defaultSettings } from '../../src/lib/types';
 
@@ -86,6 +87,52 @@ it('enforces the selected source scope and returns no evidence for unsupported t
   expect(retrieve(mainPath, indexPath, '什么是？').hits).toEqual([]);
   expect(() => retrieve(mainPath, indexPath, '" OR * - NEAR(closure)')).not.toThrow();
 });
+it('keeps separate evidence for both named concepts in a comparison without admitting unrelated scope', () => {
+  const { mainPath, indexPath } = fixture();
+  const store = new Storage(mainPath);
+  const id = 'c'.repeat(64);
+  store.addSource({
+    id,
+    name: '自然观察.md',
+    kind: 'markdown',
+    bytes: 100,
+    pageCount: 1,
+    textStatus: 'ready',
+    outline: [],
+    segments: [
+      {
+        anchor: 'md-line-1',
+        title: '蜻蜓',
+        depth: 1,
+        line: 1,
+        text: '蜻蜓能悬停，捕食飞行中的小昆虫。',
+      },
+      {
+        anchor: 'md-line-5',
+        title: '蝴蝶',
+        depth: 1,
+        line: 5,
+        text: '蝴蝶拍动翅膀飞行，用口器吸取花蜜。',
+      },
+      {
+        anchor: 'md-line-9',
+        title: '捕食',
+        depth: 1,
+        line: 9,
+        text: '蝴蝶出现在照片旁边，照片没有解释它的特点。',
+      },
+    ],
+  });
+  store.close();
+  const question = '蜻蜓和蝴蝶分别在飞行与进食上有什么特点？';
+  const hits = retrieve(mainPath, indexPath, question, id).hits;
+  expect(hits.map((hit) => hit.anchor)).toEqual(expect.arrayContaining(['md-line-1', 'md-line-5']));
+  expect(hits.map((hit) => hit.sourceId)).toEqual(hits.map(() => id));
+  expect(hits.map((hit) => hit.anchor)).not.toContain('md-line-9');
+  for (const hit of hits) expect(hit.text.length).toBe(hit.end - hit.start);
+  expect(retrieve(mainPath, indexPath, question, 'a'.repeat(64)).hits).toEqual([]);
+  expect(retrieve(mainPath, indexPath, '鲸鱼和海豚分别有什么特点？', id).hits).toEqual([]);
+});
 it('chunks long text without losing Unicode characters, offsets, or the end of a section', () => {
   const text = '事务🙂隔离。'.repeat(1000);
   const parts = [...chunks(text)];
@@ -96,6 +143,90 @@ it('chunks long text without losing Unicode characters, offsets, or the end of a
     expect(part.text).not.toMatch(/^[\uDC00-\uDFFF]|[\uD800-\uDBFF]$/);
   }
   expect(parts.at(-1)?.end).toBe(text.length);
+});
+
+it('distinguishes TCP socket from UDP socket when their shared word also appears in a distractor', () => {
+  const { mainPath, indexPath } = fixture();
+  const store = new Storage(mainPath);
+  const sourceId = 'd'.repeat(64);
+  store.addSource({
+    id: sourceId,
+    name: '传输协议.md',
+    kind: 'markdown',
+    bytes: 200,
+    pageCount: 1,
+    textStatus: 'ready',
+    outline: [],
+    segments: [
+      {
+        anchor: 'md-line-1',
+        title: 'TCP socket',
+        depth: 1,
+        line: 1,
+        text: 'TCP socket 提供面向连接、有序可靠的字节流。',
+      },
+      {
+        anchor: 'md-line-5',
+        title: 'UDP socket',
+        depth: 1,
+        line: 5,
+        text: 'UDP socket 以数据报发送，不保证可靠交付或顺序。',
+      },
+      {
+        anchor: 'md-line-9',
+        title: 'socket 示例',
+        depth: 1,
+        line: 9,
+        text: 'socket 是接口名，这张照片没有说明两种传输协议的性质。',
+      },
+    ],
+  });
+  store.close();
+  const question = 'TCP socket 和 UDP socket 有什么区别？';
+  const hits = retrieve(mainPath, indexPath, question, sourceId).hits;
+  expect(hits.map((hit) => hit.anchor)).toEqual(['md-line-1', 'md-line-5']);
+  expect(hits[0].text).toContain('TCP');
+  expect(hits[1].text).toContain('UDP');
+  expect(hits.every((hit) => hit.sourceId === sourceId)).toBe(true);
+  expect(retrieve(mainPath, indexPath, question, 'a'.repeat(64)).hits).toEqual([]);
+});
+
+it('keeps the two comparison subjects in adjacent overlapping chunks at offsets 0 and 680', () => {
+  const { mainPath, indexPath } = fixture();
+  const store = new Storage(mainPath);
+  const sourceId = 'e'.repeat(64);
+  const text =
+    'TCP socket 提供可靠有序字节流。'.padEnd(820, '空') +
+    'UDP socket 发送独立数据报，不保证可靠或顺序。';
+  store.addSource({
+    id: sourceId,
+    name: '长协议段落.md',
+    kind: 'markdown',
+    bytes: Buffer.byteLength(text),
+    pageCount: 1,
+    textStatus: 'ready',
+    outline: [],
+    segments: [{ anchor: 'md-line-1', title: '传输协议', depth: 1, line: 1, text }],
+  });
+  store.close();
+  const hits = retrieve(
+    mainPath,
+    indexPath,
+    'TCP socket 和 UDP socket 有什么区别？',
+    sourceId,
+  ).hits;
+  expect(hits.map((hit) => hit.start)).toEqual([0, 680]);
+  expect(hits.map((hit) => hit.anchor)).toEqual(['md-line-1', 'md-line-1']);
+  expect(hits[0].text).toContain('TCP socket');
+  expect(hits[0].text).not.toContain('UDP socket');
+  expect(hits[1].text).toContain('UDP socket');
+  for (const hit of hits) expect(hit.text).toBe(text.slice(hit.start, hit.end));
+});
+it('retains evidence for each subject in a bare conjunction with unequal token counts', () => {
+  const { mainPath, indexPath } = fixture();
+  expect(
+    retrieve(mainPath, indexPath, 'JavaScript promises 和 closure').hits.map((hit) => hit.anchor),
+  ).toEqual(expect.arrayContaining(['page-1', 'page-2']));
 });
 it('indexes newly imported sources and preserves the old index when a rebuild fails', () => {
   const { mainPath, indexPath } = fixture();
@@ -149,13 +280,10 @@ it('upgrades v3 with a recoverable backup, preserving existing conversations and
     evidence: [],
   });
   store.close();
-  const old = new DatabaseSync(mainPath);
-  old.exec(
-    'ALTER TABLE chat_turns DROP COLUMN mode; ALTER TABLE chat_turns DROP COLUMN evidence; PRAGMA user_version = 3;',
-  );
-  old.close();
-  store = new Storage(mainPath);
-  expect(store.schemaVersion).toBe(4);
+  const legacyPath = mainPath + '.v3';
+  copyIntoLegacy(mainPath, legacyPath, 3);
+  store = new Storage(legacyPath);
+  expect(store.schemaVersion).toBe(12);
   expect(store.loadSettings().displayName).toBe('保留我');
   expect(store.chat.get(conversation.id).turns).toEqual([
     expect.objectContaining({

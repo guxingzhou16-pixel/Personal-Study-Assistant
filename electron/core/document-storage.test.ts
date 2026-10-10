@@ -21,7 +21,7 @@ it('upgrades the existing v1 database, preserving settings and keeping a recover
     old.close();
     const oldBytes = readFileSync(path);
     storage = new Storage(path);
-    expect(storage.schemaVersion).toBe(4);
+    expect(storage.schemaVersion).toBe(12);
     expect(storage.loadSettings()).toMatchObject({
       displayName: '保留旧设置',
       dailyGoalMinutes: 70,
