@@ -55,7 +55,7 @@ if ([IO.Path]::GetFileName($uninstaller) -cne 'Uninstall StudyCompanion.exe' -or
 foreach ($path in @($profile, $appData, $localData, 'C:\AcceptanceInput', 'C:\AcceptanceLogs', $uninstaller)) {
     $cursor = $path
     while ($cursor -and $cursor -ine 'C:\') {
-        if ((Get-Item -LiteralPath $cursor).Attributes -band [IO.FileAttributes]::ReparsePoint) { throw 'Linked acceptance/install/profile path.' }
+        if ((Get-Item -LiteralPath $cursor -Force).Attributes -band [IO.FileAttributes]::ReparsePoint) { throw 'Linked acceptance/install/profile path.' }
         $cursor = Split-Path -Parent $cursor
     }
 }
@@ -168,10 +168,8 @@ async function value(locator, wanted) {
   );
 }
 async function navigate(name) {
-  await page
-    .getByRole('navigation', { name: '主导航' })
-    .getByRole('button', { name, exact: true })
-    .click();
+  const navigation = name === '设置' ? page : page.getByRole('navigation', { name: '主导航' });
+  await navigation.getByRole('button', { name, exact: true }).click();
 }
 async function api(method, ...args) {
   return page.evaluate(async ({ method, args }) => window.studyCompanion[method](...args), {

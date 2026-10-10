@@ -161,7 +161,6 @@ export function PlanningPage({
       const result = await desktop.planningOverview(day);
       if (!mounted.current || version !== loadVersion.current) return;
       setOverview(result);
-      setError('');
       if (reloadEditor && editor) {
         if (editor.kind === 'project') {
           const record = result.projects.find((project) => project.id === editor.record?.id);

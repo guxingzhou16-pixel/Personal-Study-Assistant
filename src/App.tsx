@@ -1,4 +1,5 @@
 import { useEffect, useLayoutEffect, useRef, useState } from 'react';
+import { version as appVersion } from '../package.json';
 import {
   ArrowRight,
   BookOpen,
@@ -291,7 +292,7 @@ export default function App() {
           </button>
           <div className="sidebar-version">
             <span>STUDY COMPANION</span>
-            <span>v0.1.0</span>
+            <span>v{appVersion}</span>
           </div>
         </div>
       </aside>
