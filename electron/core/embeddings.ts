@@ -74,6 +74,16 @@ export async function loadLocalEncoder(path: string): Promise<EmbeddingEncoder> 
     };
   } catch (error) {
     if (error instanceof AppError) throw error;
+    if (
+      error instanceof Error &&
+      'code' in error &&
+      error.code === 'ERR_DLOPEN_FAILED' &&
+      /onnxruntime_binding\.node/i.test(error.message)
+    )
+      throw new AppError(
+        'embeddingRuntime',
+        '本地嵌入的 Windows 运行组件加载失败，请检查应用安装文件，并安装或更新 Microsoft Visual C++ v14 运行库（x64）后重启拾知。',
+      );
     throw new AppError('embeddingLoad', '本地嵌入模型无法加载，请检查安装文件或重新下载。');
   }
 }

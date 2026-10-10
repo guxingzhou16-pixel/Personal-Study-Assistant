@@ -17,9 +17,12 @@ try {
     progress({ current: 0, total: 0, message: '正在加载本地检索模型…' });
     try {
       encoder = await loadLocalEncoder(modelPath);
-    } catch {
+    } catch (error) {
+      const reported = failure(error);
       fallback =
-        '本地嵌入模型无法加载或校验失败，已使用关键词检索；请在设置中检查模型或重新下载。 ';
+        reported.code === 'embeddingRuntime'
+          ? `${reported.message} 已使用关键词检索。 `
+          : '本地嵌入模型无法加载或校验失败，已使用关键词检索；请在设置中检查模型或重新下载。 ';
     }
   } else fallback = '未加载本地嵌入模型，已使用关键词检索；可在设置中下载语义检索模型。 ';
   let result;

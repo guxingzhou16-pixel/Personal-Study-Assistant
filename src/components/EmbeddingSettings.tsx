@@ -40,7 +40,7 @@ export function EmbeddingSettings() {
     setProgress(null);
     try {
       setStatus(await desktop.downloadEmbedding());
-      setNotice('检索模型已下载并校验，资料问答会自动使用混合检索。');
+      setNotice('检索模型文件已下载并校验，下一次资料问答将尝试混合检索。');
     } catch (error) {
       setNotice(errorMessage(error));
       try {
@@ -81,6 +81,12 @@ export function EmbeddingSettings() {
       </details>
       <p className="field-hint">
         点击下载只获取模型文件，不上传资料。首次检索会在后台建立向量索引，可能需要等待；可取消，模型不可用时仍能关键词检索。
+      </p>
+      <p className="field-hint">
+        Windows 本地语义检索需要 Microsoft Visual C++ v14
+        运行库（x64）。首次使用请从微软官方下载并安装，完成后重启拾知。 官方下载地址：
+        <code>https://aka.ms/vc14/vc_redist.x64.exe</code>。
+        “模型已就绪”表示模型文件通过校验，推理是否成功以检索结果的说明为准。
       </p>
       <p role="status">
         {downloading

@@ -39,3 +39,27 @@ it('loads CPU inference from verified local files, applies the BGE query instruc
   await encoder.dispose();
   expect(fake.dispose).toHaveBeenCalledOnce();
 });
+
+it('reports missing Windows native runtime separately from damaged model files without exposing paths', async () => {
+  fake.pipeline.mockRejectedValueOnce(
+    Object.assign(
+      new Error('The specified module could not be found. C:\\private\\onnxruntime_binding.node'),
+      {
+        code: 'ERR_DLOPEN_FAILED',
+      },
+    ),
+  );
+  const unavailable = loadLocalEncoder('local-test-model');
+  await expect(unavailable).rejects.toMatchObject({
+    code: 'embeddingRuntime',
+    message: expect.stringContaining('Microsoft Visual C++'),
+  });
+  await expect(unavailable).rejects.toMatchObject({
+    message: expect.not.stringContaining('private'),
+  });
+  fake.pipeline.mockRejectedValueOnce(new Error('private model parsing details'));
+  await expect(loadLocalEncoder('local-test-model')).rejects.toMatchObject({
+    code: 'embeddingLoad',
+    message: '本地嵌入模型无法加载，请检查安装文件或重新下载。',
+  });
+});
