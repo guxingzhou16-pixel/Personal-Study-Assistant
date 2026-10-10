@@ -134,6 +134,7 @@ const result = {
 let application;
 let page;
 let server;
+let modelFixture;
 let expected;
 let createdSnapshot;
 let relaunchedProcessProof;
@@ -236,6 +237,15 @@ async function fixedFiles(directory) {
 }
 
 async function launch() {
+  // Reserve the saved loopback fixture before Electron allocates its debugging ports.
+  if (stage !== 'create' && !server) {
+    const saved = JSON.parse(await readFile(expectedPath, 'utf8'));
+    assert.equal(saved.sandboxSid, identity.sid);
+    const address = new URL(saved.snapshot.settings.openai.baseUrl);
+    assert.equal(address.protocol, 'http:');
+    assert.equal(address.hostname, '127.0.0.1');
+    await modelServer(Number(address.port));
+  }
   const { _electron } = await import(
     pathToFileURL(join(input, 'tools', 'playwright-core', 'index.mjs')).href
   );
@@ -292,6 +302,7 @@ async function closeServer() {
     server.close(done);
   });
   server = undefined;
+  modelFixture = undefined;
 }
 
 async function until(read, predicate, description, timeout = 20_000) {
@@ -369,6 +380,11 @@ async function snapshot(day) {
   };
 }
 async function modelServer(port = 0) {
+  if (server) {
+    assert.equal(server.listening, true);
+    assert.equal(server.address().port, port);
+    return modelFixture;
+  }
   let authorized = 0;
   server = createServer((request, response) => {
     response.setHeader('content-type', 'application/json');
@@ -384,7 +400,11 @@ async function modelServer(port = 0) {
     server.once('error', fail);
     server.listen(port, '127.0.0.1', done);
   });
-  return { baseUrl: `http://127.0.0.1:${server.address().port}/v1`, authorized: () => authorized };
+  modelFixture = {
+    baseUrl: `http://127.0.0.1:${server.address().port}/v1`,
+    authorized: () => authorized,
+  };
+  return modelFixture;
 }
 
 async function create() {
