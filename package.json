@@ -1,6 +1,6 @@
 {
   "name": "personal-study-assistant",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "拾知：本地模型优先的学习助手，支持资料阅读、可追溯问答与学习计划。",
   "author": {
     "name": "guxingzhou16-pixel"

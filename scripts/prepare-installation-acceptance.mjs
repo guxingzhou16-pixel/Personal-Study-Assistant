@@ -245,7 +245,8 @@ function Installed {
       -not (Test-Path -LiteralPath $uninstaller -PathType Leaf)) { throw '卸载器不属于沙盒用户。' }
   $directory = Split-Path -Parent $uninstaller
   $location = (Get-ItemProperty -LiteralPath ('HKCU:\Software\' + $plan.nsisGuid) -ErrorAction Stop).InstallLocation
-  if ([IO.Path]::GetFileName($uninstaller) -cne ('Uninstall ' + $plan.productName + '.exe') -or
+  # Builder uses the configured win.executableName, not productName.
+  if ([IO.Path]::GetFileName($uninstaller) -cne 'Uninstall StudyCompanion.exe' -or
       -not $location -or [IO.Path]::GetFullPath($location).TrimEnd('\') -ine $directory) {
     throw '卸载文件名/真实NSIS安装位置不一致。'
   }
@@ -263,7 +264,7 @@ function Installed {
     $_.gitCommit -eq $info.gitCommit -and $_.version -eq $info.version -and $_.lockfileSha256 -eq $info.lockfileSha256
   }
   $exeVersion = (Get-Item -LiteralPath $exe).VersionInfo
-  if ($sources.Count -ne 1 -or $info.appId -ne $plan.appId -or
+  if (@($sources).Count -ne 1 -or $info.appId -ne $plan.appId -or
       $entries[0].DisplayName -cne ($plan.productName + ' ' + $info.version) -or
       $entries[0].DisplayVersion -ne $info.version -or $exeVersion.FileVersion -ne $info.version -or
       $exeVersion.ProductName -cne $plan.productName -or -not (Test-Path -LiteralPath $exe -PathType Leaf)) {

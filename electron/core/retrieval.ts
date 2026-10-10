@@ -187,6 +187,8 @@ export function retrieve(
         const matchedGroups = groups.flatMap((_, index) =>
           matchesGroup(normalized, index) ? [index] : [],
         );
+        // Comparison evidence must name a subject, not just a shared word or question filler.
+        if (groups.length > 0 && matchedGroups.length === 0) continue;
         const fullCoverage =
           terms.filter((term) => normalized.includes(term)).length / terms.length;
         const coverage = Math.max(
