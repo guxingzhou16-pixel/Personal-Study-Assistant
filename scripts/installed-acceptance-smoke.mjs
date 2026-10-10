@@ -8,7 +8,13 @@ import { createServer } from 'node:http';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 
-const stages = ['create', 'verify-restart', 'verify-replacement', 'verify-reinstall'];
+const stages = [
+  'create',
+  'verify-restart',
+  'verify-replacement',
+  'verify-reinstall',
+  'verify-os-restart',
+];
 assert.equal(process.platform, 'win32', 'Windows Sandbox is required.');
 assert.equal(process.argv.length, 4, 'Usage: node installed-acceptance-smoke.mjs --stage <stage>');
 assert.equal(process.argv[2], '--stage');
@@ -312,7 +318,7 @@ async function create() {
   await navigate('学习笔记');
   await page.getByRole('button', { name: '新建笔记', exact: true }).click();
   await page.getByLabel('笔记标题', { exact: true }).fill(fixture.note);
-  await page.getByLabel('关联资料', { exact: true }).selectOption(source.id);
+  await page.getByRole('combobox', { name: '关联资料', exact: true }).selectOption(source.id);
   for (const [label, text] of Object.entries(fixture.sections))
     await page.getByLabel(label, { exact: false }).fill(text);
   await page.getByRole('button', { name: '保存笔记', exact: true }).click();
@@ -333,7 +339,9 @@ async function create() {
   await navigate('学习计划');
   await page.getByRole('button', { name: '新建项目', exact: true }).click();
   await page.getByLabel('标题', { exact: true }).fill(fixture.project);
-  await page.getByLabel('学习目标', { exact: true }).fill('完成阅读、作品和专注复盘。');
+  await page
+    .getByRole('textbox', { name: '学习目标', exact: true })
+    .fill('完成阅读、作品和专注复盘。');
   await page.getByRole('button', { name: '确认保存到本机', exact: true }).click();
   await until(
     () => api('planningOverview', day),
@@ -346,7 +354,7 @@ async function create() {
     await page.getByLabel('标题', { exact: true }).fill(title);
     await page.getByLabel('安排日期', { exact: true }).fill(day);
     await page.getByLabel('预计分钟', { exact: true }).fill('25');
-    await page.getByLabel('关联项目', { exact: true }).selectOption(project.id);
+    await page.getByRole('combobox', { name: '关联项目', exact: true }).selectOption(project.id);
     await page.getByLabel('具体行动与说明', { exact: true }).fill('合成验收资料；不代表知识掌握。');
     await page.getByRole('button', { name: '确认保存到本机', exact: true }).click();
     await until(
@@ -370,7 +378,7 @@ async function create() {
   await screenshot('planning');
 
   await navigate('专注时光');
-  await page.getByLabel('关联任务', { exact: true }).selectOption(todo.id);
+  await page.getByRole('combobox', { name: '关联任务', exact: true }).selectOption(todo.id);
   await page.getByLabel('本轮专注分钟', { exact: true }).fill('5');
   await page.getByRole('button', { name: '确认并开始本轮', exact: true }).click();
   await until(
@@ -514,7 +522,10 @@ async function verify() {
     await value(page.getByLabel(label, { exact: false }), text);
   await screenshot('restored-note');
   await navigate('学习计划');
-  await page.getByLabel('任务日期', { exact: true }).fill(expected.snapshot.day);
+  await page
+    .locator('.planning-page')
+    .getByLabel('任务日期', { exact: true })
+    .fill(expected.snapshot.day);
   await page
     .locator('.planning-task-list')
     .getByRole('button', { name: new RegExp(fixture.completed) })
@@ -528,7 +539,7 @@ async function verify() {
     .getByRole('list', { name: '已结束的专注记录' })
     .getByRole('button', { name: new RegExp(fixture.todo) })
     .click();
-  await value(page.getByLabel('一句收获、一个疑问或下一步', { exact: true }), fixture.review);
+  await visible(page.getByText(fixture.review, { exact: true }));
   await screenshot('restored-focus');
   assert.deepEqual(
     await snapshot(expected.snapshot.day),
@@ -604,6 +615,13 @@ try {
 } catch (error) {
   result.status = 'failed';
   result.error = { name: error.name, message: error.message, stack: error.stack };
+  await writeFile(
+    join(output, 'failure-before-close.json'),
+    JSON.stringify(result, null, 2) + '\n',
+    {
+      flag: 'wx',
+    },
+  );
   if (page && !page.isClosed())
     await screenshot('failure').catch((failure) => {
       result.failureScreenshotError = failure.message;
@@ -612,6 +630,14 @@ try {
 } finally {
   if (application) {
     try {
+      if (result.status === 'failed') {
+        // A failed fixture can leave a dirty note. Record failure before allowing
+        // normal shutdown; otherwise the native discard prompt blocks reporting.
+        result.dialogSubstitutions.push('failure-only dirty note discard on normal exit');
+        await application.evaluate(({ dialog }) => {
+          dialog.showMessageBox = async () => ({ response: 1, checkboxChecked: false });
+        });
+      }
       await application.close();
     } catch (error) {
       result.status = 'failed';

@@ -6,6 +6,7 @@ import { mkdir, readdir, readFile, stat, writeFile } from 'node:fs/promises';
 import { createRequire } from 'node:module';
 import { basename, join, relative, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { finalizeUninstaller } from './nsis-uninstaller.mjs';
 
 const root = fileURLToPath(new URL('../', import.meta.url));
 process.chdir(root);
@@ -62,7 +63,9 @@ if (mode === 'nsis') {
       args.length !== 0
     )
       throw new Error('打包器请求了未核对的程序执行，拒绝构建。');
-    await UninstallerReader.exec(installer, installer.replace(/\.exe$/, '.__uninstaller.exe'));
+    const uninstaller = installer.replace(/\.exe$/, '.__uninstaller.exe');
+    await UninstallerReader.exec(installer, uninstaller);
+    await writeFile(uninstaller, finalizeUninstaller(await readFile(uninstaller)));
     uninstallerExtractions++;
     console.log('已从编译文件提取卸载器，未执行临时安装程序。');
     return '';

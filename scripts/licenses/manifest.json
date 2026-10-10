@@ -234,6 +234,48 @@
           "sha256": "fe9fe30ca3776e4ed9e2bdde015e0cb03f26f32c42640955d213de2df7ff8669",
           "source": "https://chromium.googlesource.com/chromium/src/third_party/zlib/+/646b7f569718921d7d4b5b8e22572ff6c76f2596/README.chromium?format=TEXT",
           "description": "Exact Chromium/Skia dependency revision pinned by Skia a9c42c9 DEPS; version taken from the exact revision README.chromium; actual Canvas binary and secondary notice coverage remain to be reviewed"
+        },
+        {
+          "file": "assets/skia-deps-freetype-264b5fb-src-base-fthash.c",
+          "sha256": "693e5a54b3ce30140975a94a3369dbe706eb1f280c69e80da426d39cc45b94ef",
+          "source": "https://api.github.com/repos/freetype/freetype/git/blobs/ab248ace8bd01b3680767fb5b49d7e2ed46afbb4",
+          "description": "Exact FreeType 264b5fb original src/base/fthash.c including embedded copyright/license header; Git blob verified; full source retained without rewriting; actual Canvas binary coverage remains pending."
+        },
+        {
+          "file": "assets/skia-deps-freetype-264b5fb-include-freetype-internal-fthash.h",
+          "sha256": "023d88d49d29ecf3833db7717a3f7ae223c17ec2012bdb5bf33bb67abaf616c4",
+          "source": "https://api.github.com/repos/freetype/freetype/git/blobs/642d21e21c6afb73b0d1bdd50c8a78c98af9810b",
+          "description": "Exact FreeType 264b5fb original include/freetype/internal/fthash.h including embedded copyright/license header; Git blob verified; full source retained without rewriting; actual Canvas binary coverage remains pending."
+        },
+        {
+          "file": "assets/skia-deps-freetype-264b5fb-src-gzip-zlib.h",
+          "sha256": "c86a25c27f74cb97b8fa07b175f479f063d5064ace9995b4684063643c81cf1b",
+          "source": "https://api.github.com/repos/freetype/freetype/git/blobs/8c3c42a32320b678ee696cd90d8d5ab266af5bff",
+          "description": "Exact FreeType 264b5fb original src/gzip/zlib.h including embedded copyright/license header; Git blob verified; full source retained without rewriting; actual Canvas binary coverage remains pending."
+        },
+        {
+          "file": "assets/skia-deps-freetype-264b5fb-src-autofit-ft-hb-ft.c",
+          "sha256": "84dd5ddff1cec222e1755b4962faf45836238dfa3a46854dabd969eb4e50f8be",
+          "source": "https://api.github.com/repos/freetype/freetype/git/blobs/05a66ad32f6790f7a5bc80a734df6452f599ef88",
+          "description": "Exact FreeType 264b5fb original src/autofit/ft-hb-ft.c including embedded copyright/license header; Git blob verified; full source retained without rewriting; actual Canvas binary coverage remains pending."
+        },
+        {
+          "file": "assets/skia-deps-freetype-264b5fb-src-autofit-ft-hb-decls.h",
+          "sha256": "ed05eec3b5657f98a0c106fa4aa2e5a4bc7f0864e5d34bd5989eee6d8b718bcf",
+          "source": "https://api.github.com/repos/freetype/freetype/git/blobs/032d4d37a5ebea9aad52de7d014313fe61572188",
+          "description": "Exact FreeType 264b5fb original src/autofit/ft-hb-decls.h including embedded copyright/license header; Git blob verified; full source retained without rewriting; actual Canvas binary coverage remains pending."
+        },
+        {
+          "file": "assets/skia-deps-freetype-264b5fb-src-autofit-ft-hb-types.h",
+          "sha256": "f106bf7cc41f52cd70907266a74a293c57bc5f71285b01c36bf198ad8b1c6234",
+          "source": "https://api.github.com/repos/freetype/freetype/git/blobs/6176622f7caa58672a72737dc633366042cdd6c3",
+          "description": "Exact FreeType 264b5fb original src/autofit/ft-hb-types.h including embedded copyright/license header; Git blob verified; full source retained without rewriting; actual Canvas binary coverage remains pending."
+        },
+        {
+          "file": "assets/skia-deps-freetype-264b5fb-src-autofit-hb-script-list.h",
+          "sha256": "0627d9f6a59a8b09e562e8aeaf414300899308725350beeb50b62b8657399576",
+          "source": "https://api.github.com/repos/freetype/freetype/git/blobs/88e270d3479f13e67eb91b4dffd706a787de12ea",
+          "description": "Exact FreeType 264b5fb original src/autofit/hb-script-list.h including embedded copyright/license header; Git blob verified; full source retained without rewriting; actual Canvas binary coverage remains pending."
         }
       ]
     },
@@ -293,7 +335,19 @@
           "file": "assets/DirectML-1.15.4-NOTICE.txt",
           "sha256": "d242ef970d0c2af30a2c6407d371ec916de5a0ddd2de636e4dc3a816d169311b",
           "source": "https://raw.githubusercontent.com/microsoft/DirectML/a2b2dd2d15652b1a597cd6eb4855b5c952ced6a1/NOTICE",
-          "description": "Repository revision explicitly releasing DirectML 1.15.4; NuGet archive notices not separately compared"
+          "description": "Repository revision explicitly releasing DirectML 1.15.4. This original release NOTICE is distinct from LICENSE-CODE.txt/ThirdPartyNotices.txt now preserved from the complete official NuGet archive."
+        },
+        {
+          "file": "assets/DirectML-1.15.4-LICENSE-CODE.txt",
+          "sha256": "903df5512f7d02609fed0c780a9b704f5a3eeb6e4d84ebe42a29845c81899a3c",
+          "source": "https://api.nuget.org/v3-flatcontainer/microsoft.ai.directml/1.15.4/microsoft.ai.directml.1.15.4.nupkg",
+          "description": "Original Microsoft.AI.DirectML 1.15.4 NuGet member LICENSE-CODE.txt; archive SHA-256 4e7cb7ddce8cf837a7a75dc029209b520ca0101470fcdf275c1f49736a3615b9; redistribution-condition review remains pending."
+        },
+        {
+          "file": "assets/DirectML-1.15.4-ThirdPartyNotices.txt",
+          "sha256": "2c95795c13ff48a58b6ed916f37901c23d964b5d9d601af422f17ad2172e7950",
+          "source": "https://api.nuget.org/v3-flatcontainer/microsoft.ai.directml/1.15.4/microsoft.ai.directml.1.15.4.nupkg",
+          "description": "Original Microsoft.AI.DirectML 1.15.4 NuGet member ThirdPartyNotices.txt; archive SHA-256 4e7cb7ddce8cf837a7a75dc029209b520ca0101470fcdf275c1f49736a3615b9; redistribution-condition review remains pending."
         }
       ]
     },
@@ -373,11 +427,11 @@
     }
   ],
   "reviewIssues": [
-    "guid-typescript@1.0.9 upstream metadata declares ISC and author nicolas, but upstream license/copyright file is absent and pinned gitHead unavailable. SPDX ISC template is reference only; it does not complete upstream attribution.",
-    "Canvas pinned FreeType, libjpeg-turbo, libpng and zlib root licenses and referenced FreeType/JPEG texts are retained. Actual binary/build coverage and secondary headers (FreeType embedded zlib/HarfBuzz/fthash; Chromium zlib SIMD/Intel/contrib) remain pending; glue-code notices are not external library licenses.",
+    "guid-typescript@1.0.9 published tarball integrity matches official npm metadata and contains no LICENSE/NOTICE/copyright file; metadata declares ISC and author nicolas, but exact upstream gitHead is unavailable. SPDX ISC template remains reference only and does not complete upstream attribution.",
+    "Canvas pinned root licenses and exact FreeType embedded zlib/HarfBuzz/fthash source files with license headers are retained. Actual binary/build coverage and Chromium zlib SIMD/Intel/contrib secondary notices remain pending; glue-code notices are not external library licenses.",
     "Sharp native dependencies: preserve the 29-library table and LGPL texts; matching complete source/build notices and replacement/redistribution conditions still need review before public distribution.",
     "Fixed Xenova/bge-small-zh-v1.5 revision 75c43b069aac4d136ba6bc1122f995fedcfd2781 model-card/license assets could not be obtained. FlagEmbedding code MIT text is not a grant for quantized model weights.",
-    "DirectML 1.15.4 EULA and release-commit NOTICE retained; the full NuGet package was not compared for additional notices.",
+    "DirectML 1.15.4 complete official NuGet EULA, LICENSE-CODE and ThirdPartyNotices plus separate release NOTICE are retained. Actual/NuGet DLL raw hashes differ only in certificate/checksum/security-directory regions; matching non-certificate bytes is not signature-trust or redistribution-condition acceptance. Distribution conditions remain pending.",
     "Project code license is unselected; private:true is not a license. Public release is not authorized."
   ]
 }

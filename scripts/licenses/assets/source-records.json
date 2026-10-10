@@ -115,7 +115,14 @@
       "sourceType": "official-license-html-extracted",
       "extraction": "license-file-contents pre text; HTML entities decoded; original CRLF/BOM retained",
       "sha256": "a05138e3a085ff60a44881eedfa58dccb03ecc1d7b1f6ae888418e8c2fec4b8d",
-      "size": 10439
+      "size": 10439,
+      "archiveComparison": {
+        "archiveUrl": "https://api.nuget.org/v3-flatcontainer/microsoft.ai.directml/1.15.4/microsoft.ai.directml.1.15.4.nupkg",
+        "archiveSha256": "4e7cb7ddce8cf837a7a75dc029209b520ca0101470fcdf275c1f49736a3615b9",
+        "archiveBytes": 202292617,
+        "archiveMember": "LICENSE.txt",
+        "exactBytesMatch": true
+      }
     },
     {
       "file": "DirectML-1.15.4-NOTICE.txt",
@@ -123,7 +130,7 @@
       "revision": "a2b2dd2d15652b1a597cd6eb4855b5c952ced6a1",
       "sourceType": "official-license-text",
       "version": "1.15.4",
-      "provenance": "Repository revision explicitly releasing DirectML 1.15.4; NuGet archive notices not separately compared",
+      "provenance": "Repository revision explicitly releasing DirectML 1.15.4. This original release NOTICE is distinct from LICENSE-CODE.txt/ThirdPartyNotices.txt now preserved from the complete official NuGet archive.",
       "sha256": "d242ef970d0c2af30a2c6407d371ec916de5a0ddd2de636e4dc3a816d169311b",
       "size": 88339
     },
@@ -142,9 +149,17 @@
       "version": "1.0.9",
       "revision": "1870de806c3db7ba46c5b8a1387c60fc9dda9284",
       "sourceType": "official-published-package-metadata",
-      "provenance": "Original npm metadata declares ISC and author nicolas; gitHead not found in redirected upstream repository",
+      "provenance": "Original npm metadata declares ISC and author nicolas; complete published 1.0.9 tarball SHA-1/SHA-512 matches metadata and has only package.json, README.md and two dist files, with no LICENSE/NOTICE/copyright file. Exact gitHead API returns 422 after upstream redirect.",
       "sha256": "6378c2ba06b0a41e033140a30359ba77fbf8706e46a2c9913d9ffff318c3d23a",
-      "size": 2687
+      "size": 2687,
+      "archiveComparison": {
+        "url": "https://registry.npmjs.org/guid-typescript/-/guid-typescript-1.0.9.tgz",
+        "sha256": "29775e81a4855bc391f853e9285508a465ee50da0ccb562559ae09412a3ababc",
+        "bytes": 1813,
+        "integrityMatches": true,
+        "files": 4,
+        "licenseFiles": 0
+      }
     },
     {
       "file": "icu-d578f2e-LICENSE.txt",
@@ -506,6 +521,160 @@
       "provenance": "Exact Chromium/Skia dependency revision pinned by Skia a9c42c9 DEPS; version taken from the exact revision README.chromium; actual Canvas binary and secondary notice coverage remain to be reviewed",
       "sha256": "fe9fe30ca3776e4ed9e2bdde015e0cb03f26f32c42640955d213de2df7ff8669",
       "size": 1289
+    },
+    {
+      "file": "DirectML-1.15.4-LICENSE-CODE.txt",
+      "url": "https://api.nuget.org/v3-flatcontainer/microsoft.ai.directml/1.15.4/microsoft.ai.directml.1.15.4.nupkg",
+      "version": "1.15.4",
+      "sourceType": "official-nuget-archive-member",
+      "archiveUrl": "https://api.nuget.org/v3-flatcontainer/microsoft.ai.directml/1.15.4/microsoft.ai.directml.1.15.4.nupkg",
+      "archiveResolvedUrl": "https://nuget.azure.cn/v3-flatcontainer/microsoft.ai.directml/1.15.4/microsoft.ai.directml.1.15.4.nupkg",
+      "archiveSha256": "4e7cb7ddce8cf837a7a75dc029209b520ca0101470fcdf275c1f49736a3615b9",
+      "archiveBytes": 202292617,
+      "archiveMember": "LICENSE-CODE.txt",
+      "extraction": "Original ZIP entry bytes read without rewriting; archive ID/version confirmed from Microsoft.AI.DirectML.nuspec",
+      "provenance": "Additional official NuGet notice; separate release-commit NOTICE is not this file. Actual DLL and NuGet DLL raw hashes differ; all non-certificate bytes match under the specified PE comparison.",
+      "binaryComparison": {
+        "actualBytes": 18527584,
+        "actualSha256": "234e8898778cdec88d3cb0539508273494082812c968699f3de665a018971625",
+        "nugetBytes": 18527776,
+        "nugetSha256": "9c9e6d822561c6c41b90e6994b3e8857cf1d66dbfb1e0c4c799c7c89b4e92da1",
+        "fileVersion": "1.15.4+241025-1615.1.dml-1.15.fac7597",
+        "excludedRegions": "Only trailing certificate table, PE optional-header checksum and security-directory fields",
+        "normalizedBytes": 18517504,
+        "normalizedSha256": "518c2f3fc40dd6e7ed2087bb21cf9b98296e8f0066e9c74d3d52b76766cdd4d7",
+        "nonCertificateBytesEqual": true,
+        "rawFilesIdentical": false,
+        "signatureTrustVerified": false
+      },
+      "sha256": "903df5512f7d02609fed0c780a9b704f5a3eeb6e4d84ebe42a29845c81899a3c",
+      "size": 1093
+    },
+    {
+      "file": "DirectML-1.15.4-ThirdPartyNotices.txt",
+      "url": "https://api.nuget.org/v3-flatcontainer/microsoft.ai.directml/1.15.4/microsoft.ai.directml.1.15.4.nupkg",
+      "version": "1.15.4",
+      "sourceType": "official-nuget-archive-member",
+      "archiveUrl": "https://api.nuget.org/v3-flatcontainer/microsoft.ai.directml/1.15.4/microsoft.ai.directml.1.15.4.nupkg",
+      "archiveResolvedUrl": "https://nuget.azure.cn/v3-flatcontainer/microsoft.ai.directml/1.15.4/microsoft.ai.directml.1.15.4.nupkg",
+      "archiveSha256": "4e7cb7ddce8cf837a7a75dc029209b520ca0101470fcdf275c1f49736a3615b9",
+      "archiveBytes": 202292617,
+      "archiveMember": "ThirdPartyNotices.txt",
+      "extraction": "Original ZIP entry bytes read without rewriting; archive ID/version confirmed from Microsoft.AI.DirectML.nuspec",
+      "provenance": "Additional official NuGet notice; separate release-commit NOTICE is not this file. Actual DLL and NuGet DLL raw hashes differ; all non-certificate bytes match under the specified PE comparison.",
+      "binaryComparison": {
+        "actualBytes": 18527584,
+        "actualSha256": "234e8898778cdec88d3cb0539508273494082812c968699f3de665a018971625",
+        "nugetBytes": 18527776,
+        "nugetSha256": "9c9e6d822561c6c41b90e6994b3e8857cf1d66dbfb1e0c4c799c7c89b4e92da1",
+        "fileVersion": "1.15.4+241025-1615.1.dml-1.15.fac7597",
+        "excludedRegions": "Only trailing certificate table, PE optional-header checksum and security-directory fields",
+        "normalizedBytes": 18517504,
+        "normalizedSha256": "518c2f3fc40dd6e7ed2087bb21cf9b98296e8f0066e9c74d3d52b76766cdd4d7",
+        "nonCertificateBytesEqual": true,
+        "rawFilesIdentical": false,
+        "signatureTrustVerified": false
+      },
+      "sha256": "2c95795c13ff48a58b6ed916f37901c23d964b5d9d601af422f17ad2172e7950",
+      "size": 4577
+    },
+    {
+      "file": "skia-deps-freetype-264b5fb-src-base-fthash.c",
+      "url": "https://api.github.com/repos/freetype/freetype/git/blobs/ab248ace8bd01b3680767fb5b49d7e2ed46afbb4",
+      "revision": "264b5fbf5b912b39f98d038bf75d39be0a73f21b",
+      "sourceType": "official-upstream-source-with-embedded-license",
+      "upstreamPath": "src/base/fthash.c",
+      "viewUrl": "https://github.com/freetype/freetype/blob/264b5fbf5b912b39f98d038bf75d39be0a73f21b/src/base/fthash.c",
+      "extraction": "Official GitHub API base64 decoded to original source bytes; Git blob matched fixed revision tree; full file including license header retained without rewriting",
+      "dependencyPinUrl": "https://raw.githubusercontent.com/google/skia/a9c42c9fce77cd748805df0ec67ef5718800b1e9/DEPS",
+      "gitBlob": "ab248ace8bd01b3680767fb5b49d7e2ed46afbb4",
+      "provenance": "Exact FreeType revision pinned by Skia a9c42c9. Embedded license text supplements root licenses; complete actual Canvas binary coverage remains pending.",
+      "sha256": "693e5a54b3ce30140975a94a3369dbe706eb1f280c69e80da426d39cc45b94ef",
+      "size": 8406
+    },
+    {
+      "file": "skia-deps-freetype-264b5fb-include-freetype-internal-fthash.h",
+      "url": "https://api.github.com/repos/freetype/freetype/git/blobs/642d21e21c6afb73b0d1bdd50c8a78c98af9810b",
+      "revision": "264b5fbf5b912b39f98d038bf75d39be0a73f21b",
+      "sourceType": "official-upstream-source-with-embedded-license",
+      "upstreamPath": "include/freetype/internal/fthash.h",
+      "viewUrl": "https://github.com/freetype/freetype/blob/264b5fbf5b912b39f98d038bf75d39be0a73f21b/include/freetype/internal/fthash.h",
+      "extraction": "Official GitHub API base64 decoded to original source bytes; Git blob matched fixed revision tree; full file including license header retained without rewriting",
+      "dependencyPinUrl": "https://raw.githubusercontent.com/google/skia/a9c42c9fce77cd748805df0ec67ef5718800b1e9/DEPS",
+      "gitBlob": "642d21e21c6afb73b0d1bdd50c8a78c98af9810b",
+      "provenance": "Exact FreeType revision pinned by Skia a9c42c9. Embedded license text supplements root licenses; complete actual Canvas binary coverage remains pending.",
+      "sha256": "023d88d49d29ecf3833db7717a3f7ae223c17ec2012bdb5bf33bb67abaf616c4",
+      "size": 4055
+    },
+    {
+      "file": "skia-deps-freetype-264b5fb-src-gzip-zlib.h",
+      "url": "https://api.github.com/repos/freetype/freetype/git/blobs/8c3c42a32320b678ee696cd90d8d5ab266af5bff",
+      "revision": "264b5fbf5b912b39f98d038bf75d39be0a73f21b",
+      "sourceType": "official-upstream-source-with-embedded-license",
+      "upstreamPath": "src/gzip/zlib.h",
+      "viewUrl": "https://github.com/freetype/freetype/blob/264b5fbf5b912b39f98d038bf75d39be0a73f21b/src/gzip/zlib.h",
+      "extraction": "Official GitHub API base64 decoded to original source bytes; Git blob matched fixed revision tree; full file including license header retained without rewriting",
+      "dependencyPinUrl": "https://raw.githubusercontent.com/google/skia/a9c42c9fce77cd748805df0ec67ef5718800b1e9/DEPS",
+      "gitBlob": "8c3c42a32320b678ee696cd90d8d5ab266af5bff",
+      "provenance": "Exact FreeType revision pinned by Skia a9c42c9. Embedded license text supplements root licenses; complete actual Canvas binary coverage remains pending.",
+      "sha256": "c86a25c27f74cb97b8fa07b175f479f063d5064ace9995b4684063643c81cf1b",
+      "size": 97499
+    },
+    {
+      "file": "skia-deps-freetype-264b5fb-src-autofit-ft-hb-ft.c",
+      "url": "https://api.github.com/repos/freetype/freetype/git/blobs/05a66ad32f6790f7a5bc80a734df6452f599ef88",
+      "revision": "264b5fbf5b912b39f98d038bf75d39be0a73f21b",
+      "sourceType": "official-upstream-source-with-embedded-license",
+      "upstreamPath": "src/autofit/ft-hb-ft.c",
+      "viewUrl": "https://github.com/freetype/freetype/blob/264b5fbf5b912b39f98d038bf75d39be0a73f21b/src/autofit/ft-hb-ft.c",
+      "extraction": "Official GitHub API base64 decoded to original source bytes; Git blob matched fixed revision tree; full file including license header retained without rewriting",
+      "dependencyPinUrl": "https://raw.githubusercontent.com/google/skia/a9c42c9fce77cd748805df0ec67ef5718800b1e9/DEPS",
+      "gitBlob": "05a66ad32f6790f7a5bc80a734df6452f599ef88",
+      "provenance": "Exact FreeType revision pinned by Skia a9c42c9. Embedded license text supplements root licenses; complete actual Canvas binary coverage remains pending.",
+      "sha256": "84dd5ddff1cec222e1755b4962faf45836238dfa3a46854dabd969eb4e50f8be",
+      "size": 3315
+    },
+    {
+      "file": "skia-deps-freetype-264b5fb-src-autofit-ft-hb-decls.h",
+      "url": "https://api.github.com/repos/freetype/freetype/git/blobs/032d4d37a5ebea9aad52de7d014313fe61572188",
+      "revision": "264b5fbf5b912b39f98d038bf75d39be0a73f21b",
+      "sourceType": "official-upstream-source-with-embedded-license",
+      "upstreamPath": "src/autofit/ft-hb-decls.h",
+      "viewUrl": "https://github.com/freetype/freetype/blob/264b5fbf5b912b39f98d038bf75d39be0a73f21b/src/autofit/ft-hb-decls.h",
+      "extraction": "Official GitHub API base64 decoded to original source bytes; Git blob matched fixed revision tree; full file including license header retained without rewriting",
+      "dependencyPinUrl": "https://raw.githubusercontent.com/google/skia/a9c42c9fce77cd748805df0ec67ef5718800b1e9/DEPS",
+      "gitBlob": "032d4d37a5ebea9aad52de7d014313fe61572188",
+      "provenance": "Exact FreeType revision pinned by Skia a9c42c9. Embedded license text supplements root licenses; complete actual Canvas binary coverage remains pending.",
+      "sha256": "ed05eec3b5657f98a0c106fa4aa2e5a4bc7f0864e5d34bd5989eee6d8b718bcf",
+      "size": 5350
+    },
+    {
+      "file": "skia-deps-freetype-264b5fb-src-autofit-ft-hb-types.h",
+      "url": "https://api.github.com/repos/freetype/freetype/git/blobs/6176622f7caa58672a72737dc633366042cdd6c3",
+      "revision": "264b5fbf5b912b39f98d038bf75d39be0a73f21b",
+      "sourceType": "official-upstream-source-with-embedded-license",
+      "upstreamPath": "src/autofit/ft-hb-types.h",
+      "viewUrl": "https://github.com/freetype/freetype/blob/264b5fbf5b912b39f98d038bf75d39be0a73f21b/src/autofit/ft-hb-types.h",
+      "extraction": "Official GitHub API base64 decoded to original source bytes; Git blob matched fixed revision tree; full file including license header retained without rewriting",
+      "dependencyPinUrl": "https://raw.githubusercontent.com/google/skia/a9c42c9fce77cd748805df0ec67ef5718800b1e9/DEPS",
+      "gitBlob": "6176622f7caa58672a72737dc633366042cdd6c3",
+      "provenance": "Exact FreeType revision pinned by Skia a9c42c9. Embedded license text supplements root licenses; complete actual Canvas binary coverage remains pending.",
+      "sha256": "f106bf7cc41f52cd70907266a74a293c57bc5f71285b01c36bf198ad8b1c6234",
+      "size": 4139
+    },
+    {
+      "file": "skia-deps-freetype-264b5fb-src-autofit-hb-script-list.h",
+      "url": "https://api.github.com/repos/freetype/freetype/git/blobs/88e270d3479f13e67eb91b4dffd706a787de12ea",
+      "revision": "264b5fbf5b912b39f98d038bf75d39be0a73f21b",
+      "sourceType": "official-upstream-source-with-embedded-license",
+      "upstreamPath": "src/autofit/hb-script-list.h",
+      "viewUrl": "https://github.com/freetype/freetype/blob/264b5fbf5b912b39f98d038bf75d39be0a73f21b/src/autofit/hb-script-list.h",
+      "extraction": "Official GitHub API base64 decoded to original source bytes; Git blob matched fixed revision tree; full file including license header retained without rewriting",
+      "dependencyPinUrl": "https://raw.githubusercontent.com/google/skia/a9c42c9fce77cd748805df0ec67ef5718800b1e9/DEPS",
+      "gitBlob": "88e270d3479f13e67eb91b4dffd706a787de12ea",
+      "provenance": "Exact FreeType revision pinned by Skia a9c42c9. Embedded license text supplements root licenses; complete actual Canvas binary coverage remains pending.",
+      "sha256": "0627d9f6a59a8b09e562e8aeaf414300899308725350beeb50b62b8657399576",
+      "size": 19854
     }
   ]
 }
