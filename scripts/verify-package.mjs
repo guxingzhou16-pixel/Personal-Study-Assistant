@@ -1,5 +1,5 @@
 import { extractFile, listPackage, statFile } from '@electron/asar';
-import { readFile, stat, writeFile } from 'node:fs/promises';
+import { lstat, readFile, stat, writeFile } from 'node:fs/promises';
 import { dirname, join, normalize } from 'node:path';
 import { generatePackageNotices } from './package-notices.mjs';
 
@@ -8,6 +8,14 @@ export default async function verifyPackage(context) {
   if (context.electronPlatformName !== 'win32')
     throw new Error('Only Windows packages are supported.');
   const resources = join(context.appOutDir, 'resources');
+  const projectLicense = await readFile(join(context.packager.projectDir, 'LICENSE'));
+  const licensePath = join(resources, 'LICENSE.txt');
+  if (
+    !projectLicense.length ||
+    !(await lstat(licensePath)).isFile() ||
+    !projectLicense.equals(await readFile(licensePath))
+  )
+    throw new Error('Project license does not match the source LICENSE.');
   const archive = join(resources, 'app.asar');
   const entries = listPackage(archive, { isPack: false }).map((path) =>
     path.replaceAll('\\', '/').replace(/^\//, ''),
@@ -86,6 +94,7 @@ export default async function verifyPackage(context) {
   const info = JSON.parse(await readFile(join(resources, 'build-info.json'), 'utf8'));
   if (
     metadata.main !== 'dist-electron/main.cjs' ||
+    metadata.license !== 'MIT' ||
     metadata.version !== info.version ||
     info.arch !== 'x64'
   )
@@ -102,6 +111,7 @@ export default async function verifyPackage(context) {
     archiveEntries: entries.length,
     workers: 3,
     nativeRuntime: 'win32-x64',
+    projectLicense: { license: 'MIT', file: 'resources/LICENSE.txt', bytes: projectLicense.length },
     notices,
     functionalAcceptance: 'pending',
   };

@@ -533,7 +533,6 @@
     "Canvas pinned root licenses, exact FreeType embedded notices and Chromium zlib SIMD/Intel/optimization source notices are retained. Actual binary/build coverage still requires review; glue-code notices are not external library licenses.",
     "Sharp native dependencies: preserve the 29-library table and LGPL texts; matching complete source/build notices and replacement/redistribution conditions still need review before public distribution.",
     "Fixed Xenova/bge-small-zh-v1.5 revision 75c43b069aac4d136ba6bc1122f995fedcfd2781 model card was obtained and Git-blob verified. It identifies the BAAI base model but contains no license field or quantized-weight grant. FlagEmbedding code MIT text is not a grant for these weights; license review remains pending.",
-    "DirectML 1.15.4 complete official NuGet EULA, LICENSE-CODE and ThirdPartyNotices plus separate release NOTICE are retained. Actual/NuGet DLL raw hashes differ only in certificate/checksum/security-directory regions; matching non-certificate bytes is not signature-trust or redistribution-condition acceptance. Distribution conditions remain pending.",
-    "Project code license is unselected; private:true is not a license. Public release is not authorized."
+    "DirectML 1.15.4 complete official NuGet EULA, LICENSE-CODE and ThirdPartyNotices plus separate release NOTICE are retained. Actual/NuGet DLL raw hashes differ only in certificate/checksum/security-directory regions; matching non-certificate bytes is not signature-trust or redistribution-condition acceptance. Distribution conditions remain pending."
   ]
 }

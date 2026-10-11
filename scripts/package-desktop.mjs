@@ -81,7 +81,7 @@ try {
     config: {
       ...config,
       directories: { ...config.directories, output },
-      extraResources: [{ from: infoPath, to: 'build-info.json' }],
+      extraResources: [...(config.extraResources ?? []), { from: infoPath, to: 'build-info.json' }],
     },
     publish: 'never',
   });

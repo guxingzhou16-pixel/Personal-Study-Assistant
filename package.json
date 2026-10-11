@@ -6,6 +6,7 @@
     "name": "guxingzhou16-pixel"
   },
   "private": true,
+  "license": "MIT",
   "type": "module",
   "main": "dist-electron/main.cjs",
   "scripts": {

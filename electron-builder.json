@@ -5,6 +5,7 @@
   "electronDist": "node_modules/electron/dist",
   "asar": true,
   "asarUnpack": ["dist-electron/*-worker.mjs", "node_modules/**/*"],
+  "extraResources": [{ "from": "LICENSE", "to": "LICENSE.txt" }],
   "files": [
     "dist/**/*",
     "dist-electron/main.cjs",
