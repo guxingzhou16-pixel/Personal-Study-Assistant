@@ -18,6 +18,7 @@ import { learningMessages } from './learning-agent';
 import { practiceMessages } from './practice';
 import { parsePractice } from '../../src/lib/practice';
 import { evidencePolicy } from './evidence-policy';
+import { auditCitations } from './citation-audit';
 
 type LearningContext =
   | { kind: 'note'; note: StudyNote }
@@ -321,15 +322,19 @@ export class ChatService {
   }
 }
 export function citationNumbers(answer: string): number[] {
-  // Code samples such as arr[0] or items[1] are not evidence references and must
-  // not be counted as citations (or as missing ones) in the completion notice.
-  const visible = answer.replace(/```[\s\S]*?```/g, ' ').replace(/`[^`\n]*`/g, ' ');
-  return [...visible.matchAll(/\[(\d{1,3})\]/g)].map((match) => Number(match[1]));
+  return auditCitations(answer, []).numbers;
 }
 function citationNotice(turn: ChatTurn): string {
-  const references = citationNumbers(turn.answer);
-  if (!references.length) return '模型未提供引用编号，回答未完成出处核对，请查看下方检索原文。';
-  if (references.some((number) => !turn.evidence.some((hit) => hit.number === number)))
-    return '回答包含未检索到的引用编号，这些引用不可跳转。请对照下方原文核查。';
-  return '';
+  const { numbers, unmatchedQuotes } = auditCitations(turn.answer, turn.evidence);
+  return [
+    !numbers.length ? '模型未提供引用编号，回答未完成出处核对，请查看下方检索原文。' : '',
+    numbers.some((number) => !turn.evidence.some((hit) => hit.number === number))
+      ? '回答包含未检索到的引用编号，这些引用不可跳转。请对照下方原文核查。'
+      : '',
+    unmatchedQuotes.length
+      ? `回答中的部分引句未在所标注证据 ${unmatchedQuotes.map((number) => `[${number}]`).join('、')} 找到连续原文，请对照下方原文核查。引句核对不代表已验证事实或结论。`
+      : '',
+  ]
+    .filter(Boolean)
+    .join(' ');
 }

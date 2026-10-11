@@ -91,6 +91,39 @@ it.each(['尚待核对', '   '])(
     expect(store.notes.get(note.id)).toEqual(note);
   },
 );
+it('keeps a mistaken note citation unverified and labels notes and proposed exercises separately', async () => {
+  const answer =
+    '你的笔记在“我的理解”部分写道：“事务允许只提交一半操作。” [2]。资料要求全部提交或回滚。[1]';
+  const { store, chat, search, transport } = setup(answer);
+  const note = store.notes.save({
+    ...emptyNoteDraft(),
+    id: null,
+    revision: 0,
+    title: '事务原子性',
+    understanding: '事务允许只提交一半操作。',
+    evidence: '尚待核对',
+  });
+  const service = new NoteFeedbackService(store, search, chat);
+  const preview = await service.prepare(note.id, note.revision, '事务原子性', () => {});
+  const initial = service.send({
+    retrievalId: preview.evidence.id,
+    expectedProfile: 'ollama|http://127.0.0.1:11434|fixture',
+  });
+  await expect.poll(() => store.chat.getTurn(initial.id).status).toBe('completed');
+  const turn = store.chat.getTurn(initial.id);
+  expect(turn.answer).toBe(answer);
+  expect(turn.notice).toContain('未检索到的引用编号');
+  expect(turn.notice).toContain('不可跳转');
+  expect(turn.evidence.map((hit) => hit.number)).toEqual([1]);
+  expect(store.notes.get(note.id)).toEqual(note);
+  const systems = transport.mock.calls[0][0].messages
+    .filter((m) => m.role === 'system')
+    .map((m) => m.content)
+    .join('\n');
+  expect(systems).toContain('只有实际检索证据中的编号');
+  expect(systems).toContain('笔记是用户表述，没有资料引用编号');
+  expect(systems).toContain('自拟练习');
+});
 it.each([10, 30, 179, 180])(
   'sends a four-step allocation totaling the requested %i minutes',
   async (minutes) => {
