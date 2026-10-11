@@ -14,6 +14,7 @@ const stages = [
   'verify-restart',
   'verify-replacement',
   'verify-reinstall',
+  'verify-reinstall-resources',
   'verify-os-restart',
   'verify-native-resources',
   'verify-restore',
@@ -1062,6 +1063,67 @@ async function verifyRestore() {
   await restoreBaseline(root, credentialSha256, files);
 }
 
+async function verifyReinstalledResources() {
+  await verify();
+  const root = join(identity.appData, 'StudyCompanion');
+  const records = [];
+  for (const entry of await readdir(logs, { withFileTypes: true })) {
+    if (!entry.isFile() || !/^\d{8}-\d{6}-\d{3}-before-uninstall\.json$/.test(entry.name)) continue;
+    const record = JSON.parse(
+      (await readFile(join(logs, entry.name), 'utf8')).replace(/^\uFEFF/, ''),
+    );
+    assert.equal(record.action, 'Record');
+    assert.equal(record.stage, 'before-uninstall');
+    assert.equal(record.sid, identity.sid);
+    assert.equal(record.dataRoot.toLowerCase(), root.toLowerCase());
+    assert.equal(record.installed.source.gitCommit, identity.source.gitCommit);
+    records.push(record);
+  }
+  assert.equal(records.length, 1, 'Require this Sandbox unique pre-uninstall snapshot.');
+  for (const name of ['active-learning.json', 'credentials.enc.json']) {
+    const before = records[0].dataFiles.filter((file) => file.file === name);
+    assert.equal(before.length, 1, `Missing pre-uninstall ${name} receipt.`);
+    const data = await readFile(join(root, name));
+    assert.equal(data.length, before[0].bytes);
+    assert.equal(createHash('sha256').update(data).digest('hex'), before[0].sha256);
+  }
+  const active = JSON.parse(await readFile(join(root, 'active-learning.json'), 'utf8'));
+  assert.equal(active.format, 1);
+  assert.match(active.id, /^[a-f0-9]{8}(-[a-f0-9]{4}){3}-[a-f0-9]{12}$/);
+  await assert.rejects(lstat(join(root, 'pending-restore.json')), { code: 'ENOENT' });
+  const state = await api('backupState');
+  assert.equal(state.operation, 'idle');
+  assert.equal(
+    state.learningDirectory.toLowerCase(),
+    join(root, 'learning-restores', active.id).toLowerCase(),
+  );
+  const files = await fixedFiles(join(root, 'embedding-models', embedding.directory));
+  assert.equal((await api('embeddingStatus')).state, 'ready');
+  const source = expected.snapshot.sources[0];
+  const evidence = await api('prepareQuestion', '如何进行主动回忆？', source.id);
+  assert.match(evidence.notice, /混合检索/);
+  assert.doesNotMatch(evidence.notice, /已使用关键词检索|未完成|进程退出|超时/);
+  assert.ok(
+    evidence.hits.some(
+      (hit) => hit.sourceId === source.id && hit.text.includes('先尝试独立回答，再核对资料。'),
+    ),
+  );
+  assert.deepEqual(await fixedFiles(join(root, 'embedding-models', embedding.directory)), files);
+  assert.deepEqual(await snapshot(expected.snapshot.day), expected.snapshot);
+  result.reinstallation = {
+    active,
+    learningDirectory: state.learningDirectory,
+    modelFiles: files,
+    evidence,
+  };
+  result.checks.push(
+    'reinstalled app retained the exact active restore pointer and encrypted credential bytes; no pending restore remains',
+  );
+  result.checks.push(
+    'reinstalled packaged ONNX CPU worker retrieved baseline evidence in hybrid mode without fallback or model generation; pinned model files and saved business values unchanged',
+  );
+}
+
 try {
   if (stage === 'create') {
     await assert.rejects(
@@ -1074,6 +1136,7 @@ try {
   if (stage === 'create') await create();
   else if (stage === 'verify-native-resources') await verifyNativeResources();
   else if (stage === 'verify-restore') await verifyRestore();
+  else if (stage === 'verify-reinstall-resources') await verifyReinstalledResources();
   else await verify();
   assert.deepEqual(consoleErrors, [], 'Renderer reported an uncaught error.');
   assert.deepEqual(networkRequests, [], 'Unexpected renderer HTTP request.');

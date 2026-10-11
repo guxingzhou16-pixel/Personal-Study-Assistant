@@ -276,6 +276,102 @@
           "sha256": "0627d9f6a59a8b09e562e8aeaf414300899308725350beeb50b62b8657399576",
           "source": "https://api.github.com/repos/freetype/freetype/git/blobs/88e270d3479f13e67eb91b4dffd706a787de12ea",
           "description": "Exact FreeType 264b5fb original src/autofit/hb-script-list.h including embedded copyright/license header; Git blob verified; full source retained without rewriting; actual Canvas binary coverage remains pending."
+        },
+        {
+          "file": "assets/skia-deps-zlib-646b7f5-adler32_simd.c",
+          "sha256": "48bf89b890c80fd737d91a18389439a348a91a18f59f695af72005c7fc17f5d3",
+          "source": "https://api.github.com/repos/chromium/chromium/git/blobs/58966eecf0b8009fcd3a84239ebfd8f614f31cf4",
+          "description": "Official Chromium GitHub API base64 decoded; full source including embedded notices retained; Git blob and size verified against the exact standalone revision tree Exact 646b7f5 dependency pin in Skia a9c42c9; identical to Chromium origin 2f39ac8 top-level zlib tree. Build-source context, not proof of complete actual Canvas binary coverage."
+        },
+        {
+          "file": "assets/skia-deps-zlib-646b7f5-adler32_simd.h",
+          "sha256": "8c1362d66be00e4ee75a303b8b67a36b128786666386d090ebd2cac8cbacd9ea",
+          "source": "https://api.github.com/repos/chromium/chromium/git/blobs/0b2361a5174f7af327d52889771f94c0634184fa",
+          "description": "Official Chromium GitHub API base64 decoded; full source including embedded notices retained; Git blob and size verified against the exact standalone revision tree Exact 646b7f5 dependency pin in Skia a9c42c9; identical to Chromium origin 2f39ac8 top-level zlib tree. Build-source context, not proof of complete actual Canvas binary coverage."
+        },
+        {
+          "file": "assets/skia-deps-zlib-646b7f5-crc32_simd.c",
+          "sha256": "8db6cd08c69e69020a857d0472e89aa26a5b526a8b2999444015914de656f79c",
+          "source": "https://api.github.com/repos/chromium/chromium/git/blobs/7428270920a03e06da4a037434de0255e486058b",
+          "description": "Official Chromium GitHub API base64 decoded; full source including embedded notices retained; Git blob and size verified against the exact standalone revision tree Exact 646b7f5 dependency pin in Skia a9c42c9; identical to Chromium origin 2f39ac8 top-level zlib tree. Build-source context, not proof of complete actual Canvas binary coverage."
+        },
+        {
+          "file": "assets/skia-deps-zlib-646b7f5-crc32_simd.h",
+          "sha256": "80688abed37fbff1b49079050954749f0a694b5b9998abdbf59019f65401208a",
+          "source": "https://api.github.com/repos/chromium/chromium/git/blobs/84624647bcd21624e8611ad638426643dd98294a",
+          "description": "Official Chromium GitHub API base64 decoded; full source including embedded notices retained; Git blob and size verified against the exact standalone revision tree Exact 646b7f5 dependency pin in Skia a9c42c9; identical to Chromium origin 2f39ac8 top-level zlib tree. Build-source context, not proof of complete actual Canvas binary coverage."
+        },
+        {
+          "file": "assets/skia-deps-zlib-646b7f5-crc_folding.c",
+          "sha256": "0b2ec29d92cb44d10499a397bbace1d970b0ff11192cea0ecb6ad01a5e78e6bf",
+          "source": "https://api.github.com/repos/chromium/chromium/git/blobs/1b4f4e1d193871bd02d91d048e9f9ba268ec1ffb",
+          "description": "Official Chromium GitHub API base64 decoded; full source including embedded notices retained; Git blob and size verified against the exact standalone revision tree Exact 646b7f5 dependency pin in Skia a9c42c9; identical to Chromium origin 2f39ac8 top-level zlib tree. Build-source context, not proof of complete actual Canvas binary coverage."
+        },
+        {
+          "file": "assets/skia-deps-zlib-646b7f5-slide_hash_simd.h",
+          "sha256": "0524fd845c79ac31bf7e23436e68aa9eb20d21a849088f4ec3250d460214284c",
+          "source": "https://api.github.com/repos/chromium/chromium/git/blobs/1000b774ccb60a601e42d9a30a18e0aa00357ae1",
+          "description": "Official Chromium GitHub API base64 decoded; full source including embedded notices retained; Git blob and size verified against the exact standalone revision tree Exact 646b7f5 dependency pin in Skia a9c42c9; identical to Chromium origin 2f39ac8 top-level zlib tree. Build-source context, not proof of complete actual Canvas binary coverage."
+        },
+        {
+          "file": "assets/skia-deps-zlib-646b7f5-contrib-optimizations-chunkcopy.h",
+          "sha256": "10fae79493be1ab143476151b88dcb8ec7bc94ff10c90cdd77c153dac68d8209",
+          "source": "https://api.github.com/repos/chromium/chromium/git/blobs/f40546d54dbe770c9e4625881317efadceaf0b5b",
+          "description": "Official Chromium GitHub API base64 decoded; full source including embedded notices retained; Git blob and size verified against the exact standalone revision tree Exact 646b7f5 dependency pin in Skia a9c42c9; identical to Chromium origin 2f39ac8 top-level zlib tree. Build-source context, not proof of complete actual Canvas binary coverage."
+        },
+        {
+          "file": "assets/skia-deps-zlib-646b7f5-contrib-optimizations-inffast_chunk.c",
+          "sha256": "1d30b2735708b139da9de8198e11cb036115f39e9752bec3d2547bd2e586b767",
+          "source": "https://api.github.com/repos/chromium/chromium/git/blobs/b1db452c2e7232f1d57258379232dd55d8045a1a",
+          "description": "Official Chromium GitHub API base64 decoded; full source including embedded notices retained; Git blob and size verified against the exact standalone revision tree Exact 646b7f5 dependency pin in Skia a9c42c9; identical to Chromium origin 2f39ac8 top-level zlib tree. Build-source context, not proof of complete actual Canvas binary coverage."
+        },
+        {
+          "file": "assets/skia-deps-zlib-646b7f5-contrib-optimizations-inffast_chunk.h",
+          "sha256": "670f8d05461dbad596e81355f6e218deb8d9e2e6595259465cfb8d2fad6a2315",
+          "source": "https://api.github.com/repos/chromium/chromium/git/blobs/e75ee5e915e13646ba9c3a66dce8aba147c8e3af",
+          "description": "Official Chromium GitHub API base64 decoded; full source including embedded notices retained; Git blob and size verified against the exact standalone revision tree Exact 646b7f5 dependency pin in Skia a9c42c9; identical to Chromium origin 2f39ac8 top-level zlib tree. Build-source context, not proof of complete actual Canvas binary coverage."
+        },
+        {
+          "file": "assets/skia-deps-zlib-646b7f5-contrib-optimizations-inflate.c",
+          "sha256": "e1e6affe42a3539e6558aac361ed4957655a70180a658f15d486740e4e2a63b2",
+          "source": "https://api.github.com/repos/chromium/chromium/git/blobs/c535c5af0c89ee52fbb6925e0f37191c6fced75a",
+          "description": "Official Chromium GitHub API base64 decoded; full source including embedded notices retained; Git blob and size verified against the exact standalone revision tree Exact 646b7f5 dependency pin in Skia a9c42c9; identical to Chromium origin 2f39ac8 top-level zlib tree. Build-source context, not proof of complete actual Canvas binary coverage."
+        },
+        {
+          "file": "assets/skia-deps-zlib-646b7f5-contrib-optimizations-insert_string.h",
+          "sha256": "ff03fe98a4dcaa22022a44340f8fe62f4820c64cd1f326bd710fa5d37f8a2897",
+          "source": "https://api.github.com/repos/chromium/chromium/git/blobs/260b8268029a8c0bc03055ba2ac2dcb19c277c9d",
+          "description": "Official Chromium GitHub API base64 decoded; full source including embedded notices retained; Git blob and size verified against the exact standalone revision tree Exact 646b7f5 dependency pin in Skia a9c42c9; identical to Chromium origin 2f39ac8 top-level zlib tree. Build-source context, not proof of complete actual Canvas binary coverage."
+        },
+        {
+          "file": "assets/skia-deps-zlib-646b7f5-zlib.h",
+          "sha256": "d6e12754edb0c019107c7560902c741eab10c15ced7e5f249e642b82c007c0bf",
+          "source": "https://api.github.com/repos/chromium/chromium/git/blobs/f1b149b93e43466ae57d72e10dda35b9f357e9ca",
+          "description": "Official Chromium GitHub API base64 decoded; full source including embedded notices retained; Git blob and size verified against the exact standalone revision tree Exact 646b7f5 dependency pin in Skia a9c42c9; identical to Chromium origin 2f39ac8 top-level zlib tree. Build-source context, not proof of complete actual Canvas binary coverage."
+        },
+        {
+          "file": "assets/skia-deps-zlib-646b7f5-cpu_features.c",
+          "sha256": "10cedfb372a28a8c30f842def6213eeb40e6f7d59c3f98737e4eb78bd1999e06",
+          "source": "https://api.github.com/repos/chromium/chromium/git/blobs/64e0428cd2fc2d965cf18c2af9212df68d2ea8c8",
+          "description": "Official Chromium GitHub API base64 decoded; full source including embedded notices retained; Git blob and size verified against the exact standalone revision tree Exact 646b7f5 dependency pin in Skia a9c42c9; identical to Chromium origin 2f39ac8 top-level zlib tree. Build-source context, not proof of complete actual Canvas binary coverage."
+        },
+        {
+          "file": "assets/skia-deps-zlib-646b7f5-cpu_features.h",
+          "sha256": "a3746f6fa6ece0fd7039185b259af68420fe61c2a240baea060952010c29c424",
+          "source": "https://api.github.com/repos/chromium/chromium/git/blobs/aed3e834c5ac8910eebf0796b3cb69f65f6d432b",
+          "description": "Official Chromium GitHub API base64 decoded; full source including embedded notices retained; Git blob and size verified against the exact standalone revision tree Exact 646b7f5 dependency pin in Skia a9c42c9; identical to Chromium origin 2f39ac8 top-level zlib tree. Build-source context, not proof of complete actual Canvas binary coverage."
+        },
+        {
+          "file": "assets/skia-deps-zlib-646b7f5-chromeconf.h",
+          "sha256": "52d0220bf96954d07af195a953c46c4568bcf1f85dc196b0175892c44b37f314",
+          "source": "https://api.github.com/repos/chromium/chromium/git/blobs/5b91c86442105afc1d3f8929ab315881b49f6a82",
+          "description": "Official Chromium GitHub API base64 decoded; full source including embedded notices retained; Git blob and size verified against the exact standalone revision tree Exact 646b7f5 dependency pin in Skia a9c42c9; identical to Chromium origin 2f39ac8 top-level zlib tree. Build-source context, not proof of complete actual Canvas binary coverage."
+        },
+        {
+          "file": "assets/chromium-2f39ac8-LICENSE.txt",
+          "sha256": "368cca1106be99d39ecd32a38d8305585d802a475effb66380b91ffc9bcf709b",
+          "source": "https://api.github.com/repos/chromium/chromium/contents/LICENSE?ref=2f39ac8d0a414dd65c0e1d5aae38c8f97aa06ae9",
+          "description": "Official Chromium GitHub API base64 decoded; Git blob verified; original bytes retained Chromium root BSD-style license referenced by the pinned zlib SIMD headers; origin revision explicitly recorded by fixed standalone Gitiles commit."
         }
       ]
     },
@@ -424,13 +520,19 @@
       "sha256": "587a673933425dbc36ec61268d3b954051b2d3ef3c9b322ede357976055ffdd5",
       "source": "https://raw.githubusercontent.com/FlagOpen/FlagEmbedding/fd1a2bdf69488ffebe0327999d4400d8c8058a0b/LICENSE",
       "description": "Original code repository MIT license; not verified as the license asset of fixed Xenova quantized weights"
+    },
+    {
+      "file": "assets/Xenova-bge-small-zh-v1.5-75c43b0-README.md",
+      "sha256": "cb22054df1a98f7ee9d5b281d023e67c27cc316e1733baf03fc994d95c3048ab",
+      "source": "https://huggingface.co/Xenova/bge-small-zh-v1.5/resolve/75c43b069aac4d136ba6bc1122f995fedcfd2781/README.md?download=true",
+      "description": "Text recovered from official fixed-revision raw web response; normalized blank lines reconstructed only where the resulting Git blob equals the official resolve-cache ETag Fixed model card names BAAI/bge-small-zh-v1.5 as base model. No license field or weights grant appears in this README; not a substitute for weight-license review."
     }
   ],
   "reviewIssues": [
     "guid-typescript@1.0.9 published tarball integrity matches official npm metadata and contains no LICENSE/NOTICE/copyright file; metadata declares ISC and author nicolas, but exact upstream gitHead is unavailable. SPDX ISC template remains reference only and does not complete upstream attribution.",
-    "Canvas pinned root licenses and exact FreeType embedded zlib/HarfBuzz/fthash source files with license headers are retained. Actual binary/build coverage and Chromium zlib SIMD/Intel/contrib secondary notices remain pending; glue-code notices are not external library licenses.",
+    "Canvas pinned root licenses, exact FreeType embedded notices and Chromium zlib SIMD/Intel/optimization source notices are retained. Actual binary/build coverage still requires review; glue-code notices are not external library licenses.",
     "Sharp native dependencies: preserve the 29-library table and LGPL texts; matching complete source/build notices and replacement/redistribution conditions still need review before public distribution.",
-    "Fixed Xenova/bge-small-zh-v1.5 revision 75c43b069aac4d136ba6bc1122f995fedcfd2781 model-card/license assets could not be obtained. FlagEmbedding code MIT text is not a grant for quantized model weights.",
+    "Fixed Xenova/bge-small-zh-v1.5 revision 75c43b069aac4d136ba6bc1122f995fedcfd2781 model card was obtained and Git-blob verified. It identifies the BAAI base model but contains no license field or quantized-weight grant. FlagEmbedding code MIT text is not a grant for these weights; license review remains pending.",
     "DirectML 1.15.4 complete official NuGet EULA, LICENSE-CODE and ThirdPartyNotices plus separate release NOTICE are retained. Actual/NuGet DLL raw hashes differ only in certificate/checksum/security-directory regions; matching non-certificate bytes is not signature-trust or redistribution-condition acceptance. Distribution conditions remain pending.",
     "Project code license is unselected; private:true is not a license. Public release is not authorized."
   ]
