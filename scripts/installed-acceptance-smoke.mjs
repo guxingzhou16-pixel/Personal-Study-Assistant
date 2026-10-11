@@ -18,12 +18,16 @@ const stages = [
   'verify-os-restart',
   'verify-native-resources',
   'verify-restore',
+  'ai-create',
+  'ai-restore',
+  'ai-verify',
 ];
 assert.equal(process.platform, 'win32', 'Windows Sandbox is required.');
 assert.equal(process.argv.length, 4, 'Usage: node installed-acceptance-smoke.mjs --stage <stage>');
 assert.equal(process.argv[2], '--stage');
 const stage = process.argv[3];
 assert.ok(stages.includes(stage), 'Unknown acceptance stage.');
+const aiStage = stage.startsWith('ai-');
 const input = 'C:\\AcceptanceInput';
 const logs = 'C:\\AcceptanceLogs';
 const script = fileURLToPath(import.meta.url);
@@ -107,7 +111,9 @@ const identity = JSON.parse(
     },
   ).trim(),
 );
-const candidate = stage === 'create' || stage === 'verify-restart' ? plan.previous : plan.current;
+const candidate = ['create', 'verify-restart', 'ai-create'].includes(stage)
+  ? plan.previous
+  : plan.current;
 assert.equal(
   identity.source.gitCommit,
   candidate.manifest.gitCommit,
@@ -115,7 +121,8 @@ assert.equal(
 );
 const output = join(logs, `ui-${stage}-${randomUUID()}`);
 await mkdir(output);
-const expectedPath = join(logs, 'installed-expected.json');
+const expectedPath = join(logs, aiStage ? 'installed-ai-expected.json' : 'installed-expected.json');
+const aiRestorePath = join(logs, 'installed-ai-restored.json');
 const result = {
   format: 1,
   stage,
@@ -157,6 +164,19 @@ const fixture = {
     待解问题: '如何判断自己的解释是否遗漏条件？',
     下一步练习: '写一个例子，并返回资料核对。',
   },
+};
+const aiFixture = {
+  source: '沙盒 AI 事务资料',
+  note: '沙盒 AI 事务笔记',
+  question: '事务是否允许只提交一半？',
+  goal: '核对事务全部提交或回滚，并写一个失败实验',
+  text: '# 沙盒 AI 事务资料\n\n事务必须全部提交，或者全部回滚。数据库索引使查询更快。\n',
+  answers: [
+    '这是本机合成的普通聊天回答，没有读取资料。',
+    '“事务只提交一半。”[1]\n\n这是故意写错的合成引句，请返回原文核查。',
+    '“事务只提交一半。”[1]\n\n用户笔记的理解尚待核对。[99]\n\n这是故意使用不存在编号的合成反馈。',
+    '### 阅读与求证\n5分钟：阅读资料。“事务只提交一半。”[1]\n\n### 解释与练习\n10分钟：故意触发失败。\n\n### 学习作品\n10分钟：写下实验结果。\n\n### 复盘与下一步\n5分钟：对照原文。',
+  ],
 };
 // These pins match electron/core/embedding-model.ts. Never accept a path or digest
 // from an arbitrary receipt as authority for copying into the guest app profile.
@@ -238,9 +258,45 @@ async function fixedFiles(directory) {
   return receipts;
 }
 
+async function preseedModel(root) {
+  const modelInput = join(input, 'embedding-model');
+  const modelDirectory = join(root, 'embedding-models', embedding.directory);
+  const inputModels = await fixedFiles(modelInput);
+  let cursor = join(root, 'embedding-models');
+  while (cursor.toLowerCase() !== dirname(cursor).toLowerCase()) {
+    try {
+      assert.equal(
+        (await lstat(cursor)).isSymbolicLink(),
+        false,
+        'Linked model destination refused.',
+      );
+    } catch (error) {
+      if (error.code !== 'ENOENT') throw error;
+    }
+    cursor = dirname(cursor);
+  }
+  await mkdir(join(root, 'embedding-models')).catch(async (error) => {
+    if (error.code !== 'EEXIST' || !(await lstat(join(root, 'embedding-models'))).isDirectory())
+      throw error;
+  });
+  await mkdir(modelDirectory);
+  await mkdir(join(modelDirectory, 'onnx'));
+  for (const [name] of embedding.files)
+    await copyFile(join(modelInput, name), join(modelDirectory, name), constants.COPYFILE_EXCL);
+  assert.deepEqual(await fixedFiles(modelDirectory), inputModels);
+  const modelStatus = await api('embeddingStatus');
+  assert.equal(modelStatus.state, 'ready');
+  assert.equal(modelStatus.revision, embedding.revision);
+  result.preseededModel = { directory: modelDirectory, downloaded: false, files: inputModels };
+  result.checks.push(
+    'five pinned offline model files preseeded into real guest root cache; size/SHA verified independently and by installed app',
+  );
+  return inputModels;
+}
+
 async function launch() {
   // Reserve the saved loopback fixture before Electron allocates its debugging ports.
-  if (stage !== 'create' && !server) {
+  if (stage !== 'create' && stage !== 'ai-create' && !server) {
     const saved = JSON.parse(await readFile(expectedPath, 'utf8'));
     assert.equal(saved.sandboxSid, identity.sid);
     const address = new URL(saved.snapshot.settings.openai.baseUrl);
@@ -388,11 +444,45 @@ async function modelServer(port = 0) {
     return modelFixture;
   }
   let authorized = 0;
-  server = createServer((request, response) => {
+  const generations = [];
+  server = createServer(async (request, response) => {
     response.setHeader('content-type', 'application/json');
     if (request.url === '/v1/models' && request.headers.authorization === `Bearer ${fakeKey}`) {
       authorized++;
       response.end(JSON.stringify({ data: [{ id: 'sandbox-fixture-model' }] }));
+    } else if (
+      aiStage &&
+      stage === 'ai-create' &&
+      request.method === 'POST' &&
+      request.url === '/v1/chat/completions' &&
+      request.headers.authorization === `Bearer ${fakeKey}`
+    ) {
+      try {
+        const parts = [];
+        let bytes = 0;
+        for await (const part of request) {
+          bytes += part.length;
+          assert.ok(bytes <= 65_536, 'Oversized synthetic request.');
+          parts.push(part);
+        }
+        const payload = JSON.parse(Buffer.concat(parts).toString('utf8'));
+        assert.equal(payload.model, 'sandbox-fixture-model');
+        assert.equal(payload.stream, true);
+        assert.ok(Array.isArray(payload.messages) && payload.messages.length > 0);
+        const answer = aiFixture.answers[generations.length];
+        assert.equal(typeof answer, 'string', 'Unexpected extra generation request.');
+        generations.push(payload);
+        response.setHeader('content-type', 'text/event-stream');
+        const split = Math.ceil(answer.length / 2);
+        for (const content of [answer.slice(0, split), answer.slice(split)])
+          response.write(`data: ${JSON.stringify({ choices: [{ delta: { content } }] })}\n\n`);
+        response.end('data: [DONE]\n\n');
+      } catch (error) {
+        result.fixtureErrors ??= [];
+        result.fixtureErrors.push(error.message);
+        if (!response.headersSent) response.statusCode = 400;
+        response.end();
+      }
     } else {
       response.statusCode = 401;
       response.end(JSON.stringify({ error: 'Synthetic loopback fixture only' }));
@@ -405,6 +495,7 @@ async function modelServer(port = 0) {
   modelFixture = {
     baseUrl: `http://127.0.0.1:${server.address().port}/v1`,
     authorized: () => authorized,
+    generations: () => generations,
   };
   return modelFixture;
 }
@@ -714,6 +805,393 @@ async function verify() {
   );
 }
 
+async function aiSnapshot(day) {
+  const saved = await snapshot(day);
+  const summaries = (await api('listConversations')).sort((a, b) => a.id.localeCompare(b.id));
+  const conversations = await Promise.all(summaries.map((item) => api('getConversation', item.id)));
+  const feedback = await Promise.all(saved.notes.map((note) => api('listNoteFeedback', note.id)));
+  // Normalize optional fields exactly as the JSON receipt does; no saved field is removed.
+  return JSON.parse(
+    JSON.stringify({
+      ...saved,
+      conversations,
+      feedback,
+      routes: await api('listLearningDrafts'),
+      memories: await api('listMemories'),
+    }),
+  );
+}
+
+async function aiTurn(initial, read, answerIndex) {
+  const turn = await until(
+    async () => {
+      const current = (await read()).find((entry) => entry.id === initial.id);
+      result.aiTurns ??= {};
+      result.aiTurns[answerIndex] = current;
+      return current;
+    },
+    (current) => current && current.status !== 'streaming',
+    `synthetic AI turn ${answerIndex}`,
+    60_000,
+  );
+  assert.equal(turn.status, 'completed');
+  assert.equal(turn.answer, aiFixture.answers[answerIndex]);
+  if (answerIndex > 0) {
+    assert.ok(turn.evidence.length > 0, 'Synthetic citation test requires actual evidence.');
+    assert.match(turn.notice, /找到连续原文/);
+    const hit = turn.evidence.find((item) => item.number === 1);
+    assert.ok(hit && hit.text.includes('事务必须全部提交，或者全部回滚。'));
+    assert.deepEqual(await api('resolveCitation', turn.id, 1), {
+      sourceId: hit.sourceId,
+      anchor: hit.anchor,
+      page: hit.page ?? 1,
+    });
+    if (answerIndex === 2) {
+      assert.match(turn.notice, /未检索到的引用编号/);
+      await assert.rejects(api('resolveCitation', turn.id, 99));
+    }
+  }
+  return turn;
+}
+
+async function createAi() {
+  const boot = await api('bootstrap');
+  assert.equal(boot.schemaVersion, 12);
+  for (const method of [
+    'listSources',
+    'listNotes',
+    'listConversations',
+    'listLearningDrafts',
+    'listMemories',
+  ])
+    assert.equal(
+      (await api(method)).length,
+      0,
+      'AI create requires a fresh guest learning library.',
+    );
+  const day = await page.evaluate(() => new Date().toLocaleDateString('sv-SE'));
+  assert.deepEqual((await api('planningOverview', day)).tasks, []);
+  const model = await modelServer();
+  await navigate('设置');
+  await page.getByRole('button', { name: /兼容 OpenAI 的接口/ }).click();
+  await page.getByLabel('服务基础地址').fill(model.baseUrl);
+  await page.locator('input[name="apiKey"]').fill(fakeKey);
+  await page.locator('input[name="model"]').fill('sandbox-fixture-model');
+  await page.getByRole('button', { name: '保存设置', exact: true }).click();
+  await visible(page.getByText('此地址已有保存的密钥', { exact: true }));
+  await page.getByRole('button', { name: '检测连接', exact: true }).click();
+  await until(
+    () => model.authorized(),
+    (count) => count > 0,
+    'synthetic key encrypted/decrypted',
+  );
+  const root = boot.dataDir;
+  await preseedModel(root);
+
+  const sourcePath = join(output, `${aiFixture.source}.md`);
+  await writeFile(sourcePath, aiFixture.text, { flag: 'wx' });
+  await navigate('资料库');
+  result.dialogSubstitutions.push('open-file selection for synthetic AI Markdown');
+  await choose(sourcePath);
+  try {
+    await page.getByRole('button', { name: '导入资料', exact: true }).click();
+    await visible(page.getByText('导入完成：1 份新增，0 份重复，0 份失败。'));
+  } finally {
+    await restoreDialog();
+  }
+  const sources = await api('listSources');
+  assert.equal(sources.length, 1);
+  const source = sources[0];
+  const note = await api('saveNote', {
+    id: null,
+    revision: 0,
+    title: aiFixture.note,
+    sourceId: source.id,
+    understanding: '事务允许只提交一半，尚待核对。',
+    evidence: '核对已导入的事务资料。',
+    questions: aiFixture.question,
+    nextStep: '写出失败实验并核对原文。',
+  });
+  const signature = `openai|${model.baseUrl}|sandbox-fixture-model`;
+  const ordinary = await api('createConversation');
+  const ordinaryTurn = await api('sendChat', {
+    conversationId: ordinary.id,
+    question: '普通聊天验收',
+    expectedProfile: signature,
+  });
+  await aiTurn(ordinaryTurn, async () => (await api('getConversation', ordinary.id)).turns, 0);
+
+  result.aiPreviews = {};
+  const rag = await api('createConversation');
+  const evidence = await api('prepareQuestion', aiFixture.question, source.id);
+  result.aiPreviews.rag = evidence;
+  assert.ok(evidence.hits.length > 0);
+  assert.match(evidence.notice, /混合检索/);
+  assert.doesNotMatch(evidence.notice, /已使用关键词检索|未完成|进程退出|超时/);
+  const ragTurn = await api('sendChat', {
+    conversationId: rag.id,
+    question: aiFixture.question,
+    expectedProfile: signature,
+    retrievalId: evidence.id,
+  });
+  await aiTurn(ragTurn, async () => (await api('getConversation', rag.id)).turns, 1);
+  const feedback = await api('prepareNoteFeedback', note.id, note.revision, aiFixture.question);
+  result.aiPreviews.feedback = feedback;
+  assert.ok(feedback.evidence.hits.length > 0);
+  const feedbackTurn = await api('sendNoteFeedback', {
+    retrievalId: feedback.evidence.id,
+    expectedProfile: signature,
+  });
+  await aiTurn(feedbackTurn, () => api('listNoteFeedback', note.id), 2);
+  assert.deepEqual(await api('getNote', note.id), note, 'Feedback must not overwrite the note.');
+
+  const routePreview = await api('prepareLearningDraft', {
+    goal: aiFixture.goal,
+    query: '事务全部提交回滚',
+    sourceId: source.id,
+    minutes: 30,
+  });
+  result.aiPreviews.route = routePreview;
+  assert.ok(routePreview.evidence.hits.length > 0);
+  const routeTurn = await api('sendLearningDraft', {
+    retrievalId: routePreview.evidence.id,
+    expectedProfile: signature,
+  });
+  const route = await aiTurn(routeTurn, () => api('listLearningDrafts'), 3);
+  assert.deepEqual(await api('listMemories'), []);
+  assert.deepEqual((await api('planningOverview', day)).tasks, []);
+  result.checks.push(
+    'four real IPC/SSE pipelines saved exact synthetic chat/RAG/feedback/route answers; quote mismatch/unknown ID warned, valid citation resolved, no automatic writes',
+  );
+
+  await navigate('学习路线');
+  await page.getByRole('combobox', { name: '选择草稿', exact: true }).selectOption(route.id);
+  await visible(
+    page.getByRole('region', { name: '学习路线 Agent', exact: true }).getByText(route.notice, {
+      exact: true,
+    }),
+  );
+  const tasks = page.getByRole('region', { name: '学习任务提议' });
+  await tasks.getByLabel('安排日期', { exact: true }).fill(day);
+  await tasks.getByRole('button', { name: '起草任务提议', exact: true }).click();
+  await visible(page.getByRole('region', { name: '任务最终写入预览' }));
+  assert.deepEqual((await api('planningOverview', day)).tasks, []);
+  await screenshot('ai-task-preview');
+  await tasks.getByRole('button', { name: '确认新增这项待完成任务', exact: true }).click();
+  await visible(tasks.getByRole('heading', { name: '实际已保存', exact: true }));
+  const memoryPanel = page.getByRole('region', { name: '学习意向记忆提议' });
+  await memoryPanel.getByRole('button', { name: '起草记忆提议', exact: true }).click();
+  assert.deepEqual(await api('listMemories'), []);
+  await screenshot('ai-memory-preview');
+  await memoryPanel.getByRole('button', { name: '确认新增这条记忆', exact: true }).click();
+  await visible(memoryPanel.getByRole('heading', { name: '实际已保存', exact: true }));
+  const savedTask = (await api('planningOverview', day)).tasks;
+  const memories = await api('listMemories');
+  assert.equal(savedTask.length, 1);
+  assert.equal(memories.length, 1);
+  assert.equal(savedTask[0].origin, 'learning-route');
+  assert.equal(savedTask[0].originTurnId, route.id);
+  assert.equal(savedTask[0].originTurnRevision, route.revision);
+  assert.equal(savedTask[0].status, 'todo');
+  assert.equal(savedTask[0].completedAt, null);
+  assert.equal(memories[0].origin, 'learning-route');
+  assert.equal(memories[0].originTurnId, route.id);
+  assert.equal(memories[0].scope, 'local');
+  assert.equal(
+    model.generations().length,
+    4,
+    'Proposals must not request another model generation.',
+  );
+  result.aiGenerations = model.generations();
+  result.checks.push(
+    'real UI previews left memory/tasks empty; separate explicit confirmations saved exactly one local intent memory and one sourced todo task',
+  );
+  await screenshot('ai-confirmed-proposals');
+
+  await navigate('设置');
+  const destination = join(output, 'backup-export');
+  await mkdir(destination);
+  result.dialogSubstitutions.push('AI backup destination selection');
+  await choose(destination);
+  try {
+    await page.getByRole('button', { name: '导出完整备份', exact: true }).click();
+    await visible(page.getByText('备份已导出', { exact: true }));
+  } finally {
+    await restoreDialog();
+  }
+  const backup = await api('backupState');
+  assert.equal(backup.operation, 'idle');
+  assert.equal(backup.lastError, null);
+  assert.ok(resolve(backup.lastExport.directory).startsWith(resolve(destination) + '\\'));
+  const manifest = JSON.parse(
+    await readFile(join(backup.lastExport.directory, 'manifest.json'), 'utf8'),
+  );
+  assert.equal(manifest.mainVersion, 12);
+  assert.equal(manifest.activityVersion, 1);
+  assert.deepEqual(manifest.counts, {
+    sources: 1,
+    notes: 1,
+    conversations: 4,
+    turns: 4,
+    memories: 1,
+    projects: 0,
+    tasks: 1,
+    focusSessions: 0,
+    studyDays: 0,
+  });
+  assert.ok(manifest.files.every((file) => !/credential|embedding|secret/i.test(file.path)));
+  result.backup = { directory: backup.lastExport.directory, counts: manifest.counts };
+  createdSnapshot = await aiSnapshot(day);
+  result.checks.push(
+    'installed utility worker exported AI histories and confirmed memory/task with exact nine-category counts; model cache and encrypted key excluded',
+  );
+  await screenshot('ai-backup-export');
+}
+
+async function verifyAi() {
+  expected = JSON.parse(await readFile(expectedPath, 'utf8'));
+  assert.equal(expected.format, 1);
+  assert.equal(expected.sandboxSid, identity.sid);
+  assert.equal(expected.source.gitCommit, plan.previous.manifest.gitCommit);
+  const current = await aiSnapshot(expected.snapshot.day);
+  assert.deepEqual(
+    current,
+    expected.snapshot,
+    'Saved AI records/snapshots/source provenance differ.',
+  );
+  const model = await modelServer(Number(new URL(current.settings.openai.baseUrl).port));
+  await navigate('设置');
+  await visible(page.getByText('此地址已有保存的密钥', { exact: true }));
+  await page.getByRole('button', { name: '检测连接', exact: true }).click();
+  await until(
+    () => model.authorized(),
+    (count) => count > 0,
+    'recovered encrypted synthetic key',
+  );
+  await navigate('学习助手');
+  const chat = page.getByRole('region', { name: '学习助手', exact: true });
+  await chat.getByRole('button', { name: '刷新会话', exact: true }).click();
+  for (const conversation of current.conversations) {
+    const selection = chat.getByRole('button', {
+      name: `会话：${conversation.title}`,
+      exact: true,
+    });
+    await selection.click();
+    await until(
+      () => selection.getAttribute('aria-current'),
+      (value) => value === 'true',
+      'target saved conversation selected',
+    );
+    const answer = chat.getByTestId('chat-answer');
+    await visible(answer);
+    await until(
+      () => answer.textContent(),
+      (value) => value?.replace(/\s+/g, '') === conversation.turns[0].answer.replace(/\s+/g, ''),
+      'target saved synthetic answer rendered',
+    );
+    if (conversation.turns[0].mode === 'sources') {
+      await visible(chat.getByText(conversation.turns[0].notice, { exact: true }));
+      await visible(chat.getByRole('button', { name: '引用 1', exact: true }));
+    }
+    await screenshot(`ai-restored-chat-${conversation.id}`);
+  }
+  await navigate('学习笔记');
+  await page.getByRole('button', { name: new RegExp(aiFixture.note) }).click();
+  await value(page.getByLabel('笔记标题', { exact: true }), aiFixture.note);
+  const feedbackPanel = page.getByRole('region', { name: 'AI 笔记反馈', exact: true });
+  await visible(feedbackPanel.getByText(current.feedback[0][0].notice, { exact: true }));
+  assert.equal(
+    await feedbackPanel.getByRole('button', { name: '引用 99', exact: true }).count(),
+    0,
+  );
+  await screenshot('ai-restored-feedback');
+  await navigate('学习路线');
+  await page
+    .getByRole('combobox', { name: '选择草稿', exact: true })
+    .selectOption(current.routes[0].id);
+  await visible(
+    page
+      .getByRole('region', { name: '学习路线 Agent', exact: true })
+      .getByText(current.routes[0].notice, {
+        exact: true,
+      }),
+  );
+  await screenshot('ai-restored-route');
+  result.checks.push(
+    'full saved AI histories/evidence/note snapshots and confirmed memory/task provenance equal independent create receipt; UI warnings/valid links restored and key decrypted',
+  );
+
+  const root = join(identity.appData, 'StudyCompanion');
+  const modelDirectory = join(root, 'embedding-models', embedding.directory);
+  const files = await fixedFiles(modelDirectory);
+  const status = await api('embeddingStatus');
+  assert.equal(status.state, 'ready');
+  assert.equal(status.revision, embedding.revision);
+  const evidence = await api('prepareQuestion', '怎样让查找更迅速？', current.sources[0].id);
+  assert.match(evidence.notice, /混合检索/);
+  assert.doesNotMatch(evidence.notice, /已使用关键词检索|未完成|进程退出|超时/);
+  assert.ok(
+    evidence.hits.some(
+      (hit) =>
+        hit.sourceId === current.sources[0].id && hit.text.includes('数据库索引使查询更快。'),
+    ),
+  );
+  assert.deepEqual(await fixedFiles(modelDirectory), files);
+  assert.deepEqual(await aiSnapshot(current.day), expected.snapshot);
+  assert.equal(
+    model.generations().length,
+    0,
+    'Read-only AI verification must not regenerate histories.',
+  );
+  result.aiCpu = { status, evidence, modelFiles: files, modelGenerations: 0 };
+  result.checks.push(
+    'reopened packaged real ONNX CPU worker retrieved synonym evidence with hybrid notice/no fallback; pinned five-file cache and saved AI values unchanged',
+  );
+  if (stage === 'ai-verify') {
+    const proof = JSON.parse(await readFile(aiRestorePath, 'utf8'));
+    assert.equal(proof.sandboxSid, identity.sid);
+    assert.equal(proof.source.gitCommit, identity.source.gitCommit);
+    assert.deepEqual(
+      JSON.parse(await readFile(join(root, 'active-learning.json'), 'utf8')),
+      proof.active,
+    );
+    assert.equal(
+      createHash('sha256')
+        .update(await readFile(join(root, 'credentials.enc.json')))
+        .digest('hex'),
+      proof.credentialSha256,
+    );
+    assert.deepEqual(files, proof.modelFiles);
+    await assert.rejects(lstat(join(root, 'pending-restore.json')), { code: 'ENOENT' });
+    assert.equal(
+      (await api('backupState')).learningDirectory.toLowerCase(),
+      join(root, 'learning-restores', proof.active.id).toLowerCase(),
+    );
+    result.aiRetainedRestore = proof;
+    result.checks.push(
+      'reinstalled AI package retained exact activated restore pointer, encrypted credentials and all five model hashes; no pending restore remains',
+    );
+  }
+}
+
+async function restoreAi() {
+  await verifyAi();
+  const root = join(identity.appData, 'StudyCompanion');
+  const files = await fixedFiles(join(root, 'embedding-models', embedding.directory));
+  const credentialSha256 = createHash('sha256')
+    .update(await readFile(join(root, 'credentials.enc.json')))
+    .digest('hex');
+  await restoreBaseline(root, credentialSha256, files);
+  result.aiRestoreProof = {
+    format: 1,
+    sandboxSid: identity.sid,
+    source: identity.source,
+    active: result.relaunch.active,
+    credentialSha256,
+    modelFiles: files,
+  };
+}
+
 async function verifyNativeResources() {
   await verify();
   const root = join(identity.appData, 'StudyCompanion');
@@ -730,38 +1208,7 @@ async function verifyNativeResources() {
     .update(await readFile(join(root, 'credentials.enc.json')))
     .digest('hex');
 
-  const modelInput = join(input, 'embedding-model');
-  const modelDirectory = join(root, 'embedding-models', embedding.directory);
-  const inputModels = await fixedFiles(modelInput);
-  let cursor = join(root, 'embedding-models');
-  while (cursor.toLowerCase() !== dirname(cursor).toLowerCase()) {
-    try {
-      assert.equal(
-        (await lstat(cursor)).isSymbolicLink(),
-        false,
-        'Linked model destination refused.',
-      );
-    } catch (error) {
-      if (error.code !== 'ENOENT') throw error;
-    }
-    cursor = dirname(cursor);
-  }
-  await mkdir(join(root, 'embedding-models')).catch(async (error) => {
-    if (error.code !== 'EEXIST' || !(await lstat(join(root, 'embedding-models'))).isDirectory())
-      throw error;
-  });
-  await mkdir(modelDirectory);
-  await mkdir(join(modelDirectory, 'onnx'));
-  for (const [name] of embedding.files)
-    await copyFile(join(modelInput, name), join(modelDirectory, name), constants.COPYFILE_EXCL);
-  assert.deepEqual(await fixedFiles(modelDirectory), inputModels);
-  const modelStatus = await api('embeddingStatus');
-  assert.equal(modelStatus.state, 'ready');
-  assert.equal(modelStatus.revision, embedding.revision);
-  result.preseededModel = { directory: modelDirectory, downloaded: false, files: inputModels };
-  result.checks.push(
-    'five pinned offline model files preseeded into real guest root cache; size/SHA verified independently and by installed app',
-  );
+  const inputModels = await preseedModel(root);
 
   const resources = join(input, 'native-resources');
   for (const [name, kind] of [
@@ -894,13 +1341,15 @@ async function restoreBaseline(root, credentialSha256, inputModels) {
   const sourcesBeforePreview = await api('listSources');
 
   const creates = [];
+  const createStage = aiStage ? 'ai-create' : 'create';
+  const createDirectory = new RegExp(`^ui-${createStage}-[a-f0-9-]{36}$`);
   for (const entry of await readdir(logs, { withFileTypes: true })) {
-    if (!entry.isDirectory() || !/^ui-create-[a-f0-9-]{36}$/.test(entry.name)) continue;
+    if (!entry.isDirectory() || !createDirectory.test(entry.name)) continue;
     try {
       const receipt = JSON.parse(await readFile(join(logs, entry.name, 'result.json'), 'utf8'));
       if (
         receipt.format === 1 &&
-        receipt.stage === 'create' &&
+        receipt.stage === createStage &&
         receipt.status === 'passed' &&
         receipt.source.gitCommit === expected.source.gitCommit &&
         receipt.sandboxProfile === identity.profile
@@ -914,7 +1363,9 @@ async function restoreBaseline(root, credentialSha256, inputModels) {
   const backupDirectory = resolve(creates[0].backup.directory);
   assert.ok(
     backupDirectory.toLowerCase().startsWith(resolve(logs).toLowerCase() + '\\') &&
-      /\\ui-create-[a-f0-9-]{36}\\backup-export\\/i.test(backupDirectory),
+      new RegExp(`\\\\ui-${createStage}-[a-f0-9-]{36}\\\\backup-export\\\\`, 'i').test(
+        backupDirectory,
+      ),
     'Restore may use only this Sandbox baseline backup.',
   );
   const manifest = JSON.parse(await readFile(join(backupDirectory, 'manifest.json'), 'utf8'));
@@ -1011,7 +1462,8 @@ async function restoreBaseline(root, credentialSha256, inputModels) {
   relaunchedProcessProof = undefined;
   await closeServer();
   result.restoredRuntime = await launch();
-  await verify();
+  if (aiStage) await verifyAi();
+  else await verify();
   const restored = await api('backupState');
   assert.equal(
     restored.learningDirectory.toLowerCase(),
@@ -1125,21 +1577,31 @@ async function verifyReinstalledResources() {
 }
 
 try {
-  if (stage === 'create') {
+  if (stage === 'create' || stage === 'ai-create') {
     await assert.rejects(
       lstat(expectedPath),
       { code: 'ENOENT' },
       'Expected snapshot already exists; refusing overwrite.',
     );
   }
+  if (stage === 'ai-create' || stage === 'ai-restore')
+    await assert.rejects(
+      lstat(aiRestorePath),
+      { code: 'ENOENT' },
+      'AI restore receipt already exists; refusing overwrite.',
+    );
   result.runtime = await launch();
   if (stage === 'create') await create();
+  else if (stage === 'ai-create') await createAi();
+  else if (stage === 'ai-restore') await restoreAi();
+  else if (stage === 'ai-verify') await verifyAi();
   else if (stage === 'verify-native-resources') await verifyNativeResources();
   else if (stage === 'verify-restore') await verifyRestore();
   else if (stage === 'verify-reinstall-resources') await verifyReinstalledResources();
   else await verify();
   assert.deepEqual(consoleErrors, [], 'Renderer reported an uncaught error.');
   assert.deepEqual(networkRequests, [], 'Unexpected renderer HTTP request.');
+  assert.deepEqual(result.fixtureErrors ?? [], [], 'Synthetic fixture rejected a request.');
   result.status = 'passed';
 } catch (error) {
   result.status = 'failed';
@@ -1193,7 +1655,7 @@ try {
         false,
         'Synthetic API key appears in plaintext credential storage.',
       );
-      if (stage === 'create') {
+      if (stage === 'create' || stage === 'ai-create') {
         await writeFile(
           expectedPath,
           JSON.stringify(
@@ -1210,6 +1672,10 @@ try {
           { flag: 'wx' },
         );
       }
+      if (stage === 'ai-restore')
+        await writeFile(aiRestorePath, JSON.stringify(result.aiRestoreProof, null, 2) + '\n', {
+          flag: 'wx',
+        });
     }
   } catch (error) {
     result.status = 'failed';

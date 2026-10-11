@@ -123,7 +123,8 @@ for (const fixture of cases) {
       embedding: { repository: embeddingModel.repository, revision: embeddingModel.revision },
       startedAt: new Date().toISOString(),
       semanticAcceptance: 'pending-human-review',
-      fixturePurpose: 'independent holdout; no parameter tuning or repeated generation',
+      fixturePurpose:
+        'Fixed synthetic fixtures; first-use or regression status is recorded in the dated human-review report.',
     };
     const persist = () =>
       writeFileSync(join(output, `${fixture.id}.json`), JSON.stringify(result, null, 2));
