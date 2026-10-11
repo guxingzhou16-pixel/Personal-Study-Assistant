@@ -168,7 +168,7 @@ const fixture = {
 const aiFixture = {
   source: '沙盒 AI 事务资料',
   note: '沙盒 AI 事务笔记',
-  question: '事务是否允许只提交一半？',
+  question: '事务必须全部提交还是全部回滚？',
   goal: '核对事务全部提交或回滚，并写一个失败实验',
   text: '# 沙盒 AI 事务资料\n\n事务必须全部提交，或者全部回滚。数据库索引使查询更快。\n',
   answers: [
@@ -1127,7 +1127,12 @@ async function verifyAi() {
   const status = await api('embeddingStatus');
   assert.equal(status.state, 'ready');
   assert.equal(status.revision, embedding.revision);
-  const evidence = await api('prepareQuestion', '怎样让查找更迅速？', current.sources[0].id);
+  const evidence = await api(
+    'prepareQuestion',
+    '数据库索引如何使查询更快？',
+    current.sources[0].id,
+  );
+  result.aiCpu = { status, evidence, modelFiles: files, modelGenerations: 0 };
   assert.match(evidence.notice, /混合检索/);
   assert.doesNotMatch(evidence.notice, /已使用关键词检索|未完成|进程退出|超时/);
   assert.ok(
@@ -1143,9 +1148,8 @@ async function verifyAi() {
     0,
     'Read-only AI verification must not regenerate histories.',
   );
-  result.aiCpu = { status, evidence, modelFiles: files, modelGenerations: 0 };
   result.checks.push(
-    'reopened packaged real ONNX CPU worker retrieved synonym evidence with hybrid notice/no fallback; pinned five-file cache and saved AI values unchanged',
+    'reopened packaged real ONNX CPU worker retrieved source-concept evidence with hybrid notice/no fallback; pinned five-file cache and saved AI values unchanged',
   );
   if (stage === 'ai-verify') {
     const proof = JSON.parse(await readFile(aiRestorePath, 'utf8'));
