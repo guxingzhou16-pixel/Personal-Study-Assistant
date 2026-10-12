@@ -279,6 +279,18 @@ export interface LearningRequest {
   query: string;
   sourceId: string | null;
   minutes: number;
+  format?: 'steps-v1';
+}
+export interface LearningStep {
+  title: string;
+  action: string;
+  minutes: number;
+  citations: number[];
+  artifact: string;
+}
+export interface LearningPlan {
+  steps: LearningStep[];
+  limitations: string;
 }
 export interface LearningPreview {
   request: LearningRequest;
@@ -381,6 +393,23 @@ export interface TaskProposal {
   expiresAt: string;
   draft: TaskDraft;
   project: StudyProject | null;
+}
+export interface TaskBatchRequest {
+  plan: LearningPlan;
+  indices: number[];
+  day: string;
+  projectId: string | null;
+}
+export interface TaskBatchProposal {
+  id: string;
+  turnId: string;
+  turnRevision: number;
+  expiresAt: string;
+  plan: LearningPlan;
+  indices: number[];
+  tasks: TaskDraft[];
+  project: StudyProject | null;
+  budgetMinutes: number;
 }
 export type FocusStatus = 'running' | 'paused' | 'completed' | 'stopped' | 'interrupted';
 export type FocusEndReason =
@@ -569,6 +598,8 @@ export interface DesktopApi {
   prepareTaskProposal(turnId: string, request: TaskProposalRequest): Promise<TaskProposal>;
   confirmTaskProposal(id: string): Promise<DailyTask>;
   discardTaskProposal(id: string): Promise<void>;
+  prepareTaskBatch(turnId: string, request: TaskBatchRequest): Promise<TaskBatchProposal>;
+  confirmTaskBatch(id: string): Promise<DailyTask[]>;
   focusOverview(): Promise<FocusOverview>;
   focusHistory(query: FocusHistoryQuery): Promise<FocusHistoryPage>;
   getFocusSession(id: string): Promise<FocusSession>;

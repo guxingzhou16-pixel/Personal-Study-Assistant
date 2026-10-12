@@ -1,0 +1,67 @@
+.learning-plan {
+  display: grid;
+  gap: 16px;
+  margin-top: 20px;
+}
+.learning-budget {
+  color: var(--accent);
+  font-variant-numeric: tabular-nums;
+}
+.learning-step {
+  display: grid;
+  gap: 12px;
+  min-width: 0;
+  border: 1px solid var(--line);
+  padding: 16px;
+  border-radius: 9px;
+}
+.learning-step legend {
+  padding: 0 6px;
+  color: var(--accent);
+}
+.learning-step-options {
+  display: grid;
+  grid-template-columns: minmax(110px, 1fr) minmax(0, 2fr);
+  gap: 16px;
+}
+.learning-check,
+.learning-step-sources label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+}
+.learning-check input,
+.learning-step-sources input {
+  width: auto;
+}
+.learning-step-sources {
+  display: grid;
+  gap: 8px;
+}
+.learning-step-sources > span {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.learning-batch-preview {
+  display: grid;
+  gap: 12px;
+  padding: 16px;
+  background: var(--theme-surface-muted, #f2f6ee);
+  border: 1px solid var(--line);
+  border-radius: 9px;
+}
+.learning-batch-preview p {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  font-size: 13px;
+}
+.learning-plan > button {
+  justify-self: start;
+}
+@media (max-width: 700px) {
+  .learning-step-options {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

@@ -58,8 +58,12 @@ test('connects import, reading, cited question, note, feedback, route, confirmed
       const { current, recent } = await api.focusOverview();
       return {
         sources: await api.listSources(),
-        note: await api.getNote(notes[0].id),
-        feedback: await api.listNoteFeedback(notes[0].id),
+        note: await api.getNote(notes.find((note) => note.title === '事务闭环笔记')!.id),
+        notes: await Promise.all(notes.map((note) => api.getNote(note.id))),
+        reviews: await api.listReviews(null),
+        feedback: await api.listNoteFeedback(
+          notes.find((note) => note.title === '事务闭环笔记')!.id,
+        ),
         conversation: await api.getConversation(conversations[0].id),
         routes: await api.listLearningDrafts(),
         memories: await api.listMemories(),
@@ -80,6 +84,15 @@ test('connects import, reading, cited question, note, feedback, route, confirmed
       });
     }, endpoint);
     await page.reload();
+    await page.evaluate(() => {
+      const label = document.querySelector('.topbar > div > span')!;
+      const pages = [label.textContent!];
+      (window as unknown as { journeyPages: string[] }).journeyPages = pages;
+      new MutationObserver(() => {
+        const name = label.textContent!;
+        if (name !== pages.at(-1)) pages.push(name);
+      }).observe(label, { childList: true, subtree: true, characterData: true });
+    });
     await choose(original);
     await nav(page, '资料库');
     await nav(page, '导入资料');
@@ -121,8 +134,16 @@ test('connects import, reading, cited question, note, feedback, route, confirmed
             ?.status,
       )
       .toBe('completed');
-    output =
-      '### 阅读与求证\n8分钟：核对原文。[1]\n### 解释与练习\n8分钟：观察回滚。\n### 学习作品\n7分钟：写笔记。\n### 复盘与下一步\n7分钟：比较结果。\n总计8+8+7+7=30分钟。';
+    output = JSON.stringify({
+      limitations: '资料给出行为规则，底层机制仍须另找原文。',
+      steps: [8, 8, 7, 7].map((minutes, index) => ({
+        title: ['阅读与求证', '解释与练习', '学习作品', '复盘与下一步'][index],
+        action: '对照全部提交或回滚的原文要求，再写自己的例子与待求证问题。',
+        artifact: '用户手写理解和观察记录',
+        minutes,
+        citations: [1],
+      })),
+    });
     await nav(page, '学习路线');
     await page.getByRole('textbox', { name: '学习目标', exact: true }).fill('验证事务原子性');
     await page.getByRole('textbox', { name: '用来查找原文的概念或问题', exact: true }).fill('事务');
@@ -140,10 +161,69 @@ test('connects import, reading, cited question, note, feedback, route, confirmed
       (await page.evaluate((d) => window.studyCompanion!.planningOverview(d), day)).tasks,
     ).toEqual([]);
     expect(await page.evaluate(() => window.studyCompanion!.listMemories())).toEqual([]);
-    const tasks = page.getByRole('region', { name: '学习任务提议' });
-    await tasks.getByRole('button', { name: '起草任务提议', exact: true }).click();
-    await tasks.getByRole('button', { name: '确认新增这项待完成任务', exact: true }).click();
-    await expect(tasks.getByRole('heading', { name: '实际已保存' })).toBeVisible();
+    const route = page.getByRole('region', { name: '结构化学习路线', exact: true });
+    await route
+      .getByRole('textbox', { name: '步骤 1 标题', exact: true })
+      .fill('核对原子性定义（我编辑）');
+    await route.getByRole('spinbutton', { name: '步骤 1 预计分钟', exact: true }).fill('9');
+    await expect(
+      route.getByRole('button', { name: '核对并确认路线建议', exact: true }),
+    ).toBeDisabled();
+    await expect(route.getByText(/步骤合计31分钟/)).toBeVisible();
+    await route.getByRole('spinbutton', { name: '步骤 2 预计分钟', exact: true }).fill('7');
+    await route.getByRole('button', { name: '核对原文 [1]', exact: true }).first().click();
+    await expect(page.locator('.markdown-reading')).toBeVisible();
+    await nav(page, '返回路线');
+    await expect(route.getByRole('textbox', { name: '步骤 1 标题', exact: true })).toHaveValue(
+      '核对原子性定义（我编辑）',
+    );
+    await route.getByRole('button', { name: '核对并确认路线建议', exact: true }).click();
+    await route.getByRole('checkbox', { name: '选择步骤 1 生成任务', exact: true }).check();
+    await route.getByRole('checkbox', { name: '选择步骤 3 生成任务', exact: true }).check();
+    await route.getByRole('button', { name: '预览所选步骤任务', exact: true }).click();
+    await expect(
+      page.getByRole('region', { name: '多步骤任务最终预览', exact: true }),
+    ).toBeVisible();
+    expect(
+      (await page.evaluate((day) => window.studyCompanion!.planningOverview(day), day)).tasks,
+    ).toEqual([]);
+    await route.getByRole('button', { name: '取消多步骤预览', exact: true }).click();
+    expect(
+      (await page.evaluate((day) => window.studyCompanion!.planningOverview(day), day)).tasks,
+    ).toEqual([]);
+    await route.getByRole('button', { name: '预览所选步骤任务', exact: true }).click();
+    await page.screenshot({ path: 'artifacts/structured-route-preview.png' });
+    await app!.evaluate(({ ipcMain }) => {
+      const handlers = (
+        ipcMain as unknown as { _invokeHandlers: Map<string, (...args: unknown[]) => unknown> }
+      )._invokeHandlers;
+      const original = handlers.get('study:confirm-task-batch')!;
+      if (!original) throw new Error('Missing real confirmation handler');
+      ipcMain.removeHandler('study:confirm-task-batch');
+      ipcMain.handle('study:confirm-task-batch', async (...args) => {
+        const result = await original(...args);
+        await new Promise((resolve) => setTimeout(resolve, 350));
+        return result;
+      });
+    });
+    await route.getByRole('button', { name: '确认新增这 2 项待完成任务', exact: true }).click();
+    await nav(page, '学习首页');
+    await expect
+      .poll(
+        async () =>
+          (await page.evaluate((day) => window.studyCompanion!.planningOverview(day), day)).tasks
+            .length,
+      )
+      .toBe(2);
+    await nav(page, '学习路线');
+    await expect(
+      route.getByRole('heading', { name: '实际已保存 2 项', exact: true }),
+    ).toBeVisible();
+    const createdTasks = (
+      await page.evaluate((day) => window.studyCompanion!.planningOverview(day), day)
+    ).tasks;
+    expect(createdTasks).toHaveLength(2);
+    expect(createdTasks.map((task) => task.minutes).sort()).toEqual([7, 9]);
     const memories = page.getByRole('region', { name: '学习意向记忆提议' });
     await memories.getByRole('button', { name: '起草记忆提议', exact: true }).click();
     await memories.getByRole('button', { name: '确认新增这条记忆', exact: true }).click();
@@ -171,13 +251,55 @@ test('connects import, reading, cited question, note, feedback, route, confirmed
       .fill('已核对定义，回滚实验尚未完成');
     await nav(page, '保存复盘');
     await expect(page.getByText('复盘已保存到本机。', { exact: true })).toBeVisible();
+    await page
+      .getByRole('textbox', { name: '这次学会了什么', exact: true })
+      .fill('我能解释为何不能只提交一半；实验还没有完成。');
+    await page
+      .getByRole('textbox', { name: '还卡在哪里', exact: true })
+      .fill('还需找失败观测和底层机制的依据。');
+    await nav(page, '编辑为笔记');
+    await page.getByLabel('笔记标题', { exact: true }).fill('本轮专注理解');
+    await nav(page, '保存笔记');
+    await expect(page.getByText('笔记已保存到本机。', { exact: true })).toBeVisible();
+    await nav(page, '专注时光');
     expect(
       (await page.evaluate((d) => window.studyCompanion!.planningOverview(d), day)).tasks[0].status,
     ).toBe('todo');
     await nav(page, '签到今天');
+    output = JSON.stringify({
+      items: [1, 2, 3].map((index) => ({
+        question: `事务回忆 ${index}`,
+        answer: '全部成功才提交，失败则回滚全部操作。',
+        citations: [1],
+      })),
+    });
+    await nav(page, '学习助手');
+    await page.getByRole('combobox', { name: '问答方式', exact: true }).selectOption('quiz');
+    await page.getByRole('textbox', { name: '输入练习主题', exact: true }).fill('事务原子性');
+    await nav(page, '检索原文');
+    await nav(page, '生成 3 项练习');
+    await page
+      .getByRole('textbox', { name: '第 1 题 · 我的作答', exact: true })
+      .fill('全部成功才提交，发生失败需要全部回滚。');
+    await page.getByRole('checkbox', { name: '第 1 题仍有疑问', exact: true }).check();
+    await page.getByLabel('第 1 题复习日期', { exact: true }).fill('2026-10-13');
+    await nav(page, '保存第 1 题作答与安排');
+    await expect(
+      page.getByText('第 1 题的作答与安排已保存；没有评分或掌握判断。', { exact: true }),
+    ).toBeVisible();
+    await nav(page, '学习首页');
+    await nav(page, '打开轻量复习');
+    await page.locator('.review-list-item').first().click();
+    await expect(page.getByRole('button', { name: '开始这次回忆', exact: true })).toBeVisible();
+    const experiencePages = await page.evaluate(
+      () => (window as unknown as { journeyPages: string[] }).journeyPages,
+    );
     const baseline = await snapshot(page);
     expect(baseline.focus.recent[0].status).toBe('stopped');
-    expect(calls).toBe(3);
+    expect(calls).toBe(4);
+    expect(baseline.reviews).toHaveLength(1);
+    expect(baseline.notes).toHaveLength(2);
+    expect(baseline.planning.tasks).toHaveLength(2);
     const backups = mkdtempSync(join(tmpdir(), 'study-journey-backup-'));
     await choose(backups);
     await nav(page, '设置');
@@ -213,7 +335,21 @@ test('connects import, reading, cited question, note, feedback, route, confirmed
     mkdirSync(artifacts, { recursive: true });
     writeFileSync(
       join(artifacts, 'learning-journey.json'),
-      JSON.stringify({ root, calls, baseline, exported, receipt }, null, 2),
+      JSON.stringify(
+        {
+          root,
+          calls,
+          baseline,
+          exported,
+          receipt,
+          experiencePages,
+          pageSwitches: experiencePages.length - 1,
+          procedure:
+            'Synthetic learning content, simulated model, actual Electron controls and SQLite writes; focus stopped early with durable elapsed time; next-day date checked without waiting a day.',
+        },
+        null,
+        2,
+      ),
     );
   } finally {
     await app?.close();

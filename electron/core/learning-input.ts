@@ -7,12 +7,18 @@ import { sourceId } from './documents';
 // The same boundary validates IPC input and persisted request snapshots.
 export function readLearningRequest(input: unknown): LearningRequest {
   const value = record(input);
-  if (Object.keys(value).some((key) => !['goal', 'query', 'sourceId', 'minutes'].includes(key)))
+  if (
+    Object.keys(value).some(
+      (key) => !['goal', 'query', 'sourceId', 'minutes', 'format'].includes(key),
+    )
+  )
     throw new AppError('validation', '学习目标包含不支持的字段。');
   const goal = string(value.goal, '学习目标', learningLimits.goal);
   const query = string(value.query, '检索概念或问题', learningLimits.query);
   if (!goal || !query)
     throw new AppError('learningInput', '请填写学习目标和用于查找资料的具体概念。');
+  if (Object.hasOwn(value, 'format') && value.format !== 'steps-v1')
+    throw new AppError('learningInput', '学习路线格式标识无效。');
   if (
     typeof value.minutes !== 'number' ||
     !Number.isInteger(value.minutes) ||
@@ -25,5 +31,6 @@ export function readLearningRequest(input: unknown): LearningRequest {
     query,
     sourceId: value.sourceId === null ? null : sourceId(value.sourceId),
     minutes: value.minutes,
+    ...(value.format === 'steps-v1' ? { format: value.format } : {}),
   };
 }

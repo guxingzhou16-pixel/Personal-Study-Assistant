@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { NotebookPen, Search, Send, Settings2, Square } from 'lucide-react';
 import { desktop, errorMessage, isDesktop } from '../lib/desktop';
 import { learningLimits, sameLearningRequest } from '../lib/learning';
+import { parseLearningPlan } from '../lib/learning-plan';
 import { memoryAllowed, memoryKindLabels, memoryLimits, memoryScopeLabels } from '../lib/memories';
 import type {
   ChatTurn,
@@ -12,11 +13,13 @@ import type {
   Settings,
   Source,
   StudyMemory,
+  LearningPlan,
 } from '../lib/types';
 import { EvidenceCards } from './EvidenceCards';
 import { ModelAnswer } from './ModelAnswer';
 import { MemoryProposalPanel } from './MemoryProposalPanel';
 import { TaskProposalPanel } from './TaskProposalPanel';
+import { LearningPlanPanel } from './LearningPlanPanel';
 import { HistoryActions } from './HistoryActions';
 import './AgentMemory.css';
 
@@ -51,6 +54,25 @@ function RequestSummary({ request, scope }: { request: LearningRequest; scope: s
 
 function memorySelectionKey(memories: StudyMemory[]): string {
   return memories.map((memory) => `${memory.id}:${memory.revision}`).join('|');
+}
+
+function StructuredRoute(props: Omit<Parameters<typeof LearningPlanPanel>[0], 'initialPlan'>) {
+  let plan: LearningPlan;
+  try {
+    plan = parseLearningPlan(
+      props.turn.answer,
+      props.turn.evidence,
+      props.turn.learningRequest!.minutes,
+    );
+  } catch (reason) {
+    return (
+      <p className="feedback error" role="alert">
+        保存的路线结构无效：{reason instanceof Error ? reason.message : '无法解析'}
+        ，原始输出仍保留。
+      </p>
+    );
+  }
+  return <LearningPlanPanel {...props} initialPlan={plan} />;
 }
 
 function MemorySnapshots({ memories }: { memories: StudyMemory[] }) {
@@ -130,6 +152,16 @@ export function AgentPage({
   const loadVersion = useRef(0);
   const memoryLoadVersion = useRef(0);
   const handledPreset = useRef<number | null>(null);
+  const routeDirty = useRef(false);
+  const routeEdited = useCallback((dirty: boolean) => {
+    routeDirty.current = dirty;
+  }, []);
+  function allowRouteChange(id?: string) {
+    if (id === selectedId || !routeDirty.current) return true;
+    if (!window.confirm('当前路线编辑尚未写入任务。切换会放弃这些编辑，是否继续？')) return false;
+    routeDirty.current = false;
+    return true;
+  }
   const request: LearningRequest = {
     goal,
     query,
@@ -334,7 +366,7 @@ export function AgentPage({
       setError('未找到这项任务的来源路线，可能已删除。任务和来源标识仍保留，可刷新路线记录核对。');
       return;
     }
-    setSelectedId(source.id);
+    if (allowRouteChange(source.id)) setSelectedId(source.id);
     setError('');
   }, [visible, historyLoaded, loading, presetTurn, turns]);
 
@@ -391,6 +423,7 @@ export function AgentPage({
   }
 
   async function generate() {
+    if (!allowRouteChange()) return;
     if (
       !preview ||
       !previewValid ||
@@ -738,7 +771,9 @@ export function AgentPage({
             <select
               value={selectedId ?? ''}
               disabled={historyBusy}
-              onChange={(event) => setSelectedId(event.target.value)}
+              onChange={(event) => {
+                if (allowRouteChange(event.target.value)) setSelectedId(event.target.value);
+              }}
             >
               {turns
                 .slice()
@@ -785,11 +820,37 @@ export function AgentPage({
                 : '本地证据不足说明 · 未调用模型'}
             </p>
             <div className="chat-answer" data-testid="learning-draft-answer">
-              <ModelAnswer
-                turn={selected}
-                onOpenCitation={(number) => void openCitation(selected.id, number)}
-              />
+              {selected.learningRequest.format === 'steps-v1' &&
+              selected.answer.trim().startsWith('{') ? (
+                <details>
+                  <summary>查看保存的原始路线输出</summary>
+                  <ModelAnswer
+                    turn={selected}
+                    onOpenCitation={(number) => void openCitation(selected.id, number)}
+                  />
+                </details>
+              ) : (
+                <ModelAnswer
+                  turn={selected}
+                  onOpenCitation={(number) => void openCitation(selected.id, number)}
+                />
+              )}
             </div>
+            {selected.status === 'completed' &&
+              selected.learningRequest.format === 'steps-v1' &&
+              selected.evidence.length > 0 &&
+              !selected.notice.startsWith('本地证据保护') && (
+                <StructuredRoute
+                  key={selected.id}
+                  turn={selected}
+                  visible={visible}
+                  onSaved={onTaskSaved}
+                  onOpenTask={onOpenTask}
+                  onCitation={(number) => void openCitation(selected.id, number)}
+                  onDirtyChange={routeEdited}
+                  onCleanupError={setError}
+                />
+              )}
             <p className="chat-turn-status" role="status">
               {statusLabels[selected.status]}
             </p>
@@ -819,14 +880,30 @@ export function AgentPage({
               selected.evidence.length > 0 &&
               Boolean(selected.answer.trim()) && (
                 <>
-                  <TaskProposalPanel
-                    key={`task-${selected.id}`}
-                    turn={selected}
-                    visible={visible}
-                    onSaved={onTaskSaved}
-                    onOpenTask={onOpenTask}
-                    onCleanupError={setError}
-                  />
+                  {selected.learningRequest.format === 'steps-v1' ? (
+                    !selected.notice.startsWith('本地证据保护') && (
+                      <details>
+                        <summary>把整个目标安排为一项任务</summary>
+                        <TaskProposalPanel
+                          key={`task-${selected.id}`}
+                          turn={selected}
+                          visible={visible}
+                          onSaved={onTaskSaved}
+                          onOpenTask={onOpenTask}
+                          onCleanupError={setError}
+                        />
+                      </details>
+                    )
+                  ) : (
+                    <TaskProposalPanel
+                      key={`task-${selected.id}`}
+                      turn={selected}
+                      visible={visible}
+                      onSaved={onTaskSaved}
+                      onOpenTask={onOpenTask}
+                      onCleanupError={setError}
+                    />
+                  )}
                   <MemoryProposalPanel
                     key={selected.id}
                     turn={selected}

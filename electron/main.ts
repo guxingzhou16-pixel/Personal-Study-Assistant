@@ -544,6 +544,10 @@ function registerHandlers(
   );
   handle('study:confirm-task-proposal', (id) => taskProposals.confirm(id));
   handle('study:discard-task-proposal', (id) => taskProposals.discard(id));
+  handle('study:prepare-task-batch', (turnId, request) =>
+    taskProposals.prepareBatch(turnId, request),
+  );
+  handle('study:confirm-task-batch', (id) => taskProposals.confirmBatch(id));
   handle('study:embedding-status', () => embeddings.status());
   handle('study:cancel-embedding-download', () => embeddings.cancel());
   handle('study:download-embedding', () => {

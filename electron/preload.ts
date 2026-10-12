@@ -36,6 +36,7 @@ import type {
   StudyProject,
   DailyTask,
   TaskProposal,
+  TaskBatchProposal,
   FocusOverview,
   FocusHistoryPage,
   FocusSession,
@@ -166,6 +167,9 @@ const api: DesktopApi = {
     call<TaskProposal>('study:prepare-task-proposal', turnId, request),
   confirmTaskProposal: (id) => call<DailyTask>('study:confirm-task-proposal', id),
   discardTaskProposal: (id) => call<void>('study:discard-task-proposal', id),
+  prepareTaskBatch: (turnId, request) =>
+    call<TaskBatchProposal>('study:prepare-task-batch', turnId, request),
+  confirmTaskBatch: (id) => call<DailyTask[]>('study:confirm-task-batch', id),
   focusOverview: () => call<FocusOverview>('study:focus-overview'),
   focusHistory: (query) => call<FocusHistoryPage>('study:focus-history', query),
   getFocusSession: (id) => call<FocusSession>('study:get-focus-session', id),

@@ -327,6 +327,8 @@
 - 第七轮`5da840bd6e1bc16079b90fb3d4a29f76deb0c047`／run38222160190实际整轮success：许可7/7、30个核心文件330/330、类型/构建、36条真实Electron全部通过，含真五分钟、旧v4迁移、完整恢复／回退／学习闭环及专注成果草稿。必需门禁通过后也完成Post步骤，没有把第五轮成功规格但取消的整体结论换绿。此SHA包含已提交v13改善，不含未提交新路线；旧d205包仍v12，CI不代替新NSIS验收或五项第三方分发条件。文档提交及后续CI的确切SHA在本机回执核对。
 - source-map-js仅补丁更新1.2.1→1.2.2，lock只version/resolved/integrity，无生产依赖变化。官方registry审计8中危/0高危、omit=dev本次0；sprintf-js无已发布补丁，八项builder开发链告警保留，不用audit fix --force降级固定builder或声称全部安全。旧d205包/锁摘要和安装记录不重写、不重复执行。
 
+新生成的路线learning_request.format为steps-v1（旧JSON无该字段仍读旧Markdown）；ChatService完成前共用learning-plan严格校验2～8步、行动/预期作品/实际引用及总预算，失败status=error且保留原答，不改写/重试/建任务。用户编辑只在窗口保留，所选确认内容进入任务。多步骤复用TaskProposalService同一UUID缓存与PlanningStorage事务，一次确认只收ID，事务内复核来源revision/status/用途及项目快照，整批成功才消费ID，失败回滚、取消零写入。新增prepareTaskBatch/confirmTaskBatch，discard沿用原接口；当前桥接90方法/84请求/6事件。多行JSON编号用结构校验，不能用普通Markdown的编号缺失判断；文字未知编号仍拒绝，编号有效不证明支持关系。
+
 ## 4. 产品范围与功能要求
 
 ### 4.1 资料导入与辅助阅读

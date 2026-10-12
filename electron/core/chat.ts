@@ -17,6 +17,7 @@ import { noteFeedbackMessages } from './note-feedback';
 import { learningMessages } from './learning-agent';
 import { practiceMessages } from './practice';
 import { parsePractice } from '../../src/lib/practice';
+import { parseLearningPlan } from '../../src/lib/learning-plan';
 import { evidencePolicy, onlyOverrideEvidence } from './evidence-policy';
 import { auditCitations } from './citation-audit';
 
@@ -65,7 +66,10 @@ export class ChatService {
     const question = string(request.question, '问题', 4000);
     if (!question) throw new AppError('question', '请先输入问题。');
     const noteSnapshot = context?.kind === 'note' ? context.note : undefined;
-    const learningRequest = context?.kind === 'learning' ? context.request : undefined;
+    const learningRequest =
+      context?.kind === 'learning'
+        ? { ...context.request, format: 'steps-v1' as const }
+        : undefined;
     const learningMemories = context?.kind === 'learning' ? context.memories : undefined;
     const practiceRequest = context?.kind === 'practice' ? context.request : undefined;
     const existing = noteSnapshot
@@ -301,6 +305,17 @@ export class ChatService {
           );
         }
       }
+      if (job.turn.learningRequest?.format === 'steps-v1') {
+        try {
+          if (result.truncated) throw new Error('模型输出被截断，路线未完成。');
+          parseLearningPlan(job.turn.answer, job.turn.evidence, job.turn.learningRequest.minutes);
+        } catch (error) {
+          throw new AppError(
+            'learningOutput',
+            `路线未通过结构校验：${error instanceof Error ? error.message : '无效输出。'} 原始输出已保留，不创建任务、不自动改写或重试。`,
+          );
+        }
+      }
       this.finish(
         job,
         'completed',
@@ -309,7 +324,11 @@ export class ChatService {
             ? job.turn.notice
             : '',
           result.truncated ? '模型达到输出长度上限，回答可能尚未结束。可以继续提问。' : '',
-          job.turn.mode === 'sources' && !job.turn.practiceRequest ? citationNotice(job.turn) : '',
+          job.turn.mode === 'sources' && !job.turn.practiceRequest
+            ? job.turn.learningRequest?.format === 'steps-v1'
+              ? '路线关联编号与预算已通过结构校验；这不证明事实或建议被原文支持，请逐条核对资料。'
+              : citationNotice(job.turn)
+            : '',
         ]
           .filter(Boolean)
           .join(' '),

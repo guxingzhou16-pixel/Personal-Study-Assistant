@@ -76,8 +76,16 @@ test('runs feedback, route, explicit memory/task proposals and route deletion th
       )
       .toBe('completed');
     expect(await page.evaluate((id) => window.studyCompanion!.getNote(id), note.id)).toEqual(note);
-    output =
-      '### 阅读与求证\n5分钟：阅读事务原文。[1]\n### 解释与练习\n10分钟：故意触发失败。\n### 学习作品\n10分钟：写笔记。\n### 复盘与下一步\n5分钟：对照结果。';
+    output = JSON.stringify({
+      limitations: '底层机制需另找原文求证。',
+      steps: [5, 10, 10, 5].map((minutes, index) => ({
+        title: ['阅读与求证', '解释与练习', '学习作品', '复盘与下一步'][index],
+        action: '对照事务全部提交或回滚的资料规则，写自己的例子。',
+        artifact: '用户笔记及待求证问题',
+        minutes,
+        citations: [1],
+      })),
+    });
     await page.getByRole('button', { name: '学习路线', exact: true }).click();
     await page.getByRole('textbox', { name: '学习目标', exact: true }).fill('核对事务原子性');
     await page.getByRole('textbox', { name: '用来查找原文的概念或问题', exact: true }).fill('事务');
@@ -97,6 +105,7 @@ test('runs feedback, route, explicit memory/task proposals and route deletion th
       (await page.evaluate((d) => window.studyCompanion!.planningOverview(d), day)).tasks,
     ).toEqual([]);
     expect(await page.evaluate(() => window.studyCompanion!.listMemories())).toEqual([]);
+    await page.getByText('把整个目标安排为一项任务', { exact: true }).click();
     const tasks = page.getByRole('region', { name: '学习任务提议' });
     await tasks.getByRole('button', { name: '起草任务提议', exact: true }).click();
     await expect(page.getByRole('region', { name: '任务最终写入预览' })).toBeVisible();

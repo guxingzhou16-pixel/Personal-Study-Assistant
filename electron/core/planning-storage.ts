@@ -302,12 +302,31 @@ export class PlanningStorage {
     projectSnapshot: StudyProject | null,
     origin: { turnId: string; turnRevision: number },
   ): DailyTask {
-    const draft = readTaskDraft(input);
+    return this.createManyFromProposal([input], projectSnapshot, origin)[0];
+  }
+
+  createManyFromProposal(
+    inputs: TaskDraft[],
+    projectSnapshot: StudyProject | null,
+    origin: { turnId: string; turnRevision: number },
+  ): DailyTask[] {
+    if (!Array.isArray(inputs) || !inputs.length || inputs.length > 8)
+      throw new AppError('taskProposalCount', '一次只能确认1～8项任务。');
+    const drafts = inputs.map(readTaskDraft);
     const turnId = planningId(origin.turnId);
     const turnRevision = revision(origin.turnRevision);
     this.db.exec('BEGIN IMMEDIATE;');
     try {
-      if (draft.projectId !== (projectSnapshot?.id ?? null))
+      const source = this.db
+        .prepare(
+          `SELECT t.revision, t.status FROM chat_turns t
+        JOIN conversations c ON c.id = t.conversation_id
+        WHERE t.id = ? AND c.purpose = 'learning-agent'`,
+        )
+        .get(turnId);
+      if (!source || source.revision !== turnRevision || source.status !== 'completed')
+        throw new AppError('taskProposalChanged', '来源路线已变化或删除，请重新预览。');
+      if (drafts.some((draft) => draft.projectId !== (projectSnapshot?.id ?? null)))
         throw new AppError('taskProposalProject', '任务关联项目与预览不一致，请重新预览。');
       if (projectSnapshot !== null) {
         const project = this.getProject(projectSnapshot.id);
@@ -315,34 +334,37 @@ export class PlanningStorage {
           throw new AppError('taskProposalProject', '关联项目已更新或归档，请重新预览任务提议。');
       }
       if (
-        Number(this.db.prepare('SELECT count(*) AS count FROM daily_tasks').get()?.count) >=
+        Number(this.db.prepare('SELECT count(*) AS count FROM daily_tasks').get()?.count) +
+          drafts.length >
         planningLimits.tasks
       )
         throw new AppError('taskLimit', '任务达到当前上限（5000），请整理并删除不再需要的任务。');
       const now = new Date().toISOString();
-      const task = decodeTask(
-        this.db
-          .prepare(
-            `INSERT INTO daily_tasks
+      const tasks = drafts.map((draft) =>
+        decodeTask(
+          this.db
+            .prepare(
+              `INSERT INTO daily_tasks
             (id, title, details, project_id, day, minutes, status, completed_at,
              revision, created_at, updated_at, origin, origin_turn_id, origin_turn_revision)
             VALUES (?, ?, ?, ?, ?, ?, 'todo', NULL, 1, ?, ?, 'learning-route', ?, ?) RETURNING *`,
-          )
-          .get(
-            randomUUID(),
-            draft.title,
-            draft.details,
-            draft.projectId,
-            draft.day,
-            draft.minutes,
-            now,
-            now,
-            turnId,
-            turnRevision,
-          )!,
+            )
+            .get(
+              randomUUID(),
+              draft.title,
+              draft.details,
+              draft.projectId,
+              draft.day,
+              draft.minutes,
+              now,
+              now,
+              turnId,
+              turnRevision,
+            )!,
+        ),
       );
       this.db.exec('COMMIT;');
-      return task;
+      return tasks;
     } catch (error) {
       try {
         this.db.exec('ROLLBACK;');

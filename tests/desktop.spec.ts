@@ -171,6 +171,8 @@ test('desktop navigation, persistent preferences, encrypted keys and model check
       'prepareTaskProposal',
       'confirmTaskProposal',
       'discardTaskProposal',
+      'prepareTaskBatch',
+      'confirmTaskBatch',
       'focusOverview',
       'focusHistory',
       'getFocusSession',

@@ -1,5 +1,6 @@
 import { afterEach, expect, it, vi } from 'vitest';
 import { randomUUID } from 'node:crypto';
+import { readFileSync } from 'node:fs';
 import { Storage } from './storage';
 import { ChatService } from './chat';
 import { NoteFeedbackService } from './note-feedback';
@@ -23,7 +24,7 @@ afterEach(() => {
 const validOutput = JSON.stringify({
   items: [1, 2, 3].map((i) => ({ question: `问题${i}`, answer: '全部提交或回滚', citations: [1] })),
 });
-function setup(answer = '全部提交或回滚。[1]', evidence = fixtureEvidence) {
+function setup(answer?: string, evidence = fixtureEvidence) {
   const store = new Storage(':memory:');
   store.saveSettings({
     ...defaultSettings,
@@ -43,8 +44,26 @@ function setup(answer = '全部提交或回滚。[1]', evidence = fixtureEvidenc
   });
   const search = { prepare, consume } as unknown as SearchService;
   const load = vi.fn(() => 'fake-key');
-  const transport = vi.fn<typeof streamChat>(async (_input, onText) => {
-    onText(answer);
+  const transport = vi.fn<typeof streamChat>(async (input, onText) => {
+    const learning = input.messages.find((message) => message.content.startsWith('本次学习请求'));
+    const request = learning
+      ? JSON.parse(learning.content.slice(learning.content.indexOf('\n') + 1))
+      : null;
+    onText(
+      answer ??
+        (request
+          ? JSON.stringify({
+              limitations: '',
+              steps: request.timeAllocation.map((step: { step: string; minutes: number }) => ({
+                title: step.step,
+                minutes: step.minutes,
+                action: '对照全部提交或回滚的规则，再写自己的例子。',
+                artifact: '用户的笔记与疑问',
+                citations: [1],
+              })),
+            })
+          : '全部提交或回滚。[1]'),
+    );
     return { truncated: false };
   });
   const chat = new ChatService(store, { load }, () => {}, transport, search);
@@ -125,7 +144,7 @@ it('keeps a mistaken note citation unverified and labels notes and proposed exer
   expect(systems).toContain('自拟练习');
 });
 it.each([10, 30, 179, 180])(
-  'sends a four-step allocation totaling the requested %i minutes',
+  'sends a feasible allocation totaling the requested %i minutes and validates new structured output',
   async (minutes) => {
     const { store, chat, search, transport } = setup();
     const service = new LearningAgentService(store, search, chat);
@@ -139,7 +158,7 @@ it.each([10, 30, 179, 180])(
       m.content.startsWith('本次学习请求'),
     )!;
     const request = JSON.parse(message.content.slice(message.content.indexOf('\n') + 1));
-    expect(request.timeAllocation).toHaveLength(4);
+    expect(request.timeAllocation).toHaveLength(minutes < 20 ? 2 : 4);
     expect(
       request.timeAllocation.reduce(
         (sum: number, step: { minutes: number }) => sum + step.minutes,
@@ -148,12 +167,27 @@ it.each([10, 30, 179, 180])(
     ).toBe(minutes);
     expect(
       request.timeAllocation.every(
-        (step: { minutes: number }) => Number.isInteger(step.minutes) && step.minutes > 0,
+        (step: { minutes: number }) => Number.isInteger(step.minutes) && step.minutes >= 5,
       ),
     ).toBe(true);
     expect(store.planning.overview('2026-10-08').tasks).toEqual([]);
+    expect(store.chat.getTurn(turn.id).learningRequest?.format).toBe('steps-v1');
   },
 );
+it('recognizes citations in actual pretty JSON route output rather than applying prose token rules', async () => {
+  const raw = readFileSync('tests/fixtures/structured-route-real-2026-10-12.txt', 'utf8').trim();
+  const { store, chat, search } = setup(raw);
+  const service = new LearningAgentService(store, search, chat);
+  const preview = await service.prepare({ ...fixtureRequest, minutes: 30 }, () => {});
+  const turn = service.send({
+    retrievalId: preview.evidence.id,
+    expectedProfile: 'ollama|http://127.0.0.1:11434|fixture',
+  });
+  await expect.poll(() => store.chat.getTurn(turn.id).status).toBe('completed');
+  expect(store.chat.getTurn(turn.id).notice).not.toContain('模型未提供引用编号');
+  expect(store.chat.getTurn(turn.id).notice).toContain('不证明');
+  expect(store.chat.getTurn(turn.id).answer).toBe(raw);
+});
 it('prepares only the saved note, binds revision during retrieval and sending, isolates feedback and cascades deletion', async () => {
   const { store, chat, search, transport } = setup();
   const note = store.notes.save({
@@ -465,7 +499,18 @@ it.each(['rag', 'feedback', 'route', 'practice'] as const)(
               citations: [1],
             })),
           })
-        : '作业前断电并验电。[1]',
+        : kind === 'route'
+          ? JSON.stringify({
+              limitations: '',
+              steps: [10, fixtureRequest.minutes - 10].map((minutes, index) => ({
+                title: `求证${index + 1}`,
+                action: domainText,
+                artifact: '用户核对规范的笔记',
+                minutes,
+                citations: [1],
+              })),
+            })
+          : '作业前断电并验电。[1]',
       evidence,
     );
     let turn;
@@ -532,5 +577,46 @@ it.each(['rag', 'feedback', 'route', 'practice'] as const)(
     expect(store.chat.getTurn(turn.id).evidence).toEqual(evidence);
     expect(store.planning.overview('2026-10-10').tasks).toEqual([]);
     expect(store.memories.list()).toEqual([]);
+  },
+);
+
+it.each([
+  '### 阅读与求证\n25分钟阅读。[1]',
+  JSON.stringify({
+    limitations: '',
+    steps: [5, 5].map((minutes, index) => ({
+      title: `步骤${index + 1}`,
+      action: '阅读原文',
+      artifact: '用户笔记',
+      minutes,
+      citations: [1],
+    })),
+  }),
+  JSON.stringify({
+    limitations: '',
+    steps: [10, 15].map((minutes, index) => ({
+      title: `步骤${index + 1}`,
+      action: '阅读原文',
+      artifact: '用户笔记',
+      minutes,
+      citations: [99],
+    })),
+  }),
+])(
+  'preserves invalid new route output and records failure after one generation, without creating tasks: %s',
+  async (raw) => {
+    const { store, chat, search, transport } = setup(raw);
+    const service = new LearningAgentService(store, search, chat);
+    const preview = await service.prepare(fixtureRequest, () => {});
+    const initial = service.send({
+      retrievalId: preview.evidence.id,
+      expectedProfile: 'ollama|http://127.0.0.1:11434|fixture',
+    });
+    await expect.poll(() => store.chat.getTurn(initial.id).status).toBe('error');
+    const saved = store.chat.getTurn(initial.id);
+    expect(saved.answer).toBe(raw);
+    expect(saved.notice).toContain('不自动改写或重试');
+    expect(transport).toHaveBeenCalledTimes(1);
+    expect(store.planning.overview('2026-10-13').tasks).toEqual([]);
   },
 );
