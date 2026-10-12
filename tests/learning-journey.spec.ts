@@ -153,13 +153,18 @@ test('connects import, reading, cited question, note, feedback, route, confirmed
     await nav(page, '为这项任务安排专注');
     await page.getByLabel('本轮专注分钟', { exact: true }).fill('5');
     await nav(page, '确认并开始本轮');
+    // Allow bounded time for durable SQLite checkpoints on Windows CI.
     await expect
       .poll(
         async () =>
           (await page.evaluate(() => window.studyCompanion!.focusOverview())).current?.elapsedMs ??
           0,
+        { timeout: 15_000 },
       )
       .toBeGreaterThanOrEqual(1000);
+    expect(
+      (await page.evaluate(() => window.studyCompanion!.focusOverview())).current?.status,
+    ).toBe('running');
     await nav(page, '提前结束本轮');
     await page
       .getByRole('textbox', { name: '一句收获、一个疑问或下一步', exact: true })

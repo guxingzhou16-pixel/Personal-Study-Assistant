@@ -143,7 +143,7 @@ test('migrates a v4 desktop database and restores saved notes, old evidence and 
   await expect(page.getByRole('textbox', { name: /待解问题/ })).toHaveValue('保存后新增的问题');
   const db = new DatabaseSync(path, { readOnly: true });
   try {
-    expect(db.prepare('PRAGMA user_version').get()?.user_version).toBe(12);
+    expect(db.prepare('PRAGMA user_version').get()?.user_version).toBe(13);
     expect(db.prepare('PRAGMA integrity_check').get()?.integrity_check).toBe('ok');
   } finally {
     db.close();
