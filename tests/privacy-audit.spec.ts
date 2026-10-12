@@ -26,7 +26,24 @@ test('enforces remote memory scope, current preview consent and one request agai
     response.setHeader('content-type', 'text/event-stream');
     response.end(
       'data: ' +
-        JSON.stringify({ choices: [{ delta: { content: '阅读、练习、作品、复盘。[1]' } }] }) +
+        JSON.stringify({
+          choices: [
+            {
+              delta: {
+                content: JSON.stringify({
+                  limitations: '资料只有原子性规则，底层机制仍待求证。',
+                  steps: ['核对原文', '写下理解与疑问'].map((title) => ({
+                    title,
+                    action: '对照全部提交或回滚的资料规则，写自己的例子。',
+                    minutes: 15,
+                    citations: [1],
+                    artifact: '用户自己的理解与待求证问题',
+                  })),
+                }),
+              },
+            },
+          ],
+        }) +
         '\n\ndata: [DONE]\n\n',
     );
   });
