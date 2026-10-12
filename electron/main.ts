@@ -331,6 +331,10 @@ function registerHandlers(
   handle('study:copy-citation', (id, anchor, quote) =>
     clipboard.writeText(files.citation(id, anchor, quote)),
   );
+  handle('study:read-selection', async (id, anchor, quote) => {
+    await files.verify(id);
+    return files.selection(id, anchor, quote);
+  });
   handle('study:list-conversations', () => database.chat.list());
   handle('study:create-conversation', () => database.chat.create());
   handle('study:get-conversation', (id) => database.chat.get(id));
@@ -413,6 +417,10 @@ function registerHandlers(
   handle('study:prepare-question', (question, id) =>
     retrieval.prepare(question, id, retrievalProgress),
   );
+  handle('study:prepare-reading-question', async (question, id, anchor, quote) => {
+    await files.verify(id);
+    return retrieval.prepare(question, id, retrievalProgress, files.selection(id, anchor, quote));
+  });
   handle('study:prepare-practice', (request) => practice.prepare(request, retrievalProgress));
   handle('study:send-practice', (request) => {
     assertHistoryIdle();

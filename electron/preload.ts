@@ -21,6 +21,7 @@ import type {
   PracticePreview,
   RetrievalProgress,
   CitationTarget,
+  ReadingSelection,
   EmbeddingStatus,
   NoteSummary,
   StudyNote,
@@ -72,6 +73,10 @@ const api: DesktopApi = {
   openSource: (id) => call<OpenDocument>('study:open-source', id),
   saveReadingPosition: (id, position) => call<void>('study:save-reading-position', id, position),
   copyCitation: (id, anchor, quote) => call<void>('study:copy-citation', id, anchor, quote),
+  readSelection: (id, anchor, quote) =>
+    call<ReadingSelection>('study:read-selection', id, anchor, quote),
+  prepareReadingQuestion: (question, id, anchor, quote) =>
+    call<EvidencePreview>('study:prepare-reading-question', question, id, anchor, quote),
   listConversations: () => call<ConversationSummary[]>('study:list-conversations'),
   createConversation: () => call<Conversation>('study:create-conversation'),
   getConversation: (id) => call<Conversation>('study:get-conversation', id),

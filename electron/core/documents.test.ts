@@ -58,6 +58,25 @@ function context() {
   const sources = join(directory, 'sources');
   return { directory, storage, sources, documents: new Documents(storage, sources, workerPath) };
 }
+it('returns exact selected source offsets, preserves literal punctuation and rejects invented or cross-section text', () => {
+  const { storage, documents } = context();
+  const text = '# 原文\n\n第一行 (x.y)[1]。\n第二行继续。\n\n## 下一节\n另一节。';
+  const id = createHash('sha256').update(text).digest('hex');
+  storage.addSource({
+    id,
+    name: '选文.md',
+    kind: 'markdown',
+    bytes: Buffer.byteLength(text),
+    ...parseMarkdown(Buffer.from(text)),
+  });
+  const selection = documents.selection(id, 'md-line-1', '(x.y)[1]。 第二行继续。');
+  const segment = storage.getSegment(id, selection.anchor)!;
+  expect(segment.text.slice(selection.start, selection.end)).toBe(selection.text);
+  expect(selection.text).toContain('\n');
+  expect(selection.sourceId).toBe(id);
+  expect(() => documents.selection(id, 'md-line-1', '(xay)[1]。')).toThrow('同一页或同一章节');
+  expect(() => documents.selection(id, 'md-line-1', '继续。 另一节。')).toThrow('同一页或同一章节');
+});
 const utf8 = (value: string) => new TextEncoder().encode(value);
 
 describe('document parsing and stable evidence locations', () => {

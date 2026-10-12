@@ -179,6 +179,7 @@ export interface CitationTarget {
   anchor: string;
   page: number;
 }
+export type ReadingSelection = Omit<Evidence, 'number'>;
 export interface ConversationSummary {
   id: string;
   title: string;
@@ -477,6 +478,7 @@ export interface DesktopApi {
   openSource(id: string): Promise<OpenDocument>;
   saveReadingPosition(id: string, position: ReadingPosition): Promise<void>;
   copyCitation(id: string, anchor: string, quote: string): Promise<void>;
+  readSelection(id: string, anchor: string, quote: string): Promise<ReadingSelection>;
   listConversations(): Promise<ConversationSummary[]>;
   createConversation(): Promise<Conversation>;
   getConversation(id: string): Promise<Conversation>;
@@ -489,6 +491,12 @@ export interface DesktopApi {
   activeChat(): Promise<ChatTurn | null>;
   onChatUpdate(listener: (turn: ChatTurn) => void): () => void;
   prepareQuestion(question: string, sourceId: string | null): Promise<EvidencePreview>;
+  prepareReadingQuestion(
+    question: string,
+    id: string,
+    anchor: string,
+    quote: string,
+  ): Promise<EvidencePreview>;
   preparePractice(request: PracticeRequest): Promise<PracticePreview>;
   sendPractice(request: PracticeSendRequest): Promise<ChatTurn>;
   cancelRetrieval(): Promise<void>;

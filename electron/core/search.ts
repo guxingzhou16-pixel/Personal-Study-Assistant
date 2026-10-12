@@ -7,6 +7,7 @@ import type {
   Evidence,
   EvidencePreview,
   RetrievalProgress,
+  ReadingSelection,
 } from '../../src/lib/types';
 import type { Storage } from './storage';
 import { AppError } from './errors';
@@ -61,12 +62,34 @@ export class SearchService {
     input: unknown,
     sourceInput: unknown,
     progress: (value: RetrievalProgress) => void,
+    selection?: ReadingSelection,
   ): Promise<EvidencePreview> {
     const question = string(input, '问题', 4000);
     if (!question) return Promise.reject(new AppError('question', '请先输入具体问题。'));
     const scope = sourceInput === null || sourceInput === undefined ? null : sourceId(sourceInput);
     return this.run(question, scope, false, progress).then((value) => {
-      const preview = { ...value, id: randomUUID() };
+      const hits = selection
+        ? [
+            selection,
+            ...value.hits.filter(
+              (hit) =>
+                !(
+                  hit.sourceId === selection.sourceId &&
+                  hit.anchor === selection.anchor &&
+                  hit.start < selection.end &&
+                  hit.end > selection.start
+                ),
+            ),
+          ]
+            .slice(0, 4)
+            .map((hit, index) => ({ ...hit, number: index + 1 }))
+        : value.hits;
+      const preview = {
+        ...value,
+        hits,
+        id: randomUUID(),
+        ...(selection ? { notice: `已加入你选中的确切原文，位置已核对。 ${value.notice}` } : {}),
+      };
       if (this.previews.size >= 10) this.previews.delete(this.previews.keys().next().value!);
       this.previews.set(preview.id, {
         value: structuredClone(preview),

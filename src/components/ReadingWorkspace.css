@@ -1,0 +1,104 @@
+.reader-main.reading-workspace {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(310px, 42%);
+  grid-template-rows: auto minmax(0, 1fr);
+}
+.reading-workspace > .reader {
+  grid-column: 1;
+  grid-row: 1 / 3;
+}
+.reader-side-controls {
+  grid-column: 2;
+  grid-row: 1;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--line);
+  border-left: 1px solid var(--line);
+  background: var(--surface);
+}
+.reader-side-controls [aria-pressed='true'] {
+  background: var(--theme-accent-soft, #edf3e7);
+  color: var(--accent);
+}
+.reading-workspace > .notes-container,
+.reading-workspace > .chat-container {
+  grid-column: 2;
+  grid-row: 2;
+  min-width: 0;
+  min-height: 0;
+  overflow: auto;
+  border-left: 1px solid var(--line);
+}
+.reading-workspace .chat-page,
+.reading-workspace .notes-page {
+  padding: 16px;
+  height: auto;
+  min-height: 100%;
+}
+.reading-workspace .chat-workspace,
+.reading-workspace .notes-workspace {
+  grid-template-columns: minmax(0, 1fr);
+  margin-top: 12px;
+}
+.reading-workspace .chat-history,
+.reading-workspace .notes-sidebar,
+.reading-workspace .eyebrow {
+  display: none;
+}
+.reading-workspace h1 {
+  font-size: 18px;
+}
+.reading-workspace .page-heading,
+.reading-workspace .chat-heading,
+.reading-workspace .reader-header {
+  flex-wrap: wrap;
+  gap: 10px;
+}
+.reading-workspace .reader-header {
+  padding: 12px;
+}
+.reading-workspace .reader-outline {
+  width: 130px;
+  padding-inline: 6px;
+}
+.reading-workspace .chat-transcript {
+  flex: none;
+  height: 270px;
+  padding: 12px;
+}
+.reading-workspace .note-editor {
+  padding: 14px;
+}
+.reading-workspace .note-editor-actions,
+.reading-workspace .reader-toolbar {
+  flex-wrap: wrap;
+}
+.reading-workspace .reader-selection .text-button {
+  margin-left: 0;
+}
+.reading-context {
+  padding: 12px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  font-size: 12px;
+}
+.reading-context blockquote {
+  margin: 8px 0;
+  padding-left: 10px;
+  border-left: 2px solid var(--accent);
+  max-height: 120px;
+  overflow: auto;
+  white-space: pre-wrap;
+}
+@media (max-width: 1000px) {
+  .reading-workspace .reader-outline {
+    width: 100px;
+  }
+  .reading-workspace .reader-save {
+    font-size: 10px;
+  }
+}

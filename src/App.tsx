@@ -22,6 +22,7 @@ import {
 import { SettingsPage } from './components/SettingsPage';
 import { LibraryPage } from './components/LibraryPage';
 import { ReadingPage } from './components/ReadingPage';
+import './components/ReadingWorkspace.css';
 import { RecentReadings } from './components/RecentReadings';
 import { TodayTasks } from './components/TodayTasks';
 import { HomeStudyFlow } from './components/HomeStudyFlow';
@@ -41,6 +42,8 @@ import {
   type Settings,
   type CitationTarget,
   type DailyTask,
+  type ReadingSelection,
+  type ReadingPosition,
 } from './lib/types';
 
 type Page =
@@ -67,6 +70,21 @@ export default function App() {
   const mainRef = useRef<HTMLElement>(null);
   const [page, setPage] = useState<Page>('home');
   const [sourceId, setSourceId] = useState<string | null>(null);
+  const [readerPanel, setReaderPanel] = useState<'chat' | 'notes' | null>(null);
+  const [selectionQuestion, setSelectionQuestion] = useState<{
+    selection: ReadingSelection;
+    sequence: number;
+  } | null>(null);
+  const [selectionNote, setSelectionNote] = useState<{
+    selection: ReadingSelection;
+    sequence: number;
+  } | null>(null);
+  const [readerRestore, setReaderRestore] = useState<ReadingPosition | undefined>();
+  const [readerBookmark, setReaderBookmark] = useState<{
+    id: string;
+    position: ReadingPosition;
+  } | null>(null);
+  const readerPosition = useRef<ReadingPosition | null>(null);
   const [citationTarget, setCitationTarget] = useState<CitationTarget | null>(null);
   const [readerReturn, setReaderReturn] = useState<'library' | 'chat' | 'notes' | 'agent'>(
     'library',
@@ -133,11 +151,17 @@ export default function App() {
     setBoot((previous) => (previous ? { ...previous, settings, hasApiKey } : previous));
   }
   function navigate(next: Page) {
+    setReaderPanel(null);
+    setReaderRestore(undefined);
+    setReaderBookmark(null);
     setSourceId(null);
     setCitationTarget(null);
     setPage(next);
   }
   function openSource(id: string) {
+    setReaderPanel(null);
+    setReaderRestore(undefined);
+    setReaderBookmark(null);
     setCitationTarget(null);
     setReaderReturn('library');
     setSourceId(id);
@@ -149,19 +173,34 @@ export default function App() {
     returnTo: 'chat' | 'notes' | 'agent' = 'chat',
   ) {
     const target = await desktop.resolveCitation(turnId, number);
+    if (sourceId && readerPanel) {
+      if (!readerBookmark && readerPosition.current)
+        setReaderBookmark({ id: sourceId, position: readerPosition.current });
+      setReaderRestore(undefined);
+      setCitationTarget(target);
+      setSourceId(target.sourceId);
+      return;
+    }
     setCitationTarget(target);
     setSourceId(target.sourceId);
     setReaderReturn(returnTo);
     setPage('library');
   }
-  function askSource() {
+  function askSource(selection?: ReadingSelection) {
     if (!sourceId) return;
+    setReaderPanel('chat');
+    if (selection) {
+      setSelectionQuestion((previous) => ({ selection, sequence: (previous?.sequence ?? 0) + 1 }));
+      return;
+    }
     setQuestionSource((previous) => ({ id: sourceId, sequence: (previous?.sequence ?? 0) + 1 }));
-    navigate('chat');
   }
-  function takeNote() {
+  function takeNote(selection?: ReadingSelection) {
     if (!sourceId) return;
-    startNote(sourceId);
+    setReaderPanel('notes');
+    if (selection)
+      setSelectionNote((previous) => ({ selection, sequence: (previous?.sequence ?? 0) + 1 }));
+    else setNoteSource((previous) => ({ id: sourceId, sequence: (previous?.sequence ?? 0) + 1 }));
   }
   function startNote(id: string | null) {
     setNoteSource((previous) => ({ id, sequence: (previous?.sequence ?? 0) + 1 }));
@@ -309,7 +348,7 @@ export default function App() {
           id="main-content"
           ref={mainRef}
           tabIndex={-1}
-          className={sourceId ? 'reader-main' : undefined}
+          className={sourceId ? `reader-main${readerPanel ? ' reading-workspace' : ''}` : undefined}
         >
           {!boot && !failure && (
             <div className="center-state" role="status">
@@ -414,11 +453,49 @@ export default function App() {
               key={`${sourceId}:${citationTarget?.anchor ?? ''}`}
               id={sourceId}
               target={citationTarget ?? undefined}
-              onBack={() => navigate(readerReturn)}
-              backLabel={readerBackLabels[readerReturn]}
+              onBack={() => navigate(readerPanel ?? readerReturn)}
+              backLabel={readerBackLabels[readerPanel ?? readerReturn]}
               onAsk={askSource}
               onTakeNote={takeNote}
+              restorePosition={readerRestore}
+              onPosition={(position) => {
+                readerPosition.current = position;
+              }}
             />
+          )}
+          {sourceId && readerPanel && (
+            <div className="reader-side-controls" aria-label="阅读侧栏">
+              <button
+                className="toolbar-button"
+                aria-pressed={readerPanel === 'chat'}
+                onClick={() => setReaderPanel('chat')}
+              >
+                问答
+              </button>
+              <button
+                className="toolbar-button"
+                aria-pressed={readerPanel === 'notes'}
+                onClick={() => setReaderPanel('notes')}
+              >
+                笔记草稿
+              </button>
+              {readerBookmark && (
+                <button
+                  className="text-button"
+                  onClick={() => {
+                    setSourceId(readerBookmark.id);
+                    setCitationTarget(null);
+                    setReaderRestore(readerBookmark.position);
+                    setReaderBookmark(null);
+                  }}
+                >
+                  返回选中原文
+                </button>
+              )}
+              <button className="text-button" onClick={() => setReaderPanel(null)}>
+                收起侧栏
+              </button>
+            </div>
           )}
           {boot && !failure && page === 'settings' && (
             <SettingsPage boot={boot} onSaved={onSaved} />
@@ -435,10 +512,14 @@ export default function App() {
           )}
           <BackupBusyDialog state={backup.state} />
           {boot && !failure && (
-            <div className="notes-container" hidden={page !== 'notes'}>
+            <div
+              className="notes-container"
+              hidden={page !== 'notes' && !(sourceId && readerPanel === 'notes')}
+            >
               <NotesPage
-                visible={page === 'notes'}
+                visible={page === 'notes' || Boolean(sourceId && readerPanel === 'notes')}
                 presetSource={noteSource}
+                presetSelection={selectionNote}
                 onOpenSource={openNoteSource}
                 settings={settings}
                 onSettings={() => navigate('settings')}
@@ -486,12 +567,16 @@ export default function App() {
             </div>
           )}
           {boot && !failure && (
-            <div className="chat-container" hidden={page !== 'chat'}>
+            <div
+              className="chat-container"
+              hidden={page !== 'chat' && !(sourceId && readerPanel === 'chat')}
+            >
               <ChatPage
                 settings={settings}
                 onSettings={() => navigate('settings')}
-                visible={page === 'chat'}
+                visible={page === 'chat' || Boolean(sourceId && readerPanel === 'chat')}
                 presetSource={questionSource}
+                presetSelection={selectionQuestion}
                 onOpenCitation={openCitation}
               />
             </div>

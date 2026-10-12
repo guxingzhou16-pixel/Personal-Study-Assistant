@@ -23,6 +23,9 @@ export const desktop: DesktopApi = {
   openSource: (id) => api().openSource(id),
   saveReadingPosition: (id, position) => api().saveReadingPosition(id, position),
   copyCitation: (id, anchor, quote) => api().copyCitation(id, anchor, quote),
+  readSelection: (id, anchor, quote) => api().readSelection(id, anchor, quote),
+  prepareReadingQuestion: (question, id, anchor, quote) =>
+    api().prepareReadingQuestion(question, id, anchor, quote),
   listConversations: () => api().listConversations(),
   createConversation: () => api().createConversation(),
   getConversation: (id) => api().getConversation(id),

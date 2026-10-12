@@ -11,6 +11,7 @@ import type {
   RetrievalProgress,
   PracticeKind,
   PracticePreview,
+  ReadingSelection,
 } from '../lib/types';
 import { EvidenceCards } from './EvidenceCards';
 import { ModelAnswer } from './ModelAnswer';
@@ -47,12 +48,14 @@ export function ChatPage({
   visible,
   presetSource,
   onOpenCitation,
+  presetSelection,
 }: {
   settings: Settings;
   onSettings: () => void;
   visible: boolean;
   presetSource: { id: string; sequence: number } | null;
   onOpenCitation: (turnId: string, number: number) => Promise<void>;
+  presetSelection?: { selection: ReadingSelection; sequence: number } | null;
 }) {
   const [conversations, setConversations] = useState<ConversationSummary[]>([]);
   const [conversation, setConversation] = useState<Conversation | null>(null);
@@ -60,6 +63,10 @@ export function ChatPage({
   currentConversation.current = conversation;
   const [active, setActive] = useState<ChatTurn | null>(null);
   const [question, setQuestion] = useState('');
+  const [readingContext, setReadingContext] = useState<ReadingSelection | null>(null);
+  const lastSelection = useRef(0);
+  const questionRef = useRef(question);
+  questionRef.current = question;
   const [error, setError] = useState('');
   const [busy, setBusy] = useState(false);
   const [historyBusy, setHistoryBusy] = useState(false);
@@ -234,9 +241,11 @@ export function ChatPage({
       const created = await desktop.createConversation();
       setConversation(created);
       setQuestion('');
+      setReadingContext(null);
       setPreview(null);
       followOutput.current = true;
       await refresh();
+      return created;
     } catch (failure) {
       setError(errorMessage(failure));
     } finally {
@@ -245,11 +254,43 @@ export function ChatPage({
   }, [refresh, invalidatePreview]);
   useEffect(() => {
     if (!presetSource) return;
+    if (
+      questionRef.current.trim() &&
+      !window.confirm('当前有尚未发送的问题。放弃这个问题并新建资料问答？')
+    )
+      return;
     setMode('sources');
     setScope(presetSource.id);
     setPreview(null);
     void newConversation();
   }, [presetSource, newConversation]);
+  useEffect(() => {
+    if (
+      !presetSelection ||
+      !loaded ||
+      busy ||
+      searching ||
+      active ||
+      presetSelection.sequence === lastSelection.current
+    )
+      return;
+    lastSelection.current = presetSelection.sequence;
+    if (
+      questionRef.current.trim() &&
+      !window.confirm('保留当前会话，将未发送的问题替换为选中原文的问题？')
+    )
+      return;
+    const selection = presetSelection.selection;
+    async function apply() {
+      if (!currentConversation.current && !(await newConversation())) return;
+      invalidatePreview();
+      setMode('sources');
+      setScope(selection.sourceId);
+      setReadingContext(selection);
+      setQuestion('这段原文应该怎样理解？请区分原文支持的结论与待求证内容。');
+    }
+    void apply();
+  }, [presetSelection, loaded, busy, searching, active, newConversation, invalidatePreview]);
   async function retrieve(rebuild = false) {
     if (searchInFlight.current !== null || cancelPending.current) return;
     invalidatePreview();
@@ -278,7 +319,15 @@ export function ChatPage({
             setPreview(result.evidence);
           }
         } else {
-          const result = await desktop.prepareQuestion(question, scope || null);
+          const result =
+            readingContext && mode === 'sources' && readingContext.sourceId === scope
+              ? await desktop.prepareReadingQuestion(
+                  question,
+                  readingContext.sourceId,
+                  readingContext.anchor,
+                  readingContext.text,
+                )
+              : await desktop.prepareQuestion(question, scope || null);
           if (version === searchVersion.current) setPreview(result);
         }
       }
@@ -412,6 +461,29 @@ export function ChatPage({
             ? '资料问答 · 先查看检索原文，再让拾知依据证据回答。每次问题独立检索，请写清具体概念。'
             : '普通聊天 · 不检索资料库。回答请结合原文核对。'}
       </p>
+      {readingContext && (
+        <div className="reading-context" aria-label="已选中原文">
+          <p>
+            《{readingContext.sourceName}》 ·{' '}
+            {readingContext.page
+              ? `第 ${readingContext.page} 页`
+              : `${readingContext.title} · 第 ${readingContext.line} 行`}
+          </p>
+          <blockquote>{readingContext.text}</blockquote>
+          <button
+            className="text-button"
+            onClick={() => {
+              setReadingContext(null);
+              invalidatePreview();
+            }}
+          >
+            移除选文
+          </button>
+          <p className="field-hint">
+            选文会加入本次证据预览；发送前可核对。问答和证据保存在本机，远程发送仍需确认。
+          </p>
+        </div>
+      )}
       <div className="chat-workspace">
         <aside className="chat-history" aria-label="会话记录">
           <button

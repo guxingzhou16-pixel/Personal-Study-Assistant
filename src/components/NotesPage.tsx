@@ -11,11 +11,21 @@ import {
 } from 'lucide-react';
 import { desktop, errorMessage, isDesktop } from '../lib/desktop';
 import { emptyNoteDraft, noteDraft, noteLimits, noteSections, sameNoteDraft } from '../lib/notes';
-import type { NoteDraft, NoteSummary, Source, StudyNote, Settings } from '../lib/types';
+import type {
+  NoteDraft,
+  NoteSummary,
+  Source,
+  StudyNote,
+  Settings,
+  ReadingSelection,
+} from '../lib/types';
 import { NoteFeedbackPanel } from './NoteFeedbackPanel';
 
 type NoteAction =
-  { type: 'new'; sourceId: string | null } | { type: 'open'; id: string } | { type: 'delete' };
+  | { type: 'new'; sourceId: string | null }
+  | { type: 'open'; id: string }
+  | { type: 'delete' }
+  | { type: 'selection'; selection: ReadingSelection };
 
 export function NotesPage({
   visible,
@@ -24,6 +34,7 @@ export function NotesPage({
   settings,
   onSettings,
   onOpenCitation,
+  presetSelection,
 }: {
   visible: boolean;
   presetSource: { id: string | null; sequence: number } | null;
@@ -31,6 +42,7 @@ export function NotesPage({
   settings: Settings;
   onSettings: () => void;
   onOpenCitation: (turnId: string, number: number) => Promise<void>;
+  presetSelection?: { selection: ReadingSelection; sequence: number } | null;
 }) {
   const [notes, setNotes] = useState<NoteSummary[]>([]);
   const [sources, setSources] = useState<Source[]>([]);
@@ -47,6 +59,7 @@ export function NotesPage({
   const confirmation = useRef<HTMLDialogElement>(null);
   const titleInput = useRef<HTMLInputElement>(null);
   const lastPreset = useRef(0);
+  const lastSelection = useRef(0);
   const dirty = editing && !sameNoteDraft(draft, current ?? emptyNoteDraft());
 
   useEffect(() => {
@@ -98,6 +111,15 @@ export function NotesPage({
     lastPreset.current = presetSource.sequence;
     requestAction({ type: 'new', sourceId: presetSource.id });
   }, [loading, busy, presetSource]);
+  useEffect(() => {
+    if (!presetSelection || loading || busy || presetSelection.sequence === lastSelection.current)
+      return;
+    lastSelection.current = presetSelection.sequence;
+    const action: NoteAction = { type: 'selection', selection: presetSelection.selection };
+    if (editing && (!draft.sourceId || draft.sourceId === presetSelection.selection.sourceId))
+      void performAction(action);
+    else requestAction(action);
+  }, [presetSelection, loading, busy]);
 
   useEffect(() => {
     const dialog = confirmation.current;
@@ -126,6 +148,25 @@ export function NotesPage({
         setCurrent(null);
         setDraft(emptyNoteDraft(action.sourceId));
         setEditing(true);
+      } else if (action.type === 'selection') {
+        const selected = action.selection;
+        const base =
+          editing && (!draft.sourceId || draft.sourceId === selected.sourceId)
+            ? draft
+            : {
+                ...emptyNoteDraft(selected.sourceId),
+                title: `${selected.sourceName} · 我的理解`.slice(0, noteLimits.title),
+              };
+        const location = selected.page
+          ? `第 ${selected.page} 页`
+          : `${selected.title} · 第 ${selected.line} 行`;
+        const evidence = `${base.evidence}${base.evidence ? '\n\n' : ''}“${selected.text}”\n——《${selected.sourceName}》${location}\nstudy-companion://source/${selected.sourceId}#${selected.anchor}`;
+        if (evidence.length > noteLimits.section)
+          throw new Error('原文依据已超过笔记长度限制，请先整理草稿再添加。');
+        if (base !== draft) setCurrent(null);
+        setDraft({ ...base, sourceId: selected.sourceId, evidence });
+        setEditing(true);
+        setNotice('确切原文已加入草稿，尚未保存；请用自己的话写下理解，再明确保存。');
       } else if (action.type === 'open') {
         const note = await desktop.getNote(action.id);
         setCurrent(note);

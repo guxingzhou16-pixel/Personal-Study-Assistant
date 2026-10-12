@@ -112,6 +112,8 @@ test('desktop navigation, persistent preferences, encrypted keys and model check
       'openSource',
       'saveReadingPosition',
       'copyCitation',
+      'readSelection',
+      'prepareReadingQuestion',
       'listConversations',
       'createConversation',
       'getConversation',

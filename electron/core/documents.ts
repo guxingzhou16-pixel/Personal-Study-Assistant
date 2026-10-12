@@ -240,7 +240,11 @@ export class Documents {
     if (bytes !== source.bytes || hash.digest('hex') !== id)
       throw new AppError('sourceChanged', '资料副本已被修改，请重新导入后再检索和引用。');
   }
-  citation(input: unknown, anchorInput: unknown, quoteInput: unknown): string {
+  selection(
+    input: unknown,
+    anchorInput: unknown,
+    quoteInput: unknown,
+  ): import('../../src/lib/types').ReadingSelection {
     const id = sourceId(input);
     const source = this.storage.getSource(id);
     if (!source) throw new AppError('sourceMissing', '这份资料不存在。');
@@ -254,10 +258,31 @@ export class Documents {
     if (!segment) throw new AppError('citation', '无法找到这个资料位置。');
     const normalize = (value: string) => value.replace(/\s+/g, ' ').trim();
     const quote = normalize(quoteInput);
-    if (!quote || !normalize(segment.text).includes(quote))
-      throw new AppError('citation', '请选择同一页或同一章节内的原文，再复制引用。');
+    const pattern = quote
+      .split(' ')
+      .map((part) => part.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'))
+      .join('\\s+');
+    const match = quote ? new RegExp(pattern, 'u').exec(segment.text) : null;
+    if (!match) throw new AppError('citation', '请选择同一页或同一章节内的原文，再复制引用。');
+    return {
+      sourceId: id,
+      sourceName: source.name,
+      kind: source.kind,
+      anchor: segment.anchor,
+      title: segment.title,
+      ...(segment.page ? { page: segment.page } : {}),
+      ...(segment.line ? { line: segment.line } : {}),
+      text: match[0],
+      start: match.index,
+      end: match.index + match[0].length,
+    };
+  }
+  citation(input: unknown, anchorInput: unknown, quoteInput: unknown): string {
+    const selection = this.selection(input, anchorInput, quoteInput);
     const location =
-      source.kind === 'pdf' ? `第 ${segment.page} 页` : `${segment.title} · 第 ${segment.line} 行`;
-    return `“${quote}”\n——《${source.name}》${location}\nstudy-companion://source/${id}#${segment.anchor}`;
+      selection.kind === 'pdf'
+        ? `第 ${selection.page} 页`
+        : `${selection.title} · 第 ${selection.line} 行`;
+    return `“${selection.text.replace(/\s+/g, ' ').trim()}”\n——《${selection.sourceName}》${location}\nstudy-companion://source/${selection.sourceId}#${selection.anchor}`;
   }
 }

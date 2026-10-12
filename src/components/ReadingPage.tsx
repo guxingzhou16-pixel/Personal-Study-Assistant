@@ -14,7 +14,7 @@ import {
   NotebookPen,
 } from 'lucide-react';
 import { desktop, errorMessage } from '../lib/desktop';
-import type { OpenDocument, ReadingPosition, CitationTarget } from '../lib/types';
+import type { OpenDocument, ReadingPosition, CitationTarget, ReadingSelection } from '../lib/types';
 import { PdfPage } from './PdfPage';
 
 function heading(level: number) {
@@ -49,13 +49,17 @@ export function ReadingPage({
   backLabel = '返回资料库',
   onAsk,
   onTakeNote,
+  restorePosition,
+  onPosition,
 }: {
   id: string;
   onBack: () => void;
   target?: CitationTarget;
   backLabel?: string;
-  onAsk: () => void;
-  onTakeNote: () => void;
+  onAsk: (selection?: ReadingSelection) => void;
+  onTakeNote: (selection?: ReadingSelection) => void;
+  restorePosition?: ReadingPosition;
+  onPosition?: (position: ReadingPosition) => void;
 }) {
   const [document, setDocument] = useState<OpenDocument | null>(null);
   const [position, setPosition] = useState<ReadingPosition>({
@@ -95,6 +99,7 @@ export function ReadingPage({
   );
   function update(value: ReadingPosition) {
     latest.current = value;
+    onPosition?.(value);
     setPosition(value);
     setQuote(null);
     setCopyStatus('');
@@ -108,20 +113,19 @@ export function ReadingPage({
       .openSource(id)
       .then((value) => {
         if (!alive.current) return;
-        if (target)
+        if (target || restorePosition)
           value = {
             ...value,
             source: {
               ...value.source,
               position: {
                 ...value.source.position,
-                page: target.page,
-                anchor: target.anchor,
-                offset: 0,
+                ...(restorePosition ?? { page: target!.page, anchor: target!.anchor, offset: 0 }),
               },
             },
           };
         latest.current = value.source.position;
+        onPosition?.(value.source.position);
         setPosition(value.source.position);
         setDocument(value);
       })
@@ -133,7 +137,7 @@ export function ReadingPage({
       clearTimeout(timer.current);
       if (ready.current) void save(latest.current);
     };
-  }, [id, save, target]);
+  }, [id, save, target, restorePosition]);
   useEffect(() => {
     if (!document || !scroll.current) return;
     const root = scroll.current;
@@ -222,6 +226,15 @@ export function ReadingPage({
       setCopyStatus(errorMessage(reason));
     }
   }
+  async function useQuote(action: (selection: ReadingSelection) => void) {
+    if (!quote) return;
+    try {
+      const selected = await desktop.readSelection(id, quote.anchor, quote.text);
+      await leave(() => action(selected));
+    } catch (reason) {
+      setCopyStatus(errorMessage(reason));
+    }
+  }
   if (!document)
     return (
       <div className="center-state" role={error ? 'alert' : 'status'}>
@@ -258,7 +271,7 @@ export function ReadingPage({
           <Check size={13} />
           {saveState}
         </span>
-        <button className="button secondary reader-ask" onClick={() => void leave(onAsk)}>
+        <button className="button secondary reader-ask" onClick={() => void leave(() => onAsk())}>
           <MessageCircle size={16} />
           问这份资料
         </button>
@@ -268,7 +281,7 @@ export function ReadingPage({
           <List size={16} />
           目录
         </button>
-        <button className="toolbar-button" onClick={() => void leave(onTakeNote)}>
+        <button className="toolbar-button" onClick={() => void leave(() => onTakeNote())}>
           <NotebookPen size={16} />
           记笔记
         </button>
@@ -396,6 +409,14 @@ export function ReadingPage({
         <button className="text-button" disabled={!quote} onClick={() => void copyQuote()}>
           <Copy size={14} />
           复制引用
+        </button>
+        <button className="text-button" disabled={!quote} onClick={() => void useQuote(onAsk)}>
+          <MessageCircle size={14} />
+          提问选中原文
+        </button>
+        <button className="text-button" disabled={!quote} onClick={() => void useQuote(onTakeNote)}>
+          <NotebookPen size={14} />
+          加入笔记草稿
         </button>
         <span role="status">{copyStatus}</span>
       </footer>
