@@ -25,6 +25,7 @@ type NoteAction =
   | { type: 'new'; sourceId: string | null }
   | { type: 'open'; id: string }
   | { type: 'delete' }
+  | { type: 'draft'; draft: NoteDraft }
   | { type: 'selection'; selection: ReadingSelection };
 
 export function NotesPage({
@@ -35,6 +36,7 @@ export function NotesPage({
   onSettings,
   onOpenCitation,
   presetSelection,
+  presetDraft,
 }: {
   visible: boolean;
   presetSource: { id: string | null; sequence: number } | null;
@@ -43,6 +45,7 @@ export function NotesPage({
   onSettings: () => void;
   onOpenCitation: (turnId: string, number: number) => Promise<void>;
   presetSelection?: { selection: ReadingSelection; sequence: number } | null;
+  presetDraft?: { draft: NoteDraft; sequence: number } | null;
 }) {
   const [notes, setNotes] = useState<NoteSummary[]>([]);
   const [sources, setSources] = useState<Source[]>([]);
@@ -60,6 +63,7 @@ export function NotesPage({
   const titleInput = useRef<HTMLInputElement>(null);
   const lastPreset = useRef(0);
   const lastSelection = useRef(0);
+  const lastDraft = useRef(0);
   const dirty = editing && !sameNoteDraft(draft, current ?? emptyNoteDraft());
 
   useEffect(() => {
@@ -120,6 +124,12 @@ export function NotesPage({
       void performAction(action);
     else requestAction(action);
   }, [presetSelection, loading, busy]);
+  useEffect(() => {
+    if (!visible || !presetDraft || loading || busy || presetDraft.sequence === lastDraft.current)
+      return;
+    lastDraft.current = presetDraft.sequence;
+    requestAction({ type: 'draft', draft: presetDraft.draft });
+  }, [visible, presetDraft, loading, busy]);
 
   useEffect(() => {
     const dialog = confirmation.current;
@@ -148,6 +158,11 @@ export function NotesPage({
         setCurrent(null);
         setDraft(emptyNoteDraft(action.sourceId));
         setEditing(true);
+      } else if (action.type === 'draft') {
+        setCurrent(null);
+        setDraft(action.draft);
+        setEditing(true);
+        setNotice('学习成果已带入草稿，尚未保存。请编辑核对，再明确保存。');
       } else if (action.type === 'selection') {
         const selected = action.selection;
         const base =

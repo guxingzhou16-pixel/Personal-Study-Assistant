@@ -4,12 +4,15 @@ import { localDayKey } from '../lib/calendar';
 import { desktop, errorMessage, isDesktop } from '../lib/desktop';
 import { focusLimits, focusReasonLabels, focusStatusLabels, focusTime } from '../lib/focus';
 import { validPlanningDay } from '../lib/planning';
+import { emptyNoteDraft, noteLimits } from '../lib/notes';
 import type {
   FocusAction,
   FocusOverview,
   FocusReviewResult,
   FocusSession,
   PlanningOverview,
+  NoteDraft,
+  TaskDraft,
 } from '../lib/types';
 import { FocusHistoryPanel } from './FocusHistoryPanel';
 import './FocusPage.css';
@@ -18,13 +21,15 @@ interface Props {
   visible: boolean;
   presetTask: { id: string; day: string; sequence: number } | null;
   onOpenTask(id: string, day: string): void;
+  onDraftNote(draft: NoteDraft): void;
+  onDraftTask(draft: TaskDraft): void;
 }
 interface ReviewEditor {
   record: FocusSession;
   draft: string;
 }
 
-export function FocusPage({ visible, presetTask, onOpenTask }: Props) {
+export function FocusPage({ visible, presetTask, onOpenTask, onDraftNote, onDraftTask }: Props) {
   const [overview, setOverview] = useState<FocusOverview | null>(null);
   const [taskDay, setTaskDay] = useState(() => localDayKey(new Date()));
   const [planning, setPlanning] = useState<PlanningOverview | null>(null);
@@ -41,6 +46,11 @@ export function FocusPage({ visible, presetTask, onOpenTask }: Props) {
   const [reviewLookup, setReviewLookup] = useState<FocusSession | null>(null);
   const [pendingReview, setPendingReview] = useState<FocusSession | null>(null);
   const [historyRevision, setHistoryRevision] = useState(0);
+  const [outcomes, setOutcomes] = useState<Record<string, { learned: string; stuck: string }>>({});
+  const [restEnabled, setRestEnabled] = useState(false);
+  const [restReminder, setRestReminder] = useState<string | null>(null);
+  const restEnabledRef = useRef(restEnabled);
+  restEnabledRef.current = restEnabled;
   const dialog = useRef<HTMLDialogElement>(null);
   const reviewTitle = useRef<HTMLHeadingElement>(null);
   const requestedReviewFocus = useRef<string | null>(null);
@@ -77,6 +87,19 @@ export function FocusPage({ visible, presetTask, onOpenTask }: Props) {
       ? lookupReview
       : recentReview;
   const reviewConflict = Boolean(latestReview && latestReview.revision !== review?.record.revision);
+  const outcome = (review && outcomes[review.record.id]) ?? { learned: '', stuck: '' };
+
+  function changeOutcome(field: 'learned' | 'stuck', value: string) {
+    if (!review) return;
+    const id = review.record.id;
+    setOutcomes((previous) => ({
+      ...previous,
+      [id]: { ...(previous[id] ?? { learned: '', stuck: '' }), [field]: value },
+    }));
+  }
+  function outcomeOrigin(record: FocusSession) {
+    return `用户手写专注成果\n专注记录：${record.id}（版本 ${record.revision}）\n来源任务：${record.taskTitle}（${record.taskId}，开始时版本 ${record.taskRevision}）\n实际计时 ${focusTime(record.elapsedMs)}；时长不代表知识掌握。`;
+  }
 
   function accept(result: FocusOverview): boolean {
     if (!mounted.current || result.version < acceptedVersion.current) return false;
@@ -92,6 +115,8 @@ export function FocusPage({ visible, presetTask, onOpenTask }: Props) {
       setNotice(
         ended.reason ? focusReasonLabels[ended.reason] : '本轮已结束，可以查看实际记录和复盘。',
       );
+    if (ended?.status === 'completed' && restEnabledRef.current)
+      setRestReminder('本轮已计满。可以离开屏幕、活动一下，准备好后再继续。');
     setReview((previous) => {
       if (previous && previous.draft !== previous.record.review) return previous;
       const newRecord =
@@ -388,6 +413,25 @@ export function FocusPage({ visible, presetTask, onOpenTask }: Props) {
       <p className="field-hint">
         专注记录、任务完成、首页累计学习计时和签到分别保存。专注结束不会自动完成任务或签到。
       </p>
+      <label className="focus-rest-option">
+        <input
+          type="checkbox"
+          checked={restEnabled}
+          onChange={(event) => {
+            setRestEnabled(event.target.checked);
+            if (!event.target.checked) setRestReminder(null);
+          }}
+        />
+        计满后提醒休息（仅本次运行，应用内提示）
+      </label>
+      {restReminder && (
+        <div className="focus-rest-reminder" role="status">
+          <p>{restReminder}</p>
+          <button className="text-button" onClick={() => setRestReminder(null)}>
+            关闭休息提示
+          </button>
+        </div>
+      )}
       <div className="focus-workspace">
         <div className="focus-main">
           {current ? (
@@ -624,6 +668,64 @@ export function FocusPage({ visible, presetTask, onOpenTask }: Props) {
               <p className="field-hint">
                 查看任务后可单独确认完成；签到只记录今天。复盘手动保存，切页保留草稿，关闭或重载可能丢失未保存内容。
               </p>
+              <div className="focus-outcome" aria-label="本轮学习成果">
+                <h3>留下一点真实成果</h3>
+                <label className="focus-field">
+                  这次学会了什么
+                  <textarea
+                    aria-label="这次学会了什么"
+                    rows={3}
+                    maxLength={1000}
+                    value={outcome.learned}
+                    onChange={(event) => changeOutcome('learned', event.target.value)}
+                  />
+                </label>
+                <label className="focus-field">
+                  还卡在哪里
+                  <textarea
+                    aria-label="还卡在哪里"
+                    rows={3}
+                    maxLength={1000}
+                    value={outcome.stuck}
+                    onChange={(event) => changeOutcome('stuck', event.target.value)}
+                  />
+                </label>
+                <div className="focus-actions">
+                  <button
+                    className="button secondary"
+                    disabled={blocked || !(outcome.learned.trim() || outcome.stuck.trim())}
+                    onClick={() =>
+                      onDraftNote({
+                        ...emptyNoteDraft(),
+                        title: `${review.record.taskTitle} · 专注成果`.slice(0, noteLimits.title),
+                        understanding: outcome.learned,
+                        questions: outcome.stuck,
+                        evidence: outcomeOrigin(review.record),
+                      })
+                    }
+                  >
+                    编辑为笔记
+                  </button>
+                  <button
+                    className="button secondary"
+                    disabled={blocked || !outcome.stuck.trim()}
+                    onClick={() =>
+                      onDraftTask({
+                        title: `继续：${review.record.taskTitle}`.slice(0, 120),
+                        details: `待解决的问题：\n${outcome.stuck}\n\n${outcomeOrigin(review.record)}`,
+                        projectId: null,
+                        day: localDayKey(new Date()),
+                        minutes: 25,
+                      })
+                    }
+                  >
+                    编辑为下一项任务
+                  </button>
+                </div>
+                <p className="field-hint">
+                  这两项是你的自述，各最多1000字符。按钮只带入现有编辑器，核对后明确保存才写入本机；不发送给模型，不自动保存复盘或完成任务。切页和切记录保留本次草稿，关闭或重载会丢失未保存内容。
+                </p>
+              </div>
             </section>
           )}
         </div>

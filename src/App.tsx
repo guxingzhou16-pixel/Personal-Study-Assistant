@@ -47,6 +47,8 @@ import {
   type DailyTask,
   type ReadingSelection,
   type ReadingPosition,
+  type NoteDraft,
+  type TaskDraft,
 } from './lib/types';
 
 type Page =
@@ -112,6 +114,7 @@ export default function App() {
     null,
   );
   const [planningTarget, setPlanningTarget] = useState<PlanningTarget | null>(null);
+  const [notePreset, setNotePreset] = useState<{ draft: NoteDraft; sequence: number } | null>(null);
   const [routeTarget, setRouteTarget] = useState<{ id: string; sequence: number } | null>(null);
   const [planningVersion, setPlanningVersion] = useState(0);
   const [focusTarget, setFocusTarget] = useState<{
@@ -227,6 +230,19 @@ export default function App() {
     setReaderReturn('notes');
     setSourceId(id);
     setPage('library');
+  }
+  function draftOutcomeNote(draft: NoteDraft) {
+    setNotePreset((previous) => ({ draft, sequence: (previous?.sequence ?? 0) + 1 }));
+    navigate('notes');
+  }
+  function draftOutcomeTask(draft: TaskDraft) {
+    setPlanningTarget((previous) => ({
+      kind: 'draft',
+      draft,
+      day: draft.day,
+      sequence: (previous?.sequence ?? 0) + 1,
+    }));
+    navigate('planning');
   }
   function openTask(task: DailyTask) {
     openTaskReference(task.id, task.day);
@@ -568,6 +584,7 @@ export default function App() {
                 visible={page === 'notes' || Boolean(sourceId && readerPanel === 'notes')}
                 presetSource={noteSource}
                 presetSelection={selectionNote}
+                presetDraft={notePreset}
                 onOpenSource={openNoteSource}
                 settings={settings}
                 onSettings={() => navigate('settings')}
@@ -611,6 +628,8 @@ export default function App() {
                 visible={page === 'focus'}
                 presetTask={focusTarget}
                 onOpenTask={openTaskReference}
+                onDraftNote={draftOutcomeNote}
+                onDraftTask={draftOutcomeTask}
               />
             </div>
           )}

@@ -47,6 +47,10 @@ test('completes a real five minute focus only after durable elapsed time without
         }),
       saved,
     );
+    await page.getByRole('button', { name: '专注时光', exact: true }).click();
+    await page
+      .getByRole('checkbox', { name: '计满后提醒休息（仅本次运行，应用内提示）', exact: true })
+      .check();
     await expect
       .poll(
         async () => (await page.evaluate(() => window.studyCompanion!.focusOverview())).current,
@@ -56,6 +60,14 @@ test('completes a real five minute focus only after durable elapsed time without
     const result = await page.evaluate(() => window.studyCompanion!.focusOverview());
     expect(result.recent[0].status).toBe('completed');
     expect(result.recent[0].elapsedMs).toBe(300_000);
+    await expect(
+      page.getByText('本轮已计满。可以离开屏幕、活动一下，准备好后再继续。', { exact: true }),
+    ).toBeVisible();
+    await page.getByRole('button', { name: '关闭休息提示', exact: true }).click();
+    await expect(page.getByRole('button', { name: '关闭休息提示', exact: true })).toHaveCount(0);
+    await page
+      .getByRole('checkbox', { name: '计满后提醒休息（仅本次运行，应用内提示）', exact: true })
+      .uncheck();
     const planning = await page.evaluate(
       (day) => window.studyCompanion!.planningOverview(day),
       saved.day,

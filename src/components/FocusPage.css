@@ -104,6 +104,29 @@
 .focus-notice {
   margin: 14px 0;
 }
+.focus-rest-option {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 12px 0;
+  color: var(--muted);
+  font-size: 12px;
+}
+.focus-rest-option input {
+  width: auto;
+}
+.focus-rest-reminder {
+  padding: 12px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--theme-surface-muted, #f2f6ee);
+}
+.focus-outcome {
+  display: grid;
+  gap: 12px;
+  padding-top: 18px;
+  border-top: 1px solid var(--line);
+}
 .focus-history-list {
   display: grid;
   gap: 9px;

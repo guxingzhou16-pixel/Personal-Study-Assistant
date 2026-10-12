@@ -23,10 +23,11 @@ type Action =
   | { kind: 'project' | 'task'; id: string }
   | { kind: 'day'; day: string }
   | { kind: 'open-task'; id: string; day: string }
-  | { kind: 'open-day'; day: string };
+  | { kind: 'open-day'; day: string }
+  | { kind: 'draft-task'; draft: TaskDraft };
 
 export type PlanningTarget = { day: string; sequence: number } & (
-  { kind: 'day' } | { kind: 'task'; id: string }
+  { kind: 'day' } | { kind: 'task'; id: string } | { kind: 'draft'; draft: TaskDraft }
 );
 
 function projectDraft(project: ProjectDraft): ProjectDraft {
@@ -141,7 +142,9 @@ export function PlanningPage({
     request(
       presetTarget.kind === 'task'
         ? { kind: 'open-task', id: presetTarget.id, day: presetTarget.day }
-        : { kind: 'open-day', day: presetTarget.day },
+        : presetTarget.kind === 'draft'
+          ? { kind: 'draft-task', draft: presetTarget.draft }
+          : { kind: 'open-day', day: presetTarget.day },
     );
   }, [visible, presetTarget, busy, loading]);
   useEffect(() => {
@@ -189,11 +192,13 @@ export function PlanningPage({
     setError('');
     setNotice('');
     if (action.kind === 'refresh') return refresh(true);
-    if (action.kind === 'open-task' || action.kind === 'open-day') {
+    if (action.kind === 'open-task' || action.kind === 'open-day' || action.kind === 'draft-task') {
       const version = ++loadVersion.current;
       setLoading(true);
       try {
-        const result = await desktop.planningOverview(action.day);
+        const result = await desktop.planningOverview(
+          action.kind === 'draft-task' ? action.draft.day : action.day,
+        );
         if (!mounted.current || version !== loadVersion.current) return;
         const record =
           action.kind === 'open-task' ? result.tasks.find((task) => task.id === action.id) : null;
@@ -209,6 +214,14 @@ export function PlanningPage({
           const draft = taskDraft(record);
           setEditor({ kind: 'task', record, draft, original: draft });
           setNotice('已打开任务的最新保存版本。');
+        } else if (action.kind === 'draft-task') {
+          setEditor({
+            kind: 'task',
+            record: null,
+            draft: action.draft,
+            original: emptyTaskDraft(action.draft.day),
+          });
+          setNotice('待解决的问题已带入任务草稿，尚未保存。请核对日期和预计分钟后保存。');
         } else {
           setEditor(null);
           setNotice('已读取这一天的全部任务。');
