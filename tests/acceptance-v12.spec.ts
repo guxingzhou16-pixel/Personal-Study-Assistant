@@ -264,7 +264,7 @@ test('exports and restores with the real backup worker, startup switch, preserve
   page = await launch();
   const restored = await page.evaluate(() => window.studyCompanion!.backupState());
   // Windows temp roots can use an 8.3 alias; restore receipts use the canonical directory.
-  const canonicalRoot = realpathSync(root);
+  const canonicalRoot = realpathSync.native(root);
   expect(restored.restoreReceipt?.preservedDirectory).toBe(canonicalRoot);
   expect(restored.learningDirectory).not.toBe(canonicalRoot);
   expect(existsSync(join(root, 'pending-restore.json'))).toBe(false);

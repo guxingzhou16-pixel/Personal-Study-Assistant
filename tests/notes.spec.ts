@@ -272,6 +272,8 @@ test('rejects stale save/delete/export, retains failed edits and preserves sourc
   await expect(page.getByRole('dialog').getByRole('alert')).toContainText('尚未覆盖新版本');
   await page.getByRole('dialog').getByRole('button', { name: '取消', exact: true }).click();
   await page.getByRole('button', { name: '另存为新笔记', exact: true }).click();
+  // The reading sidebar hides the library list; check its summary in the full notes view.
+  await notesPage(page);
   await expect(page.getByText('2 份笔记', { exact: true })).toBeVisible();
   const copy = await page.evaluate(async (id) => {
     const item = (await window.studyCompanion!.listNotes()).find((note) => note.id !== id)!;
