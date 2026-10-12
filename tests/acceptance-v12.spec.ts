@@ -13,6 +13,7 @@ import {
   readFileSync,
   existsSync,
   renameSync,
+  realpathSync,
 } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
@@ -262,8 +263,10 @@ test('exports and restores with the real backup worker, startup switch, preserve
   expect(existsSync(join(root, 'pending-restore.json'))).toBe(true);
   page = await launch();
   const restored = await page.evaluate(() => window.studyCompanion!.backupState());
-  expect(restored.restoreReceipt?.preservedDirectory).toBe(root);
-  expect(restored.learningDirectory).not.toBe(root);
+  // Windows temp roots can use an 8.3 alias; restore receipts use the canonical directory.
+  const canonicalRoot = realpathSync(root);
+  expect(restored.restoreReceipt?.preservedDirectory).toBe(canonicalRoot);
+  expect(restored.learningDirectory).not.toBe(canonicalRoot);
   expect(existsSync(join(root, 'pending-restore.json'))).toBe(false);
   const current = await page.evaluate(
     async ({ note, conversation, day }) => ({
