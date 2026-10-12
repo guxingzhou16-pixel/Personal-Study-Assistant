@@ -35,6 +35,8 @@ import {
   snapshotDatabase,
 } from '../../tests/fixtures/legacy-databases';
 
+// Real SQLite snapshots can exceed the default 5s budget on hosted Windows runners.
+vi.setConfig({ testTimeout: 30_000 });
 afterEach(() => vi.restoreAllMocks());
 const progress = () => {};
 function temp() {

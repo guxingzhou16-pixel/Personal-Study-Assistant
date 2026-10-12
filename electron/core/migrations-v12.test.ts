@@ -11,6 +11,8 @@ import {
   snapshotDatabase,
 } from '../../tests/fixtures/legacy-databases';
 
+// Real SQLite migrations can exceed the default 5s budget on hosted Windows runners.
+vi.setConfig({ testTimeout: 30_000 });
 afterEach(() => vi.restoreAllMocks());
 function path() {
   return join(mkdtempSync(join(tmpdir(), 'study-v12-migration-')), 'study-companion.sqlite3');
