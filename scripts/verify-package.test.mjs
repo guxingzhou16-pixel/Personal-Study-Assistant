@@ -5,6 +5,7 @@ import test from 'node:test';
 import verifyPackage from './verify-package.mjs';
 
 async function fixture() {
+  await mkdir('artifacts', { recursive: true });
   const projectDir = await mkdtemp(join(process.cwd(), 'artifacts', 'project-license-fixture-'));
   const appOutDir = join(projectDir, 'app');
   await mkdir(join(appOutDir, 'resources'), { recursive: true });

@@ -40,7 +40,7 @@
 
 ## 3. 当前状态与接手快照
 
-本节核对日期：**2026-10-11**。最新收尾见3.26～3.28；接手时重新检查，不将下面的提交号、测试数量或工作区状态写成实时结果。
+本节核对日期：**2026-10-12**。最新收尾见3.26～3.29；接手时重新检查，不将下面的提交号、测试数量或工作区状态写成实时结果。
 
 ### 3.1 已交付并有历史验收记录
 
@@ -299,11 +299,13 @@
 - 原create“只提交一半”问题实际混合为空，关键词覆盖2/6；只改协议夹具为直接概念6/7。原restore同义CPU问题目标未命中，尚未到restore；只改原生可用性探针为直接概念并在断言前存实际返回，不降产品阈值／断言。两份FAILED原字节保留，不能称原题召回修复。失败数据同真实guest父目录改名，PS5长路径核对失败原非零保留，Node只读核对67文件完全一致后重试。脚本三版本和范围见`docs/testing/installed-ai-2026-10-11.md`。
 - `artifacts/installation-acceptance-656dbf62-e1d2-4144-bec2-11918e5be7e0/lifecycle-summary.json`汇总233输入／日志／截图／备份摘要，实际三阶段PASS、两FAIL分列；本次Sandbox关闭，内部临时数据销毁，宿主证据保留。未在宿主运行正式包、不读私人DB、不请求收费API、不推送或发布；许可／远端CI／授权及真实质量边界仍按发布总表，接手不重复已验收链。
 
-### 3.29 用户选择项目MIT许可（2026-10-11，新包补核进行中）
+### 3.29 项目MIT许可与新包实物（2026-10-12核对完成）
 
 - 用户明确选择自有代码MIT，根目录LICENSE为完整正文／2026 guxingzhou16-pixel；package与lock根标识一致，无依赖／迁移／IPC或业务代码变化。第三方遵守各自许可，manifest只删除已关闭的项目许可项，余五项保持pending。许可选择没有授予推送或公开发布权限。
-- `extraResources`携带原字节到`resources/LICENSE.txt`；`package-desktop.mjs`必须合并配置资源再追加build-info，不能覆盖。afterPack拒绝缺失、非普通文件、字节不一致及非MIT包元数据，实际package-audit记录项目全文。两个负例RED到GREEN；独立新包的正向实物和最终摘要待本轮核对，不用旧36包声称携带新LICENSE。
-- 旧36安装／恢复／卸载重装与真实模型结果保持原记录；本轮只补许可资源的实际打包风险，不重复已完成全链。新包若未执行，明确静态结果与编译等价范围。五项第三方条件、获准推送后的CI及发布授权继续按发布总表处理。
+- `extraResources`携带原字节到`resources/LICENSE.txt`；`package-desktop.mjs`必须合并配置资源再追加build-info，不能覆盖。afterPack拒绝缺失、非普通文件、字节不一致及非MIT包元数据，实际package-audit记录项目全文。两个负例RED到GREEN加原五规格共7/7，类型／格式和两reviewer通过。独立干净冻结d2055b2的五构建阶段全部0；目录／NSIS构建载荷／实际setup提取载荷的1075字节MIT全文与源码一致。
+- 新目录／实际setup载荷4896文件完整大小／SHA核对，385第三方输出及五项pending保持；setup152390060字节，SHA `8b277d83cfa3626c84250c530674117d90242b407b6d013098949e4d324fe2a0`，完整性启用／NotSigned。207个dist／dist-electron文件与已安装36逐字节相同，仅新增MIT资源，五个预期元数据／启动器／通知差异记录，无删除；卸载器与旧包原字节相同。
+- 旧36安装／恢复／卸载重装与真实模型结果保持原记录；本轮只补许可资源的实际打包风险，新正式包未执行，不写成重跑旧全链。完整路径／26静态回执／独立比对见`docs/testing/mit-package-2026-10-12.md`和`artifacts/mit-package-8bf2e1f3-f3ce-42b7-8083-6cfc4b3fbff1/`；五项第三方条件、获准推送后的CI及发布授权继续按发布总表处理。
+- `.github/workflows/check.yml`使用`node node_modules/electron/install.js`准备锁定运行时，加入package-notices／verify-package两类纯文件规格；不走额外未锁定npx命令。verify-package测试fixture须自行创建artifacts，不能靠另一规格文件或旧工作区；仅有LICENSE的洁净目录补验RED2／GREEN2，未重跑源码全套。此后只改CI／测试／文档，不进入d205应用载荷、不重构建；远端实际结果仍待授权推送后验证。
 
 ## 4. 产品范围与功能要求
 
@@ -383,13 +385,14 @@
 | `scripts/package-notices.mjs`、`scripts/licenses/` | 实际顶层/嵌套包元数据、许可全文与固定官方资产生成；缺失/版本/摘要/链接检查，法律审阅状态另记 |
 | `scripts/prepare-installation-acceptance.mjs` | 两个干净NSIS候选来源/摘要核对，生成限定input/logs映射的离线Sandbox材料；不自动执行验收 |
 | `.github/workflows/package-windows.yml` | 手动Windows候选构建和七日artifact，contents只读，不推送/标签/Release |
-| `docs/testing/packaging-acceptance.md` | 隔离安装与发布门禁清单；当前36补验与历史53范围分别记录，不自动勾选整份清单 |
+| `docs/testing/packaging-acceptance.md` | 隔离安装与发布门禁清单；当前d205静态／36补验／历史53范围分别记录，不自动勾选整份清单 |
 | `docs/testing/release-readiness.md` | 固定候选来源/摘要与十一份详细清单汇总、未通过门槛、证据和回退边界，不自动验收/发布 |
 | `docs/testing/first-release-closeout-2026-10-09.md` | 独立报告/修复/新整合版本的证据边界与复验清单，全部新版本执行项待测试方确认 |
 | `docs/testing/independent-acceptance-2026-10-08.md`、`v12-fixes-2026-10-08.md` | 旧验收/修复报告原样保留，次数/失败/包路径只描述各自版本，不改写历史 |
 | `docs/testing/focus-history-acceptance.md` | 只读终态分页/开始日期时区/旧复盘草稿/迟到状态与原计时回归，全部待独立执行 |
 | `docs/releases/0.1.0-candidate.md` | 候选说明草稿，功能是实现范围；无下载公告、验收或公开分发许可承诺 |
-| `docs/releases/0.1.1-candidate.md` | 当前36候选能力、实际包摘要、验收范围及发布条件；本机草稿，无GitHub下载地址 |
+| `docs/releases/0.1.1-candidate.md` | 当前d205候选能力、实际包摘要、验收范围及发布条件；本机草稿，无GitHub下载地址 |
+| `docs/testing/mit-package-2026-10-12.md` | 当前d205 MIT包的原字节许可／静态载荷／207编译文件比对；实际运行仍限定旧36／53记录 |
 | `docs/testing/history-acceptance.md` | 历史权限/确切版本/删除影响/来源保留/应答丢失/导出交接，全部待执行 |
 | `src/App.tsx` | 工作台/首页、启动/导航、内部day/task目标及移除入口后的主区焦点，保持已有页面挂载 |
 | `src/components/TodayTasks.tsx`、`HomeStudyFlow.tsx`、`HomeStudy.css` | 只读今日任务/日期刷新/计划或专注准备、六步纯导航与模型配置提示；不生成或自动写学习数据 |
