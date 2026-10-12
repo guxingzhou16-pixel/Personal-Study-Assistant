@@ -10,12 +10,15 @@ import {
   safeStorage,
   utilityProcess,
 } from 'electron';
-import { mkdirSync } from 'node:fs';
+import { mkdirSync, writeFileSync } from 'node:fs';
 import { basename, join, resolve } from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { Credentials } from './core/credentials';
 import { AppError, failure } from './core/errors';
 import { checkConnection } from './core/models';
+import { probeGeneration } from './core/model-health';
+import { studyExample } from '../src/lib/study-example';
+import { createHash } from 'node:crypto';
 import { Storage } from './core/storage';
 import { Documents } from './core/documents';
 import { string, validateProfile, validateProvider } from './core/settings';
@@ -310,6 +313,21 @@ function registerHandlers(
     return checkConnection(provider, profile, key);
   });
   handle('study:list-sources', () => database.listSources());
+  handle('study:import-example', async () => {
+    const directory = join(dataDir, 'example-input');
+    mkdirSync(directory, { recursive: true });
+    const path = join(directory, '拾知学习示例.md');
+    writeFileSync(path, studyExample, 'utf8');
+    const report = await files.import([path], () => {});
+    if (report.failures.length || report.cancelled)
+      throw new AppError(
+        'exampleImport',
+        '示例资料未能导入，请检查数据目录权限、磁盘空间或稍后重试。',
+      );
+    const source = database.getSource(createHash('sha256').update(studyExample).digest('hex'));
+    if (!source) throw new AppError('exampleImport', '示例导入没有生成资料记录，请重试。');
+    return source;
+  });
   handle('study:import-sources', async () => {
     if (!window) throw new AppError('window', '请在桌面窗口中导入。');
     const selection = await dialog.showOpenDialog(window, {
@@ -340,10 +358,29 @@ function registerHandlers(
   handle('study:get-conversation', (id) => database.chat.get(id));
   const history = new HistoryService(database.chat, () => chats.current());
   let historyBusy = false;
+  let generationProbeActive = false;
   let exportingNote = false;
   function assertHistoryIdle() {
+    if (generationProbeActive)
+      throw new AppError('modelBusy', '请等待模型生成检查完成，再开始其他模型请求。');
     if (historyBusy) throw new AppError('historyBusy', '请完成当前历史记录操作后再试。');
   }
+  handle('study:probe-generation', async (signature, consentEndpoint) => {
+    assertHistoryIdle();
+    if (chats.current()) throw new AppError('modelBusy', '请停止当前回答或等待完成，再检查生成。');
+    generationProbeActive = true;
+    try {
+      return await probeGeneration(
+        database.loadSettings(),
+        credentials,
+        signature,
+        consentEndpoint,
+      );
+    } finally {
+      generationProbeActive = false;
+    }
+  });
+  handle('study:probe-embedding', () => retrieval.probeEmbedding());
   async function historyDialog<T>(work: () => Promise<T>): Promise<T> {
     assertHistoryIdle();
     if (exportingNote) throw new AppError('historyBusy', '请完成笔记导出后再管理历史记录。');

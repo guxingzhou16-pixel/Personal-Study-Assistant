@@ -3,7 +3,7 @@ import { failure } from './core/errors';
 import { loadLocalEncoder } from './core/embeddings';
 import { retrieveHybrid } from './core/vector-retrieval';
 
-const [mainPath, indexPath, question, scope, rebuild, modelPath] = process.argv.slice(2);
+const [mainPath, indexPath, question, scope, rebuild, modelPath, operation] = process.argv.slice(2);
 function send(value: unknown) {
   if (process.parentPort) process.parentPort.postMessage(value);
   else process.send?.(value as object);
@@ -27,17 +27,36 @@ try {
   } else fallback = '未加载本地嵌入模型，已使用关键词检索；可在设置中下载语义检索模型。 ';
   let result;
   try {
-    result = encoder
-      ? await retrieveHybrid(
-          mainPath,
-          indexPath,
-          question,
-          scope || null,
-          rebuild === '1',
-          progress,
-          encoder,
-        )
-      : retrieve(mainPath, indexPath, question, scope || null, rebuild === '1', progress);
+    if (operation === 'probe') {
+      const vectors = encoder ? await encoder.embed(['用自己的话复述，再核对原文。'], 'query') : [];
+      const valid =
+        vectors.length === 1 &&
+        vectors[0].length === 512 &&
+        vectors[0].every(Number.isFinite) &&
+        vectors[0].some((value) => value !== 0);
+      result = {
+        question,
+        sourceId: null,
+        sourceCount: 0,
+        hits: [],
+        embeddingAvailable: valid,
+        notice: valid
+          ? '本次固定文本的本地嵌入推理通过（512 维）；不代表所有资料召回正确。'
+          : `${fallback}未通过实际嵌入推理；仍可阅读并使用关键词检索。`,
+      };
+      fallback = '';
+    } else
+      result = encoder
+        ? await retrieveHybrid(
+            mainPath,
+            indexPath,
+            question,
+            scope || null,
+            rebuild === '1',
+            progress,
+            encoder,
+          )
+        : retrieve(mainPath, indexPath, question, scope || null, rebuild === '1', progress);
   } finally {
     await encoder?.dispose();
   }

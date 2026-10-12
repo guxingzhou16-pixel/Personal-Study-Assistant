@@ -53,7 +53,7 @@ export function ChatPage({
   settings: Settings;
   onSettings: () => void;
   visible: boolean;
-  presetSource: { id: string; sequence: number } | null;
+  presetSource: { id: string; sequence: number; question?: string } | null;
   onOpenCitation: (turnId: string, number: number) => Promise<void>;
   presetSelection?: { selection: ReadingSelection; sequence: number } | null;
 }) {
@@ -262,7 +262,9 @@ export function ChatPage({
     setMode('sources');
     setScope(presetSource.id);
     setPreview(null);
-    void newConversation();
+    void newConversation().then((created) => {
+      if (created && presetSource.question) setQuestion(presetSource.question);
+    });
   }, [presetSource, newConversation]);
   useEffect(() => {
     if (

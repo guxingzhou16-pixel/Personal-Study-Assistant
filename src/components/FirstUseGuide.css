@@ -1,0 +1,48 @@
+.first-use-guide {
+  margin: 24px 0;
+  padding: 18px 20px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--surface);
+  font-size: 13px;
+  line-height: 1.8;
+}
+.first-use-guide summary {
+  cursor: pointer;
+  font-weight: 600;
+}
+.first-use-guide ol {
+  padding-left: 22px;
+}
+.first-use-guide li {
+  margin: 14px 0;
+}
+.first-use-guide li > * {
+  margin-right: 12px;
+}
+.first-use-guide li span {
+  color: var(--muted);
+}
+.model-health {
+  margin-top: 24px;
+}
+.model-health ul {
+  padding-left: 18px;
+  line-height: 1.8;
+  font-size: 13px;
+}
+.model-health li {
+  margin: 10px 0;
+}
+.model-health pre {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  padding: 8px;
+  background: var(--theme-surface-muted, #f4f6f0);
+}
+.health-actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-top: 14px;
+}

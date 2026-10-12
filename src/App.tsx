@@ -26,6 +26,7 @@ import './components/ReadingWorkspace.css';
 import { RecentReadings } from './components/RecentReadings';
 import { TodayTasks } from './components/TodayTasks';
 import { HomeStudyFlow } from './components/HomeStudyFlow';
+import { FirstUseGuide } from './components/FirstUseGuide';
 import { StudyCalendar } from './components/StudyCalendar';
 import { ChatPage } from './components/ChatPage';
 import { NotesPage } from './components/NotesPage';
@@ -89,9 +90,11 @@ export default function App() {
   const [readerReturn, setReaderReturn] = useState<'library' | 'chat' | 'notes' | 'agent'>(
     'library',
   );
-  const [questionSource, setQuestionSource] = useState<{ id: string; sequence: number } | null>(
-    null,
-  );
+  const [questionSource, setQuestionSource] = useState<{
+    id: string;
+    sequence: number;
+    question?: string;
+  } | null>(null);
   const [noteSource, setNoteSource] = useState<{ id: string | null; sequence: number } | null>(
     null,
   );
@@ -443,6 +446,19 @@ export default function App() {
                 />
               </div>
               <HomeStudyFlow settings={settings} onNavigate={navigate} />
+              <FirstUseGuide
+                settings={settings}
+                onSettings={() => navigate('settings')}
+                onRead={openSource}
+                onAsk={(id) => {
+                  setQuestionSource((previous) => ({
+                    id,
+                    sequence: (previous?.sequence ?? 0) + 1,
+                    question: '为什么需要用自己的话复述，并核对原文？',
+                  }));
+                  navigate('chat');
+                }}
+              />
             </div>
           )}
           {boot && !failure && page === 'library' && !sourceId && (

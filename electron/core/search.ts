@@ -8,6 +8,7 @@ import type {
   EvidencePreview,
   RetrievalProgress,
   ReadingSelection,
+  ModelProbeReport,
 } from '../../src/lib/types';
 import type { Storage } from './storage';
 import { AppError } from './errors';
@@ -65,6 +66,13 @@ export class SearchService {
     selection?: ReadingSelection,
   ): Promise<EvidencePreview> {
     const question = string(input, '问题', 4000);
+    if (selection && selection.text.length > 800)
+      return Promise.reject(
+        new AppError(
+          'selectionLength',
+          '提问选文最多 800 字，请缩短选文；较长原文仍可加入笔记草稿。',
+        ),
+      );
     if (!question) return Promise.reject(new AppError('question', '请先输入具体问题。'));
     const scope = sourceInput === null || sourceInput === undefined ? null : sourceId(sourceInput);
     return this.run(question, scope, false, progress).then((value) => {
@@ -102,6 +110,14 @@ export class SearchService {
     const result = await this.run('', null, true, progress);
     this.previews.clear();
     return result.notice;
+  }
+  async probeEmbedding(): Promise<ModelProbeReport> {
+    const result = await this.runWorker('', null, false, () => {}, this.modelPath(), true);
+    return {
+      available: result.embeddingAvailable === true,
+      message: result.notice,
+      checkedAt: new Date().toISOString(),
+    };
   }
   consume(input: unknown, question: string): EvidencePreview {
     const id = chatId(input);
@@ -155,7 +171,8 @@ export class SearchService {
     rebuild: boolean,
     progress: (value: RetrievalProgress) => void,
     modelPath: string | null,
-  ): Promise<Omit<EvidencePreview, 'id'>> {
+    probe = false,
+  ): Promise<Omit<EvidencePreview, 'id'> & { embeddingAvailable?: boolean }> {
     if (this.active)
       return Promise.reject(new AppError('searchBusy', '已有检索正在进行，请先取消或等待完成。'));
     const indexPath = join(this.directory, 'search-index.sqlite3');
@@ -170,6 +187,7 @@ export class SearchService {
         scope ?? '',
         rebuild ? '1' : '0',
         modelPath ?? '',
+        ...(probe ? ['probe'] : []),
       ]);
       let finished = false;
       let resultReceived = false;

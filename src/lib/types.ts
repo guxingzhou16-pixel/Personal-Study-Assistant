@@ -174,6 +174,13 @@ export interface EmbeddingStatus {
   revision: string;
   message: string;
 }
+export interface ModelProbeReport {
+  available: boolean;
+  message: string;
+  checkedAt: string;
+  profile?: string;
+  sample?: string;
+}
 export interface CitationTarget {
   sourceId: string;
   anchor: string;
@@ -472,6 +479,9 @@ export interface DesktopApi {
     key?: string,
   ): Promise<ConnectionReport>;
   listSources(): Promise<Source[]>;
+  importExample(): Promise<Source>;
+  probeGeneration(expectedProfile: string, consentEndpoint?: string): Promise<ModelProbeReport>;
+  probeEmbedding(): Promise<ModelProbeReport>;
   importSources(): Promise<ImportReport>;
   cancelImport(): Promise<void>;
   onImportProgress(listener: (progress: ImportProgress) => void): () => void;

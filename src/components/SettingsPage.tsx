@@ -14,6 +14,8 @@ import { desktop, errorMessage, isDesktop, sameEndpoint } from '../lib/desktop';
 import type { Bootstrap, ConnectionReport, Provider, Settings } from '../lib/types';
 import { themeOptions } from '../lib/themes';
 import { EmbeddingSettings } from './EmbeddingSettings';
+import { ModelHealthPanel } from './ModelHealthPanel';
+import './FirstUseGuide.css';
 
 interface Props {
   boot: Bootstrap;
@@ -407,6 +409,7 @@ export function SettingsPage({ boot, onSaved }: Props) {
         </fieldset>
       </form>
       <EmbeddingSettings />
+      <ModelHealthPanel settings={boot.settings} />
       <div className="storage-details">
         <h3>
           <HardDrive size={15} />

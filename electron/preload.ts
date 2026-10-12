@@ -22,6 +22,7 @@ import type {
   RetrievalProgress,
   CitationTarget,
   ReadingSelection,
+  ModelProbeReport,
   EmbeddingStatus,
   NoteSummary,
   StudyNote,
@@ -60,6 +61,10 @@ const api: DesktopApi = {
   checkConnection: (provider: Provider, profile: ModelProfile, key?: string) =>
     call<ConnectionReport>('study:check-connection', provider, profile, key),
   listSources: () => call<Source[]>('study:list-sources'),
+  importExample: () => call<Source>('study:import-example'),
+  probeGeneration: (signature, consentEndpoint) =>
+    call<ModelProbeReport>('study:probe-generation', signature, consentEndpoint),
+  probeEmbedding: () => call<ModelProbeReport>('study:probe-embedding'),
   importSources: () => call<ImportReport>('study:import-sources'),
   cancelImport: () => call<void>('study:cancel-import'),
   onImportProgress: (listener) => {

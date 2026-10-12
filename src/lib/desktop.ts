@@ -17,6 +17,10 @@ export const desktop: DesktopApi = {
   setStudyRunning: (running, year, month) => api().setStudyRunning(running, year, month),
   checkConnection: (provider, profile, key) => api().checkConnection(provider, profile, key),
   listSources: () => api().listSources(),
+  importExample: () => api().importExample(),
+  probeGeneration: (signature, consentEndpoint) =>
+    api().probeGeneration(signature, consentEndpoint),
+  probeEmbedding: () => api().probeEmbedding(),
   importSources: () => api().importSources(),
   cancelImport: () => api().cancelImport(),
   onImportProgress: (listener) => api().onImportProgress(listener),

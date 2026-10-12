@@ -86,7 +86,7 @@ export function EmbeddingSettings() {
         Windows 本地语义检索需要 Microsoft Visual C++ v14
         运行库（x64）。首次使用请从微软官方下载并安装，完成后重启拾知。 官方下载地址：
         <code>https://aka.ms/vc14/vc_redist.x64.exe</code>。
-        “模型已就绪”表示模型文件通过校验，推理是否成功以检索结果的说明为准。
+        “模型文件已校验”只表示固定文件通过校验，推理是否成功以能力检查和检索结果为准。
       </p>
       <p role="status">
         {downloading
@@ -118,7 +118,7 @@ export function EmbeddingSettings() {
             onClick={() => void download()}
           >
             <Download size={16} />
-            {status?.state === 'ready' ? '模型已就绪' : '下载检索模型'}
+            {status?.state === 'ready' ? '模型文件已校验' : '下载检索模型'}
           </button>
         )}
         {downloading && <LoaderCircle size={16} className="spin" aria-hidden="true" />}
