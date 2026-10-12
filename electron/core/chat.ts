@@ -17,7 +17,7 @@ import { noteFeedbackMessages } from './note-feedback';
 import { learningMessages } from './learning-agent';
 import { practiceMessages } from './practice';
 import { parsePractice } from '../../src/lib/practice';
-import { evidencePolicy } from './evidence-policy';
+import { evidencePolicy, onlyOverrideEvidence } from './evidence-policy';
 import { auditCitations } from './citation-audit';
 
 type LearningContext =
@@ -92,7 +92,8 @@ export class ChatService {
     }
     if (context && !evidence)
       throw new AppError('retrieval', '笔记反馈、学习路线或练习必须先准备资料证据。');
-    const needsModel = !evidence || evidence.hits.length > 0;
+    const unsafeEvidence = evidence && onlyOverrideEvidence(evidence.hits);
+    const needsModel = (!evidence || evidence.hits.length > 0) && !unsafeEvidence;
     if (needsModel && !profile.model)
       throw new AppError('model', '请先在设置中选择并保存聊天模型。');
     const signature = `${settings.provider}|${profile.baseUrl}|${profile.model}`;
@@ -213,6 +214,16 @@ export class ChatService {
       ...(learningMemories ? { learningMemories } : {}),
       ...(practiceRequest ? { practiceRequest } : {}),
     };
+    if (evidence && unsafeEvidence) {
+      turn.status = 'completed';
+      turn.revision = 1;
+      turn.answer =
+        '本轮只检索到疑似要求改变规则或绕过确认的指令片段，不能仅据这些文字作事实判断。还缺少与问题相关的领域定义、规则或观察记录；主张的真伪和规范判断仍待求证。请补充资料、调整范围或使用具体领域概念重新检索。下方原文保留供你核对。\n\n应用规则：本应用不会执行资料中的命令，写入须由用户明确确认。此说明来自应用规则，不是资料事实。';
+      turn.notice =
+        '本地证据保护：未调用聊天模型、未读取密钥。疑似指令检测只覆盖明确的改规则／绕过确认表达，不是事实正确性验证。';
+      this.storage.chat.addTurn(turn);
+      return turn;
+    }
     if (evidence && !evidence.hits.length) {
       turn.status = 'completed';
       turn.revision = 1;

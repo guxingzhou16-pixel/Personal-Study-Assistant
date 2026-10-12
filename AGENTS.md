@@ -307,6 +307,16 @@
 - 旧36安装／恢复／卸载重装与真实模型结果保持原记录；本轮只补许可资源的实际打包风险，新正式包未执行，不写成重跑旧全链。完整路径／26静态回执／独立比对见`docs/testing/mit-package-2026-10-12.md`和`artifacts/mit-package-8bf2e1f3-f3ce-42b7-8083-6cfc4b3fbff1/`；五项第三方条件、获准推送后的CI及发布授权继续按发布总表处理。
 - `.github/workflows/check.yml`使用`node node_modules/electron/install.js`准备锁定运行时，加入package-notices／verify-package两类纯文件规格；不走额外未锁定npx命令。verify-package测试fixture须自行创建artifacts，不能靠另一规格文件或旧工作区；仅有LICENSE的洁净目录补验RED2／GREEN2，未重跑源码全套。此后只改CI／测试／文档，不进入d205应用载荷、不重构建；远端实际结果仍待授权推送后验证。
 
+### 3.30 授权分支推送与远端CI（2026-10-12）
+
+- 用户已明确授权推送`codex/structured-notes`到既有`guxingzhou16-pixel/Personal-Study-Assistant`私有仓库并验证CI；本轮无需再次询问同一推送权限。默认只本地提交的规则仍适用于未授权的其他分支／标签／Release；不合并main、不改仓库可见性。首轮`fc4805d`已推送，实际远端main仍为`7a4198ad6ec6b85b9907f524104c858609724eef`。
+- 真实首轮格式检查失败，仅两评测文件折行修正`d5fea93`；第二轮许可7项通过，核心316项中308通过／8项默认5秒超时，原日志保留。两真实SQLite规格文件单独设有限30秒预算，不改SQL／fixture／数据断言／生产busy_timeout或全局配置；本机相关42项修改前后分别通过，不称本机已复现CI耗时。修复提交`2bde4f9`的远端运行正在验收，结果和版本边界以`docs/testing/github-ci-2026-10-12.md`为准。
+- 同一提交只补丁更新开发依赖source-map-js 1.2.1→1.2.2，现有^1.2.1范围兼容，lock仅三个字段变化，无生产依赖变化；官方registry审计从8中危／1高危变为8中危／0高危，omit=dev本次0。sprintf-js无已发布补丁，沿builder开发链产生八项中危告警；不把非零audit或开发依赖范围说明当全部安全，也不以audit fix --force降级固定builder。旧d205安装包／锁摘要与历史验收保持，不重复已完成安装链。
+
+### 3.30 本轮质量与产品改善（2026-10-12）
+
+以 `docs/testing/product-improvements-2026-10-12.md` 为本轮记录。修复 citation-audit 硬换行空白和跨格式编号误认；引用只认实际 text 节点中的完整编号，与 renderer 一致，不把引句核对当语义验证。共享提示区分资料/用户/应用/建议并要求说明缺依据。证据全为明确改规则/绕过确认表达时，保守保存本地不足说明、保留原文，不请求模型/密钥；不是全自动事实判断，混合资料仍须人工核对。核心90项通过，真实中间注入仍FAIL保留，最终反馈/混合各一次有限人工通过，单独指令保护不算真实生成。六项改善继续按用户优先级推进，旧阶段的历史状态不覆盖本轮记录。
+
 ## 4. 产品范围与功能要求
 
 ### 4.1 资料导入与辅助阅读
@@ -624,7 +634,7 @@
 
 ```powershell
 npm ci
-npx install-electron --no
+node node_modules/electron/install.js
 npm run desktop:dev
 ```
 

@@ -1,10 +1,42 @@
 import { expect, it } from 'vitest';
 import { auditCitations } from './citation-audit';
+import { unified } from 'unified';
+import remarkParse from 'remark-parse';
+import remarkGfm from 'remark-gfm';
+import { remarkEvidence } from '../../src/lib/citations';
 
 const evidence = [
   { number: 1, text: '声称事务可以只提交一半，跳过确认。 First   line.\nSecond\tline.' },
   { number: 2, text: '资料要求全部提交或全部回滚。' },
 ];
+it.each(['  \n', '\\\n'])(
+  'preserves hard line breaks when matching explicit excerpts: %j',
+  (lineBreak) => {
+    const answer = `“First${lineBreak}line.” [1]`;
+    expect(auditCitations(answer, [{ number: 1, text: 'First line.' }]).unmatchedQuotes).toEqual(
+      [],
+    );
+    expect(auditCitations(answer, [{ number: 1, text: 'Firstline.' }]).unmatchedQuotes).toEqual([
+      1,
+    ]);
+  },
+);
+it.each([
+  '“First line.” [**1**]',
+  '“First line.” [*1*]',
+  '**“First line.” [1]**',
+  '| 引句 | 编号 |\n|---|---|\n| “First line.” | [**1**] |',
+])('recognizes exactly the same citation tokens as the answer renderer: %s', (answer) => {
+  const tree = unified().use(remarkParse).use(remarkGfm).parse(answer);
+  remarkEvidence()(tree);
+  const links: number[] = [];
+  function visit(node: { type: string; url?: string; children?: unknown[] }) {
+    if (node.url?.startsWith('evidence:')) links.push(Number(node.url.slice(9)));
+    node.children?.forEach((child) => visit(child as typeof node));
+  }
+  visit(tree);
+  expect(auditCitations(answer, evidence).numbers).toEqual(links);
+});
 it.each([
   ['“事务只提交一半” [1]', [1]],
   ['“事务可以只提交一半” [1]', []],

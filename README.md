@@ -1,19 +1,21 @@
 # 私人学习助手（Study Companion）
 
-> **项目状态（2026-10-12）：首版功能已实现，本机收尾验收已补齐，正式发布仍有条件。** `53f66a6`候选通过270项核心及限定安装生命周期，整合基线通过32条Electron流程。后续引句核对已补充相关测试，三次真实模型定向复验通过有限人工核对；首次独立题发现错引与结论限定问题，最小修正后只复验两题，本次有限输出通过，原失败保留。900段真实向量门禁通过；`36f28d8`候选的AI数据保留、实际恢复重启、卸载重装后CPU补验通过，原换说法漏召回仍保留。自有代码[MIT](LICENSE)及新`d2055b2`包的全文携带已核对，207个编译文件与36相同；五项第三方分发条件、远端CI及发布授权尚未关闭。记忆与任务写入需预览确认，学习进度由用户实际操作记录，不推断掌握；展示网站最后建设。
+> **当前状态（2026-10-12）：首版基础功能已实现，正在按优先级改善质量与学习体验。** 当前实现/本轮验证以本节及[本轮产品验收](docs/testing/product-improvements-2026-10-12.md)为准；旧候选的通过次数不算本轮结果。项目使用 [MIT](LICENSE)；第三方分发条件、远端 CI 和正式发布授权仍未关闭。学习进度由用户实际记录，不推断掌握；展示网站最后建设。
 
 私人学习助手是一款以本地数据和个人学习体验为中心的学习软件。它将资料阅读、可追溯的 AI 问答、学习笔记、计划和专注记录连在一起，帮助用户提升注意力和学习效率、理解知识、看见进步，并保持学习动力。第一版以编程与技术学习为主要场景，后续逐步扩展到跨学科资料。
 
-**2026-10-09首版收尾：**独立测试对话已提交[验收报告](docs/testing/independent-acceptance-2026-10-08.md)及[修复复验](docs/testing/v12-fixes-2026-10-08.md)。主线`ce9caae`整合九份生产修复，并补严共享词/近邻比较证据与领域安全知识引用，保留恢复期限修复及全量专注历史。旧分支核心232项、桌面30项和最后焦点7项是各自版本的记录，不能算作整合版全部通过；表中“待功能验收”指当前整合候选。新版本[收尾交接与复验清单](docs/testing/first-release-closeout-2026-10-09.md)和[发布总表](docs/testing/release-readiness.md)是最新入口。安装/升级/卸载、当前版功能复验、许可与发布仍待完成，展示网站最后。
+**历史证据：**[原独立验收](docs/testing/independent-acceptance-2026-10-08.md)、[修复复验](docs/testing/v12-fixes-2026-10-08.md)、[整合验收](docs/testing/final-acceptance-2026-10-10.md)和[发布总表](docs/testing/release-readiness.md)保留各自候选与范围。下方旧实现阶段与“待验收”标签是当时快照，不能覆盖顶部当前状态，也不代表新改动已经重新验收。
 
 ## 功能实现与验收状态
 
 ### 当前收尾入口（2026-10-12）
 
+- **本轮 RAG 改善：**修复硬换行引句误判和跨格式编号误认；明确指令证据不足的本地保护分支，保留原 FAIL 和确切片段。相关核心 90 项、构建及当前格式检查通过；最终两次真实本地生成作有限人工核对，单独指令片段只作本地说明，不算真实生成。详细输出、提示仍失败的中间记录和边界见[本轮验收第 1 节](docs/testing/product-improvements-2026-10-12.md#1-rag-回答与引用边界)。
+
 当前用户已授权本对话继续源码、实际安装和真实本机模型测试，早期“测试交其他对话”的分工不再限制本轮。详细证据与未通过项见[整合验收](docs/testing/final-acceptance-2026-10-10.md)、[最新模型逐题复核](docs/testing/local-quality-2026-10-11.md)、[向量规模记录](docs/testing/vector-scale-2026-10-11.md)、[安装版AI补验](docs/testing/installed-ai-2026-10-11.md)和[发布总表](docs/testing/release-readiness.md)。下方带日期的实现记录和旧“待验收”标签为历史快照，不能覆盖这些最新记录。
 
 - 用户已选择项目MIT，许可负例加原五项规格共7/7通过。干净冻结`d2055b2`新目录／安装器构建通过，实际4896文件／1075字节项目全文／385第三方输出已核对；207个编译与renderer／PDF资产和已安装36逐字节相同。新正式包未执行，历史安装结果仍按各自源码记录，详见[MIT新包实物](docs/testing/mit-package-2026-10-12.md)。
-- CI准备已改用锁安装内的Electron入口，并加入两类许可规格。洁净目录补验发现新许可fixture依赖已有artifacts，已让其自行建目录；两项在仅有LICENSE的临时工作目录先失败、修复后2/2通过。工作流格式及静态审查另记，远端CI仍须获准推送后实际执行，不写成GitHub已通过。
+- CI准备已改用锁安装内的Electron入口，并加入两类许可规格。洁净目录补验发现新许可fixture依赖已有artifacts，已让其自行建目录；两项在仅有LICENSE的临时工作目录先失败、修复后2/2通过。用户已明确授权推送`codex/structured-notes`并验证CI；已保留格式失败及SQLite默认超时失败，修复后的远端运行正在验收，详见[远端CI记录](docs/testing/github-ci-2026-10-12.md)。
 
 - 本次修复比较问题只共享泛词而命中干扰段、删除关联任务的提示被刷新清除、侧栏版本号硬编码；保留真实失败与修复复验。
 - 整合基线 `ea94f25` 的 27 个核心文件 269/269、桌面 32/32，含真实五分钟计满；真实 BGE CPU 门禁另 1 条通过。最终软件候选 `53f66a6` 核心 270/270、设置导航两条和真实 BGE 一条通过；没有把基线的完整桌面结果写成新提交全量重跑。旧 schema 用独立历史 DDL 验证升级，500 份 FTS 样本不等于大规模向量库验收。
@@ -26,7 +28,7 @@
 - 新跨学科独立题首次过程检查3/3，但人工发现复习观察的片段错引和历史因果结论限定含糊，科学实验题在限定条件内通过。共享提示只补事实就近引用／保留条件，不按题目硬编码；两题各一次定向回归2/2，人工核对本次输出通过，原始失败不覆盖。之后归为回归集，不能称普遍正确率或提示必然有效。
 - 300份合成Markdown、900个短段的真实CPU向量门禁1/1：全部512维缓存落库、取消重建保留旧文件、重启复用、读取IPC和计划状态保持。冷查询约5.0秒，期间与NSIS压缩重叠，仅为带负载观察；不为取得更好数字重跑，不代表长PDF或其他机器。
 
-默认只提交本地，不执行推送、标签或 GitHub Release。后续接手先读最新报告及 `AGENTS.md`，核对实际 Git 状态；不要复用旧 UUID 安装包冒充当前候选。
+默认只提交本地；本轮用户已明确授权推送`codex/structured-notes`到既有私有仓库并验证CI，授权不包括合并`main`、标签或GitHub Release。后续接手先读最新报告及 `AGENTS.md`，核对实际 Git 状态；不要复用旧 UUID 安装包冒充当前候选。
 
 **分发收尾进展（2026-10-09）：**本地`3955e01`接入按实际包版本生成的许可全文/来源/待办与离线Sandbox验收材料工具；新目录包含150依赖及49补充资产，全部4869文件已独立核对摘要。详见[第三方说明](docs/third-party-licenses.md)、[隔离验收流程](docs/testing/isolated-installation-acceptance.md)。本机尚未准备可用隔离环境，安装、升级、卸载未执行；许可原文的复制/摘要核对不代表所有原生分发条件通过。软件功能与模型质量继续由测试对话验收，本对话负责本轮明确要求的分发收尾；候选与回执以[发布总表](docs/testing/release-readiness.md)为准。
 
@@ -70,11 +72,11 @@
 
 ```powershell
 npm ci
-npx install-electron --no
+node node_modules/electron/install.js
 npm run desktop:dev
 ```
 
-首次安装 Electron 需要下载运行时；若下载失败，按 [Electron 官方安装说明](https://www.electronjs.org/docs/latest/tutorial/installation) 配置可用网络或代理，然后重新运行 `npx install-electron --no`。不要将本机代理地址写入项目配置。
+首次安装 Electron 需要下载运行时；若下载失败，按 [Electron 官方安装说明](https://www.electronjs.org/docs/latest/tutorial/installation) 配置可用网络或代理，然后重新运行 `node node_modules/electron/install.js`。该入口来自已锁定的Electron依赖，不额外下载另一套安装工具；不要将本机代理地址写入项目配置。
 
 开发模式支持界面热更新；修改 `electron/` 后重启开发命令。也可以打开经过构建的桌面版本：
 
@@ -91,7 +93,7 @@ npm run desktop:start
 
 ```powershell
 npm ci
-npx install-electron --no
+node node_modules/electron/install.js
 npm run desktop:pack
 npm run desktop:dist
 ```

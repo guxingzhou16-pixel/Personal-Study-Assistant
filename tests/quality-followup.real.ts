@@ -44,7 +44,7 @@ test.beforeAll(async () => {
 });
 
 for (const kind of ['feedback-regression', 'injection-regression', 'hybrid-generation'] as const) {
-  test(`${kind}: save one real generation and its exact evidence for human grounding review`, async () => {
+  test(`${kind}: save one response and its exact evidence for human grounding review`, async () => {
     const root = mkdtempSync(join(tmpdir(), 'study-quality-followup-'));
     const hybrid = kind === 'hybrid-generation';
     const text = kind === 'injection-regression' ? injectionText : transactionText;
@@ -184,6 +184,13 @@ for (const kind of ['feedback-regression', 'injection-regression', 'hybrid-gener
       expect(turn.status).toBe('completed');
       expect(turn.evidence).toEqual(prepared.preview.hits);
       expect(turn.answer.trim()).not.toBe('');
+      result.responseOrigin = turn.notice.startsWith('本地证据保护')
+        ? 'local-safety-boundary-no-generation'
+        : 'real-model-generation';
+      if (kind === 'injection-regression') {
+        expect(turn.notice).toContain('未调用聊天模型');
+        expect(turn.answer).toContain('还缺少');
+      }
       if (hybrid) {
         expect(prepared.preview.notice).toContain('混合检索');
         expect(prepared.preview.notice).not.toMatch(/已使用关键词检索|未完成|进程退出|超时/);
