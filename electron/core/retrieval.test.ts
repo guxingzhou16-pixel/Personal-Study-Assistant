@@ -283,7 +283,7 @@ it('upgrades v3 with a recoverable backup, preserving existing conversations and
   const legacyPath = mainPath + '.v3';
   copyIntoLegacy(mainPath, legacyPath, 3);
   store = new Storage(legacyPath);
-  expect(store.schemaVersion).toBe(12);
+  expect(store.schemaVersion).toBe(13);
   expect(store.loadSettings().displayName).toBe('保留我');
   expect(store.chat.get(conversation.id).turns).toEqual([
     expect.objectContaining({

@@ -134,6 +134,9 @@ export class SearchService {
     const hit = turn.evidence.find((entry) => entry.number === numberInput);
     if (turn.mode !== 'sources' || !hit)
       throw new AppError('citation', '这条引用不在实际检索结果中。');
+    return this.resolveEvidence(hit);
+  }
+  async resolveEvidence(hit: Evidence): Promise<CitationTarget> {
     const target = this.checkEvidence(hit);
     await this.verifySource(target.sourceId);
     return target;

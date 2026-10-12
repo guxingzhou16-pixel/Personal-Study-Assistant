@@ -40,11 +40,12 @@ export function readManifest(input: unknown): BackupManifest {
   if (value.format !== backupLimits.format || value.application !== 'StudyCompanion')
     invalid('这不是当前版本支持的拾知备份（格式 1）。请使用对应的软件版本打开。');
   if (
-    value.mainVersion !== backupLimits.mainVersion ||
+    ![12, backupLimits.mainVersion].includes(Number(value.mainVersion)) ||
+    typeof value.mainVersion !== 'number' ||
     value.activityVersion !== backupLimits.activityVersion
   )
     invalid(
-      `备份的数据库版本不兼容；当前支持主库 ${backupLimits.mainVersion}、学习记录库 ${backupLimits.activityVersion}。旧备份请先用对应版本恢复，再升级应用。`,
+      `备份的数据库版本不兼容；当前支持主库 12 或 ${backupLimits.mainVersion}、学习记录库 ${backupLimits.activityVersion}。更旧备份请先用对应版本恢复，再升级应用。`,
     );
   if (
     typeof value.createdAt !== 'string' ||
@@ -54,11 +55,26 @@ export function readManifest(input: unknown): BackupManifest {
     invalid();
   const rawCounts = fields(
     value.counts,
-    backupCountLabels.map(({ key }) => key),
+    backupCountLabels
+      .filter(
+        ({ key }) =>
+          value.mainVersion !== 12 ||
+          key !== 'reviews' ||
+          Object.hasOwn(record(value.counts), 'reviews'),
+      )
+      .map(({ key }) => key),
   );
   const counts = Object.fromEntries(
-    backupCountLabels.map(({ key }) => [key, integer(rawCounts[key], 0, 1_000_000)]),
+    backupCountLabels.map(({ key }) => [
+      key,
+      integer(
+        key === 'reviews' && value.mainVersion === 12 ? (rawCounts[key] ?? 0) : rawCounts[key],
+        0,
+        1_000_000,
+      ),
+    ]),
   ) as unknown as BackupCounts;
+  if (value.mainVersion === 12 && counts.reviews !== 0) invalid('旧版备份不能含作答记录。');
   if (
     !Array.isArray(value.files) ||
     value.files.length < 2 ||
@@ -104,7 +120,7 @@ export function readManifest(input: unknown): BackupManifest {
     format: 1,
     application: 'StudyCompanion',
     createdAt: value.createdAt,
-    mainVersion: backupLimits.mainVersion,
+    mainVersion: value.mainVersion,
     activityVersion: backupLimits.activityVersion,
     counts,
     files,
@@ -235,6 +251,7 @@ export async function verifyBackup(
   }
   const checked = inspectDatabases(destination ?? directory);
   if (
+    checked.mainVersion !== manifest.mainVersion ||
     backupCountLabels.some(({ key }) => manifest.counts[key] !== checked.counts[key]) ||
     checked.sources.some(
       (source) =>
@@ -313,7 +330,7 @@ export async function writeBackup(
     format: 1,
     application: 'StudyCompanion',
     createdAt: new Date().toISOString(),
-    mainVersion: backupLimits.mainVersion,
+    mainVersion: checked.mainVersion,
     activityVersion: backupLimits.activityVersion,
     counts: checked.counts,
     files,

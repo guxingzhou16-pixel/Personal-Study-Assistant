@@ -354,6 +354,19 @@ function registerHandlers(
     return files.selection(id, anchor, quote);
   });
   handle('study:list-conversations', () => database.chat.list());
+  handle('study:list-reviews', (turnId) => database.reviews.list(turnId));
+  handle('study:get-review', (id) => database.reviews.get(id));
+  handle('study:save-review', (input) => database.reviews.save(input));
+  handle('study:resolve-review-citation', (id, number) => {
+    const saved = database.reviews.get(id);
+    if (
+      typeof number !== 'number' ||
+      !Number.isInteger(number) ||
+      !saved.citations.includes(number)
+    )
+      throw new AppError('citation', '此作答没有这个出处编号。');
+    return retrieval.resolveEvidence(saved.evidence.find((hit) => hit.number === number)!);
+  });
   handle('study:create-conversation', () => database.chat.create());
   handle('study:get-conversation', (id) => database.chat.get(id));
   const history = new HistoryService(database.chat, () => chats.current());
@@ -445,6 +458,37 @@ function registerHandlers(
     assertHistoryIdle();
     return chats.send(request);
   });
+  handle('study:export-review', (id, revision) =>
+    historyDialog(async () => {
+      const saved = database.reviews.get(id);
+      if (saved.revision !== revision)
+        throw new AppError('reviewConflict', '作答已更新，请刷新后导出。');
+      if (!window) throw new AppError('window', '请在桌面窗口中导出。');
+      const selection = await dialog.showSaveDialog(window, {
+        title: '导出已保存作答与复习安排（包含参考答案与原文）',
+        defaultPath: markdownFileName(saved.topic, '复习作答'),
+        filters: [{ name: 'Markdown', extensions: ['md'] }],
+        properties: ['showOverwriteConfirmation'],
+      });
+      if (selection.canceled || !selection.filePath) return { cancelled: true };
+      const current = database.reviews.get(id);
+      if (current.revision !== revision)
+        throw new AppError('reviewConflict', '选择位置期间作答已更新，请刷新后导出。');
+      const content = `# ${current.topic}\n\n## 问题\n${current.question}\n\n## 我的作答\n${current.response || '尚未填写'}\n\n仍有疑问：${current.hasQuestion ? '是' : '否'}\n复习日期：${current.reviewDay ?? '未安排'}\n\n## 参考答案（AI生成，须核对）\n${current.referenceAnswer}\n\n## 原文\n${current.evidence.map((hit) => `[${hit.number}] 《${hit.sourceName}》 ${hit.anchor}\n${hit.text}\nstudy-companion://source/${hit.sourceId}#${hit.anchor}`).join('\n\n')}\n\n来源轮次：${current.turnId} / 版本${current.turnRevision}\n保存作答版本：${current.revision}\n`;
+      await writeMarkdownExport(
+        selection.filePath,
+        content,
+        dataDir,
+        '作答',
+        'reviewExport',
+        () => {
+          if (database.reviews.get(id).revision !== revision)
+            throw new AppError('reviewConflict', '作答已更新，导出已取消。');
+        },
+      );
+      return { cancelled: false, fileName: basename(selection.filePath) };
+    }),
+  );
   handle('study:stop-chat', (id) => chats.stop(id));
   handle('study:active-chat', () => chats.current());
   const retrievalProgress = (progress: import('../src/lib/types').RetrievalProgress) => {

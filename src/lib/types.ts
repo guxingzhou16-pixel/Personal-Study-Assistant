@@ -187,6 +187,25 @@ export interface CitationTarget {
   page: number;
 }
 export type ReadingSelection = Omit<Evidence, 'number'>;
+export interface ReviewDraft {
+  turnId: string;
+  itemIndex: number;
+  revision: number;
+  response: string;
+  hasQuestion: boolean;
+  reviewDay: string | null;
+}
+export interface StudyReview extends ReviewDraft {
+  id: string;
+  turnRevision: number;
+  topic: string;
+  question: string;
+  referenceAnswer: string;
+  citations: number[];
+  evidence: Evidence[];
+  createdAt: string;
+  updatedAt: string;
+}
 export interface ConversationSummary {
   id: string;
   title: string;
@@ -425,6 +444,7 @@ export interface BackupCounts {
   tasks: number;
   focusSessions: number;
   studyDays: number;
+  reviews: number;
 }
 export interface BackupFile {
   path: string;
@@ -482,6 +502,11 @@ export interface DesktopApi {
   importExample(): Promise<Source>;
   probeGeneration(expectedProfile: string, consentEndpoint?: string): Promise<ModelProbeReport>;
   probeEmbedding(): Promise<ModelProbeReport>;
+  listReviews(turnId: string | null): Promise<StudyReview[]>;
+  getReview(id: string): Promise<StudyReview>;
+  saveReview(input: ReviewDraft): Promise<StudyReview>;
+  resolveReviewCitation(id: string, number: number): Promise<CitationTarget>;
+  exportReview(id: string, revision: number): Promise<NoteExportResult>;
   importSources(): Promise<ImportReport>;
   cancelImport(): Promise<void>;
   onImportProgress(listener: (progress: ImportProgress) => void): () => void;

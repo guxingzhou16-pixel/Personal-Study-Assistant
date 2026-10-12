@@ -23,6 +23,7 @@ import type {
   CitationTarget,
   ReadingSelection,
   ModelProbeReport,
+  StudyReview,
   EmbeddingStatus,
   NoteSummary,
   StudyNote,
@@ -65,6 +66,12 @@ const api: DesktopApi = {
   probeGeneration: (signature, consentEndpoint) =>
     call<ModelProbeReport>('study:probe-generation', signature, consentEndpoint),
   probeEmbedding: () => call<ModelProbeReport>('study:probe-embedding'),
+  listReviews: (turnId) => call<StudyReview[]>('study:list-reviews', turnId),
+  getReview: (id) => call<StudyReview>('study:get-review', id),
+  saveReview: (input) => call<StudyReview>('study:save-review', input),
+  resolveReviewCitation: (id, number) =>
+    call<CitationTarget>('study:resolve-review-citation', id, number),
+  exportReview: (id, revision) => call<NoteExportResult>('study:export-review', id, revision),
   importSources: () => call<ImportReport>('study:import-sources'),
   cancelImport: () => call<void>('study:cancel-import'),
   onImportProgress: (listener) => {

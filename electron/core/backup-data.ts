@@ -14,6 +14,7 @@ import { FocusStorage } from './focus-storage';
 import { ChatStorage, chatId } from './chat-storage';
 import { DOCUMENT_LIMITS, sourceId } from './documents';
 import { parsePractice } from '../../src/lib/practice';
+import { ReviewStorage } from './review-storage';
 
 export const MAIN_DATABASE = 'study-companion.sqlite3';
 export const ACTIVITY_DATABASE = 'study-activity.sqlite3';
@@ -37,6 +38,7 @@ const countTables: Record<keyof BackupCounts, string> = {
   tasks: 'daily_tasks',
   focusSessions: 'focus_sessions',
   studyDays: 'study_days',
+  reviews: 'practice_reviews',
 };
 
 function text(input: unknown, limit: number, allowEmpty = true): string {
@@ -96,6 +98,7 @@ function checkDatabase(db: DatabaseSync, version: number, definition: string): v
 }
 
 export function inspectDatabases(directory: string): {
+  mainVersion: number;
   counts: BackupCounts;
   sources: { path: string; bytes: number; sha256: string }[];
 } {
@@ -114,18 +117,31 @@ export function inspectDatabases(directory: string): {
       allowExtension: false,
       defensive: true,
     });
-    checkDatabase(main, backupLimits.mainVersion, expected.schemaDefinition());
+    const mainVersion = Number(main.prepare('PRAGMA user_version').get()?.user_version);
+    const definition =
+      mainVersion === 12
+        ? JSON.stringify(
+            (JSON.parse(expected.schemaDefinition()) as { tbl_name: string }[]).filter(
+              (row) => row.tbl_name !== 'practice_reviews',
+            ),
+          )
+        : expected.schemaDefinition();
+    if (mainVersion !== 12 && mainVersion !== backupLimits.mainVersion)
+      invalid('不支持此备份的主库版本。');
+    checkDatabase(main, mainVersion, definition);
     checkDatabase(activity, backupLimits.activityVersion, expectedActivity.schemaDefinition());
     const counts = Object.fromEntries(
       backupCountLabels.map(({ key }) => [
         key,
-        integer(
-          (key === 'studyDays' ? activity! : main!)
-            .prepare('SELECT count(*) AS count FROM ' + countTables[key])
-            .get()?.count,
-          0,
-          1_000_000,
-        ),
+        key === 'reviews' && mainVersion === 12
+          ? 0
+          : integer(
+              (key === 'studyDays' ? activity! : main!)
+                .prepare('SELECT count(*) AS count FROM ' + countTables[key])
+                .get()?.count,
+              0,
+              1_000_000,
+            ),
       ]),
     ) as unknown as BackupCounts;
     if (
@@ -135,7 +151,8 @@ export function inspectDatabases(directory: string): {
       counts.memories > 500 ||
       counts.projects > 200 ||
       counts.tasks > 5000 ||
-      counts.focusSessions > 10000
+      counts.focusSessions > 10000 ||
+      counts.reviews > 1000
     )
       invalid('备份记录数量超过当前应用限制。');
     if (
@@ -158,6 +175,11 @@ export function inspectDatabases(directory: string): {
       planning = new PlanningStorage(main),
       focus = new FocusStorage(main),
       chat = new ChatStorage(main);
+    if (mainVersion === 13) {
+      const reviews = new ReviewStorage(main, chat);
+      for (const row of main.prepare('SELECT id FROM practice_reviews').iterate())
+        checkEvidence(reviews.get(row.id).evidence, 'sources');
+    }
     for (const row of main.prepare('SELECT id FROM notes').iterate()) notes.get(row.id);
     for (const row of main.prepare('SELECT id FROM memories').iterate()) memories.get(row.id);
     for (const row of main.prepare('SELECT id FROM study_projects').iterate())
@@ -285,7 +307,7 @@ export function inspectDatabases(directory: string): {
       }
       sources.push({ path: `sources/${id}.${kind === 'pdf' ? 'pdf' : 'md'}`, bytes, sha256: id });
     }
-    return { counts, sources };
+    return { counts, sources, mainVersion };
   } finally {
     main?.close();
     activity?.close();

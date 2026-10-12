@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
-import type { ChatTurn, PracticeItem } from '../lib/types';
+import type { ChatTurn, PracticeItem, StudyReview } from '../lib/types';
+import { desktop, errorMessage, isDesktop } from '../lib/desktop';
 import { parsePractice, practiceLabels, practiceLimits } from '../lib/practice';
 import './PracticeResult.css';
 
@@ -12,10 +13,78 @@ export function PracticeResult({
 }) {
   const [answers, setAnswers] = useState<string[]>([]);
   const [revealed, setRevealed] = useState<boolean[]>([]);
+  const [saved, setSaved] = useState<StudyReview[]>([]);
+  const [questions, setQuestions] = useState<boolean[]>([]);
+  const [dates, setDates] = useState<string[]>([]);
+  const [saving, setSaving] = useState(false);
+  const [notice, setNotice] = useState('');
+  const [loading, setLoading] = useState(true);
   useEffect(() => {
     setAnswers([]);
     setRevealed([]);
-  }, [turn.id, turn.revision]);
+    setSaved([]);
+    setQuestions([]);
+    setDates([]);
+    setNotice('');
+  }, [turn.id]);
+  useEffect(() => {
+    if (!isDesktop || turn.status !== 'completed' || turn.practiceRequest?.kind !== 'quiz') {
+      setLoading(false);
+      return;
+    }
+    let cancelled = false;
+    setLoading(true);
+    void desktop
+      .listReviews(turn.id)
+      .then((items) => {
+        if (cancelled) return;
+        setSaved(items);
+        setAnswers((previous) => {
+          const next = [...previous];
+          for (const item of items) next[item.itemIndex] = item.response;
+          return next;
+        });
+        setQuestions((previous) => {
+          const next = [...previous];
+          for (const item of items) next[item.itemIndex] = item.hasQuestion;
+          return next;
+        });
+        setDates((previous) => {
+          const next = [...previous];
+          for (const item of items) next[item.itemIndex] = item.reviewDay ?? '';
+          return next;
+        });
+      })
+      .catch((reason) => {
+        if (!cancelled) setNotice(errorMessage(reason));
+      })
+      .finally(() => {
+        if (!cancelled) setLoading(false);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [turn.id, turn.status]);
+  async function saveResponse(index: number) {
+    setSaving(true);
+    setNotice('');
+    try {
+      const item = await desktop.saveReview({
+        turnId: turn.id,
+        itemIndex: index,
+        revision: saved.find((item) => item.itemIndex === index)?.revision ?? 0,
+        response: answers[index] ?? '',
+        hasQuestion: questions[index] ?? false,
+        reviewDay: dates[index] || null,
+      });
+      setSaved((previous) => [...previous.filter((entry) => entry.id !== item.id), item]);
+      setNotice(`第 ${index + 1} 题的作答与安排已保存；没有评分或掌握判断。`);
+    } catch (reason) {
+      setNotice(errorMessage(reason));
+    } finally {
+      setSaving(false);
+    }
+  }
   const parsed = useMemo((): { items: PracticeItem[]; error: string } => {
     if (turn.status !== 'completed' || !turn.evidence.length) return { items: [], error: '' };
     try {
@@ -34,7 +103,7 @@ export function PracticeResult({
       </p>
       {quiz && (
         <p className="field-hint">
-          作答只留在当前界面；切换会话、重载或关闭可能丢失，不自动保存或发送给模型。
+          作答默认只在窗口内；明确保存后，问题、参考答案、原文快照、你的作答、疑问和复习日期进入本机与完整备份。可单独导出；不发送作答给模型，不评分。未保存内容关闭时可能丢失。
         </p>
       )}
       {parsed.items.map((item, index) => {
@@ -47,7 +116,9 @@ export function PracticeResult({
               <label>
                 第 {index + 1} 题 · 我的作答
                 <textarea
+                  aria-label={`第 ${index + 1} 题 · 我的作答`}
                   value={answers[index] ?? ''}
+                  disabled={loading || saving}
                   maxLength={practiceLimits.answer}
                   placeholder="先用自己的话写出要点…"
                   onChange={(event) =>
@@ -59,6 +130,50 @@ export function PracticeResult({
                   }
                 />
               </label>
+            )}
+            {quiz && (
+              <div className="review-controls">
+                <label>
+                  <input
+                    type="checkbox"
+                    checked={questions[index] ?? false}
+                    disabled={loading || saving}
+                    onChange={(event) =>
+                      setQuestions((previous) => {
+                        const next = [...previous];
+                        next[index] = event.target.checked;
+                        return next;
+                      })
+                    }
+                  />
+                  第 {index + 1} 题仍有疑问
+                </label>
+                <label>
+                  第 {index + 1} 题复习日期
+                  <input
+                    type="date"
+                    value={dates[index] ?? ''}
+                    disabled={loading || saving}
+                    onChange={(event) =>
+                      setDates((previous) => {
+                        const next = [...previous];
+                        next[index] = event.target.value;
+                        return next;
+                      })
+                    }
+                  />
+                </label>
+                <button
+                  className="button secondary"
+                  disabled={loading || saving}
+                  onClick={() => void saveResponse(index)}
+                >
+                  保存第 {index + 1} 题作答与安排
+                </button>
+                {saved.some((item) => item.itemIndex === index) && (
+                  <small>这道题已有保存记录；再次保存会替换该题作答和安排。</small>
+                )}
+              </div>
             )}
             <button
               type="button"
@@ -94,6 +209,7 @@ export function PracticeResult({
           </article>
         );
       })}
+      {notice && <p role="status">{notice}</p>}
       {!parsed.items.length && (
         <p role="status">
           {turn.status === 'streaming'

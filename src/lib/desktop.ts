@@ -21,6 +21,11 @@ export const desktop: DesktopApi = {
   probeGeneration: (signature, consentEndpoint) =>
     api().probeGeneration(signature, consentEndpoint),
   probeEmbedding: () => api().probeEmbedding(),
+  listReviews: (turnId) => api().listReviews(turnId),
+  getReview: (id) => api().getReview(id),
+  saveReview: (input) => api().saveReview(input),
+  resolveReviewCitation: (id, number) => api().resolveReviewCitation(id, number),
+  exportReview: (id, revision) => api().exportReview(id, revision),
   importSources: () => api().importSources(),
   cancelImport: () => api().cancelImport(),
   onImportProgress: (listener) => api().onImportProgress(listener),

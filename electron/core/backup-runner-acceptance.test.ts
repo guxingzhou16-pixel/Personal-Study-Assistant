@@ -19,6 +19,7 @@ const manifest: BackupManifest = {
     tasks: 0,
     focusSessions: 0,
     studyDays: 0,
+    reviews: 0,
   },
   files: ['study-companion.sqlite3', 'study-activity.sqlite3'].map((path) => ({
     path,

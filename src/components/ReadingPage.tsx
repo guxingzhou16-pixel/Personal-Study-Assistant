@@ -156,7 +156,7 @@ export function ReadingPage({
     clearTimeout(timer.current);
     try {
       if (ready.current) await save(latest.current);
-      action();
+      if (alive.current) action();
     } catch {
       /* Keep the reader open with its save error so the user can retry. */
     }
@@ -230,6 +230,7 @@ export function ReadingPage({
     if (!quote) return;
     try {
       const selected = await desktop.readSelection(id, quote.anchor, quote.text);
+      if (!alive.current) return;
       await leave(() => action(selected));
     } catch (reason) {
       setCopyStatus(errorMessage(reason));

@@ -18,14 +18,14 @@ function path() {
   return join(mkdtempSync(join(tmpdir(), 'study-v12-migration-')), 'study-companion.sqlite3');
 }
 it.each(Array.from({ length: 11 }, (_, i) => i + 1))(
-  'migrates authentic v%i to v12 without changing old values or rowids, and keeps a readable original backup',
+  'migrates authentic v%i to current v13 without changing old values or rowids, and keeps a readable original backup',
   (version) => {
     const location = path();
     createLegacyDatabase(location, version);
     const before = snapshotDatabase(location);
     const store = new Storage(location);
     try {
-      expect(store.schemaVersion).toBe(12);
+      expect(store.schemaVersion).toBe(13);
       expect(store.loadSettings()).toMatchObject({
         displayName: '独立迁移样本',
         dailyGoalMinutes: 65,
@@ -117,7 +117,7 @@ it.each([5, 6, 7, 8, 9, 10, 11])(
     }
   },
 );
-it('refuses backup failure before any migration and rejects future v13 without changing saved data', () => {
+it('refuses backup failure before any migration and rejects future v14 without changing saved data', () => {
   const location = path();
   createLegacyDatabase(location, 11);
   const before = snapshotDatabase(location);
@@ -133,7 +133,7 @@ it('refuses backup failure before any migration and rejects future v13 without c
   expect(snapshotDatabase(location)).toEqual(before);
   vi.restoreAllMocks();
   const db = new DatabaseSync(location);
-  db.exec('PRAGMA user_version=13');
+  db.exec('PRAGMA user_version=14');
   db.close();
   expect(() => new Storage(location)).toThrow('更新的软件版本');
   expect(snapshotDatabase(location)).toEqual(before);

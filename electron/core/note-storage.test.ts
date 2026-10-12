@@ -60,7 +60,7 @@ it.each([1, 2, 3, 4])(
     const rows = tables.map((table) => before.prepare(`SELECT * FROM ${table}`).all());
     before.close();
     const store = open(path);
-    expect(store.schemaVersion).toBe(12);
+    expect(store.schemaVersion).toBe(13);
     expect(store.loadSettings()).toMatchObject({ displayName: '迁移验收', dailyGoalMinutes: 65 });
     expect(store.notes.list()).toEqual([]);
     if (version >= 2)
@@ -150,9 +150,9 @@ it('does not migrate if the mandatory backup fails, and rejects v6 without write
   try {
     expect(db.prepare('PRAGMA user_version').get()?.user_version).toBe(4);
     expect(db.prepare("SELECT name FROM sqlite_master WHERE name = 'notes'").get()).toBeUndefined();
-    db.exec('PRAGMA user_version = 13;');
+    db.exec('PRAGMA user_version = 14;');
     expect(() => new Storage(path)).toThrow('更新');
-    expect(db.prepare('PRAGMA user_version').get()?.user_version).toBe(13);
+    expect(db.prepare('PRAGMA user_version').get()?.user_version).toBe(14);
     expect(db.prepare('SELECT answer FROM chat_turns').get()?.answer).toBe('全部提交或者回滚。[1]');
   } finally {
     db.close();

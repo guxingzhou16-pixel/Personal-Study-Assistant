@@ -22,8 +22,9 @@ import { MEMORIES_MIGRATION, MemoryStorage } from './memory-storage';
 import { PLANNING_MIGRATION, TASK_ORIGIN_MIGRATION, PlanningStorage } from './planning-storage';
 import { FOCUS_MIGRATION, FocusStorage } from './focus-storage';
 import { PRACTICE_MIGRATION } from './practice';
+import { REVIEW_MIGRATION, ReviewStorage } from './review-storage';
 
-const SCHEMA_VERSION = 12;
+const SCHEMA_VERSION = 13;
 
 const INITIAL_MIGRATION = `
   CREATE TABLE app_settings (
@@ -59,6 +60,7 @@ export class Storage {
   readonly memories: MemoryStorage;
   readonly planning: PlanningStorage;
   readonly focus: FocusStorage;
+  readonly reviews: ReviewStorage;
 
   constructor(path: string) {
     this.db = new DatabaseSync(path);
@@ -92,6 +94,7 @@ export class Storage {
           if (version < 10) this.db.exec(TASK_ORIGIN_MIGRATION);
           if (version < 11) this.db.exec(FOCUS_MIGRATION);
           if (version < 12) this.db.exec(PRACTICE_MIGRATION);
+          if (version < 13) this.db.exec(REVIEW_MIGRATION);
           this.db.exec('COMMIT;');
         } catch (error) {
           this.db.exec('ROLLBACK;');
@@ -106,6 +109,7 @@ export class Storage {
       this.memories = new MemoryStorage(this.db);
       this.planning = new PlanningStorage(this.db);
       this.focus = new FocusStorage(this.db);
+      this.reviews = new ReviewStorage(this.db, this.chat);
     } catch (error) {
       this.db.close();
       throw error;

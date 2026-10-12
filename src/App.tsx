@@ -27,6 +27,8 @@ import { RecentReadings } from './components/RecentReadings';
 import { TodayTasks } from './components/TodayTasks';
 import { HomeStudyFlow } from './components/HomeStudyFlow';
 import { FirstUseGuide } from './components/FirstUseGuide';
+import { ReviewsPage } from './components/ReviewsPage';
+import { ReviewDue } from './components/ReviewDue';
 import { StudyCalendar } from './components/StudyCalendar';
 import { ChatPage } from './components/ChatPage';
 import { NotesPage } from './components/NotesPage';
@@ -48,7 +50,16 @@ import {
 } from './lib/types';
 
 type Page =
-  'home' | 'library' | 'chat' | 'notes' | 'agent' | 'memories' | 'planning' | 'focus' | 'settings';
+  | 'home'
+  | 'library'
+  | 'chat'
+  | 'notes'
+  | 'agent'
+  | 'memories'
+  | 'planning'
+  | 'focus'
+  | 'settings'
+  | 'reviews';
 const pageLabels: Record<Page, string> = {
   home: '学习首页',
   library: '资料库',
@@ -59,12 +70,14 @@ const pageLabels: Record<Page, string> = {
   planning: '学习计划',
   focus: '专注时光',
   settings: '设置',
+  reviews: '轻量复习',
 };
 const readerBackLabels = {
   library: '返回资料库',
   chat: '返回问答',
   notes: '返回笔记',
   agent: '返回路线',
+  reviews: '返回复习',
 };
 
 export default function App() {
@@ -87,9 +100,9 @@ export default function App() {
   } | null>(null);
   const readerPosition = useRef<ReadingPosition | null>(null);
   const [citationTarget, setCitationTarget] = useState<CitationTarget | null>(null);
-  const [readerReturn, setReaderReturn] = useState<'library' | 'chat' | 'notes' | 'agent'>(
-    'library',
-  );
+  const [readerReturn, setReaderReturn] = useState<
+    'library' | 'chat' | 'notes' | 'agent' | 'reviews'
+  >('library');
   const [questionSource, setQuestionSource] = useState<{
     id: string;
     sequence: number;
@@ -284,6 +297,7 @@ export default function App() {
             { id: 'notes' as const, icon: NotebookPen },
             { id: 'agent' as const, icon: Sparkles },
             { id: 'memories' as const, icon: Brain },
+            { id: 'reviews' as const, icon: BookOpen },
           ].map(({ id, icon: Icon }) => (
             <button
               key={id}
@@ -459,6 +473,7 @@ export default function App() {
                   navigate('chat');
                 }}
               />
+              <ReviewDue onOpen={() => navigate('reviews')} />
             </div>
           )}
           {boot && !failure && page === 'library' && !sourceId && (
@@ -527,6 +542,23 @@ export default function App() {
             </div>
           )}
           <BackupBusyDialog state={backup.state} />
+          {boot && !failure && (
+            <div hidden={page !== 'reviews'}>
+              <ReviewsPage
+                visible={page === 'reviews'}
+                onCitation={async (id, number) => {
+                  const target = await desktop.resolveReviewCitation(id, number);
+                  setReaderPanel(null);
+                  setReaderRestore(undefined);
+                  setReaderBookmark(null);
+                  setCitationTarget(target);
+                  setSourceId(target.sourceId);
+                  setReaderReturn('reviews');
+                  setPage('library');
+                }}
+              />
+            </div>
+          )}
           {boot && !failure && (
             <div
               className="notes-container"

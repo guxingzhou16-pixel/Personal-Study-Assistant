@@ -2,7 +2,7 @@ import type { BackupCounts } from './types';
 
 export const backupLimits = {
   format: 1,
-  mainVersion: 12,
+  mainVersion: 13,
   activityVersion: 1,
   files: 10_002,
   databaseBytes: 2 * 1024 ** 3,
@@ -22,6 +22,7 @@ export const backupCountLabels: { key: keyof BackupCounts; label: string }[] = [
   { key: 'tasks', label: '每日任务' },
   { key: 'focusSessions', label: '专注记录' },
   { key: 'studyDays', label: '日历学习记录' },
+  { key: 'reviews', label: '已保存作答与复习安排' },
 ];
 
 export function backupSize(bytes: number): string {
