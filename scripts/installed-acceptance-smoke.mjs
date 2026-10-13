@@ -21,13 +21,20 @@ const stages = [
   'ai-create',
   'ai-restore',
   'ai-verify',
+  'v13-upgrade',
+  'v13-restore-legacy',
+  'v13-reset-legacy',
+  'v13-create',
+  'v13-restore',
+  'v13-verify',
 ];
 assert.equal(process.platform, 'win32', 'Windows Sandbox is required.');
 assert.equal(process.argv.length, 4, 'Usage: node installed-acceptance-smoke.mjs --stage <stage>');
 assert.equal(process.argv[2], '--stage');
 const stage = process.argv[3];
 assert.ok(stages.includes(stage), 'Unknown acceptance stage.');
-const aiStage = stage.startsWith('ai-');
+const v13Stage = stage.startsWith('v13-');
+const aiStage = stage.startsWith('ai-') || v13Stage;
 const input = 'C:\\AcceptanceInput';
 const logs = 'C:\\AcceptanceLogs';
 const script = fileURLToPath(import.meta.url);
@@ -121,7 +128,14 @@ assert.equal(
 );
 const output = join(logs, `ui-${stage}-${randomUUID()}`);
 await mkdir(output);
-const expectedPath = join(logs, aiStage ? 'installed-ai-expected.json' : 'installed-expected.json');
+const expectedPath = join(
+  logs,
+  ['v13-restore', 'v13-verify'].includes(stage)
+    ? 'installed-v13-expected.json'
+    : aiStage
+      ? 'installed-ai-expected.json'
+      : 'installed-expected.json',
+);
 const aiRestorePath = join(logs, 'installed-ai-restored.json');
 const result = {
   format: 1,
@@ -444,6 +458,7 @@ async function modelServer(port = 0) {
     return modelFixture;
   }
   let authorized = 0;
+  let nextAnswer;
   const generations = [];
   server = createServer(async (request, response) => {
     response.setHeader('content-type', 'application/json');
@@ -452,7 +467,7 @@ async function modelServer(port = 0) {
       response.end(JSON.stringify({ data: [{ id: 'sandbox-fixture-model' }] }));
     } else if (
       aiStage &&
-      stage === 'ai-create' &&
+      ['ai-create', 'v13-create'].includes(stage) &&
       request.method === 'POST' &&
       request.url === '/v1/chat/completions' &&
       request.headers.authorization === `Bearer ${fakeKey}`
@@ -469,8 +484,9 @@ async function modelServer(port = 0) {
         assert.equal(payload.model, 'sandbox-fixture-model');
         assert.equal(payload.stream, true);
         assert.ok(Array.isArray(payload.messages) && payload.messages.length > 0);
-        const answer = aiFixture.answers[generations.length];
+        const answer = v13Stage ? nextAnswer : aiFixture.answers[generations.length];
         assert.equal(typeof answer, 'string', 'Unexpected extra generation request.');
+        nextAnswer = undefined;
         generations.push(payload);
         response.setHeader('content-type', 'text/event-stream');
         const split = Math.ceil(answer.length / 2);
@@ -496,6 +512,12 @@ async function modelServer(port = 0) {
     baseUrl: `http://127.0.0.1:${server.address().port}/v1`,
     authorized: () => authorized,
     generations: () => generations,
+    setAnswer: (answer) => {
+      assert.equal(stage, 'v13-create');
+      assert.equal(nextAnswer, undefined, 'Previous fixture answer has not been consumed.');
+      assert.equal(typeof answer, 'string');
+      nextAnswer = answer;
+    },
   };
   return modelFixture;
 }
@@ -1048,15 +1070,18 @@ async function createAi() {
   await screenshot('ai-backup-export');
 }
 
-async function verifyAi() {
+async function verifyAi({ schemaVersion = 12 } = {}) {
   expected = JSON.parse(await readFile(expectedPath, 'utf8'));
   assert.equal(expected.format, 1);
   assert.equal(expected.sandboxSid, identity.sid);
   assert.equal(expected.source.gitCommit, plan.previous.manifest.gitCommit);
+  assert.equal(expected.snapshot.schemaVersion, 12);
+  assert.ok(schemaVersion === 12 || (v13Stage && schemaVersion === 13));
+  const expectedSnapshot = { ...expected.snapshot, schemaVersion };
   const current = await aiSnapshot(expected.snapshot.day);
   assert.deepEqual(
     current,
-    expected.snapshot,
+    expectedSnapshot,
     'Saved AI records/snapshots/source provenance differ.',
   );
   const model = await modelServer(Number(new URL(current.settings.openai.baseUrl).port));
@@ -1142,7 +1167,7 @@ async function verifyAi() {
     ),
   );
   assert.deepEqual(await fixedFiles(modelDirectory), files);
-  assert.deepEqual(await aiSnapshot(current.day), expected.snapshot);
+  assert.deepEqual(await aiSnapshot(current.day), expectedSnapshot);
   assert.equal(
     model.generations().length,
     0,
@@ -1326,7 +1351,12 @@ async function verifyNativeResources() {
   await restoreBaseline(root, credentialSha256, inputModels);
 }
 
-async function restoreBaseline(root, credentialSha256, inputModels) {
+async function restoreBaseline(root, credentialSha256, inputModels, baseline) {
+  baseline ??= {
+    createStage: aiStage ? 'ai-create' : 'create',
+    expected,
+    verify: aiStage ? verifyAi : verify,
+  };
   const modelDirectory = join(root, 'embedding-models', embedding.directory);
   const before = await api('backupState');
   let previousId = null;
@@ -1345,7 +1375,7 @@ async function restoreBaseline(root, credentialSha256, inputModels) {
   const sourcesBeforePreview = await api('listSources');
 
   const creates = [];
-  const createStage = aiStage ? 'ai-create' : 'create';
+  const createStage = baseline.createStage;
   const createDirectory = new RegExp(`^ui-${createStage}-[a-f0-9-]{36}$`);
   for (const entry of await readdir(logs, { withFileTypes: true })) {
     if (!entry.isDirectory() || !createDirectory.test(entry.name)) continue;
@@ -1355,7 +1385,7 @@ async function restoreBaseline(root, credentialSha256, inputModels) {
         receipt.format === 1 &&
         receipt.stage === createStage &&
         receipt.status === 'passed' &&
-        receipt.source.gitCommit === expected.source.gitCommit &&
+        receipt.source.gitCommit === baseline.expected.source.gitCommit &&
         receipt.sandboxProfile === identity.profile
       )
         creates.push(receipt);
@@ -1373,10 +1403,21 @@ async function restoreBaseline(root, credentialSha256, inputModels) {
     'Restore may use only this Sandbox baseline backup.',
   );
   const manifest = JSON.parse(await readFile(join(backupDirectory, 'manifest.json'), 'utf8'));
-  assert.equal(manifest.counts.sources, expected.snapshot.sources.length);
-  assert.equal(manifest.counts.notes, expected.snapshot.notes.length);
-  assert.equal(manifest.counts.tasks, expected.snapshot.tasks.length);
+  assert.equal(manifest.counts.sources, baseline.expected.snapshot.sources.length);
+  assert.equal(manifest.counts.notes, baseline.expected.snapshot.notes.length);
+  assert.equal(manifest.counts.tasks, baseline.expected.snapshot.tasks.length);
   await navigate('设置');
+  if (v13Stage) {
+    await visible(
+      page.locator('.model-health').getByText('固定文件已校验；不代表能推理。', { exact: false }),
+    );
+    await visible(
+      page
+        .locator('.embedding-settings')
+        .getByRole('button', { name: '模型文件已校验', exact: true }),
+    );
+    await visible(page.getByText('此地址已有保存的密钥', { exact: true }));
+  }
   result.dialogSubstitutions.push('restore baseline backup folder selection');
   await choose(backupDirectory);
   try {
@@ -1387,7 +1428,10 @@ async function restoreBaseline(root, credentialSha256, inputModels) {
   }
   const preview = (await api('backupState')).preview;
   assert.ok(preview && /^[a-f0-9]{8}(-[a-f0-9]{4}){3}-[a-f0-9]{12}$/.test(preview.id));
-  assert.deepEqual(preview.counts, manifest.counts);
+  if (v13Stage && manifest.mainVersion === 12) {
+    assert.equal(manifest.counts.reviews ?? 0, 0, 'A v12 backup cannot contain saved answers.');
+    assert.deepEqual(preview.counts, { ...manifest.counts, reviews: 0 });
+  } else assert.deepEqual(preview.counts, manifest.counts);
   assert.deepEqual(
     await api('listSources'),
     sourcesBeforePreview,
@@ -1466,8 +1510,7 @@ async function restoreBaseline(root, credentialSha256, inputModels) {
   relaunchedProcessProof = undefined;
   await closeServer();
   result.restoredRuntime = await launch();
-  if (aiStage) await verifyAi();
-  else await verify();
+  await baseline.verify();
   const restored = await api('backupState');
   assert.equal(
     restored.learningDirectory.toLowerCase(),
@@ -1595,7 +1638,51 @@ try {
       'AI restore receipt already exists; refusing overwrite.',
     );
   result.runtime = await launch();
-  if (stage === 'create') await create();
+  if (v13Stage) {
+    const { runV13Acceptance } = await import('./installed-v13-acceptance.mjs');
+    await runV13Acceptance({
+      stage,
+      input,
+      logs,
+      output,
+      identity,
+      plan,
+      result,
+      fixture: aiFixture,
+      api,
+      until,
+      visible,
+      navigate,
+      screenshot,
+      choose,
+      restoreDialog,
+      snapshot: aiSnapshot,
+      modelFiles: () =>
+        fixedFiles(
+          join(identity.appData, 'StudyCompanion', 'embedding-models', embedding.directory),
+        ),
+      model: () => modelFixture,
+      verifyLegacy: () => verifyAi({ schemaVersion: 13 }),
+      get page() {
+        return page;
+      },
+      get application() {
+        return application;
+      },
+      restore: async (receipt, createStage, check) => {
+        const root = join(identity.appData, 'StudyCompanion');
+        const files = await fixedFiles(join(root, 'embedding-models', embedding.directory));
+        const credentials = createHash('sha256')
+          .update(await readFile(join(root, 'credentials.enc.json')))
+          .digest('hex');
+        await restoreBaseline(root, credentials, files, {
+          createStage,
+          expected: receipt,
+          verify: check,
+        });
+      },
+    });
+  } else if (stage === 'create') await create();
   else if (stage === 'ai-create') await createAi();
   else if (stage === 'ai-restore') await restoreAi();
   else if (stage === 'ai-verify') await verifyAi();
@@ -1680,6 +1767,12 @@ try {
         await writeFile(aiRestorePath, JSON.stringify(result.aiRestoreProof, null, 2) + '\n', {
           flag: 'wx',
         });
+      if (stage === 'v13-create')
+        await writeFile(
+          join(logs, 'installed-v13-expected.json'),
+          JSON.stringify(result.v13Expected, null, 2) + '\n',
+          { flag: 'wx' },
+        );
     }
   } catch (error) {
     result.status = 'failed';

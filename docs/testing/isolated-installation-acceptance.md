@@ -6,6 +6,8 @@
 
 当前 fresh 材料为 `artifacts/installation-acceptance-f0ff5020-3c1d-4854-b66c-5e170d849e6f/`，前候选 `b810f7520109d9994d4bf00e38712512f0ddaae5`（0.1.0），新候选 `53f66a65c30be92ba9671c869a5183722f9203c5`（0.1.1），类型 `version-upgrade`。只在真实 guest 中执行；后续代码变更或换包须生成新 UUID，不在旧 input/plan 内替换候选来源。
 
+**2026-10-12～13 当前执行完成：**25b/v13 新 setup 在独立真实 Sandbox 中补实际迁移 / 新流程 / 两种备份恢复 / 卸载保留 122 文件 / 重装读回与真实 CPU，全部限定门槛通过。Sandbox 已关闭，209 证据摘要 / 6 原 UI FAIL 保留，见[安装版 v13 验收](installed-v13-2026-10-12.md)。旧 53 / 36 回执保留其原范围，不重复旧 OS 重启或目录启动。新流程使用实际旧 v12 包生成数据，不改 PRAGMA 伪造迁移。
+
 ## 1. 先准备真实隔离环境
 
 2026-10-09 的只读检查当时没有发现可用 Sandbox/VM；2026-10-10 用户已启用 Sandbox，本轮已核对真实 WDAGUtilityAccount SID/profile 后执行。现有 CodexSandbox 辅助账户仍未用作交互验收。不在个人 Windows 账户运行安装器，不自行启用 OS 功能、创建账户或重启宿主。

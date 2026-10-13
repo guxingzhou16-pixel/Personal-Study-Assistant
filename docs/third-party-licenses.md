@@ -46,6 +46,10 @@ zlib材料来自Skia固定依赖 `646b7f569718921d7d4b5b8e22572ff6c76f2596`，�
 
 固定Xenova模型卡已取得，1057字节、SHA-256 `cb22054df1a98f7ee9d5b281d023e67c27cc316e1733baf03fc994d95c3048ab`，Git blob `e26ec7fcc01a7aff66171d44acff0a80fae865e1` 与官方固定下载ETag匹配。模型卡仅标 `base_model: BAAI/bge-small-zh-v1.5` 与transformers.js，没有license字段或量化权重授权全文；取得卡片不能关闭权重许可问题。失败请求和恢复字节的核对方式保存在 `artifacts/license-followup-93d8d7be-0fe5-493d-8ce6-233622645d2f/`，没有执行这些上游源文件。
 
+### 2026-10-12：当前 v13 包实物
+
+冻结 `25b2f96c58ab82b761e7bbfed68d5cfbe996264b` / 0.1.1 新 NSIS 的包内审计仍为 150 份元数据、158 许可通知、75 补充，共 385 个通知输出；项目 `resources/LICENSE.txt` 是根目录 MIT 原字节 1075。实际 setup 摘要与[安装版 v13 验收](testing/installed-v13-2026-10-12.md)对应。五项 `reviewIssues` 仍 pending；真实安装、PDF 和 CPU 推理通过也不关闭第三方分发条件。原 d205 / 36 / 53 实物和来源不改写。
+
 ## 3. 已补的具体说明
 
 | 组件                         | 本轮资产及来源边界                                                                                                                          |
