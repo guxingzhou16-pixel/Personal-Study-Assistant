@@ -509,12 +509,6 @@
           "description": "Original archive member pango-1.58.2/COPYING from checksum-verified pango 1.58.2 source archive (342385b6ca3b7c73455d7c80a13b7dbe4489e00bc3bd4c5bd6ed4dce421e374a). Notice candidate superset may include source tools/tests; complete compiled-binary coverage remains pending."
         },
         {
-          "file": "assets/sharp-native-pixman-0.46.4-e3b0c44298fc-AUTHORS.txt",
-          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-          "source": "https://cairographics.org/releases/pixman-0.46.4.tar.gz",
-          "description": "Original archive member pixman-0.46.4/AUTHORS from checksum-verified pixman 0.46.4 source archive (d09c44ebc3bd5bee7021c79f922fe8fb2fb57f7320f55e97ff9914d2346a591c). Notice candidate superset may include source tools/tests; complete compiled-binary coverage remains pending."
-        },
-        {
           "file": "assets/sharp-native-pixman-0.46.4-fac9270f0987-COPYING.txt",
           "sha256": "fac9270f0987b96ff4533fca3548c633e02083cbba4a0172a3b149b2e4019793",
           "source": "https://cairographics.org/releases/pixman-0.46.4.tar.gz",

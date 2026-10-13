@@ -1808,18 +1808,6 @@
       "provenance": "Exact native build source version. Additional source notices are retained conservatively; not an assertion every licensed source component is linked into the DLL."
     },
     {
-      "file": "sharp-native-pixman-0.46.4-e3b0c44298fc-AUTHORS.txt",
-      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-      "size": 0,
-      "url": "https://cairographics.org/releases/pixman-0.46.4.tar.gz",
-      "version": "0.46.4",
-      "sourceType": "official-source-archive-notice",
-      "archiveSha256": "d09c44ebc3bd5bee7021c79f922fe8fb2fb57f7320f55e97ff9914d2346a591c",
-      "archiveMember": "pixman-0.46.4/AUTHORS",
-      "extraction": "Unmodified source archive member bytes, rechecked against evidence inventory; source never executed.",
-      "provenance": "Exact native build source version. Additional source notices are retained conservatively; not an assertion every licensed source component is linked into the DLL."
-    },
-    {
       "file": "sharp-native-pixman-0.46.4-fac9270f0987-COPYING.txt",
       "sha256": "fac9270f0987b96ff4533fca3548c633e02083cbba4a0172a3b149b2e4019793",
       "size": 2087,
