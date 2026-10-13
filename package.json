@@ -26,6 +26,7 @@
     "desktop:build": "npm run build && npm run build:electron",
     "desktop:pack": "npm run desktop:build && node scripts/package-desktop.mjs dir",
     "desktop:dist": "npm run desktop:build && node scripts/package-desktop.mjs nsis",
+    "desktop:dist:signed": "node scripts/windows-signing.mjs && npm run desktop:build && node scripts/package-desktop.mjs nsis --signed",
     "desktop:start": "electron .",
     "test:e2e": "npm run desktop:build && playwright test",
     "format": "prettier --write src electron scripts tests *.json *.ts .github index.html",

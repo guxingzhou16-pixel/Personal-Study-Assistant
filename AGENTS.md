@@ -337,6 +337,14 @@
 - 本次 Sandbox 已停止且 `wsb list` 为空；原日志 / 备份 / 6 UI FAIL 及脚本修订保留。`artifacts/v13-package-9eff0639-0f4a-409a-bfe5-f03c659827b5/handoff-summary.json` 汇总 209 证据摘要、11 PASS / 6 FAIL，其中 4 PASS 是失败夹具重置而非新功能；详细范围见 `docs/testing/installed-v13-2026-10-12.md`。合成 SSE 不作真实质量结论，简单 PDF 不覆盖任意复杂资料，旧同义失败及五项分发条件 / 公开发布授权继续保留。
 - `installed-v13-acceptance.mjs` 只由已检查身份 / 正式 EXE / 当前包来源的 `installed-acceptance-smoke.mjs` 加载，不能在宿主直接运行。成功创建才生成独立黄金回执，不覆盖；原失败与输入脚本版本保留。`v13-reset-legacy` 仅在无成功 v13 黄金记录且有同 guest / 同源码的失败创建回执时显式恢复原合成数据；复用真实 backup/relaunch，不能直接删除数据库或改 active 指针。
 
+### 3.33 签名、分发条件与零预算发布（2026-10-13）
+
+- 用户已明确选择“保留NSIS，公开开源并申请SignPath”，提供申请显示姓名；现授权既有库公开和真实状态申请，原分支推送/CI有效，不重复询问。付费、身份证明、main合并、Store账号和对其他上游发消息未授权。当前可见性/申请结果另记实际回执，旧私有/未授权快照不覆盖新指令，账户姓名邮箱不进公开文档。
+- `desktop:dist:signed`先核对Windows已有证书，SHA256/RFC3161；三个自有EXE均通过指定证书/嵌入式/EKU/时间戳/最终摘要才写回执，保留卸载器副本。无私钥导出、签名降级或第三方重签。缺证书实际退出1且输出目录28→28；真实自有签名未执行，旧25b仍NotSigned，14规格及微软只读探针不等于自有签名。
+- 新规则只排除独立onnxruntime-web/GUID，ASAR hook拒绝漏入，内嵌Web/Common通知绑定实际Transformers4.3.0。Sharp/Canvas/DirectML仍保留；DirectML当前Windows ML用途/通知/数据说明已核对，新manifest剩Canvas/Sharp/固定量化BGE三项。旧包五项pending不改写，新实物/CPU/PDF按新报告核对。
+- 零预算候选SignPath Foundation（需开源/已发布/审核及组件资格）或Store/MSIX（个人注册/Store签名免费，本人身份及新格式验收必需）。本机证书命令不等于SignPath HSM接入，Store对MSIX签名不适用于NSIS。无申请成功或即时获得证书的保证。
+- 交接/条件/测试清单见`docs/releases/distribution-closeout-2026-10-13.md`，申请/隐私/角色材料见`docs/releases/code-signing-policy.md`。只补包装/签名影响路径，不重跑已充分验收旧业务/安装链；本机新signed-distribution UUID证据、原字节上游资产及私人资料不格式化或顺手提交。
+
 ## 4. 产品范围与功能要求
 
 ### 4.1 资料导入与辅助阅读

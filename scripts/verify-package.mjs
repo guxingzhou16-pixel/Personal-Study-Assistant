@@ -27,6 +27,8 @@ export default async function verifyPackage(context) {
     if (!allowedRoots.has(path.split('/')[0])) throw new Error(`Unexpected package entry: ${path}`);
     if (!path.startsWith('node_modules/') && privateFile.test(path))
       throw new Error(`Private or source-only file in package: ${path}`);
+    if (/(?:^|\/)node_modules\/(?:onnxruntime-web|guid-typescript)(?:\/|$)/.test(path))
+      throw new Error(`Unused standalone browser dependency must not be distributed: ${path}`);
   }
   const requireFile = async (path, unpacked = false) => {
     const entry = statFile(archive, normalize(path), false);

@@ -133,14 +133,20 @@ export async function generatePackageNotices({ archive, appOutDir, projectDir, e
     const source = new URL(asset.source);
     if (source.protocol !== 'https:' || source.username || source.password)
       throw new Error(`Invalid supplemental license source: ${asset.file}`);
-    const bytes = text(
-      await readFile(await checkedPath(projectDir, `scripts/licenses/${safeRelative(asset.file)}`)),
-      asset.file,
+    const original = await readFile(
+      await checkedPath(projectDir, `scripts/licenses/${safeRelative(asset.file)}`),
     );
+    const encoding = asset.encoding ?? 'utf8';
+    if (encoding !== 'utf8' && encoding !== 'latin1')
+      throw new Error(`Unsupported notice encoding: ${asset.file}`);
+    const bytes = encoding === 'utf8' ? text(original, asset.file) : original;
+    if (bytes.includes(0) || !bytes.toString(encoding).trim())
+      throw new Error(`Missing or non-text notice: ${asset.file}`);
     if (digest(bytes) !== asset.sha256)
       throw new Error(`Supplemental license digest mismatch: ${asset.file}`);
     return add(`supplements/${asset.file.slice('assets/'.length)}`, asset.source, bytes, {
       description: asset.description,
+      ...(asset.encoding ? { encoding } : {}),
     });
   };
   for (const supplement of manifest.supplements) {
@@ -208,6 +214,7 @@ export async function generatePackageNotices({ archive, appOutDir, projectDir, e
         'metadata/ 保留每个实际包的原始 package.json，便于核对完整作者和声明。',
         'licenses/ 保留包内及 Electron/Chromium 原始文本，supplements/ 保留固定摘要核对的补充文本。',
         '补充文本可供多个包引用，文件只保存一份；AUTHORS/NOTICE 本身不代替缺失的许可全文。',
+        '旧上游文本若声明encoding=latin1，按该编码阅读；所有许可字节与摘要保持原文，不转码。',
         'additional 包含本地嵌入模型和原生依赖的补充通知；嵌入模型权重不随安装包分发。',
         '模型和外部服务的使用范围、费用与第三方条款仍需使用者自行核对。',
         '',

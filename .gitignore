@@ -28,6 +28,9 @@
 !.env.example
 *.pem
 *.key
+*.pfx
+*.p12
+*.pvk
 
 # 依赖、构建产物与日志
 node_modules/

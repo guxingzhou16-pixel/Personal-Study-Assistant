@@ -84,6 +84,34 @@ const asset = {
   description: 'Synthetic fixture only.',
 };
 
+test('preserves explicitly labelled Latin-1 notice bytes and rejects undeclared encoding', async () => {
+  const bytes = Buffer.from('Synthetic author: Andr\xe9.', 'latin1');
+  for (const encoding of [undefined, 'latin1', 'unknown']) {
+    const legacy = { ...asset, sha256: createHash('sha256').update(bytes).digest('hex'), encoding };
+    const context = await fixture(
+      { 'node_modules/dep': { name: 'dep', version: '1.0.0', licenseText: 'Fixture license.' } },
+      { format: 1, supplements: [], additional: [legacy] },
+    );
+    await writeFile(join(context.projectDir, 'scripts', 'licenses', asset.file), bytes);
+    if (encoding !== 'latin1') {
+      await assert.rejects(generatePackageNotices(context));
+      continue;
+    }
+    const result = await generatePackageNotices(context);
+    assert.ok(
+      (
+        await readFile(
+          join(context.appOutDir, 'resources', 'third-party', 'supplements', 'supplement.txt'),
+        )
+      ).equals(bytes),
+    );
+    assert.equal(
+      result.files.find((file) => file.file === 'supplements/supplement.txt').encoding,
+      'latin1',
+    );
+  }
+});
+
 test('rejects stale supplementary package version and wrong asset hash', async () => {
   for (const [version, sha256] of [
     ['2.0.0', asset.sha256],

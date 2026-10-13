@@ -12,7 +12,7 @@
 
 两份原报告以提交内容原样保存：[原独立验收](independent-acceptance-2026-10-08.md)、[修复及复验](v12-fixes-2026-10-08.md)。其中“未修复”、旧候选路径、测试数量和权限仅描述各自当时的版本；最新状态由本交接及发布总表说明，不改写原失败。
 
-原始证据仍在原工作区：`C:\Users\Vionikos\.codex\worktrees\ce74\拾知-v12验收`、`C:\Users\Vionikos\.codex\worktrees\ce74\拾知-v12修复` 的 `artifacts/`。两份工作区与分支保留；测试代码也保留在测试分支，本轮未盲目合并其测试、旧README/AGENTS或候选产物。主线不能直接引用旧日志宣称当前代码全部通过。接手测试方在独立工作区把已有规格与最新 `focusHistory` 契约对齐，并使用新候选重新记录结果。
+原始证据仍在原工作区：`%USERPROFILE%\.codex\worktrees\ce74\拾知-v12验收`、`%USERPROFILE%\.codex\worktrees\ce74\拾知-v12修复` 的 `artifacts/`。两份工作区与分支保留；测试代码也保留在测试分支，本轮未盲目合并其测试、旧README/AGENTS或候选产物。主线不能直接引用旧日志宣称当前代码全部通过。接手测试方在独立工作区把已有规格与最新 `focusHistory` 契约对齐，并使用新候选重新记录结果。
 
 ## 2. 整合的最小修复
 

@@ -20,7 +20,7 @@ jobs:
       - run: npm ci
       - run: node node_modules/electron/install.js
       - run: npm run format:check
-      - run: node --test scripts/package-notices.test.mjs scripts/verify-package.test.mjs
+      - run: node --test scripts/package-notices.test.mjs scripts/verify-package.test.mjs scripts/windows-signing.test.mjs
       # Durable SQLite writes on Windows runners need a bounded integration-test budget.
       - run: npm test -- --testTimeout=30000
       - run: npm run test:e2e

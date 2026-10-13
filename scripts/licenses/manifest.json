@@ -50,6 +50,565 @@
           "sha256": "e2611d5d854815a8b33c8a3d2ec649511a9596ccf16844e8eae7cf81e79881c4",
           "source": "https://registry.npmjs.org/@img/sharp-win32-x64/-/sharp-win32-x64-0.35.5.tgz",
           "description": "Exact bytes copied from lock-installed local package; package version checked; not re-downloaded or compared with registry archive"
+        },
+        {
+          "file": "assets/sharp-native-aom-3.15.1-c31b80ca48fd-AUTHORS.txt",
+          "sha256": "c31b80ca48fde06ca03aef2f3dec15413fe0c2661fe6b56e86ccd69dbc6f9a1d",
+          "source": "https://storage.googleapis.com/aom-releases/libaom-3.15.1.tar.gz",
+          "description": "Original archive member libaom-3.15.1/AUTHORS from checksum-verified aom 3.15.1 source archive (8ca0c52746174603500f0adb6f2a215d69c9ca2aab2acb3caa06fb791d8d01bf). Notice candidate superset may include source tools/tests; complete compiled-binary coverage remains pending."
+        },
+        {
+          "file": "assets/sharp-native-aom-3.15.1-4764a286d8b2-LICENSE.txt",
+          "sha256": "4764a286d8b2faeaf42f4418e7d7a28d58fc8fd4d00a3d0a7f44b0a4099de7f2",
+          "source": "https://storage.googleapis.com/aom-releases/libaom-3.15.1.tar.gz",
+          "description": "Original archive member libaom-3.15.1/LICENSE from checksum-verified aom 3.15.1 source archive (8ca0c52746174603500f0adb6f2a215d69c9ca2aab2acb3caa06fb791d8d01bf). Notice candidate superset may include source tools/tests; complete compiled-binary coverage remains pending."
+        },
+        {
+          "file": "assets/sharp-native-aom-3.15.1-661fb8e50474-PATENTS.txt",
+          "sha256": "661fb8e504744e95587b556b94a58343448300606a41bea8c7a9b97125696e61",
+          "source": "https://storage.googleapis.com/aom-releases/libaom-3.15.1.tar.gz",
+          "description": "Original archive member libaom-3.15.1/PATENTS from checksum-verified aom 3.15.1 source archive (8ca0c52746174603500f0adb6f2a215d69c9ca2aab2acb3caa06fb791d8d01bf). Notice candidate superset may include source tools/tests; complete compiled-binary coverage remains pending."
+        },
+        {
+          "file": "assets/sharp-native-aom-3.15.1-499041ddee52-LICENSE.txt",
+          "sha256": "499041ddee5227b6f29ca06c17803e5fe24d60f243c69635cd76b7ba08d0ddd5",
+          "source": "https://storage.googleapis.com/aom-releases/libaom-3.15.1.tar.gz",
+          "description": "Original archive member libaom-3.15.1/third_party/fastfeat/LICENSE from checksum-verified aom 3.15.1 source archive (8ca0c52746174603500f0adb6f2a215d69c9ca2aab2acb3caa06fb791d8d01bf). Notice candidate superset may include source tools/tests; complete compiled-binary coverage remains pending."
+        },
+        {
+          "file": "assets/sharp-native-aom-3.15.1-9702de7e4117-LICENSE.txt",
+          "sha256": "9702de7e4117a8e2b20dafab11ffda58c198aede066406496bef670d40a22138",
+          "source": "https://storage.googleapis.com/aom-releases/libaom-3.15.1.tar.gz",
+          "description": "Original archive member libaom-3.15.1/third_party/googletest/src/LICENSE from checksum-verified aom 3.15.1 source archive (8ca0c52746174603500f0adb6f2a215d69c9ca2aab2acb3caa06fb791d8d01bf). Notice candidate superset may include source tools/tests; complete compiled-binary coverage remains pending."
+        },
+        {
+          "file": "assets/sharp-native-aom-3.15.1-d25e82e26acd-LICENSE-BSD3.txt",
+          "sha256": "d25e82e26acd42ca3ccc9993622631163425b869b9e16284226d534cff6470f2",
+          "source": "https://storage.googleapis.com/aom-releases/libaom-3.15.1.tar.gz",
+          "description": "Original archive member libaom-3.15.1/third_party/highway/LICENSE-BSD3 from checksum-verified aom 3.15.1 source archive (8ca0c52746174603500f0adb6f2a215d69c9ca2aab2acb3caa06fb791d8d01bf). Notice candidate superset may include source tools/tests; complete compiled-binary coverage remains pending."
+        },
+        {
+          "file": "assets/sharp-native-aom-3.15.1-3edb5f5496bf-AUTHORS.TXT.txt",
+          "sha256": "3edb5f5496bfff3d6d4a62fa75fe996b814920d0d6e348c2e65c589e7ac5d177",
+          "source": "https://storage.googleapis.com/aom-releases/libaom-3.15.1.tar.gz",
+          "description": "Original archive member libaom-3.15.1/third_party/libwebm/AUTHORS.TXT from checksum-verified aom 3.15.1 source archive (8ca0c52746174603500f0adb6f2a215d69c9ca2aab2acb3caa06fb791d8d01bf). Notice candidate superset may include source tools/tests; complete compiled-binary coverage remains pending."
+        },
+        {
+          "file": "assets/sharp-native-aom-3.15.1-5aec868f669e-LICENSE.TXT.txt",
+          "sha256": "5aec868f669e384a22372a4e8a1a6cd7d44c64cd451f960ca69cc170d1e13acf",
+          "source": "https://storage.googleapis.com/aom-releases/libaom-3.15.1.tar.gz",
+          "description": "Original archive member libaom-3.15.1/third_party/libwebm/LICENSE.TXT from checksum-verified aom 3.15.1 source archive (8ca0c52746174603500f0adb6f2a215d69c9ca2aab2acb3caa06fb791d8d01bf). Notice candidate superset may include source tools/tests; complete compiled-binary coverage remains pending."
+        },
+        {
+          "file": "assets/sharp-native-aom-3.15.1-cc3273e0694e-PATENTS.TXT.txt",
+          "sha256": "cc3273e0694ea5896145e0677699b53471b03ea43021ddc50e7923fbb9f5023c",
+          "source": "https://storage.googleapis.com/aom-releases/libaom-3.15.1.tar.gz",
+          "description": "Original archive member libaom-3.15.1/third_party/libwebm/PATENTS.TXT from checksum-verified aom 3.15.1 source archive (8ca0c52746174603500f0adb6f2a215d69c9ca2aab2acb3caa06fb791d8d01bf). Notice candidate superset may include source tools/tests; complete compiled-binary coverage remains pending."
+        },
+        {
+          "file": "assets/sharp-native-aom-3.15.1-2b2cc1180c7e-LICENSE.txt",
+          "sha256": "2b2cc1180c7e6988328ad2033b04b80117419db9c4c584918bbb3cfec7e9364f",
+          "source": "https://storage.googleapis.com/aom-releases/libaom-3.15.1.tar.gz",
+          "description": "Original archive member libaom-3.15.1/third_party/libyuv/LICENSE from checksum-verified aom 3.15.1 source archive (8ca0c52746174603500f0adb6f2a215d69c9ca2aab2acb3caa06fb791d8d01bf). Notice candidate superset may include source tools/tests; complete compiled-binary coverage remains pending."
+        },
+        {
+          "file": "assets/sharp-native-aom-3.15.1-ff6c857ce270-LICENSE.txt",
+          "sha256": "ff6c857ce2708e87701323078aef115c1872a1f80a9649f86dc899b48083bc60",
+          "source": "https://storage.googleapis.com/aom-releases/libaom-3.15.1.tar.gz",
+          "description": "Original archive member libaom-3.15.1/third_party/vector/LICENSE from checksum-verified aom 3.15.1 source archive (8ca0c52746174603500f0adb6f2a215d69c9ca2aab2acb3caa06fb791d8d01bf). Notice candidate superset may include source tools/tests; complete compiled-binary coverage remains pending."
+        },
+        {
+          "file": "assets/sharp-native-aom-3.15.1-719d8fa235f2-LICENSE.txt",
+          "sha256": "719d8fa235f2068e0ae6d6a7dceb0a7720d7840f0f0ebed29957989e6ded3cd8",
+          "source": "https://storage.googleapis.com/aom-releases/libaom-3.15.1.tar.gz",
+          "description": "Original archive member libaom-3.15.1/third_party/x86inc/LICENSE from checksum-verified aom 3.15.1 source archive (8ca0c52746174603500f0adb6f2a215d69c9ca2aab2acb3caa06fb791d8d01bf). Notice candidate superset may include source tools/tests; complete compiled-binary coverage remains pending."
+        },
+        {
+          "file": "assets/sharp-native-cairo-1.18.6-7118b55c2d91-AUTHORS.txt",
+          "sha256": "7118b55c2d911781622ecb281d9e11fd7eeb5f46c8925e6d740f96f89e79a8fe",
+          "source": "https://cairographics.org/releases/cairo-1.18.6.tar.xz",
+          "description": "Original archive member cairo-1.18.6/AUTHORS from checksum-verified cairo 1.18.6 source archive (1c767308174337a74694da0f3ec069c271452163a1ef4540964c50c301f157d4). Notice candidate superset may include source tools/tests; complete compiled-binary coverage remains pending."
+        },
+        {
+          "file": "assets/sharp-native-cairo-1.18.6-67228a9f7c5f-COPYING.txt",
+          "sha256": "67228a9f7c5f9b67c58f556f1be178f62da4d9e2e6285318d8c74d567255abdf",
+          "source": "https://cairographics.org/releases/cairo-1.18.6.tar.xz",
+          "description": "Original archive member cairo-1.18.6/COPYING from checksum-verified cairo 1.18.6 source archive (1c767308174337a74694da0f3ec069c271452163a1ef4540964c50c301f157d4). Notice candidate superset may include source tools/tests; complete compiled-binary coverage remains pending."
+        },
+        {
+          "file": "assets/sharp-native-cairo-1.18.6-9e9e8608c4cd-COPYING-LGPL-2.1.txt",
+          "sha256": "9e9e8608c4cdda51a78cc3a385f4ec9a2e4c96d5ecad74ac8bca5fca3e563b7d",
+          "source": "https://cairographics.org/releases/cairo-1.18.6.tar.xz",
+          "description": "Original archive member cairo-1.18.6/COPYING-LGPL-2.1 from checksum-verified cairo 1.18.6 source archive (1c767308174337a74694da0f3ec069c271452163a1ef4540964c50c301f157d4). Notice candidate superset may include source tools/tests; complete compiled-binary coverage remains pending."
+        },
+        {
+          "file": "assets/sharp-native-cairo-1.18.6-53692a2ed6c6-COPYING-MPL-1.1.txt",
+          "sha256": "53692a2ed6c6a2c6ec9b32dd0b820dfae91e0a1fcdf625ca9ed0bdf8705fcc4f",
+          "source": "https://cairographics.org/releases/cairo-1.18.6.tar.xz",
+          "description": "Original archive member cairo-1.18.6/COPYING-MPL-1.1 from checksum-verified cairo 1.18.6 source archive (1c767308174337a74694da0f3ec069c271452163a1ef4540964c50c301f157d4). Notice candidate superset may include source tools/tests; complete compiled-binary coverage remains pending."
+        },
+        {
+          "file": "assets/sharp-native-cairo-1.18.6-6f93b45ea874-COPYING.txt",
+          "sha256": "6f93b45ea874706058ae35bc02df79c3f9daf00948672eea8394cc25d1327d49",
+          "source": "https://cairographics.org/releases/cairo-1.18.6.tar.xz",
+          "description": "Original archive member cairo-1.18.6/perf/COPYING from checksum-verified cairo 1.18.6 source archive (1c767308174337a74694da0f3ec069c271452163a1ef4540964c50c301f157d4). Notice candidate superset may include source tools/tests; complete compiled-binary coverage remains pending."
+        },
+        {
+          "file": "assets/sharp-native-cairo-1.18.6-a37812e0e27a-COPYING.txt",
+          "sha256": "a37812e0e27a211272d4c27fa45028c3653e78bb708acccb77c94128dc72b98e",
+          "source": "https://cairographics.org/releases/cairo-1.18.6.tar.xz",
+          "description": "Original archive member cairo-1.18.6/test/COPYING from checksum-verified cairo 1.18.6 source archive (1c767308174337a74694da0f3ec069c271452163a1ef4540964c50c301f157d4). Notice candidate superset may include source tools/tests; complete compiled-binary coverage remains pending."
+        },
+        {
+          "file": "assets/sharp-native-cairo-1.18.6-008e976b6e5e-COPYING.txt",
+          "sha256": "008e976b6e5e7155ee24322073f42cab7cd6daf90bc2322f1d5c3aacab94111c",
+          "source": "https://cairographics.org/releases/cairo-1.18.6.tar.xz",
+          "description": "Original archive member cairo-1.18.6/util/COPYING from checksum-verified cairo 1.18.6 source archive (1c767308174337a74694da0f3ec069c271452163a1ef4540964c50c301f157d4). Notice candidate superset may include source tools/tests; complete compiled-binary coverage remains pending."
+        },
+        {
+          "file": "assets/sharp-native-cairo-1.18.6-25f4d4ce651b-COPYING.txt",
+          "sha256": "25f4d4ce651b1ee6aff713ff986275d6c190a8537e36437886f8bf1497b0a174",
+          "source": "https://cairographics.org/releases/cairo-1.18.6.tar.xz",
+          "description": "Original archive member cairo-1.18.6/util/cairo-script/COPYING from checksum-verified cairo 1.18.6 source archive (1c767308174337a74694da0f3ec069c271452163a1ef4540964c50c301f157d4). Notice candidate superset may include source tools/tests; complete compiled-binary coverage remains pending."
+        },
+        {
+          "file": "assets/sharp-native-cairo-1.18.6-421158645572-COPYING.txt",
+          "sha256": "421158645572270264a980b8b130dd988138e4dae20144e22455446e0ef90902",
+          "source": "https://cairographics.org/releases/cairo-1.18.6.tar.xz",
+          "description": "Original archive member cairo-1.18.6/util/cairo-trace/COPYING from checksum-verified cairo 1.18.6 source archive (1c767308174337a74694da0f3ec069c271452163a1ef4540964c50c301f157d4). Notice candidate superset may include source tools/tests; complete compiled-binary coverage remains pending."
+        },
+        {
+          "file": "assets/sharp-native-cairo-1.18.6-8ceb4b9ee5ad-COPYING-GPL-3.txt",
+          "sha256": "8ceb4b9ee5adedde47b31e975c1d90c73ad27b6b165a1dcd80c7c545eb65b903",
+          "source": "https://cairographics.org/releases/cairo-1.18.6.tar.xz",
+          "description": "Original archive member cairo-1.18.6/util/cairo-trace/COPYING-GPL-3 from checksum-verified cairo 1.18.6 source archive (1c767308174337a74694da0f3ec069c271452163a1ef4540964c50c301f157d4). Notice candidate superset may include source tools/tests; complete compiled-binary coverage remains pending."
+        },
+        {
+          "file": "assets/sharp-native-cgif-0.5.4-76ed8a61cb7e-AUTHORS.txt",
+          "sha256": "76ed8a61cb7e254cab424641ebbb4069d08bf820dfe00f6f7ab5485057ca003d",
+          "source": "https://codeload.github.com/dloebl/cgif/tar.gz/refs/tags/v0.5.4",
+          "description": "Original archive member cgif-0.5.4/AUTHORS from checksum-verified cgif 0.5.4 source archive (83a70a15bc2da41f081a44ebc58ee48e2e1d524a6d3fdb4a24064afa08d5ad4d). Notice candidate superset may include source tools/tests; complete compiled-binary coverage remains pending."
+        },
+        {
+          "file": "assets/sharp-native-cgif-0.5.4-7264dede477a-LICENSE.txt",
+          "sha256": "7264dede477abab4ac3fe8236beb8153845c04ccd33b18f281085087e219fc6d",
+          "source": "https://codeload.github.com/dloebl/cgif/tar.gz/refs/tags/v0.5.4",
+          "description": "Original archive member cgif-0.5.4/LICENSE from checksum-verified cgif 0.5.4 source archive (83a70a15bc2da41f081a44ebc58ee48e2e1d524a6d3fdb4a24064afa08d5ad4d). Notice candidate superset may include source tools/tests; complete compiled-binary coverage remains pending."
+        },
+        {
+          "file": "assets/sharp-native-expat-2.8.5-31b15de82aa1-COPYING.txt",
+          "sha256": "31b15de82aa19a845156169a17a5488bf597e561b2c318d159ed583139b25e87",
+          "source": "https://cytranet-dal.dl.sourceforge.net/project/expat/expat/2.8.5/expat-2.8.5.tar.bz2",
+          "description": "Original archive member expat-2.8.5/COPYING from checksum-verified expat 2.8.5 source archive (952c03c33a6b337f12dae7a9b0f9dee86f867550d35c994d6bdaaddd37dc8454). Notice candidate superset may include source tools/tests; complete compiled-binary coverage remains pending."
+        },
+        {
+          "file": "assets/sharp-native-expat-2.8.5-59f14371c6b7-AUTHORS.txt",
+          "sha256": "59f14371c6b75912cfebb46e6247ee5146766e803a0365b124e5d3011e7d0877",
+          "source": "https://cytranet-dal.dl.sourceforge.net/project/expat/expat/2.8.5/expat-2.8.5.tar.bz2",
+          "description": "Original archive member expat-2.8.5/AUTHORS from checksum-verified expat 2.8.5 source archive (952c03c33a6b337f12dae7a9b0f9dee86f867550d35c994d6bdaaddd37dc8454). Notice candidate superset may include source tools/tests; complete compiled-binary coverage remains pending."
+        },
+        {
+          "file": "assets/sharp-native-fontconfig-2.18.3-db6d73a160bb-AUTHORS.txt",
+          "sha256": "db6d73a160bb2de10268f88ef60aae91771fefdeee4992b791c76ce6592a4a4b",
+          "source": "https://gitlab.freedesktop.org/fontconfig/fontconfig/-/archive/2.18.3/fontconfig-2.18.3.tar.bz2",
+          "description": "Original archive member fontconfig-2.18.3/AUTHORS from checksum-verified fontconfig 2.18.3 source archive (8d28f79d2017cbe1fbb7da84b2502c86421b4f45860234d2f4ab5b35564c8d01). Notice candidate superset may include source tools/tests; complete compiled-binary coverage remains pending."
+        },
+        {
+          "file": "assets/sharp-native-fontconfig-2.18.3-51a51aa98237-COPYING.txt",
+          "sha256": "51a51aa9823704fd90bccc616cdd17ebabb5b2b3e9cbde886ca02c7002288067",
+          "source": "https://gitlab.freedesktop.org/fontconfig/fontconfig/-/archive/2.18.3/fontconfig-2.18.3.tar.bz2",
+          "description": "Original archive member fontconfig-2.18.3/COPYING from checksum-verified fontconfig 2.18.3 source archive (8d28f79d2017cbe1fbb7da84b2502c86421b4f45860234d2f4ab5b35564c8d01). Notice candidate superset may include source tools/tests; complete compiled-binary coverage remains pending."
+        },
+        {
+          "file": "assets/sharp-native-freetype-2.14.3-5a5ee54c5001-FTL.TXT.txt",
+          "sha256": "5a5ee54c5001bbad1cdc1a57cc3dd4c42199b2da09d39c7ee41fab002d02967f",
+          "source": "https://psychz.dl.sourceforge.net/project/freetype/freetype2/2.14.3/freetype-2.14.3.tar.xz",
+          "description": "Original archive member freetype-2.14.3/docs/FTL.TXT from checksum-verified freetype 2.14.3 source archive (36bc4f1cc413335368ee656c42afca65c5a3987e8768cc28cf11ba775e785a5f). Notice candidate superset may include source tools/tests; complete compiled-binary coverage remains pending."
+        },
+        {
+          "file": "assets/sharp-native-freetype-2.14.3-bd36c8b47485-LICENSE.TXT.txt",
+          "sha256": "bd36c8b474855fa294c2ec5c184544478ef3720aad37d65a6296a4f264fd2d3b",
+          "source": "https://psychz.dl.sourceforge.net/project/freetype/freetype2/2.14.3/freetype-2.14.3.tar.xz",
+          "description": "Original archive member freetype-2.14.3/LICENSE.TXT from checksum-verified freetype 2.14.3 source archive (36bc4f1cc413335368ee656c42afca65c5a3987e8768cc28cf11ba775e785a5f). Notice candidate superset may include source tools/tests; complete compiled-binary coverage remains pending."
+        },
+        {
+          "file": "assets/sharp-native-fribidi-1.0.17-cb173f55c951-AUTHORS.txt",
+          "sha256": "cb173f55c9514c8f38f4647ac3fedd5f8611358d331e65ab955da931e826861c",
+          "source": "https://release-assets.githubusercontent.com/github-production-release-asset/5575048/f27f4405-641d-4e0b-b4f5-f3f9bc372437",
+          "description": "Original archive member fribidi-1.0.17/AUTHORS from checksum-verified fribidi 1.0.17 source archive (6949dcde27d41cebad1fd741fcafc36d55a1020d2d872d4a6eb3914caabbada2). Notice candidate superset may include source tools/tests; complete compiled-binary coverage remains pending."
+        },
+        {
+          "file": "assets/sharp-native-fribidi-1.0.17-20e50fe7aae3-COPYING.txt",
+          "sha256": "20e50fe7aae3e56378ebf0417d9de904f55a0e61e4df315333e632a4d3555d95",
+          "source": "https://release-assets.githubusercontent.com/github-production-release-asset/5575048/f27f4405-641d-4e0b-b4f5-f3f9bc372437",
+          "description": "Original archive member fribidi-1.0.17/COPYING from checksum-verified fribidi 1.0.17 source archive (6949dcde27d41cebad1fd741fcafc36d55a1020d2d872d4a6eb3914caabbada2). Notice candidate superset may include source tools/tests; complete compiled-binary coverage remains pending."
+        },
+        {
+          "file": "assets/sharp-native-glib-2.90.0-b4f60a02b2b1-AUTHORS.txt",
+          "sha256": "b4f60a02b2b1f82764f8295b2eafbfcd4c33f596d70abcf5cb3c3623b1cfbc6d",
+          "source": "https://download.gnome.org/sources/glib/2.90/glib-2.90.0.tar.xz",
+          "description": "Original archive member glib-2.90.0/docs/reference/AUTHORS from checksum-verified glib 2.90.0 source archive (17d15cac2af80a33271127408e0abc2748eb297c595c2a26409e81e14e7d1b8f). Notice candidate superset may include source tools/tests; complete compiled-binary coverage remains pending."
+        },
+        {
+          "file": "assets/sharp-native-glib-2.90.0-b1ec1d0e5947-COPYING.txt",
+          "sha256": "b1ec1d0e5947f81e815d8771f7d4d90671a94bb10a42dc687fb566de461a57aa",
+          "source": "https://download.gnome.org/sources/glib/2.90/glib-2.90.0.tar.xz",
+          "description": "Original archive member glib-2.90.0/docs/reference/COPYING from checksum-verified glib 2.90.0 source archive (17d15cac2af80a33271127408e0abc2748eb297c595c2a26409e81e14e7d1b8f). Notice candidate superset may include source tools/tests; complete compiled-binary coverage remains pending."
+        },
+        {
+          "file": "assets/sharp-native-glib-2.90.0-28073c8c65c0-AUTHORS.txt",
+          "sha256": "28073c8c65c072387b778ba00b6c24a2ff1b573ca4415e151aa91fab5a6454be",
+          "source": "https://download.gnome.org/sources/glib/2.90/glib-2.90.0.tar.xz",
+          "description": "Original archive member glib-2.90.0/gmodule/AUTHORS from checksum-verified glib 2.90.0 source archive (17d15cac2af80a33271127408e0abc2748eb297c595c2a26409e81e14e7d1b8f). Notice candidate superset may include source tools/tests; complete compiled-binary coverage remains pending."
+        },
+        {
+          "file": "assets/sharp-native-glib-2.90.0-bdbcdaa78588-COPYING.txt",
+          "sha256": "bdbcdaa7858872393e9d6b216bbdc8a23e99d98dd6cdb7cda19458025b9e19fc",
+          "source": "https://download.gnome.org/sources/glib/2.90/glib-2.90.0.tar.xz",
+          "description": "Original archive member glib-2.90.0/subprojects/gvdb/COPYING from checksum-verified glib 2.90.0 source archive (17d15cac2af80a33271127408e0abc2748eb297c595c2a26409e81e14e7d1b8f). Notice candidate superset may include source tools/tests; complete compiled-binary coverage remains pending."
+        },
+        {
+          "file": "assets/sharp-native-harfbuzz-14.5.0-19bfe8f5ed10-AUTHORS.txt",
+          "sha256": "19bfe8f5ed100636cd24ab0c90a3f71c21d8b02d9ba00719447a0faab364d49f",
+          "source": "https://release-assets.githubusercontent.com/github-production-release-asset/5050525/611443a4-8e17-4f4a-acf2-30a55c71c360",
+          "description": "Original archive member harfbuzz-14.5.0/AUTHORS from checksum-verified harfbuzz 14.5.0 source archive (b7132e148358a45185c9feafd049dbaf243649d3c44414b3534d9c95d18592b9). Notice candidate superset may include source tools/tests; complete compiled-binary coverage remains pending."
+        },
+        {
+          "file": "assets/sharp-native-harfbuzz-14.5.0-ba8f810f2455-COPYING.txt",
+          "sha256": "ba8f810f2455c2f08e2d56bb49b72f37fcf68f1f4fade38977cfd7372050ad64",
+          "source": "https://release-assets.githubusercontent.com/github-production-release-asset/5050525/611443a4-8e17-4f4a-acf2-30a55c71c360",
+          "description": "Original archive member harfbuzz-14.5.0/COPYING from checksum-verified harfbuzz 14.5.0 source archive (b7132e148358a45185c9feafd049dbaf243649d3c44414b3534d9c95d18592b9). Notice candidate superset may include source tools/tests; complete compiled-binary coverage remains pending."
+        },
+        {
+          "file": "assets/sharp-native-harfbuzz-14.5.0-cf977e70247d-COPYING.txt",
+          "sha256": "cf977e70247d5fa9d44955e4d8ed23b503c31f78570f62136756278c2cfcb3c3",
+          "source": "https://release-assets.githubusercontent.com/github-production-release-asset/5050525/611443a4-8e17-4f4a-acf2-30a55c71c360",
+          "description": "Original archive member harfbuzz-14.5.0/perf/texts/COPYING from checksum-verified harfbuzz 14.5.0 source archive (b7132e148358a45185c9feafd049dbaf243649d3c44414b3534d9c95d18592b9). Notice candidate superset may include source tools/tests; complete compiled-binary coverage remains pending."
+        },
+        {
+          "file": "assets/sharp-native-harfbuzz-14.5.0-c2cfccb812fe-COPYING.txt",
+          "sha256": "c2cfccb812fe482101a8f04597dfc5a9991a6b2748266c47ac91b6a5aae15383",
+          "source": "https://release-assets.githubusercontent.com/github-production-release-asset/5050525/611443a4-8e17-4f4a-acf2-30a55c71c360",
+          "description": "Original archive member harfbuzz-14.5.0/src/ms-use/COPYING from checksum-verified harfbuzz 14.5.0 source archive (b7132e148358a45185c9feafd049dbaf243649d3c44414b3534d9c95d18592b9). Notice candidate superset may include source tools/tests; complete compiled-binary coverage remains pending."
+        },
+        {
+          "file": "assets/sharp-native-harfbuzz-14.5.0-9b35b8485f69-COPYING.txt",
+          "sha256": "9b35b8485f69cd298fccbb3c40a827dc06cf1185553bef827903497d2944a8d7",
+          "source": "https://release-assets.githubusercontent.com/github-production-release-asset/5050525/611443a4-8e17-4f4a-acf2-30a55c71c360",
+          "description": "Original archive member harfbuzz-14.5.0/test/COPYING from checksum-verified harfbuzz 14.5.0 source archive (b7132e148358a45185c9feafd049dbaf243649d3c44414b3534d9c95d18592b9). Notice candidate superset may include source tools/tests; complete compiled-binary coverage remains pending."
+        },
+        {
+          "file": "assets/sharp-native-harfbuzz-14.5.0-f55f74bf740d-COPYING.txt",
+          "sha256": "f55f74bf740db07bb032a90aa74af4307adea3d489c1ccba12453cf0c0a764cb",
+          "source": "https://release-assets.githubusercontent.com/github-production-release-asset/5050525/611443a4-8e17-4f4a-acf2-30a55c71c360",
+          "description": "Original archive member harfbuzz-14.5.0/test/shape/data/aots/COPYING from checksum-verified harfbuzz 14.5.0 source archive (b7132e148358a45185c9feafd049dbaf243649d3c44414b3534d9c95d18592b9). Notice candidate superset may include source tools/tests; complete compiled-binary coverage remains pending."
+        },
+        {
+          "file": "assets/sharp-native-harfbuzz-14.5.0-d24039e4d22c-COPYING.txt",
+          "sha256": "d24039e4d22c9bc72096f6174374539d92a3d6e1163938546ec59179fe095e6f",
+          "source": "https://release-assets.githubusercontent.com/github-production-release-asset/5050525/611443a4-8e17-4f4a-acf2-30a55c71c360",
+          "description": "Original archive member harfbuzz-14.5.0/test/shape/data/text-rendering-tests/COPYING from checksum-verified harfbuzz 14.5.0 source archive (b7132e148358a45185c9feafd049dbaf243649d3c44414b3534d9c95d18592b9). Notice candidate superset may include source tools/tests; complete compiled-binary coverage remains pending."
+        },
+        {
+          "file": "assets/sharp-native-highway-1.4.0-e340270d4f64-LICENSE.txt",
+          "sha256": "e340270d4f64384569a91d546acb5b094d69ce47f0c015db77abb74dc6f815af",
+          "source": "https://release-assets.githubusercontent.com/github-production-release-asset/206791328/dc0c3558-7357-4b88-97de-161be965d3c1",
+          "description": "Original archive member highway-1.4.0/LICENSE from checksum-verified highway 1.4.0 source archive (36f672ab48ddb3c8555e9e89e16fe400cd7d16c6eb455a1a3d0c146a63ababdc). Notice candidate superset may include source tools/tests; complete compiled-binary coverage remains pending."
+        },
+        {
+          "file": "assets/sharp-native-highway-1.4.0-6e4ecf1cae05-copyright.txt",
+          "sha256": "6e4ecf1cae052b678ea3178dd4b3652d581ee66a82d58db8800dd7d80dd6de76",
+          "source": "https://release-assets.githubusercontent.com/github-production-release-asset/206791328/dc0c3558-7357-4b88-97de-161be965d3c1",
+          "description": "Original archive member highway-1.4.0/debian/copyright from checksum-verified highway 1.4.0 source archive (36f672ab48ddb3c8555e9e89e16fe400cd7d16c6eb455a1a3d0c146a63ababdc). Notice candidate superset may include source tools/tests; complete compiled-binary coverage remains pending."
+        },
+        {
+          "file": "assets/sharp-native-lcms-2.19.1-6dbd60437f8e-LICENSE.txt",
+          "sha256": "6dbd60437f8ef91d8de1f08ad75882547fd4931bfcc3566a0735f28db1484d31",
+          "source": "https://pilotfiber.dl.sourceforge.net/project/lcms/lcms/2.19.1/lcms2-2.19.1.tar.gz",
+          "description": "Original archive member lcms2-2.19.1/LICENSE from checksum-verified lcms 2.19.1 source archive (bfc54f7bab59fbc921012014a8032e4cba4abd46db47d46b76416a8c0b2815c8). Notice candidate superset may include source tools/tests; complete compiled-binary coverage remains pending."
+        },
+        {
+          "file": "assets/sharp-native-lcms-2.19.1-c53a65c2fd56-COPYING.GPL3.txt",
+          "sha256": "c53a65c2fd561c87eaabf1072ef5dcab8653042bc15308465f52413585eb6271",
+          "source": "https://pilotfiber.dl.sourceforge.net/project/lcms/lcms/2.19.1/lcms2-2.19.1.tar.gz",
+          "description": "Original archive member lcms2-2.19.1/plugins/fast_float/COPYING.GPL3 from checksum-verified lcms 2.19.1 source archive (bfc54f7bab59fbc921012014a8032e4cba4abd46db47d46b76416a8c0b2815c8). Notice candidate superset may include source tools/tests; complete compiled-binary coverage remains pending."
+        },
+        {
+          "file": "assets/sharp-native-lcms-2.19.1-8baac37d14ee-LICENSE_iccjpeg.txt",
+          "sha256": "8baac37d14eed89b82ffcb041677dd701164eb5cc0f26e165fe47eb11afa0dca",
+          "source": "https://pilotfiber.dl.sourceforge.net/project/lcms/lcms/2.19.1/lcms2-2.19.1.tar.gz",
+          "description": "Original archive member lcms2-2.19.1/utils/jpgicc/LICENSE_iccjpeg from checksum-verified lcms 2.19.1 source archive (bfc54f7bab59fbc921012014a8032e4cba4abd46db47d46b76416a8c0b2815c8). Notice candidate superset may include source tools/tests; complete compiled-binary coverage remains pending."
+        },
+        {
+          "encoding": "latin1",
+          "file": "assets/sharp-native-lcms-2.19.1-4847d97cd41e-AUTHORS.txt",
+          "sha256": "4847d97cd41e980794939b1d2694bd8f67b92856ec80e95c2fcfc34066f0df93",
+          "source": "https://pilotfiber.dl.sourceforge.net/project/lcms/lcms/2.19.1/lcms2-2.19.1.tar.gz",
+          "description": "Original archive member lcms2-2.19.1/AUTHORS from checksum-verified lcms 2.19.1 source archive (bfc54f7bab59fbc921012014a8032e4cba4abd46db47d46b76416a8c0b2815c8). Notice candidate superset may include source tools/tests; complete compiled-binary coverage remains pending."
+        },
+        {
+          "file": "assets/sharp-native-libarchive-3.8.9-30e556b3959e-COPYING.txt",
+          "sha256": "30e556b3959e3985d66efefec5eaac51d4995053caa1d3cffe6eb916f146f229",
+          "source": "https://www.libarchive.org/downloads/libarchive-3.8.9.tar.xz",
+          "description": "Original archive member libarchive-3.8.9/COPYING from checksum-verified libarchive 3.8.9 source archive (888c934f9d95648ecb9163dc8e23ab80a476ecb81a8f1154704a227b5b676dde). Notice candidate superset may include source tools/tests; complete compiled-binary coverage remains pending."
+        },
+        {
+          "file": "assets/sharp-native-libexif-0.6.26-a19ef6f43014-AUTHORS.txt",
+          "sha256": "a19ef6f43014fc57829658087d0c2bf59d97482e015cf553d7a68124603cbc44",
+          "source": "https://release-assets.githubusercontent.com/github-production-release-asset/112677643/c4f92d4e-b09a-4140-9e53-e34030e7f1ee",
+          "description": "Original archive member libexif-0.6.26/AUTHORS from checksum-verified libexif 0.6.26 source archive (4a055ed6575e61ca46c3172be3c753cc16c9becd0f99ec71d58dd0e471476c0c). Notice candidate superset may include source tools/tests; complete compiled-binary coverage remains pending."
+        },
+        {
+          "file": "assets/sharp-native-libexif-0.6.26-36b6d3fa4791-COPYING.txt",
+          "sha256": "36b6d3fa47916943fd5fec313c584784946047ec1337a78b440e5992cb595f89",
+          "source": "https://release-assets.githubusercontent.com/github-production-release-asset/112677643/c4f92d4e-b09a-4140-9e53-e34030e7f1ee",
+          "description": "Original archive member libexif-0.6.26/COPYING from checksum-verified libexif 0.6.26 source archive (4a055ed6575e61ca46c3172be3c753cc16c9becd0f99ec71d58dd0e471476c0c). Notice candidate superset may include source tools/tests; complete compiled-binary coverage remains pending."
+        },
+        {
+          "file": "assets/sharp-native-libffi-3.8.0-e67978cd1881-LICENSE-BUILDTOOLS.txt",
+          "sha256": "e67978cd18816c0cb7d29aaaacde7b7447402c2fb321a051698890a8eaedda94",
+          "source": "https://release-assets.githubusercontent.com/github-production-release-asset/321154/f687b05e-5780-4828-b7c6-c9c243e5cd9f",
+          "description": "Original archive member libffi-3.8.0/LICENSE-BUILDTOOLS from checksum-verified libffi 3.8.0 source archive (7da3e2d9a171eb0a038f592ecad3ff2bb2550f3496d87b3b29ad0cf4430c0db4). Notice candidate superset may include source tools/tests; complete compiled-binary coverage remains pending."
+        },
+        {
+          "file": "assets/sharp-native-libffi-3.8.0-17b64dc60f3b-LICENSE.txt",
+          "sha256": "17b64dc60f3b6897a60f971e288b973f655c2edcdf08b25f3c3dd5549857881c",
+          "source": "https://release-assets.githubusercontent.com/github-production-release-asset/321154/f687b05e-5780-4828-b7c6-c9c243e5cd9f",
+          "description": "Original archive member libffi-3.8.0/LICENSE from checksum-verified libffi 3.8.0 source archive (7da3e2d9a171eb0a038f592ecad3ff2bb2550f3496d87b3b29ad0cf4430c0db4). Notice candidate superset may include source tools/tests; complete compiled-binary coverage remains pending."
+        },
+        {
+          "file": "assets/sharp-native-libheif-1.23.5-fa81ce652315-COPYING.txt",
+          "sha256": "fa81ce652315b013359d6e8e4744335f31a50c7c192907176d3632f78a3b4596",
+          "source": "https://release-assets.githubusercontent.com/github-production-release-asset/115012280/6cb9d7bb-54ef-471e-bea5-d3959796fdad",
+          "description": "Original archive member libheif-1.23.5/COPYING from checksum-verified libheif 1.23.5 source archive (fd9036064c4432f0550d15072ddf34956a248279ee9aeaff0fba3fa0f77d8f1a). Notice candidate superset may include source tools/tests; complete compiled-binary coverage remains pending."
+        },
+        {
+          "file": "assets/sharp-native-libheif-1.23.5-278ee9bbb13e-COPYING.txt",
+          "sha256": "278ee9bbb13ecb080a131c68927bd589a6a56fd5449ce25e8e594c858864830d",
+          "source": "https://release-assets.githubusercontent.com/github-production-release-asset/115012280/6cb9d7bb-54ef-471e-bea5-d3959796fdad",
+          "description": "Original archive member libheif-1.23.5/examples/COPYING from checksum-verified libheif 1.23.5 source archive (fd9036064c4432f0550d15072ddf34956a248279ee9aeaff0fba3fa0f77d8f1a). Notice candidate superset may include source tools/tests; complete compiled-binary coverage remains pending."
+        },
+        {
+          "file": "assets/sharp-native-libimagequant-2.4.1-7391bfbcde44-COPYRIGHT.txt",
+          "sha256": "7391bfbcde4404cefb9849553362c3ab436f929f5cc1abb57071ec045590ee99",
+          "source": "https://github.com/lovell/libimagequant/archive/v2.4.1.tar.gz",
+          "description": "Original archive member libimagequant-2.4.1/COPYRIGHT from checksum-verified libimagequant 2.4.1 source archive (47d2a84b7b1052975c9d50a3d4e3cacbf57b43d84a4c3131210848ead9964dfb). Notice candidate superset may include source tools/tests; complete compiled-binary coverage remains pending."
+        },
+        {
+          "file": "assets/sharp-native-libpng-1.6.58-0c777e9f2a67-AUTHORS.txt",
+          "sha256": "0c777e9f2a67bd4058ab91050eb7a56106c92ed038ba8fe5f54c83344f2d93ca",
+          "source": "https://netactuate.dl.sourceforge.net/project/libpng/libpng16/1.6.58/libpng-1.6.58.tar.xz",
+          "description": "Original archive member libpng-1.6.58/AUTHORS from checksum-verified libpng 1.6.58 source archive (28eb403f51f0f7405249132cecfe82ea5c0ef97f1b32c5a65828814ae0d34775). Notice candidate superset may include source tools/tests; complete compiled-binary coverage remains pending."
+        },
+        {
+          "file": "assets/sharp-native-libpng-1.6.58-bdb0a645ea18-LICENSE.txt",
+          "sha256": "bdb0a645ea18c60507d0368379b1ac5474b92255fcc2d115e07486a7672ba526",
+          "source": "https://netactuate.dl.sourceforge.net/project/libpng/libpng16/1.6.58/libpng-1.6.58.tar.xz",
+          "description": "Original archive member libpng-1.6.58/LICENSE from checksum-verified libpng 1.6.58 source archive (28eb403f51f0f7405249132cecfe82ea5c0ef97f1b32c5a65828814ae0d34775). Notice candidate superset may include source tools/tests; complete compiled-binary coverage remains pending."
+        },
+        {
+          "file": "assets/sharp-native-libpng-1.6.58-508a77d2e7b5-LICENSE_MIT.txt.txt",
+          "sha256": "508a77d2e7b51d98adeed32648ad124b7b30241a8e70b2e72c99f92d8e5874d1",
+          "source": "https://netactuate.dl.sourceforge.net/project/libpng/libpng16/1.6.58/libpng-1.6.58.tar.xz",
+          "description": "Original archive member libpng-1.6.58/ci/LICENSE_MIT.txt from checksum-verified libpng 1.6.58 source archive (28eb403f51f0f7405249132cecfe82ea5c0ef97f1b32c5a65828814ae0d34775). Notice candidate superset may include source tools/tests; complete compiled-binary coverage remains pending."
+        },
+        {
+          "file": "assets/sharp-native-libpng-1.6.58-d6cb0e9e560f-COPYING.txt",
+          "sha256": "d6cb0e9e560f51085556949a84af12b79a00f10ab8b66c752537faf7cd665572",
+          "source": "https://netactuate.dl.sourceforge.net/project/libpng/libpng16/1.6.58/libpng-1.6.58.tar.xz",
+          "description": "Original archive member libpng-1.6.58/contrib/gregbook/COPYING from checksum-verified libpng 1.6.58 source archive (28eb403f51f0f7405249132cecfe82ea5c0ef97f1b32c5a65828814ae0d34775). Notice candidate superset may include source tools/tests; complete compiled-binary coverage remains pending."
+        },
+        {
+          "file": "assets/sharp-native-libpng-1.6.58-b6a03c1803eb-LICENSE.txt",
+          "sha256": "b6a03c1803eb58ffb1f1278d5c7d4096c4c116e66dce8a7553e8c77d163c3438",
+          "source": "https://netactuate.dl.sourceforge.net/project/libpng/libpng16/1.6.58/libpng-1.6.58.tar.xz",
+          "description": "Original archive member libpng-1.6.58/contrib/gregbook/LICENSE from checksum-verified libpng 1.6.58 source archive (28eb403f51f0f7405249132cecfe82ea5c0ef97f1b32c5a65828814ae0d34775). Notice candidate superset may include source tools/tests; complete compiled-binary coverage remains pending."
+        },
+        {
+          "file": "assets/sharp-native-libpng-1.6.58-1806f1f10d39-LICENSE.txt.txt",
+          "sha256": "1806f1f10d393e9e377b3a8d1b968452b54f1a90378f14eeef45426946ace330",
+          "source": "https://netactuate.dl.sourceforge.net/project/libpng/libpng16/1.6.58/libpng-1.6.58.tar.xz",
+          "description": "Original archive member libpng-1.6.58/contrib/pngminus/LICENSE.txt from checksum-verified libpng 1.6.58 source archive (28eb403f51f0f7405249132cecfe82ea5c0ef97f1b32c5a65828814ae0d34775). Notice candidate superset may include source tools/tests; complete compiled-binary coverage remains pending."
+        },
+        {
+          "file": "assets/sharp-native-libpng-1.6.58-50633b976f01-AUTHORS.md.txt",
+          "sha256": "50633b976f0133862c921aa67d56de2c0b42eb344c8ca3853686efb092a447db",
+          "source": "https://netactuate.dl.sourceforge.net/project/libpng/libpng16/1.6.58/libpng-1.6.58.tar.xz",
+          "description": "Original archive member libpng-1.6.58/scripts/cmake/AUTHORS.md from checksum-verified libpng 1.6.58 source archive (28eb403f51f0f7405249132cecfe82ea5c0ef97f1b32c5a65828814ae0d34775). Notice candidate superset may include source tools/tests; complete compiled-binary coverage remains pending."
+        },
+        {
+          "file": "assets/sharp-native-librsvg-2.63.2-14e765b9c109-AUTHORS.txt",
+          "sha256": "14e765b9c1097d93f4b842a6ad23172b530cc00dfe7a5aae1b9afefdca54531b",
+          "source": "https://download.gnome.org/sources/librsvg/2.63/librsvg-2.63.2.tar.xz",
+          "description": "Original archive member librsvg-2.63.2/AUTHORS from checksum-verified librsvg 2.63.2 source archive (852b18e1a00b8605528825a27dc7748bff2a5dd254028f59dc22a34ea57e81b6). Notice candidate superset may include source tools/tests; complete compiled-binary coverage remains pending."
+        },
+        {
+          "file": "assets/sharp-native-librsvg-2.63.2-dc626520dcd5-COPYING.LIB.txt",
+          "sha256": "dc626520dcd53a22f727af3ee42c770e56c97a64fe3adb063799d8ab032fe551",
+          "source": "https://download.gnome.org/sources/librsvg/2.63/librsvg-2.63.2.tar.xz",
+          "description": "Original archive member librsvg-2.63.2/COPYING.LIB from checksum-verified librsvg 2.63.2 source archive (852b18e1a00b8605528825a27dc7748bff2a5dd254028f59dc22a34ea57e81b6). Notice candidate superset may include source tools/tests; complete compiled-binary coverage remains pending."
+        },
+        {
+          "file": "assets/sharp-native-librsvg-2.63.2-f9c4c77baa38-LICENSE.txt",
+          "sha256": "f9c4c77baa3828004ee54b8a4f2db2e88ed44a6237a493965bf551fac0fcb62d",
+          "source": "https://download.gnome.org/sources/librsvg/2.63/librsvg-2.63.2.tar.xz",
+          "description": "Original archive member librsvg-2.63.2/librsvg-rebind/LICENSE from checksum-verified librsvg 2.63.2 source archive (852b18e1a00b8605528825a27dc7748bff2a5dd254028f59dc22a34ea57e81b6). Notice candidate superset may include source tools/tests; complete compiled-binary coverage remains pending."
+        },
+        {
+          "file": "assets/sharp-native-libwebp-1.6.0-cc3273e0694e-PATENTS.txt",
+          "sha256": "cc3273e0694ea5896145e0677699b53471b03ea43021ddc50e7923fbb9f5023c",
+          "source": "https://storage.googleapis.com/downloads.webmproject.org/releases/webp/libwebp-1.6.0.tar.gz",
+          "description": "Original archive member libwebp-1.6.0/PATENTS from checksum-verified libwebp 1.6.0 source archive (e4ab7009bf0629fd11982d4c2aa83964cf244cffba7347ecd39019a9e38c4564). Notice candidate superset may include source tools/tests; complete compiled-binary coverage remains pending."
+        },
+        {
+          "file": "assets/sharp-native-libwebp-1.6.0-5aec868f669e-COPYING.txt",
+          "sha256": "5aec868f669e384a22372a4e8a1a6cd7d44c64cd451f960ca69cc170d1e13acf",
+          "source": "https://storage.googleapis.com/downloads.webmproject.org/releases/webp/libwebp-1.6.0.tar.gz",
+          "description": "Original archive member libwebp-1.6.0/COPYING from checksum-verified libwebp 1.6.0 source archive (e4ab7009bf0629fd11982d4c2aa83964cf244cffba7347ecd39019a9e38c4564). Notice candidate superset may include source tools/tests; complete compiled-binary coverage remains pending."
+        },
+        {
+          "file": "assets/sharp-native-libwebp-1.6.0-f251be89fd44-AUTHORS.txt",
+          "sha256": "f251be89fd442bd9d701360730aea163cc8e2076ff03528f59267dc2c4f8b60a",
+          "source": "https://storage.googleapis.com/downloads.webmproject.org/releases/webp/libwebp-1.6.0.tar.gz",
+          "description": "Original archive member libwebp-1.6.0/AUTHORS from checksum-verified libwebp 1.6.0 source archive (e4ab7009bf0629fd11982d4c2aa83964cf244cffba7347ecd39019a9e38c4564). Notice candidate superset may include source tools/tests; complete compiled-binary coverage remains pending."
+        },
+        {
+          "file": "assets/sharp-native-libxml2-2.15.4-5d4873884a89-Copyright.txt",
+          "sha256": "5d4873884a890122a4b9b20ad56ac6f7da1d796a5bfcf04a427970ac96217626",
+          "source": "https://download.gnome.org/sources/libxml2/2.15/libxml2-2.15.4.tar.xz",
+          "description": "Original archive member libxml2-2.15.4/Copyright from checksum-verified libxml2 2.15.4 source archive (98087fd181d9070724f3fbc65c7377db03038eb92bd882374daff44940138821). Notice candidate superset may include source tools/tests; complete compiled-binary coverage remains pending."
+        },
+        {
+          "file": "assets/sharp-native-libxml2-2.15.4-d6a2cb265a0a-NOTICE.txt",
+          "sha256": "d6a2cb265a0a249a234b89eeffa7f316ebe5bff546672a0a2b1a861dd2238460",
+          "source": "https://download.gnome.org/sources/libxml2/2.15/libxml2-2.15.4.tar.xz",
+          "description": "Original archive member libxml2-2.15.4/test/html-tokenizer/NOTICE from checksum-verified libxml2 2.15.4 source archive (98087fd181d9070724f3fbc65c7377db03038eb92bd882374daff44940138821). Notice candidate superset may include source tools/tests; complete compiled-binary coverage remains pending."
+        },
+        {
+          "file": "assets/sharp-native-mozjpeg-0826579-96f5b328adbb-LICENSE.md.txt",
+          "sha256": "96f5b328adbb78eeaaec6980d73fd558cb1e4d62560ed615646bc3cf5e532430",
+          "source": "https://codeload.github.com/mozilla/mozjpeg/legacy.tar.gz/08265790774cd0714832c9e675522acbe5581437",
+          "description": "Original archive member mozilla-mozjpeg-0826579/LICENSE.md from checksum-verified mozjpeg 0826579 source archive (375d19302f09dfa267651dcfd3ddb62862ab3a488862b6168ce755bb1a925860). Notice candidate superset may include source tools/tests; complete compiled-binary coverage remains pending."
+        },
+        {
+          "file": "assets/sharp-native-mozjpeg-0826579-4b9abebc4338-LICENSE.txt",
+          "sha256": "4b9abebc4338048a7c2dc184e9f800deb349366bdf28eb23c2677a77b4c87726",
+          "source": "https://codeload.github.com/mozilla/mozjpeg/legacy.tar.gz/08265790774cd0714832c9e675522acbe5581437",
+          "description": "Original archive member mozilla-mozjpeg-0826579/java/doc/legal/LICENSE from checksum-verified mozjpeg 0826579 source archive (375d19302f09dfa267651dcfd3ddb62862ab3a488862b6168ce755bb1a925860). Notice candidate superset may include source tools/tests; complete compiled-binary coverage remains pending."
+        },
+        {
+          "file": "assets/sharp-native-mozjpeg-0826579-933e1427ec78-License.rtf.txt",
+          "sha256": "933e1427ec78050c76396182fd9819a23fef58c17e997b67581852167be971db",
+          "source": "https://codeload.github.com/mozilla/mozjpeg/legacy.tar.gz/08265790774cd0714832c9e675522acbe5581437",
+          "description": "Original archive member mozilla-mozjpeg-0826579/release/License.rtf from checksum-verified mozjpeg 0826579 source archive (375d19302f09dfa267651dcfd3ddb62862ab3a488862b6168ce755bb1a925860). Notice candidate superset may include source tools/tests; complete compiled-binary coverage remains pending."
+        },
+        {
+          "file": "assets/sharp-native-pango-1.58.2-d245807f9003-COPYING.txt",
+          "sha256": "d245807f90032872d1438d741ed21e2490e1175dc8aa3afa5ddb6c8e529b58e5",
+          "source": "https://download.gnome.org/sources/pango/1.58/pango-1.58.2.tar.xz",
+          "description": "Original archive member pango-1.58.2/COPYING from checksum-verified pango 1.58.2 source archive (342385b6ca3b7c73455d7c80a13b7dbe4489e00bc3bd4c5bd6ed4dce421e374a). Notice candidate superset may include source tools/tests; complete compiled-binary coverage remains pending."
+        },
+        {
+          "file": "assets/sharp-native-pixman-0.46.4-e3b0c44298fc-AUTHORS.txt",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "source": "https://cairographics.org/releases/pixman-0.46.4.tar.gz",
+          "description": "Original archive member pixman-0.46.4/AUTHORS from checksum-verified pixman 0.46.4 source archive (d09c44ebc3bd5bee7021c79f922fe8fb2fb57f7320f55e97ff9914d2346a591c). Notice candidate superset may include source tools/tests; complete compiled-binary coverage remains pending."
+        },
+        {
+          "file": "assets/sharp-native-pixman-0.46.4-fac9270f0987-COPYING.txt",
+          "sha256": "fac9270f0987b96ff4533fca3548c633e02083cbba4a0172a3b149b2e4019793",
+          "source": "https://cairographics.org/releases/pixman-0.46.4.tar.gz",
+          "description": "Original archive member pixman-0.46.4/COPYING from checksum-verified pixman 0.46.4 source archive (d09c44ebc3bd5bee7021c79f922fe8fb2fb57f7320f55e97ff9914d2346a591c). Notice candidate superset may include source tools/tests; complete compiled-binary coverage remains pending."
+        },
+        {
+          "file": "assets/sharp-native-proxy-libintl-0.5-d245807f9003-COPYING.txt",
+          "sha256": "d245807f90032872d1438d741ed21e2490e1175dc8aa3afa5ddb6c8e529b58e5",
+          "source": "https://codeload.github.com/frida/proxy-libintl/tar.gz/refs/tags/0.5",
+          "description": "Original archive member proxy-libintl-0.5/COPYING from checksum-verified proxy-libintl 0.5 source archive (f7a1cbd7579baaf575c66f9d99fb6295e9b0684a28b095967cfda17857595303). Notice candidate superset may include source tools/tests; complete compiled-binary coverage remains pending."
+        },
+        {
+          "file": "assets/sharp-native-tiff-4.7.2-02e86af3b805-license.rst.txt.txt",
+          "sha256": "02e86af3b805e0f2075ebb5ac512831f6ab2a97ddeb186de076c418956418ba1",
+          "source": "https://download.osgeo.org/libtiff/tiff-4.7.2.tar.xz",
+          "description": "Original archive member tiff-4.7.2/doc/html-prebuilt/_sources/project/license.rst.txt from checksum-verified tiff 4.7.2 source archive (4996f0c4f93094719b1ca5c6279b20e588773ba8a247533e486416fb662ddb88). Notice candidate superset may include source tools/tests; complete compiled-binary coverage remains pending."
+        },
+        {
+          "file": "assets/sharp-native-tiff-4.7.2-6c9436f8e9f5-license.html.txt",
+          "sha256": "6c9436f8e9f58a79e044949e360291b9c910715fad31cdaed66bc61b0dcf33e6",
+          "source": "https://download.osgeo.org/libtiff/tiff-4.7.2.tar.xz",
+          "description": "Original archive member tiff-4.7.2/doc/html-prebuilt/project/license.html from checksum-verified tiff 4.7.2 source archive (4996f0c4f93094719b1ca5c6279b20e588773ba8a247533e486416fb662ddb88). Notice candidate superset may include source tools/tests; complete compiled-binary coverage remains pending."
+        },
+        {
+          "file": "assets/sharp-native-tiff-4.7.2-02e86af3b805-license.rst.txt",
+          "sha256": "02e86af3b805e0f2075ebb5ac512831f6ab2a97ddeb186de076c418956418ba1",
+          "source": "https://download.osgeo.org/libtiff/tiff-4.7.2.tar.xz",
+          "description": "Original archive member tiff-4.7.2/doc/project/license.rst from checksum-verified tiff 4.7.2 source archive (4996f0c4f93094719b1ca5c6279b20e588773ba8a247533e486416fb662ddb88). Notice candidate superset may include source tools/tests; complete compiled-binary coverage remains pending."
+        },
+        {
+          "file": "assets/sharp-native-tiff-4.7.2-0e27c2382d7b-LICENSE.md.txt",
+          "sha256": "0e27c2382d7b8147972bbb746e04059a1152c8d0fda9d03ef1399d1a433c4ade",
+          "source": "https://download.osgeo.org/libtiff/tiff-4.7.2.tar.xz",
+          "description": "Original archive member tiff-4.7.2/LICENSE.md from checksum-verified tiff 4.7.2 source archive (4996f0c4f93094719b1ca5c6279b20e588773ba8a247533e486416fb662ddb88). Notice candidate superset may include source tools/tests; complete compiled-binary coverage remains pending."
+        },
+        {
+          "file": "assets/sharp-native-uhdr-2.0.2-c9247b5cb078-LICENSE.txt",
+          "sha256": "c9247b5cb07866938643cc238292434e6f2af8642e1fce10771c0e4cc7909316",
+          "source": "https://codeload.github.com/google/libultrahdr/tar.gz/refs/tags/v2.0.2",
+          "description": "Original archive member libultrahdr-2.0.2/LICENSE from checksum-verified uhdr 2.0.2 source archive (aa8d193bb887c348c419780511dd03b374f4e07af8812b6d3f80c8537cf1ef2c). Notice candidate superset may include source tools/tests; complete compiled-binary coverage remains pending."
+        },
+        {
+          "file": "assets/sharp-native-uhdr-2.0.2-cfc7749b96f6-LICENSE-APACHE.txt",
+          "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30",
+          "source": "https://codeload.github.com/google/libultrahdr/tar.gz/refs/tags/v2.0.2",
+          "description": "Original archive member libultrahdr-2.0.2/LICENSE-APACHE from checksum-verified uhdr 2.0.2 source archive (aa8d193bb887c348c419780511dd03b374f4e07af8812b6d3f80c8537cf1ef2c). Notice candidate superset may include source tools/tests; complete compiled-binary coverage remains pending."
+        },
+        {
+          "file": "assets/sharp-native-uhdr-2.0.2-029624bf1488-LICENSE-MIT.txt",
+          "sha256": "029624bf1488ed7b8c92727d267c95f588c9c12fa6932c207884c2641a7e9d37",
+          "source": "https://codeload.github.com/google/libultrahdr/tar.gz/refs/tags/v2.0.2",
+          "description": "Original archive member libultrahdr-2.0.2/LICENSE-MIT from checksum-verified uhdr 2.0.2 source archive (aa8d193bb887c348c419780511dd03b374f4e07af8812b6d3f80c8537cf1ef2c). Notice candidate superset may include source tools/tests; complete compiled-binary coverage remains pending."
+        },
+        {
+          "file": "assets/sharp-native-uhdr-2.0.2-746d8c9c414b-NOTICE.txt",
+          "sha256": "746d8c9c414b335bb7c9615918a15a6489a4dcc1c5c3aac2bda410d1072c332a",
+          "source": "https://codeload.github.com/google/libultrahdr/tar.gz/refs/tags/v2.0.2",
+          "description": "Original archive member libultrahdr-2.0.2/adobe-hdr-gain-map-license/NOTICE from checksum-verified uhdr 2.0.2 source archive (aa8d193bb887c348c419780511dd03b374f4e07af8812b6d3f80c8537cf1ef2c). Notice candidate superset may include source tools/tests; complete compiled-binary coverage remains pending."
+        },
+        {
+          "file": "assets/sharp-native-uhdr-2.0.2-c4b2cd68902b-LICENSE.txt",
+          "sha256": "c4b2cd68902b8c4a82c9b5ddebe15538acbce7f70a88fcc751e1e921bde89f7f",
+          "source": "https://codeload.github.com/google/libultrahdr/tar.gz/refs/tags/v2.0.2",
+          "description": "Original archive member libultrahdr-2.0.2/tests/data/LICENSE from checksum-verified uhdr 2.0.2 source archive (aa8d193bb887c348c419780511dd03b374f4e07af8812b6d3f80c8537cf1ef2c). Notice candidate superset may include source tools/tests; complete compiled-binary coverage remains pending."
+        },
+        {
+          "file": "assets/sharp-native-uhdr-2.0.2-cfc7749b96f6-LICENSE.txt",
+          "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30",
+          "source": "https://codeload.github.com/google/libultrahdr/tar.gz/refs/tags/v2.0.2",
+          "description": "Original archive member libultrahdr-2.0.2/third_party/image_io/LICENSE from checksum-verified uhdr 2.0.2 source archive (aa8d193bb887c348c419780511dd03b374f4e07af8812b6d3f80c8537cf1ef2c). Notice candidate superset may include source tools/tests; complete compiled-binary coverage remains pending."
+        },
+        {
+          "file": "assets/sharp-native-uhdr-2.0.2-d47e8390fb0d-LICENSE.txt",
+          "sha256": "d47e8390fb0d7ad4a18f26aedd6283c7ab6b5b4fabab536ccb4db7f9f6d90c08",
+          "source": "https://codeload.github.com/google/libultrahdr/tar.gz/refs/tags/v2.0.2",
+          "description": "Original archive member libultrahdr-2.0.2/third_party/image_io/src/modp_b64/LICENSE from checksum-verified uhdr 2.0.2 source archive (aa8d193bb887c348c419780511dd03b374f4e07af8812b6d3f80c8537cf1ef2c). Notice candidate superset may include source tools/tests; complete compiled-binary coverage remains pending."
+        },
+        {
+          "file": "assets/sharp-native-vips-8.18.7-dc626520dcd5-LICENSE.txt",
+          "sha256": "dc626520dcd53a22f727af3ee42c770e56c97a64fe3adb063799d8ab032fe551",
+          "source": "https://release-assets.githubusercontent.com/github-production-release-asset/1291410/d43a4776-45a9-4fee-820b-20af0cffcc14",
+          "description": "Original archive member vips-8.18.7/LICENSE from checksum-verified vips 8.18.7 source archive (5baaead3b0bb20ffdb9e9ff09aa9fda08620923df77b63b436654cb5e0b3bf94). Notice candidate superset may include source tools/tests; complete compiled-binary coverage remains pending."
+        },
+        {
+          "file": "assets/sharp-native-vips-8.18.7-1469b759cf18-COPYING.txt",
+          "sha256": "1469b759cf18e43c6e1b4ff892307d3962cbbb337ac497620d6690a219fad10c",
+          "source": "https://release-assets.githubusercontent.com/github-production-release-asset/1291410/d43a4776-45a9-4fee-820b-20af0cffcc14",
+          "description": "Original archive member vips-8.18.7/libvips/foreign/libnsgif/COPYING from checksum-verified vips 8.18.7 source archive (5baaead3b0bb20ffdb9e9ff09aa9fda08620923df77b63b436654cb5e0b3bf94). Notice candidate superset may include source tools/tests; complete compiled-binary coverage remains pending."
+        },
+        {
+          "file": "assets/sharp-native-zlib-ng-2.3.3-6c9f0d975b41-LICENSE.md.txt",
+          "sha256": "6c9f0d975b41afaa34d22f55bb8986ce69e5cb7ad327cb2b28820cd425edf5ee",
+          "source": "https://codeload.github.com/zlib-ng/zlib-ng/tar.gz/refs/tags/2.3.3",
+          "description": "Original archive member zlib-ng-2.3.3/LICENSE.md from checksum-verified zlib-ng 2.3.3 source archive (f9c65aa9c852eb8255b636fd9f07ce1c406f061ec19a2e7d508b318ca0c907d1). Notice candidate superset may include source tools/tests; complete compiled-binary coverage remains pending."
         }
       ]
     },
@@ -450,8 +1009,8 @@
     {
       "packages": [
         {
-          "name": "onnxruntime-web",
-          "version": "1.31.0-dev.20260914-8d85527a0"
+          "name": "@huggingface/transformers",
+          "version": "4.3.0"
         }
       ],
       "assets": [
@@ -472,8 +1031,8 @@
     {
       "packages": [
         {
-          "name": "onnxruntime-common",
-          "version": "1.31.0-dev.20260911-2a43ec07e"
+          "name": "@huggingface/transformers",
+          "version": "4.3.0"
         }
       ],
       "assets": [
@@ -488,28 +1047,6 @@
           "sha256": "143764b952fdb1a7c69ce653bfba74a7744d6a8a573bfb73e235fba356c83de3",
           "source": "https://raw.githubusercontent.com/microsoft/onnxruntime/2a43ec07e67df9263c7c56c15da76cc7f74d7b32/ThirdPartyNotices.txt",
           "description": "Original upstream license/notice bytes for onnxruntime-common-2a43ec0-ThirdPartyNotices.txt. Exact source URL and SHA-256 are retained."
-        }
-      ]
-    },
-    {
-      "packages": [
-        {
-          "name": "guid-typescript",
-          "version": "1.0.9"
-        }
-      ],
-      "assets": [
-        {
-          "file": "assets/spdx-ISC-reference-31ba1a5.txt",
-          "sha256": "521c6f0ed8e64736684f89843d16a4df6b4b7449acbcfc6ca6630a3037ca8c53",
-          "source": "https://raw.githubusercontent.com/spdx/license-list-data/31ba1a50e5397e00a304dbadc76531740e89ee48/text/ISC.txt",
-          "description": "ISC standard template with original placeholders; not guid-typescript upstream copyright notice"
-        },
-        {
-          "file": "assets/guid-typescript-1.0.9-upstream-metadata.json",
-          "sha256": "6378c2ba06b0a41e033140a30359ba77fbf8706e46a2c9913d9ffff318c3d23a",
-          "source": "https://registry.npmjs.org/guid-typescript/1.0.9",
-          "description": "Original npm metadata declares ISC and author nicolas; gitHead not found in redirected upstream repository"
         }
       ]
     }
@@ -529,10 +1066,8 @@
     }
   ],
   "reviewIssues": [
-    "guid-typescript@1.0.9 published tarball integrity matches official npm metadata and contains no LICENSE/NOTICE/copyright file; metadata declares ISC and author nicolas, but exact upstream gitHead is unavailable. SPDX ISC template remains reference only and does not complete upstream attribution.",
     "Canvas pinned root licenses, exact FreeType embedded notices and Chromium zlib SIMD/Intel/optimization source notices are retained. Actual binary/build coverage still requires review; glue-code notices are not external library licenses.",
     "Sharp native dependencies: preserve the 29-library table and LGPL texts; matching complete source/build notices and replacement/redistribution conditions still need review before public distribution.",
-    "Fixed Xenova/bge-small-zh-v1.5 revision 75c43b069aac4d136ba6bc1122f995fedcfd2781 model card was obtained and Git-blob verified. It identifies the BAAI base model but contains no license field or quantized-weight grant. FlagEmbedding code MIT text is not a grant for these weights; license review remains pending.",
-    "DirectML 1.15.4 complete official NuGet EULA, LICENSE-CODE and ThirdPartyNotices plus separate release NOTICE are retained. Actual/NuGet DLL raw hashes differ only in certificate/checksum/security-directory regions; matching non-certificate bytes is not signature-trust or redistribution-condition acceptance. Distribution conditions remain pending."
+    "Fixed Xenova/bge-small-zh-v1.5 revision 75c43b069aac4d136ba6bc1122f995fedcfd2781 model card was obtained and Git-blob verified. It identifies the BAAI base model but contains no license field or quantized-weight grant. FlagEmbedding code MIT text is not a grant for these weights; license review remains pending."
   ]
 }

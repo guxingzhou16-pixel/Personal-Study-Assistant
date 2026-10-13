@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import { mkdir, mkdtemp, readFile, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
 import test from 'node:test';
+import { createPackage } from '@electron/asar';
 import verifyPackage from './verify-package.mjs';
 
 async function fixture() {
@@ -31,4 +32,22 @@ test('rejects a copied project license whose bytes differ from the source licens
   await assert.rejects(readFile(join(context.packager.projectDir, 'package-audit.json')), {
     code: 'ENOENT',
   });
+});
+
+test('rejects standalone browser dependencies even when nested in another package', async () => {
+  for (const packagePath of [
+    'node_modules/onnxruntime-web',
+    'node_modules/unused/node_modules/guid-typescript',
+  ]) {
+    const context = await fixture();
+    const source = join(context.packager.projectDir, 'source');
+    await mkdir(join(source, packagePath), { recursive: true });
+    await writeFile(join(source, packagePath, 'index.js'), 'export const fixture = true;');
+    await writeFile(join(context.appOutDir, 'resources', 'LICENSE.txt'), await readFile('LICENSE'));
+    await createPackage(source, join(context.appOutDir, 'resources', 'app.asar'));
+    await assert.rejects(verifyPackage(context), /Unused standalone browser dependency/);
+    await assert.rejects(readFile(join(context.packager.projectDir, 'package-audit.json')), {
+      code: 'ENOENT',
+    });
+  }
 });

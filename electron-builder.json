@@ -13,6 +13,8 @@
     "dist-electron/*-worker.mjs",
     "package.json",
     "!**/*.map",
+    "!node_modules/onnxruntime-web/**/*",
+    "!**/node_modules/guid-typescript/**/*",
     "!node_modules/onnxruntime-node/bin/napi-v6/{darwin,linux}/**/*",
     "!node_modules/onnxruntime-node/bin/napi-v6/win32/arm64/**/*"
   ],

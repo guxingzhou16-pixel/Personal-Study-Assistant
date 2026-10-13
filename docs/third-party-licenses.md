@@ -1,6 +1,6 @@
 # 第三方许可与分发说明
 
-日期：2026-10-12。**状态：75份通知与来源资产及385个第三方输出已进入最新`d2055b2`MIT候选并逐字节核对；历史53包仍包含58份。用户已选择项目自有代码采用MIT，新包全文携带已核对，五项第三方来源／原生分发条件仍待完成。** 这份文档记录工程证据，不作法律合规通过结论。项目许可证在根目录[LICENSE](../LICENSE)，全文依据[SPDX MIT](https://spdx.org/licenses/MIT.html)，版权为2026 guxingzhou16-pixel。`private: true`继续防止误发npm包，仓库可见性与发布授权另行确定。
+核对日期：2026-10-13。**当前发布条件见[分发收尾](releases/distribution-closeout-2026-10-13.md)：新打包规则排除独立Web/GUID，DirectML当前Windows ML分发范围已核对，余Canvas/Sharp/固定量化BGE三项。** 旧25b/v13及d205包的75份资产/385输出和五项pending保留原字节，不沿用为新包数量或完整许可通过。用户已授权既有私有库发布；可信签名未完成，公开可见性未授权。本文为工程证据，非法律认证。项目自有代码[MIT](../LICENSE)，第三方保留各自条款；`private: true`继续防止误发npm包。
 
 ## 1. 安装包中如何查阅
 
@@ -72,6 +72,10 @@ zlib材料来自Skia固定依赖 `646b7f569718921d7d4b5b8e22572ff6c76f2596`，�
 当前候选的 DirectML.dll 为18527584字节，NuGet x64 DLL 为18527776字节，原始摘要不同。两者 FileVersion 均为 `1.15.4+241025-1615.1.dml-1.15.fac7597`。按 [微软 PE 格式](https://learn.microsoft.com/en-us/windows/win32/debug/pe-format)，只排除文件尾部证书表并清零 checksum / Security Directory 后，剩余18517504字节完全相同，归一 SHA-256 `518c2f3fc40dd6e7ed2087bb21cf9b98296e8f0066e9c74d3d52b76766cdd4d7`。原始文件和归一结果均记录在 source-records；不能写成 raw SHA 相同、签名信任验证通过或分发条件通过。
 
 ## 4. 发布前尚需完成
+
+### 当前执行入口（2026-10-13）
+
+本轮已关闭新规则的GUID分发项及当前DirectML用途/通知/数据说明工程项，现有模型和Sharp/Canvas保留。固定Sharp源码28/28已取得并匹配构建规则SHA，96份许可候选保留原字节；Rust次级对应材料和实际分发条件仍需齐全，不以“下载成功”代替闭合。具体材料、免费签名/申请、已授权目标及相关新包测试见[本轮报告](releases/distribution-closeout-2026-10-13.md)。下方2026-10-12五项清单为原候选证据，不能覆盖新的范围，也不能被改成旧包已解决。
 
 ### 本次可确认的DirectML条款范围（2026-10-12）
 
