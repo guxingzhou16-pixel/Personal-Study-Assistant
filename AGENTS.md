@@ -24,7 +24,7 @@
 | --- | --- |
 | 项目名称 | 私人学习助手 / Study Companion；当前界面使用“拾知”作为名称 |
 | 仓库 | `https://github.com/guxingzhou16-pixel/Personal-Study-Assistant` |
-| 仓库可见性 | README 记录为私有；公开发布前重新核对并取得明确授权 |
+| 仓库可见性 | 2026-10-13用户明确授权公开开源/申请SignPath，GitHub实际读回public；历史私有快照不覆盖当前状态 |
 | 主分支 | `main`；创建新的功能分支时默认使用 `codex/` 前缀 |
 | 当前开发工作区 | Windows 下的 `E:\私人学习助手`；项目代码不可依赖这个绝对路径 |
 | 首版平台 | Windows 10/11 桌面软件 |
@@ -344,6 +344,14 @@
 - 新规则只排除独立onnxruntime-web/GUID，ASAR hook拒绝漏入，内嵌Web/Common通知绑定实际Transformers4.3.0。Sharp/Canvas/DirectML仍保留；DirectML当前Windows ML用途/通知/数据说明已核对，新manifest剩Canvas/Sharp/固定量化BGE三项。旧包五项pending不改写，新实物/CPU/PDF按新报告核对。
 - 零预算候选SignPath Foundation（需开源/已发布/审核及组件资格）或Store/MSIX（个人注册/Store签名免费，本人身份及新格式验收必需）。本机证书命令不等于SignPath HSM接入，Store对MSIX签名不适用于NSIS。无申请成功或即时获得证书的保证。
 - 交接/条件/测试清单见`docs/releases/distribution-closeout-2026-10-13.md`，申请/隐私/角色材料见`docs/releases/code-signing-policy.md`。只补包装/签名影响路径，不重跑已充分验收旧业务/安装链；本机新signed-distribution UUID证据、原字节上游资产及私人资料不格式化或顺手提交。
+
+### 3.34 当前公开、裁剪包、素材与申请实况（2026-10-13）
+
+- 实际源码`2111b3c`已公开：仓库ID1397406382/private=false，默认main未变，仅推送授权功能分支。run38376393781/job115225737889整轮success，日志15打包/签名、32核心文件356、36桌面及Post通过。新NSIS140624396字节/SHA `62329e3e16c1acf5fdf20d77de2062554a731a632923b0469e59328a2a8f8bc6`，4776ASAR/472通知/3pending，仍NotSigned/未发布；包内独立Node CLI真实512维/两页PDF通过，不称新完整安装链或质量通过。
+- Sharp28完整源/GVDB/353Cargo及fixed nightly、Canvas93Cargo（30复用）已取得并校验；92份主库原文进新包，另634Cargo/158Canvas通知候选及462204248字节准备ZIP未公开，实际编译覆盖/LGPL替换等仍待闭合。省略本轮空AUTHOR，不改旧包或上游原字节。缓存/源图不得重复下载，详见`docs/releases/native-source-status-2026-10-13.md`。
+- SignPath表单按用户给定姓名/邮箱填写、如实请求新项目资格预审，营销未选；自动提交Captcha失败，用户也反馈相同错误，无成功/批准回执。不得经API绕过校验或把填表当已申请；本机`signpath-application-paste.txt`供日常浏览器手动填写，姓名/邮箱不放公开文档。
+- 用户随后单独允许发送已审阅的BGE五文件询证评论；#1487/comment6147791372实际发送并全文读回，暂未取得授权答复，详见`docs/releases/bge-license-inquiry.md`。此许可不扩展其他上游消息。450条公开源库存/摘要已进入`native-sources-0.1.1.json`；新增223份原字节Rust通知接入清单，新实物另验，不改旧2111包成绩或3pending。
+- 具体范围与未执行清单见`docs/testing/signed-distribution-2026-10-13.md`，免费签名/隐私/角色及分发条件见3.33链接。旧25b/旧5pending/旧授权记录保持边界，只补新变化风险。新本机UUID证据/用户数据不提交，上游字节不格式化。
 
 ## 4. 产品范围与功能要求
 
@@ -765,8 +773,8 @@ npx playwright test tests/rag.spec.ts
 
 - 本轮六项改善有对应源码、相关检查与实际体验记录；有限模型人工通过不代表普遍正确。新功能每项报告改动、验证、未验部分、提交和下一步。
 - 未覆盖的复杂PDF侧栏、代表性资料与不同机器做定向补验；不默认重跑旧安装全链或在个人数据上迁移试错。
-- 当前v13新源码尚未制作/验收新发布包，发布前须冻结来源、构建并隔离验证新增流程与恢复。旧MIT/安装回执不改写，新源码不借旧包成绩。
-- 分发许可、远端CI和发布授权按各自最新记录核对，不从其他对话的授权推断本任务可推送。用户本轮要求只本地提交，无标签/Release/可见性变更。
+- 当前v13旧25b包的新增流程/恢复/安装链已限定验收；新2111依赖裁剪候选的静态/包内CPU/PDF及源码CI另有证据，尚未签名或正式发布。最终包补齐许可/签名后按自身来源验证，不借旧包安装成绩。
+- 分发许可、远端CI和发布授权按各自最新记录核对，不从其他对话推断权限。本会话已明确授权该分支推送/CI、公开源码及条件齐全后的发布，实际范围见3.33/3.34；main未合并、安装包未上传或建标签，不因已获授权跳过剩余条件。
 - OCR/更多格式/云同步/复杂积分及展示网站继续规划中；软件优先，网站最后。
 ## 14. Git、隐私与协作流程
 

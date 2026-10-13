@@ -1,6 +1,6 @@
 # 第三方许可与分发说明
 
-核对日期：2026-10-13。**当前发布条件见[分发收尾](releases/distribution-closeout-2026-10-13.md)：新打包规则排除独立Web/GUID，DirectML当前Windows ML分发范围已核对，余Canvas/Sharp/固定量化BGE三项。** 旧25b/v13及d205包的75份资产/385输出和五项pending保留原字节，不沿用为新包数量或完整许可通过。用户已授权既有私有库发布；可信签名未完成，公开可见性未授权。本文为工程证据，非法律认证。项目自有代码[MIT](../LICENSE)，第三方保留各自条款；`private: true`继续防止误发npm包。
+核对日期：2026-10-13。**当前发布条件见[分发收尾](releases/distribution-closeout-2026-10-13.md)：新2111实物已排除独立Web/GUID，DirectML当前Windows ML分发范围已核对，余Canvas/Sharp/固定量化BGE三项。** 新包147元数据/158许可通知/165补充，共472输出；旧25b/v13及d205包的75补充/385输出和五项pending保留原字节，不沿用为新包数量或完整许可通过。仓库已按授权公开，SignPath提交遭Captcha失败，可信签名未完成。本文为工程证据，非法律认证。项目自有代码[MIT](../LICENSE)，第三方保留各自条款；`package.json`的`private: true`继续防止误发npm包，与GitHub可见性无关。
 
 ## 1. 安装包中如何查阅
 
@@ -75,7 +75,7 @@ zlib材料来自Skia固定依赖 `646b7f569718921d7d4b5b8e22572ff6c76f2596`，�
 
 ### 当前执行入口（2026-10-13）
 
-本轮已关闭新规则的GUID分发项及当前DirectML用途/通知/数据说明工程项，现有模型和Sharp/Canvas保留。固定Sharp源码28/28已取得并匹配构建规则SHA，96份许可候选保留原字节；Rust次级对应材料和实际分发条件仍需齐全，不以“下载成功”代替闭合。具体材料、免费签名/申请、已授权目标及相关新包测试见[本轮报告](releases/distribution-closeout-2026-10-13.md)。下方2026-10-12五项清单为原候选证据，不能覆盖新的范围，也不能被改成旧包已解决。
+本轮已关闭新候选的GUID分发项及当前DirectML用途/通知/数据说明工程项，现有模型和Sharp/Canvas保留。固定Sharp主源28/28、GVDB、353Cargo及nightly源，Canvas93Cargo/固定工程均取得并校验；92新增主库原文已入新包，634Cargo/158Canvas次级通知候选仍需按实际编译覆盖映射和接入，不以“下载成功”代替闭合。可复用库存、准备ZIP与具体缺口见[源码材料状态](releases/native-source-status-2026-10-13.md)，新包/CPU/PDF及精确CI见[本轮验证](testing/signed-distribution-2026-10-13.md)。下方2026-10-12五项清单为原候选证据，不能覆盖新的范围，也不能被改成旧包已解决。
 
 ### 本次可确认的DirectML条款范围（2026-10-12）
 

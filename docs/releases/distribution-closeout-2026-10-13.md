@@ -4,7 +4,7 @@
 
 ## 授权与发布对象
 
-用户本轮要求完成签名/分发/发布，后确认无证书，并明确选择“保留NSIS，公开开源并申请SignPath”、提供申请显示姓名。既有 `guxingzhou16-pixel/Personal-Study-Assistant` 公开及真实申请现已授权，分支推送/CI沿用此前授权；实际可见性/提交结果另记回执。付费、身份证明、main合并及向其他上游发消息没有授权，不重复询问已获授权事项。
+用户本轮要求完成签名/分发/发布，后确认无证书，并明确选择“保留NSIS，公开开源并申请SignPath”、提供申请显示姓名。既有仓库已实际公开，GitHub读回仓库ID1397406382、`private=false`、默认main未变；当前源码在授权的`codex/structured-notes`分支。申请提交被验证码拒绝，没有成功回执，详见[本轮验证](../testing/signed-distribution-2026-10-13.md)。付费、身份证明、main合并及向其他上游发消息没有授权，不重复询问已获授权事项。
 
 正式发布须有固定干净源码、对应包/通知/源码、适用范围验收、可信签名/时间戳、实际摘要及完整分发条件。用户授权已完成，不将证书/权利缺失说成仍缺用户同意。
 
@@ -12,13 +12,13 @@
 
 | 原条件          | 本轮处理                                                                                                                             | 当前结论                                                                                                                               |
 | --------------- | ------------------------------------------------------------------------------------------------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------- |
-| GUID 1.0.9      | Node ESM不使用独立Web/GUID，打包排除、ASAR审计拒绝顶层/嵌套；Transformers内嵌ONNX Web/Common通知绑定实际4.3.0                        | 新规则解决该组件分发问题，新候选实物/CPU/PDF仍需核对。没有伪造ISC版权，旧包原缺口保留                                                  |
-| Canvas 1.0.9    | 读取固定 `b2723ffa` 构建参数与Cargo.lock/toml；PDF.js DOMMatrix/Type3路径仍可能使用，保留组件                                        | **未关闭**：原52份补充并非Cargo/libavif/aom/mimalloc等实际静态组件全覆盖，不能用Skia胶水许可替代外部库                                 |
-| Sharp/libvips   | 取得固定wrapper `ef19ca09` / 基础MXE `c36160b2`完整构建源码，28主版本对应实物；定位GVDB/librsvg Cargo/libnsgif及BSD旧imagequant fork | **未关闭**：继续取得源归档/次级通知和可重建/替换材料，未编译或证明完整源已齐。Node顶层仍加载Sharp，不能直接删除                        |
+| GUID 1.0.9      | 新2111实际ASAR无顶层/嵌套独立Web/GUID，包内CPU/PDF检查通过；Transformers内嵌ONNX Web/Common通知绑定实际4.3.0                        | **新候选已关闭**：不分发该组件，没有伪造ISC版权；旧包原缺口保留                                                  |
+| Canvas 1.0.9    | 固定 `b2723ffa` 工程、Cargo.lock/toml及Skia DEPS已取得；93候选源/158原文通知已校验，实际包仍保留组件                                        | **未关闭**：新增通知未进包，Skia/Rust/运行时实际静态覆盖仍待映射，不能用Skia胶水许可替代外部库                                 |
+| Sharp/libvips   | 固定wrapper `ef19ca09` / 基础MXE `c36160b2`、28主源、GVDB、353Cargo及nightly源已校验；92主库原文已入包 | **未关闭**：完整编译覆盖、次级通知入包及LGPL相应源码/修改库替换证明仍待补齐。Node顶层仍加载Sharp，不能直接删除                        |
 | 固定量化BGE     | 原模型卡/五文件pin不变、不捆绑权重；基座/代码许可分别记录                                                                            | **未关闭**：固定Xenova revision `75c43b069aac4d136ba6bc1122f995fedcfd2781`确切依据，或自行转换且完整核对/验证；不因其他库写MIT就换权重 |
 | DirectML 1.15.4 | 按固定EULA核对Windows ML应用用途、非独立分发、通知和数据政策                                                                         | **当前范围已完成**：适用数据/出口条款持续有效；工程核对不是法律认证或SignPath System Libraries资格通过                                 |
 
-新manifest移除不分发的GUID和已具体核对的DirectML两条，剩 **Canvas、Sharp、固定量化BGE三项**。新包输出数量不可沿用旧75资产/385输出，实物结果单独记录。
+新manifest移除不分发的GUID和已具体核对的DirectML两条，剩 **Canvas、Sharp、固定量化BGE三项**。新包为147元数据/158许可通知/165补充，共472输出；旧75补充/385输出不变。全部源码材料取得范围、库存位置和剩余具体缺口见[源码材料状态](native-source-status-2026-10-13.md)。
 
 ### DirectML依据
 
@@ -27,7 +27,7 @@
 1. 第1(a)节允许Windows/Xbox机器学习框架应用分发；当前固定ONNX路径为Windows x64，无独立DirectML或跨平台发行。
 2. 第1(c)/3(c)节要求独立条款/通知保留，EULA、LICENSE-CODE、NuGet ThirdPartyNotices及另一份release NOTICE均已保留；不改为项目MIT。
 3. [签名政策隐私章节](code-signing-policy.md#隐私与系统行为)保留微软数据说明，不把CPU路径当“绝不收集”证明；本项目不新增遥测/私人资料上传。
-4. 出口等行为条件持续适用，本次只涉及既有私有仓库；具体目的地/用途变更时复核，不提前保证未来全部场景。
+4. 出口等行为条件持续适用；本轮已公开源码但未发布安装包，具体目的地/用途变更时复核，不提前保证未来全部场景。
 
 以上关闭本轮已知具体工程待办，其他组件和SignPath资格单独处理。依据[官方原文/完整包对照](../third-party-licenses.md#directml-完整包的具体对照)，不是向微软取得新审批。
 
@@ -39,7 +39,7 @@
 - 实际运行缺证书npm签名命令退出1，输出目录28→28，无编译/候选；此为负例通过，不是签名成功。
 - 两类静态评审完成，修复OidCollection.Add污染JSON、EKU ObjectId字符串、卸载器回执失效路径，复用流式摘要。真实自有证书链路未执行。
 
-本机证据：`artifacts/signed-distribution-7ff696bd-f0c1-450f-a1d6-ad8db0bb9681/`。免费路线/申请材料见[Code signing policy](code-signing-policy.md)。旧源码356/36和安装验收不计为本轮新测试。
+本机证据：`artifacts/signed-distribution-7ff696bd-f0c1-450f-a1d6-ad8db0bb9681/`。新冻结`2111b3c`的[run38376393781](https://github.com/guxingzhou16-pixel/Personal-Study-Assistant/actions/runs/38376393781)整轮及Post通过，实际日志为15打包/签名、32核心文件356、36桌面通过。新包大小/摘要、包内真实512维CPU和两页PDF结果见[本轮验证](../testing/signed-distribution-2026-10-13.md)；旧安装验收不计作新候选全链验收。免费路线/申请材料见[Code signing policy](code-signing-policy.md)。
 
 ## 剩余执行顺序与测试清单
 
@@ -47,13 +47,15 @@
 - [x] 签名预检/三文件回执/失败拒绝，规则6项与真实正/负文件读取。
 - [x] 独立Web/GUID排除、内嵌通知归属和审计拒绝规格。
 - [x] 当前DirectML用途/通知/数据说明核对。
-- [ ] 新干净NSIS实物：源码/字节/摘要、无独立Web/GUID、保留内嵌ONNX与原始通知。
-- [ ] 包内真实512维CPU、不联网降级、PDF.js Node解析；仅补被裁剪依赖链。
+- [x] 新干净NSIS实物：源码/字节/摘要、无独立Web/GUID、保留内嵌ONNX与原始通知。
+- [x] 包内真实512维CPU、PDF.js Node两页解析；样本无global fetch请求，仅补被裁剪依赖链，不称操作系统断网/故障降级或完整UI验收。
+- [x] Sharp28主源/GVDB/353Cargo/nightly、Canvas93Cargo及固定工程源校验，原始来源/摘要归档；超集不冒充实际链接覆盖。
+- [x] 用户已选择NSIS/SignPath，仓库公开及授权分支精确CI实际读回。
 - [ ] Canvas实际静态组件及通知覆盖。
-- [ ] Sharp完整源/补丁/Rust/GVDB材料，同批源码与替换/重建说明。
+- [ ] Sharp实际编译对应关系、次级通知入包、同批相应源码与修改库替换/重建说明。
 - [ ] 固定量化BGE权利证据，不以代码MIT替代。
-- [ ] 维护者选择免费路线，完成账户/申请审核；材料已准备，尚未提交。
+- [ ] SignPath有效提交/账户及资格审核；材料已准备，自动和用户提交均遇Captcha失败，没有成功回执。
 - [ ] 真签名三文件、统一发布者/版本、时间戳/摘要，干净Windows安装/卸载及CPU/PDF。
-- [ ] 固定源码/CI后在已授权私有库正式发布并核对上传字节，当前未发布。
+- [ ] 条件齐全后在已授权公开仓库正式发布并核对上传字节，当前未发布安装包/标签。
 
-路线已选NSIS/SignPath，Store作为后备研究记录。申请尚未提交、仓库实际公开动作须另读回确认，身份证明不交给AI；显示姓名/联系邮箱只用于申请，不加入项目文档。
+路线已选NSIS/SignPath，Store作为后备研究记录。页面重连后旧申请标签已丢失，本机`signpath-application-paste.txt`保留手动填写材料；请在日常浏览器使用[官方申请表](https://signpath.org/apply.html)。不绕过验证码，不把填表当有效提交；显示姓名/联系邮箱只用于申请，不加入项目文档。
