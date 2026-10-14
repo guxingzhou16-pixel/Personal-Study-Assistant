@@ -5085,6 +5085,518 @@
       "existingLicenseAsset": "assets/icu-d578f2e-LICENSE.txt",
       "existingLicenseSha256": "e55522d81edc687a341a4411e0776e54ca654e90147f354a90458aaced4116af",
       "usedByFixedHarfBuzz": "9cb1fee51069b206effb4736e443b038d230789d"
+    },
+    {
+      "file": "native-rust-adler2-2.0.1-861399f8c21c.txt",
+      "url": "https://static.rust-lang.org/dist/2026-09-24/rustc-nightly-src.tar.xz",
+      "revision": "6eeff9a52c3e35c4c4cbf5651f342dcd2191866f",
+      "sourceType": "fixed-nightly-standard-library-notice",
+      "version": "1.100.0-nightly-2026-09-24",
+      "sha256": "861399f8c21c042b110517e76dc6b63a2b334276c8cf17412fc3c8908ca8dc17",
+      "size": 665,
+      "sourceArchiveSha256": "f2c139528ba025f1141935df4f634e18db614b9b3b1cf2ea59e3675a6ade89f3",
+      "sourceMember": "rustc-nightly-src/library/vendor/adler2-2.0.1/LICENSE-0BSD",
+      "sameBytesOrigins": [
+        "rustc-nightly-src/library/vendor/adler2-2.0.1/LICENSE-0BSD"
+      ],
+      "reusedOriginalAsset": true
+    },
+    {
+      "file": "native-rust-ahash-0.8.12-a60eea817514.txt",
+      "url": "https://static.rust-lang.org/dist/2026-09-24/rustc-nightly-src.tar.xz",
+      "revision": "6eeff9a52c3e35c4c4cbf5651f342dcd2191866f",
+      "sourceType": "fixed-nightly-standard-library-notice",
+      "version": "1.100.0-nightly-2026-09-24",
+      "sha256": "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2",
+      "size": 10847,
+      "sourceArchiveSha256": "f2c139528ba025f1141935df4f634e18db614b9b3b1cf2ea59e3675a6ade89f3",
+      "sourceMember": "rustc-nightly-src/library/vendor/wit-bindgen-0.62.0/LICENSE-APACHE",
+      "sameBytesOrigins": [
+        "rustc-nightly-src/library/vendor/wit-bindgen-0.62.0/LICENSE-APACHE",
+        "rustc-nightly-src/library/vendor/wasip3-0.9.0+wasi-0.3.0/LICENSE-APACHE",
+        "rustc-nightly-src/library/vendor/gimli-0.34.0/LICENSE-APACHE",
+        "rustc-nightly-src/library/vendor/hashbrown-0.17.1/LICENSE-APACHE",
+        "rustc-nightly-src/library/vendor/addr2line-0.27.1/LICENSE-APACHE",
+        "rustc-nightly-src/library/vendor/object-0.39.1/LICENSE-APACHE",
+        "rustc-nightly-src/library/vendor/find-msvc-tools-0.1.11/LICENSE-APACHE",
+        "rustc-nightly-src/library/vendor/wasip2-2.0.1+wasi-0.2.12/LICENSE-APACHE",
+        "rustc-nightly-src/library/vendor/cc-1.4.3/LICENSE-APACHE",
+        "rustc-nightly-src/library/vendor/hermit-abi-0.5.3/LICENSE-APACHE",
+        "rustc-nightly-src/library/vendor/cfg-if-1.0.4/LICENSE-APACHE",
+        "rustc-nightly-src/library/vendor/dlmalloc-0.2.14/LICENSE-APACHE",
+        "rustc-nightly-src/library/vendor/getopts-0.2.24/LICENSE-APACHE",
+        "rustc-nightly-src/library/vendor/rustc-demangle-0.1.28/LICENSE-APACHE"
+      ],
+      "reusedOriginalAsset": true
+    },
+    {
+      "file": "native-rust-rand-0.10.2-35242e7a83f6.txt",
+      "url": "https://static.rust-lang.org/dist/2026-09-24/rustc-nightly-src.tar.xz",
+      "revision": "6eeff9a52c3e35c4c4cbf5651f342dcd2191866f",
+      "sourceType": "fixed-nightly-standard-library-notice",
+      "version": "1.100.0-nightly-2026-09-24",
+      "sha256": "35242e7a83f69875e6edeff02291e688c97caafe2f8902e4e19b49d3e78b4cab",
+      "size": 9724,
+      "sourceArchiveSha256": "f2c139528ba025f1141935df4f634e18db614b9b3b1cf2ea59e3675a6ade89f3",
+      "sourceMember": "rustc-nightly-src/library/vendor/rand_xorshift-0.4.0/LICENSE-APACHE",
+      "sameBytesOrigins": [
+        "rustc-nightly-src/library/vendor/rand_xorshift-0.4.0/LICENSE-APACHE",
+        "rustc-nightly-src/library/vendor/rand-0.9.5/LICENSE-APACHE"
+      ],
+      "reusedOriginalAsset": true
+    },
+    {
+      "file": "native-rust-dtoa-1.0.11-62c7a1e35f56.txt",
+      "url": "https://static.rust-lang.org/dist/2026-09-24/rustc-nightly-src.tar.xz",
+      "revision": "6eeff9a52c3e35c4c4cbf5651f342dcd2191866f",
+      "sourceType": "fixed-nightly-standard-library-notice",
+      "version": "1.100.0-nightly-2026-09-24",
+      "sha256": "62c7a1e35f56406896d7aa7ca52d0cc0d272ac022b5d2796e7d6905db8a3636a",
+      "size": 9723,
+      "sourceArchiveSha256": "f2c139528ba025f1141935df4f634e18db614b9b3b1cf2ea59e3675a6ade89f3",
+      "sourceMember": "rustc-nightly-src/library/vendor/unwinding-0.2.10/LICENSE-APACHE",
+      "sameBytesOrigins": [
+        "rustc-nightly-src/library/vendor/unwinding-0.2.10/LICENSE-APACHE",
+        "rustc-nightly-src/library/vendor/rustc-literal-escaper-0.0.8/LICENSE-APACHE",
+        "rustc-nightly-src/library/vendor/libc-0.2.189/LICENSE-APACHE"
+      ],
+      "reusedOriginalAsset": true
+    },
+    {
+      "file": "native-rust-adler2-2.0.1-8ada45cd9f84.txt",
+      "url": "https://static.rust-lang.org/dist/2026-09-24/rustc-nightly-src.tar.xz",
+      "revision": "6eeff9a52c3e35c4c4cbf5651f342dcd2191866f",
+      "sourceType": "fixed-nightly-standard-library-notice",
+      "version": "1.100.0-nightly-2026-09-24",
+      "sha256": "8ada45cd9f843acf64e4722ae262c622a2b3b3007c7310ef36ac1061a30f6adb",
+      "size": 10860,
+      "sourceArchiveSha256": "f2c139528ba025f1141935df4f634e18db614b9b3b1cf2ea59e3675a6ade89f3",
+      "sourceMember": "rustc-nightly-src/library/vendor/adler2-2.0.1/LICENSE-APACHE",
+      "sameBytesOrigins": [
+        "rustc-nightly-src/library/vendor/adler2-2.0.1/LICENSE-APACHE"
+      ],
+      "reusedOriginalAsset": true
+    },
+    {
+      "file": "native-rust-shlex-2.0.1-553fffcd9b1c.txt",
+      "url": "https://static.rust-lang.org/dist/2026-09-24/rustc-nightly-src.tar.xz",
+      "revision": "6eeff9a52c3e35c4c4cbf5651f342dcd2191866f",
+      "sourceType": "fixed-nightly-standard-library-notice",
+      "version": "1.100.0-nightly-2026-09-24",
+      "sha256": "553fffcd9b1cb158bc3e9edc35da85ca5c3b3d7d2e61c883ebcfa8a65814b583",
+      "size": 566,
+      "sourceArchiveSha256": "f2c139528ba025f1141935df4f634e18db614b9b3b1cf2ea59e3675a6ade89f3",
+      "sourceMember": "rustc-nightly-src/library/vendor/shlex-2.0.1/LICENSE-APACHE",
+      "sameBytesOrigins": [
+        "rustc-nightly-src/library/vendor/shlex-2.0.1/LICENSE-APACHE"
+      ],
+      "reusedOriginalAsset": true
+    },
+    {
+      "file": "sharp-nightly-6eeff9a-69fef7b0f322-LICENSE-APACHE.txt",
+      "url": "https://static.rust-lang.org/dist/2026-09-24/rustc-nightly-src.tar.xz",
+      "revision": "6eeff9a52c3e35c4c4cbf5651f342dcd2191866f",
+      "sourceType": "fixed-nightly-standard-library-notice",
+      "version": "1.100.0-nightly-2026-09-24",
+      "sha256": "69fef7b0f322a65554156141f2bc6256ed0bb78cba7e49f0d8829d7ec4ee62cd",
+      "size": 10851,
+      "sourceArchiveSha256": "f2c139528ba025f1141935df4f634e18db614b9b3b1cf2ea59e3675a6ade89f3",
+      "sourceMember": "rustc-nightly-src/library/vendor/moto-rt-0.17.4/LICENSE-APACHE",
+      "sameBytesOrigins": [
+        "rustc-nightly-src/library/vendor/moto-rt-0.17.4/LICENSE-APACHE"
+      ],
+      "reusedOriginalAsset": false
+    },
+    {
+      "file": "native-rust-rand_core-0.10.1-6df43f6f4b5d.txt",
+      "url": "https://static.rust-lang.org/dist/2026-09-24/rustc-nightly-src.tar.xz",
+      "revision": "6eeff9a52c3e35c4c4cbf5651f342dcd2191866f",
+      "sourceType": "fixed-nightly-standard-library-notice",
+      "version": "1.100.0-nightly-2026-09-24",
+      "sha256": "6df43f6f4b5d4587f3d8d71e45532c688fd168afa5fe89d571cb32fa09c4ef51",
+      "size": 10282,
+      "sourceArchiveSha256": "f2c139528ba025f1141935df4f634e18db614b9b3b1cf2ea59e3675a6ade89f3",
+      "sourceMember": "rustc-nightly-src/library/vendor/rand_core-0.9.5/LICENSE-APACHE",
+      "sameBytesOrigins": [
+        "rustc-nightly-src/library/vendor/rand_core-0.9.5/LICENSE-APACHE"
+      ],
+      "reusedOriginalAsset": true
+    },
+    {
+      "file": "sharp-nightly-6eeff9a-b1181a40b2a7-LICENSE.txt",
+      "url": "https://static.rust-lang.org/dist/2026-09-24/rustc-nightly-src.tar.xz",
+      "revision": "6eeff9a52c3e35c4c4cbf5651f342dcd2191866f",
+      "sourceType": "fixed-nightly-standard-library-notice",
+      "version": "1.100.0-nightly-2026-09-24",
+      "sha256": "b1181a40b2a7b25cf66fd01481713bc1005df082c53ef73e851e55071b102744",
+      "size": 856,
+      "sourceArchiveSha256": "f2c139528ba025f1141935df4f634e18db614b9b3b1cf2ea59e3675a6ade89f3",
+      "sourceMember": "rustc-nightly-src/library/vendor/foldhash-0.2.0/LICENSE",
+      "sameBytesOrigins": [
+        "rustc-nightly-src/library/vendor/foldhash-0.2.0/LICENSE"
+      ],
+      "reusedOriginalAsset": false
+    },
+    {
+      "file": "native-rust-miniz_oxide-0.8.9-4108245a1f2d.txt",
+      "url": "https://static.rust-lang.org/dist/2026-09-24/rustc-nightly-src.tar.xz",
+      "revision": "6eeff9a52c3e35c4c4cbf5651f342dcd2191866f",
+      "sourceType": "fixed-nightly-standard-library-notice",
+      "version": "1.100.0-nightly-2026-09-24",
+      "sha256": "4108245a1f2df9d4e94df8abed5b4ba0759bb2f9b40a6b939f1be141077ae50b",
+      "size": 1213,
+      "sourceArchiveSha256": "f2c139528ba025f1141935df4f634e18db614b9b3b1cf2ea59e3675a6ade89f3",
+      "sourceMember": "rustc-nightly-src/library/vendor/miniz_oxide-0.9.1/LICENSE",
+      "sameBytesOrigins": [
+        "rustc-nightly-src/library/vendor/miniz_oxide-0.9.1/LICENSE"
+      ],
+      "reusedOriginalAsset": true
+    },
+    {
+      "file": "native-rust-aho-corasick-1.1.5-01c266bced4a.txt",
+      "url": "https://static.rust-lang.org/dist/2026-09-24/rustc-nightly-src.tar.xz",
+      "revision": "6eeff9a52c3e35c4c4cbf5651f342dcd2191866f",
+      "sourceType": "fixed-nightly-standard-library-notice",
+      "version": "1.100.0-nightly-2026-09-24",
+      "sha256": "01c266bced4a434da0051174d6bee16a4c82cf634e2679b6155d40d75012390f",
+      "size": 126,
+      "sourceArchiveSha256": "f2c139528ba025f1141935df4f634e18db614b9b3b1cf2ea59e3675a6ade89f3",
+      "sourceMember": "rustc-nightly-src/library/vendor/memchr-2.8.3/COPYING",
+      "sameBytesOrigins": [
+        "rustc-nightly-src/library/vendor/memchr-2.8.3/COPYING"
+      ],
+      "reusedOriginalAsset": true
+    },
+    {
+      "file": "sharp-nightly-6eeff9a-fba3318d0c60-AUTHORS.txt",
+      "url": "https://static.rust-lang.org/dist/2026-09-24/rustc-nightly-src.tar.xz",
+      "revision": "6eeff9a52c3e35c4c4cbf5651f342dcd2191866f",
+      "sourceType": "fixed-nightly-standard-library-notice",
+      "version": "1.100.0-nightly-2026-09-24",
+      "sha256": "fba3318d0c600380177edf7ba4778ff6588faa8d106c679ac5dfee620011239c",
+      "size": 3067,
+      "sourceArchiveSha256": "f2c139528ba025f1141935df4f634e18db614b9b3b1cf2ea59e3675a6ade89f3",
+      "sourceMember": "rustc-nightly-src/library/vendor/r-efi-alloc-2.1.0/AUTHORS",
+      "sameBytesOrigins": [
+        "rustc-nightly-src/library/vendor/r-efi-alloc-2.1.0/AUTHORS"
+      ],
+      "reusedOriginalAsset": false
+    },
+    {
+      "file": "native-rust-r-efi-5.3.0-ff92bed461f5.txt",
+      "url": "https://static.rust-lang.org/dist/2026-09-24/rustc-nightly-src.tar.xz",
+      "revision": "6eeff9a52c3e35c4c4cbf5651f342dcd2191866f",
+      "sourceType": "fixed-nightly-standard-library-notice",
+      "version": "1.100.0-nightly-2026-09-24",
+      "sha256": "ff92bed461f50338dd703a9ba9aee496a425957873df1d91192776e4bdf5dda7",
+      "size": 3693,
+      "sourceArchiveSha256": "f2c139528ba025f1141935df4f634e18db614b9b3b1cf2ea59e3675a6ade89f3",
+      "sourceMember": "rustc-nightly-src/library/vendor/r-efi-5.3.0/AUTHORS",
+      "sameBytesOrigins": [
+        "rustc-nightly-src/library/vendor/r-efi-5.3.0/AUTHORS"
+      ],
+      "reusedOriginalAsset": true
+    },
+    {
+      "file": "native-rust-rand-0.10.2-90eb64f0279b.txt",
+      "url": "https://static.rust-lang.org/dist/2026-09-24/rustc-nightly-src.tar.xz",
+      "revision": "6eeff9a52c3e35c4c4cbf5651f342dcd2191866f",
+      "sourceType": "fixed-nightly-standard-library-notice",
+      "version": "1.100.0-nightly-2026-09-24",
+      "sha256": "90eb64f0279b0d9432accfa6023ff803bc4965212383697eee27a0f426d5f8d5",
+      "size": 569,
+      "sourceArchiveSha256": "f2c139528ba025f1141935df4f634e18db614b9b3b1cf2ea59e3675a6ade89f3",
+      "sourceMember": "rustc-nightly-src/library/vendor/rand_xorshift-0.4.0/COPYRIGHT",
+      "sameBytesOrigins": [
+        "rustc-nightly-src/library/vendor/rand_xorshift-0.4.0/COPYRIGHT",
+        "rustc-nightly-src/library/vendor/rand-0.9.5/COPYRIGHT",
+        "rustc-nightly-src/library/vendor/rand_core-0.9.5/COPYRIGHT"
+      ],
+      "reusedOriginalAsset": true
+    },
+    {
+      "file": "native-rust-adler2-2.0.1-23f18e03dc49.txt",
+      "url": "https://static.rust-lang.org/dist/2026-09-24/rustc-nightly-src.tar.xz",
+      "revision": "6eeff9a52c3e35c4c4cbf5651f342dcd2191866f",
+      "sourceType": "fixed-nightly-standard-library-notice",
+      "version": "1.100.0-nightly-2026-09-24",
+      "sha256": "23f18e03dc49df91622fe2a76176497404e46ced8a715d9d2b67a7446571cca3",
+      "size": 1023,
+      "sourceArchiveSha256": "f2c139528ba025f1141935df4f634e18db614b9b3b1cf2ea59e3675a6ade89f3",
+      "sourceMember": "rustc-nightly-src/library/vendor/wit-bindgen-0.62.0/LICENSE-MIT",
+      "sameBytesOrigins": [
+        "rustc-nightly-src/library/vendor/wit-bindgen-0.62.0/LICENSE-MIT",
+        "rustc-nightly-src/library/vendor/wasip3-0.9.0+wasi-0.3.0/LICENSE-MIT",
+        "rustc-nightly-src/library/vendor/unwinding-0.2.10/LICENSE-MIT",
+        "rustc-nightly-src/library/vendor/adler2-2.0.1/LICENSE-MIT",
+        "rustc-nightly-src/library/vendor/wasip2-2.0.1+wasi-0.2.12/LICENSE-MIT",
+        "rustc-nightly-src/library/vendor/hermit-abi-0.5.3/LICENSE-MIT",
+        "rustc-nightly-src/library/vendor/rustc-literal-escaper-0.0.8/LICENSE-MIT"
+      ],
+      "reusedOriginalAsset": true
+    },
+    {
+      "file": "native-rust-rand-0.10.2-209fbbe0ad52.txt",
+      "url": "https://static.rust-lang.org/dist/2026-09-24/rustc-nightly-src.tar.xz",
+      "revision": "6eeff9a52c3e35c4c4cbf5651f342dcd2191866f",
+      "sourceType": "fixed-nightly-standard-library-notice",
+      "version": "1.100.0-nightly-2026-09-24",
+      "sha256": "209fbbe0ad52d9235e37badf9cadfe4dbdc87203179c0899e738b39ade42177b",
+      "size": 1117,
+      "sourceArchiveSha256": "f2c139528ba025f1141935df4f634e18db614b9b3b1cf2ea59e3675a6ade89f3",
+      "sourceMember": "rustc-nightly-src/library/vendor/rand_xorshift-0.4.0/LICENSE-MIT",
+      "sameBytesOrigins": [
+        "rustc-nightly-src/library/vendor/rand_xorshift-0.4.0/LICENSE-MIT",
+        "rustc-nightly-src/library/vendor/rand-0.9.5/LICENSE-MIT",
+        "rustc-nightly-src/library/vendor/rand_core-0.9.5/LICENSE-MIT"
+      ],
+      "reusedOriginalAsset": true
+    },
+    {
+      "file": "native-rust-heck-0.5.0-7b63ecd5f190.txt",
+      "url": "https://static.rust-lang.org/dist/2026-09-24/rustc-nightly-src.tar.xz",
+      "revision": "6eeff9a52c3e35c4c4cbf5651f342dcd2191866f",
+      "sourceType": "fixed-nightly-standard-library-notice",
+      "version": "1.100.0-nightly-2026-09-24",
+      "sha256": "7b63ecd5f1902af1b63729947373683c32745c16a10e8e6292e2e2dcd7e90ae0",
+      "size": 1071,
+      "sourceArchiveSha256": "f2c139528ba025f1141935df4f634e18db614b9b3b1cf2ea59e3675a6ade89f3",
+      "sourceMember": "rustc-nightly-src/library/vendor/gimli-0.34.0/LICENSE-MIT",
+      "sameBytesOrigins": [
+        "rustc-nightly-src/library/vendor/gimli-0.34.0/LICENSE-MIT"
+      ],
+      "reusedOriginalAsset": true
+    },
+    {
+      "file": "native-rust-shlex-2.0.1-4455bf75a911.txt",
+      "url": "https://static.rust-lang.org/dist/2026-09-24/rustc-nightly-src.tar.xz",
+      "revision": "6eeff9a52c3e35c4c4cbf5651f342dcd2191866f",
+      "sourceType": "fixed-nightly-standard-library-notice",
+      "version": "1.100.0-nightly-2026-09-24",
+      "sha256": "4455bf75a91154108304cb283e0fea9948c14f13e20d60887cf2552449dea3b1",
+      "size": 1092,
+      "sourceArchiveSha256": "f2c139528ba025f1141935df4f634e18db614b9b3b1cf2ea59e3675a6ade89f3",
+      "sourceMember": "rustc-nightly-src/library/vendor/shlex-2.0.1/LICENSE-MIT",
+      "sameBytesOrigins": [
+        "rustc-nightly-src/library/vendor/shlex-2.0.1/LICENSE-MIT"
+      ],
+      "reusedOriginalAsset": true
+    },
+    {
+      "file": "native-rust-hashbrown-0.13.2-ff8f68cb076c.txt",
+      "url": "https://static.rust-lang.org/dist/2026-09-24/rustc-nightly-src.tar.xz",
+      "revision": "6eeff9a52c3e35c4c4cbf5651f342dcd2191866f",
+      "sourceType": "fixed-nightly-standard-library-notice",
+      "version": "1.100.0-nightly-2026-09-24",
+      "sha256": "ff8f68cb076caf8cefe7a6430d4ac086ce6af2ca8ce2c4e5a2004d4552ef52a2",
+      "size": 1060,
+      "sourceArchiveSha256": "f2c139528ba025f1141935df4f634e18db614b9b3b1cf2ea59e3675a6ade89f3",
+      "sourceMember": "rustc-nightly-src/library/vendor/hashbrown-0.17.1/LICENSE-MIT",
+      "sameBytesOrigins": [
+        "rustc-nightly-src/library/vendor/hashbrown-0.17.1/LICENSE-MIT"
+      ],
+      "reusedOriginalAsset": true
+    },
+    {
+      "file": "sharp-nightly-6eeff9a-e99d88d232bf-LICENSE-MIT.txt",
+      "url": "https://static.rust-lang.org/dist/2026-09-24/rustc-nightly-src.tar.xz",
+      "revision": "6eeff9a52c3e35c4c4cbf5651f342dcd2191866f",
+      "sourceType": "fixed-nightly-standard-library-notice",
+      "version": "1.100.0-nightly-2026-09-24",
+      "sha256": "e99d88d232bf57d70f0fb87f6b496d44b6653f99f8a63d250a54c61ea4bcde40",
+      "size": 1069,
+      "sourceArchiveSha256": "f2c139528ba025f1141935df4f634e18db614b9b3b1cf2ea59e3675a6ade89f3",
+      "sourceMember": "rustc-nightly-src/library/vendor/addr2line-0.27.1/LICENSE-MIT",
+      "sameBytesOrigins": [
+        "rustc-nightly-src/library/vendor/addr2line-0.27.1/LICENSE-MIT"
+      ],
+      "reusedOriginalAsset": false
+    },
+    {
+      "file": "sharp-nightly-6eeff9a-0b74dfa0bcee-LICENSE-MIT.txt",
+      "url": "https://static.rust-lang.org/dist/2026-09-24/rustc-nightly-src.tar.xz",
+      "revision": "6eeff9a52c3e35c4c4cbf5651f342dcd2191866f",
+      "sourceType": "fixed-nightly-standard-library-notice",
+      "version": "1.100.0-nightly-2026-09-24",
+      "sha256": "0b74dfa0bcee5c420c6b7f67b4b2658f9ab8388c97b8e733975f2cecbdd668a6",
+      "size": 1064,
+      "sourceArchiveSha256": "f2c139528ba025f1141935df4f634e18db614b9b3b1cf2ea59e3675a6ade89f3",
+      "sourceMember": "rustc-nightly-src/library/vendor/object-0.39.1/LICENSE-MIT",
+      "sameBytesOrigins": [
+        "rustc-nightly-src/library/vendor/object-0.39.1/LICENSE-MIT"
+      ],
+      "reusedOriginalAsset": false
+    },
+    {
+      "file": "native-rust-cc-1.4.7-378f5840b258.txt",
+      "url": "https://static.rust-lang.org/dist/2026-09-24/rustc-nightly-src.tar.xz",
+      "revision": "6eeff9a52c3e35c4c4cbf5651f342dcd2191866f",
+      "sourceType": "fixed-nightly-standard-library-notice",
+      "version": "1.100.0-nightly-2026-09-24",
+      "sha256": "378f5840b258e2779c39418f3f2d7b2ba96f1c7917dd6be0713f88305dbda397",
+      "size": 1057,
+      "sourceArchiveSha256": "f2c139528ba025f1141935df4f634e18db614b9b3b1cf2ea59e3675a6ade89f3",
+      "sourceMember": "rustc-nightly-src/library/vendor/find-msvc-tools-0.1.11/LICENSE-MIT",
+      "sameBytesOrigins": [
+        "rustc-nightly-src/library/vendor/find-msvc-tools-0.1.11/LICENSE-MIT",
+        "rustc-nightly-src/library/vendor/cc-1.4.3/LICENSE-MIT",
+        "rustc-nightly-src/library/vendor/cfg-if-1.0.4/LICENSE-MIT",
+        "rustc-nightly-src/library/vendor/dlmalloc-0.2.14/LICENSE-MIT",
+        "rustc-nightly-src/library/vendor/rustc-demangle-0.1.28/LICENSE-MIT"
+      ],
+      "reusedOriginalAsset": true
+    },
+    {
+      "file": "native-rust-aho-corasick-1.1.5-0f96a83840e1.txt",
+      "url": "https://static.rust-lang.org/dist/2026-09-24/rustc-nightly-src.tar.xz",
+      "revision": "6eeff9a52c3e35c4c4cbf5651f342dcd2191866f",
+      "sourceType": "fixed-nightly-standard-library-notice",
+      "version": "1.100.0-nightly-2026-09-24",
+      "sha256": "0f96a83840e146e43c0ec96a22ec1f392e0680e6c1226e6f3ba87e0740af850f",
+      "size": 1081,
+      "sourceArchiveSha256": "f2c139528ba025f1141935df4f634e18db614b9b3b1cf2ea59e3675a6ade89f3",
+      "sourceMember": "rustc-nightly-src/library/vendor/memchr-2.8.3/LICENSE-MIT",
+      "sameBytesOrigins": [
+        "rustc-nightly-src/library/vendor/memchr-2.8.3/LICENSE-MIT"
+      ],
+      "reusedOriginalAsset": true
+    },
+    {
+      "file": "sharp-nightly-6eeff9a-a7c936ff1ed8-LICENSE-MIT.txt",
+      "url": "https://static.rust-lang.org/dist/2026-09-24/rustc-nightly-src.tar.xz",
+      "revision": "6eeff9a52c3e35c4c4cbf5651f342dcd2191866f",
+      "sourceType": "fixed-nightly-standard-library-notice",
+      "version": "1.100.0-nightly-2026-09-24",
+      "sha256": "a7c936ff1ed8fa340172d42a98185afee078f818e907da69f3a8e336b1623b4b",
+      "size": 1075,
+      "sourceArchiveSha256": "f2c139528ba025f1141935df4f634e18db614b9b3b1cf2ea59e3675a6ade89f3",
+      "sourceMember": "rustc-nightly-src/library/vendor/moto-rt-0.17.4/LICENSE-MIT",
+      "sameBytesOrigins": [
+        "rustc-nightly-src/library/vendor/moto-rt-0.17.4/LICENSE-MIT"
+      ],
+      "reusedOriginalAsset": false
+    },
+    {
+      "file": "native-rust-bitflags-1.3.2-6485b8ed310d.txt",
+      "url": "https://static.rust-lang.org/dist/2026-09-24/rustc-nightly-src.tar.xz",
+      "revision": "6eeff9a52c3e35c4c4cbf5651f342dcd2191866f",
+      "sourceType": "fixed-nightly-standard-library-notice",
+      "version": "1.100.0-nightly-2026-09-24",
+      "sha256": "6485b8ed310d3f0340bf1ad1f47645069ce4069dcc6bb46c7d5c6faf41de1fdb",
+      "size": 1071,
+      "sourceArchiveSha256": "f2c139528ba025f1141935df4f634e18db614b9b3b1cf2ea59e3675a6ade89f3",
+      "sourceMember": "rustc-nightly-src/library/vendor/getopts-0.2.24/LICENSE-MIT",
+      "sameBytesOrigins": [
+        "rustc-nightly-src/library/vendor/getopts-0.2.24/LICENSE-MIT"
+      ],
+      "reusedOriginalAsset": true
+    },
+    {
+      "file": "native-rust-libc-0.2.189-123a331b5dbf.txt",
+      "url": "https://static.rust-lang.org/dist/2026-09-24/rustc-nightly-src.tar.xz",
+      "revision": "6eeff9a52c3e35c4c4cbf5651f342dcd2191866f",
+      "sourceType": "fixed-nightly-standard-library-notice",
+      "version": "1.100.0-nightly-2026-09-24",
+      "sha256": "123a331b5dbf04c30097fa43b8f858bc85df671fe776de498d01f3d6b7c1f69e",
+      "size": 1066,
+      "sourceArchiveSha256": "f2c139528ba025f1141935df4f634e18db614b9b3b1cf2ea59e3675a6ade89f3",
+      "sourceMember": "rustc-nightly-src/library/vendor/libc-0.2.189/LICENSE-MIT",
+      "sameBytesOrigins": [
+        "rustc-nightly-src/library/vendor/libc-0.2.189/LICENSE-MIT"
+      ],
+      "reusedOriginalAsset": true
+    },
+    {
+      "file": "native-rust-miniz_oxide-0.8.9-0a54e647fe54.txt",
+      "url": "https://static.rust-lang.org/dist/2026-09-24/rustc-nightly-src.tar.xz",
+      "revision": "6eeff9a52c3e35c4c4cbf5651f342dcd2191866f",
+      "sourceType": "fixed-nightly-standard-library-notice",
+      "version": "1.100.0-nightly-2026-09-24",
+      "sha256": "0a54e647fe54104658b5e563c04c6f9edf251710e47bce692e0bd990a4ddaa39",
+      "size": 984,
+      "sourceArchiveSha256": "f2c139528ba025f1141935df4f634e18db614b9b3b1cf2ea59e3675a6ade89f3",
+      "sourceMember": "rustc-nightly-src/library/vendor/miniz_oxide-0.9.1/LICENSE-ZLIB.md",
+      "sameBytesOrigins": [
+        "rustc-nightly-src/library/vendor/miniz_oxide-0.9.1/LICENSE-ZLIB.md"
+      ],
+      "reusedOriginalAsset": true
+    },
+    {
+      "file": "native-rust-fdeflate-0.3.7-0d542e0c8804.txt",
+      "url": "https://static.rust-lang.org/dist/2026-09-24/rustc-nightly-src.tar.xz",
+      "revision": "6eeff9a52c3e35c4c4cbf5651f342dcd2191866f",
+      "sourceType": "fixed-nightly-standard-library-notice",
+      "version": "1.100.0-nightly-2026-09-24",
+      "sha256": "0d542e0c8804e39aa7f37eb00da5a762149dc682d7829451287e11b938e94594",
+      "size": 10174,
+      "sourceArchiveSha256": "f2c139528ba025f1141935df4f634e18db614b9b3b1cf2ea59e3675a6ade89f3",
+      "sourceMember": "rustc-nightly-src/library/vendor/miniz_oxide-0.9.1/LICENSE-APACHE.md",
+      "sameBytesOrigins": [
+        "rustc-nightly-src/library/vendor/miniz_oxide-0.9.1/LICENSE-APACHE.md"
+      ],
+      "reusedOriginalAsset": true
+    },
+    {
+      "file": "native-rust-miniz_oxide-0.8.9-799e9ca9d179.txt",
+      "url": "https://static.rust-lang.org/dist/2026-09-24/rustc-nightly-src.tar.xz",
+      "revision": "6eeff9a52c3e35c4c4cbf5651f342dcd2191866f",
+      "sourceType": "fixed-nightly-standard-library-notice",
+      "version": "1.100.0-nightly-2026-09-24",
+      "sha256": "799e9ca9d179295ef372f25d3769cdda7d25bb2668add6a6a1e22d1e4c678b8d",
+      "size": 1212,
+      "sourceArchiveSha256": "f2c139528ba025f1141935df4f634e18db614b9b3b1cf2ea59e3675a6ade89f3",
+      "sourceMember": "rustc-nightly-src/library/vendor/miniz_oxide-0.9.1/LICENSE-MIT.md",
+      "sameBytesOrigins": [
+        "rustc-nightly-src/library/vendor/miniz_oxide-0.9.1/LICENSE-MIT.md"
+      ],
+      "reusedOriginalAsset": true
+    },
+    {
+      "file": "native-rust-linux-raw-sys-0.12.1-268872b9816f.txt",
+      "url": "https://static.rust-lang.org/dist/2026-09-24/rustc-nightly-src.tar.xz",
+      "revision": "6eeff9a52c3e35c4c4cbf5651f342dcd2191866f",
+      "sourceType": "fixed-nightly-standard-library-notice",
+      "version": "1.100.0-nightly-2026-09-24",
+      "sha256": "268872b9816f90fd8e85db5a28d33f8150ebb8dd016653fb39ef1f94f2686bc5",
+      "size": 12243,
+      "sourceArchiveSha256": "f2c139528ba025f1141935df4f634e18db614b9b3b1cf2ea59e3675a6ade89f3",
+      "sourceMember": "rustc-nightly-src/library/vendor/wit-bindgen-0.62.0/LICENSE-Apache-2.0_WITH_LLVM-exception",
+      "sameBytesOrigins": [
+        "rustc-nightly-src/library/vendor/wit-bindgen-0.62.0/LICENSE-Apache-2.0_WITH_LLVM-exception",
+        "rustc-nightly-src/library/vendor/wasip3-0.9.0+wasi-0.3.0/LICENSE-Apache-2.0_WITH_LLVM-exception",
+        "rustc-nightly-src/library/vendor/wasip2-2.0.1+wasi-0.2.12/LICENSE-Apache-2.0_WITH_LLVM-exception"
+      ],
+      "reusedOriginalAsset": true
+    },
+    {
+      "file": "sharp-nightly-6eeff9a-3823dda7cf04-LICENSE_txt.txt",
+      "url": "https://static.rust-lang.org/dist/2026-09-24/rustc-nightly-src.tar.xz",
+      "revision": "6eeff9a52c3e35c4c4cbf5651f342dcd2191866f",
+      "sourceType": "fixed-nightly-standard-library-notice",
+      "version": "1.100.0-nightly-2026-09-24",
+      "sha256": "3823dda7cf046602f4b4e77ec8e227863dc4736037cc85bb33d9f19febe16bb7",
+      "size": 14088,
+      "sourceArchiveSha256": "f2c139528ba025f1141935df4f634e18db614b9b3b1cf2ea59e3675a6ade89f3",
+      "sourceMember": "rustc-nightly-src/library/compiler-builtins/libm/LICENSE.txt",
+      "sameBytesOrigins": [
+        "rustc-nightly-src/library/compiler-builtins/libm/LICENSE.txt"
+      ],
+      "reusedOriginalAsset": false
+    },
+    {
+      "file": "sharp-nightly-6eeff9a-ab6eec6caf0f-LICENSE_txt.txt",
+      "url": "https://static.rust-lang.org/dist/2026-09-24/rustc-nightly-src.tar.xz",
+      "revision": "6eeff9a52c3e35c4c4cbf5651f342dcd2191866f",
+      "sourceType": "fixed-nightly-standard-library-notice",
+      "version": "1.100.0-nightly-2026-09-24",
+      "sha256": "ab6eec6caf0fa5775e411c7a8bc6a45c4ef2956b0980b157ab74fc5cd62a928b",
+      "size": 15078,
+      "sourceArchiveSha256": "f2c139528ba025f1141935df4f634e18db614b9b3b1cf2ea59e3675a6ade89f3",
+      "sourceMember": "rustc-nightly-src/library/compiler-builtins/LICENSE.txt",
+      "sameBytesOrigins": [
+        "rustc-nightly-src/library/compiler-builtins/LICENSE.txt"
+      ],
+      "reusedOriginalAsset": false
     }
   ]
 }

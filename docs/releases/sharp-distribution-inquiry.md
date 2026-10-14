@@ -1,5 +1,7 @@
 # Sharp Windows 0.35.5 分发材料询证记录
 
+2026-10-14最新：维护者已将[432](https://github.com/lovell/sharp-libvips/issues/432)关闭为not planned、标llm-generated，回复要求官方真人Question模板；没有提供许可答复。用户选择暂不追加，继续现有材料。自动API/LLM再提交可能使账户被维护者屏蔽，不能继续原自动询证；[人工资料与边界](sharp-human-followup-facts.md)及[源码安排](sharp-source-distribution-plan.md)是接手入口。下方保留当时真实发送记录，不再将其“尚无答复”当当前等待状态。
+
 日期：2026-10-14。**用户已单独授权，两条中的这一条已创建并全文读回；尚无覆盖缺口的答复。** 实际 [issue432](https://github.com/lovell/sharp-libvips/issues/432)，账号 `guxingzhou16-pixel`，创建于 `2026-10-14T07:32:33Z`；正文 SHA-256 `e5722002e1494468a458364906a9d6db4f9aba937d28631300c580fd62f21523`，取自已审阅提交 `e4b89ad64e8fdb694c0863c6be996fd524c5dd84`。已有 [401](https://github.com/lovell/sharp-libvips/issues/401) 针对旧 Darwin 1.3.2，不能作为 Windows 当前库的答复。
 
 连接器首次返回403“Resource not accessible by integration”，未创建。随后核对已有Git登录账号、仓库ID/公开/issue可用及本人无同正文/标题重复项，只POST一次；按issue number再次GET核对账号、完整正文/标题/摘要。没有保存凭据，未联系被转介的其它仓库。本机回执 `upstream-inquiry-1-result.json` 留在本轮忽略证据目录。

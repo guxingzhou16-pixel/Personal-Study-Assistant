@@ -387,6 +387,16 @@
 - 新增两份原文共1513260字节，来源记录保留原396项并仅补三项。复用生成检查器/旧77 ASAR readonly，在新目录核对147元数据/158许可/395补充/2索引，共702输出，3pending；旧77安装器仍697、前轮临时700不追改。没有新安装器/应用/数据库/模型或上游消息，不重复本机全套/安装/CPU/PDF/质量/替换测试；更新申请政策按既有权限推送功能分支后，远端CI按新SHA/run单次核对，不为补写成绩反复触发。
 - 本轮接手入口`docs/testing/signpath-retry-and-native-materials-2026-10-14.md`、`docs/releases/native-materials-followup-0.1.1.json`与签名政策；本机`artifacts/signpath-retry-2350d5e4-fae1-43b7-af14-21cf972becd8/`保留邮件状态、首次失败/续传、bridge逐项和702输出回执。首次code-reviewer容量不足不能写成批准，数据检查/其它审阅另列范围；保留他人README/AGENTS/未追踪改动。
 
+### 3.39 源码补丁、nightly通知与人工询证边界（2026-10-14）
+
+- 起点fee3c4e已推送且远端15规则/356核心/36桌面及Post通过；本轮软件源码不变，不重复该CI或旧安装/CPU/PDF/模型/库修改测试。SignPath已有基金会收件邮件，待审核，不再申请。
+- 复用固定wrapper/MXE/源归档，临时副本11组件/16补丁材料可用；14由git apply检查/应用、MozJPEG2由生产方GNU patch `-p1 -u`零模糊处理。git初报corrupt patch保留，不能误写源码不适配；原补丁/源归档不改，没有执行或编译上游代码、运行原生库。
+- 2026-09-24 Rust完整源已有vendor，版本1.100.0-nightly/6eeff9a52；library lock的31注册依赖与vendor包checksum声明对应，不是再次核对所有vendor文件或最终Windows链接清单。64候选去重32，24复用、8新原文47148字节，保留399来源仅补32。临时147元数据/158许可/403补充/2索引=710；旧77安装器697、前轮702不追改，3pending保持。
+- 官方SDK包元数据指向WinSDKLicenseURL，RTF246945字节/SHA`dd07eb178e00c6bba4148457fc00ff77cd4887eb521d504186fe59c9ec8bbe62`只读保留。官方支持静态部署；可分发`.lib`条件只适用于确有分发权的代码，生产版SDK/VC库与具体条款尚待对应，不接受新条款或把当前主线STL当固定供方许可。
+- Sharp432已被维护者closed/not_planned并标llm-generated，要求真人自己的话/官方Question模板，自动化或LLM提交可能被关闭/屏蔽。先前自动询证未核对模板，现纠正；用户明确暂不追加询证，继续现有材料。不自动发帖/改帖/另账号/联系其它维护者，不把流程关闭当许可拒绝或许可授权。原评论/回执保留，接手不得继续等432给许可答复。
+- 相应源码/库修改/公开获取的准备见`docs/releases/sharp-source-distribution-plan.md`，人工事实页`sharp-human-followup-facts.md`不代写或代勾模板。全量来源/未组合形式/实际公开提供未全部证明，不能用新材料检查冒称整项闭合；BGE仍保留等待原询证。
+- 本轮入口`docs/testing/runtime-source-materials-2026-10-14.md`、`docs/releases/runtime-source-materials-0.1.1.json`；本机`artifacts/runtime-source-followup-41c2e6c4-6dbe-42f9-9cf8-03b20b48dad9/`保留GNU/git差异、nightly原文、SDK元数据/RTF和710输出。原文不格式化；只提交自己的数据/文档，保留他人README/AGENTS/未追踪工作。
+
 ## 4. 产品范围与功能要求
 
 ### 4.1 资料导入与辅助阅读

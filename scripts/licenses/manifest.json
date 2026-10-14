@@ -1809,6 +1809,54 @@
           "sha256": "d201d14804d3bcd3b944147173175e4abfbd838b7c8069b6bd3452496bf13e6c",
           "source": "https://static.crates.io/crates/zune-core/zune-core-0.5.3.crate",
           "description": "Original zune-core-0.5.3/LICENSE-ZLIB bytes from checksum-verified zune-core@0.5.3 source archive (d56377fd46368984a170bc5aac5567e52ca5da874caa60bea39fcbca78fb658b). Candidate superset, including development/other-platform sources; this is not evidence of actual compiled inclusion. Identical bytes may reuse an existing original notice file."
+        },
+        {
+          "file": "assets/sharp-nightly-6eeff9a-69fef7b0f322-LICENSE-APACHE.txt",
+          "sha256": "69fef7b0f322a65554156141f2bc6256ed0bb78cba7e49f0d8829d7ec4ee62cd",
+          "source": "https://static.rust-lang.org/dist/2026-09-24/rustc-nightly-src.tar.xz",
+          "description": "Original notice from Rust 1.100.0-nightly 6eeff9a52c3e35c4c4cbf5651f342dcd2191866f source archive, SHA-256 f2c139528ba025f1141935df4f634e18db614b9b3b1cf2ea59e3675a6ade89f3, member rustc-nightly-src/library/vendor/moto-rt-0.17.4/LICENSE-APACHE. Standard-library lock vendor superset includes development/other-target code. Original bytes retained; no claim that every candidate was compiled into the Windows libvips binary."
+        },
+        {
+          "file": "assets/sharp-nightly-6eeff9a-b1181a40b2a7-LICENSE.txt",
+          "sha256": "b1181a40b2a7b25cf66fd01481713bc1005df082c53ef73e851e55071b102744",
+          "source": "https://static.rust-lang.org/dist/2026-09-24/rustc-nightly-src.tar.xz",
+          "description": "Original notice from Rust 1.100.0-nightly 6eeff9a52c3e35c4c4cbf5651f342dcd2191866f source archive, SHA-256 f2c139528ba025f1141935df4f634e18db614b9b3b1cf2ea59e3675a6ade89f3, member rustc-nightly-src/library/vendor/foldhash-0.2.0/LICENSE. Standard-library lock vendor superset includes development/other-target code. Original bytes retained; no claim that every candidate was compiled into the Windows libvips binary."
+        },
+        {
+          "file": "assets/sharp-nightly-6eeff9a-fba3318d0c60-AUTHORS.txt",
+          "sha256": "fba3318d0c600380177edf7ba4778ff6588faa8d106c679ac5dfee620011239c",
+          "source": "https://static.rust-lang.org/dist/2026-09-24/rustc-nightly-src.tar.xz",
+          "description": "Original notice from Rust 1.100.0-nightly 6eeff9a52c3e35c4c4cbf5651f342dcd2191866f source archive, SHA-256 f2c139528ba025f1141935df4f634e18db614b9b3b1cf2ea59e3675a6ade89f3, member rustc-nightly-src/library/vendor/r-efi-alloc-2.1.0/AUTHORS. Standard-library lock vendor superset includes development/other-target code. Original bytes retained; no claim that every candidate was compiled into the Windows libvips binary."
+        },
+        {
+          "file": "assets/sharp-nightly-6eeff9a-e99d88d232bf-LICENSE-MIT.txt",
+          "sha256": "e99d88d232bf57d70f0fb87f6b496d44b6653f99f8a63d250a54c61ea4bcde40",
+          "source": "https://static.rust-lang.org/dist/2026-09-24/rustc-nightly-src.tar.xz",
+          "description": "Original notice from Rust 1.100.0-nightly 6eeff9a52c3e35c4c4cbf5651f342dcd2191866f source archive, SHA-256 f2c139528ba025f1141935df4f634e18db614b9b3b1cf2ea59e3675a6ade89f3, member rustc-nightly-src/library/vendor/addr2line-0.27.1/LICENSE-MIT. Standard-library lock vendor superset includes development/other-target code. Original bytes retained; no claim that every candidate was compiled into the Windows libvips binary."
+        },
+        {
+          "file": "assets/sharp-nightly-6eeff9a-0b74dfa0bcee-LICENSE-MIT.txt",
+          "sha256": "0b74dfa0bcee5c420c6b7f67b4b2658f9ab8388c97b8e733975f2cecbdd668a6",
+          "source": "https://static.rust-lang.org/dist/2026-09-24/rustc-nightly-src.tar.xz",
+          "description": "Original notice from Rust 1.100.0-nightly 6eeff9a52c3e35c4c4cbf5651f342dcd2191866f source archive, SHA-256 f2c139528ba025f1141935df4f634e18db614b9b3b1cf2ea59e3675a6ade89f3, member rustc-nightly-src/library/vendor/object-0.39.1/LICENSE-MIT. Standard-library lock vendor superset includes development/other-target code. Original bytes retained; no claim that every candidate was compiled into the Windows libvips binary."
+        },
+        {
+          "file": "assets/sharp-nightly-6eeff9a-a7c936ff1ed8-LICENSE-MIT.txt",
+          "sha256": "a7c936ff1ed8fa340172d42a98185afee078f818e907da69f3a8e336b1623b4b",
+          "source": "https://static.rust-lang.org/dist/2026-09-24/rustc-nightly-src.tar.xz",
+          "description": "Original notice from Rust 1.100.0-nightly 6eeff9a52c3e35c4c4cbf5651f342dcd2191866f source archive, SHA-256 f2c139528ba025f1141935df4f634e18db614b9b3b1cf2ea59e3675a6ade89f3, member rustc-nightly-src/library/vendor/moto-rt-0.17.4/LICENSE-MIT. Standard-library lock vendor superset includes development/other-target code. Original bytes retained; no claim that every candidate was compiled into the Windows libvips binary."
+        },
+        {
+          "file": "assets/sharp-nightly-6eeff9a-3823dda7cf04-LICENSE_txt.txt",
+          "sha256": "3823dda7cf046602f4b4e77ec8e227863dc4736037cc85bb33d9f19febe16bb7",
+          "source": "https://static.rust-lang.org/dist/2026-09-24/rustc-nightly-src.tar.xz",
+          "description": "Original notice from Rust 1.100.0-nightly 6eeff9a52c3e35c4c4cbf5651f342dcd2191866f source archive, SHA-256 f2c139528ba025f1141935df4f634e18db614b9b3b1cf2ea59e3675a6ade89f3, member rustc-nightly-src/library/compiler-builtins/libm/LICENSE.txt. Standard-library lock vendor superset includes development/other-target code. Original bytes retained; no claim that every candidate was compiled into the Windows libvips binary."
+        },
+        {
+          "file": "assets/sharp-nightly-6eeff9a-ab6eec6caf0f-LICENSE_txt.txt",
+          "sha256": "ab6eec6caf0fa5775e411c7a8bc6a45c4ef2956b0980b157ab74fc5cd62a928b",
+          "source": "https://static.rust-lang.org/dist/2026-09-24/rustc-nightly-src.tar.xz",
+          "description": "Original notice from Rust 1.100.0-nightly 6eeff9a52c3e35c4c4cbf5651f342dcd2191866f source archive, SHA-256 f2c139528ba025f1141935df4f634e18db614b9b3b1cf2ea59e3675a6ade89f3, member rustc-nightly-src/library/compiler-builtins/LICENSE.txt. Standard-library lock vendor superset includes development/other-target code. Original bytes retained; no claim that every candidate was compiled into the Windows libvips binary."
         }
       ]
     },
@@ -2705,7 +2753,7 @@
   ],
   "reviewIssues": [
     "Canvas fixed Skia/GN declared components and original notices are mapped conservatively. Rust 1.98.1 generated standard-library notices, fixed HarfBuzz Microsoft USE, and Unicode 17 copyright with existing ICU Unicode License v3 are retained. Static Windows runtime distribution conditions and any concrete separately licensed embedded exceptions still require coverage; exact linked SBOM or bit-identical rebuilding are not separate license requirements.",
-    "Sharp core DLL matches official libvips 8.18.7 and genuine modified-library loading was verified. Fixed sharp 0.35.5/dev 1.3.4 bridge sources and build rules correspond; five CPP sources and 348 Windows headers match retained archives. Remaining native/runtime/header notices, corresponding-source availability and applicable combined-library material remain pending. No source rebuild or Sigstore signature-chain verification is claimed.",
+    "Sharp fixed bridge sources and shared-library modification test are mapped. All 16 selected source patches apply to retained sources; nightly 2026-09-24 library lock vendor declarations and original runtime notices are mapped conservatively. Remaining native/compiler runtime terms, applicable uncombined-library material and corresponding-source public availability need coverage. No native source build or exact linked-object inventory is claimed. Upstream inquiry432 was closed for automated submission; user chose no additional inquiry.",
     "Fixed Xenova/bge-small-zh-v1.5 revision 75c43b069aac4d136ba6bc1122f995fedcfd2781 model card was obtained and Git-blob verified. It identifies the BAAI base model but contains no license field or quantized-weight grant. FlagEmbedding code MIT text is not a grant for these weights; license review remains pending."
   ]
 }

@@ -4,6 +4,8 @@
 
 ## 已取得、校验并保留的初始库存
 
+最新[源码材料核对](../testing/runtime-source-materials-2026-10-14.md)：固定16补丁可应用，Rust nightly已含vendor且31 library lock/checksum声明对应；新增8原文47148字节/复用24，临时710输出，旧安装器697不改。Sharp432因自动提问关闭，用户选择不追加；相应源码/未组合材料及实际公开提供仍按[分发安排](sharp-source-distribution-plan.md)补齐，不重复下载已验证对象或旧测试。
+
 最新Canvas材料和本轮汇总见[本轮记录](../testing/signpath-retry-and-native-materials-2026-10-14.md)及[公开摘要](native-materials-followup-0.1.1.json)：Rust标准库详细版权/Unicode17新增两份共1513260字节，Microsoft USE复用已有通知；本轮只生成702输出，旧安装器仍697，前轮临时700不追改。
 
 2026-10-14最新Sharp增量：首次取得`@img/sharp-libvips-dev@1.3.4`，2009303字节/SHA `e9dd5562c219d44cab7ce811906773a1354b583ed4bfa5115e1cdc954a0290aa`，npm SHA-512/SHA-1均匹配，705成员原字节保留。当前sharp0.35.5固定提交`51a990faa26ade5586a4934ac9673c98d8893326`准确钉dev1.3.4；dev发布声明指向`ebb95f8add54eee8bed840e3fb587e4cbec857d7`，固定打包脚本选择libvips8.18.7。五份bridge CPP与旧已校验libvips源一致，Windows static ZIP的348份include逐项与dev匹配（47 vips/301 GLib），额外347份include不称Windows来源。已定位对应源码和公开构建入口，不宣称源码重建或Sigstore签名链验证。本机新证据`artifacts/signpath-retry-2350d5e4-fae1-43b7-af14-21cf972becd8/sharp-dev-lineage.json`；原冻结ZIP未修改，新对象尚未公开分发。

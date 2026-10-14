@@ -10,6 +10,8 @@
 
 ## 原五项的处理
 
+最新增量见[运行时/源码材料报告](../testing/runtime-source-materials-2026-10-14.md)：16补丁材料可应用，固定nightly库vendor/原文对应，新增8通知47148字节/24复用，临时710输出，旧安装器697未改。Sharp432已因自动化提问流程关闭，用户决定暂不追加；现在沿现有材料补[相应源码与未组合安排](sharp-source-distribution-plan.md)，不继续等待该原帖许可答复。SignPath收件/待审、BGE保留等待及三项pending不变。
+
 ### 2026-10-14 后续执行
 
 本轮最新Canvas标准库版权/Unicode17两份共1513260字节及Microsoft USE复用已接入，仅生成并核对702输出，旧安装器仍697；[最新报告与清单](../testing/signpath-retry-and-native-materials-2026-10-14.md)及[来源摘要](native-materials-followup-0.1.1.json)优先于下方的前轮700记录。

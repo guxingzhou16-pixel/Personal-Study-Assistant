@@ -1,0 +1,89 @@
+{
+  "format": 1,
+  "verifiedOn": "2026-10-14",
+  "sourceBefore": "fee3c4efb6ebcadb2ce15ac93bbac5ce6f8904cb",
+  "completeDistributionReview": false,
+  "sharpInquiry": {
+    "url": "https://github.com/lovell/sharp-libvips/issues/432",
+    "state": "closed",
+    "stateReason": "not_planned",
+    "label": "llm-generated",
+    "maintainerAskedForHumanQuestionTemplate": true,
+    "licenseAnswerReceived": false,
+    "userDecision": "No additional inquiry; continue existing material review",
+    "additionalMessageSent": false
+  },
+  "sourcePatches": {
+    "fixedWrapper": "ef19ca09af2453d127453d677c849ccb37cf5694",
+    "fixedMxe": "c36160b231e66e1cbe032ed54aef7617e8b259da",
+    "components": 11,
+    "selectedPatches": 16,
+    "appliedToSourceCopies": 16,
+    "gitApplied": 14,
+    "gnuPatchApplied": 2,
+    "firstGitMozjpegParseRejectionRetained": true,
+    "originalPatchesModified": false,
+    "compiled": false,
+    "sourceExecuted": false,
+    "finalBinaryCorrespondenceClaimed": false,
+    "remaining": "Source/binary runtime conditions and combined-library distribution material"
+  },
+  "nightly": {
+    "sourceArchiveUrl": "https://static.rust-lang.org/dist/2026-09-24/rustc-nightly-src.tar.xz",
+    "sourceArchiveSha256": "f2c139528ba025f1141935df4f634e18db614b9b3b1cf2ea59e3675a6ade89f3",
+    "sourceArchiveBytes": 263102648,
+    "commit": "6eeff9a52c3e35c4c4cbf5651f342dcd2191866f",
+    "version": "1.100.0-nightly (6eeff9a52 2026-09-23)",
+    "libraryLockRegistryPackages": 31,
+    "matchedVendorPackageChecksumDeclarations": 31,
+    "rawNoticeCandidates": 64,
+    "uniqueNonemptyNotices": 32,
+    "newOriginalFiles": 8,
+    "newOriginalBytes": 47148,
+    "reusedOriginalFiles": 24,
+    "individualVendorFileHashesRechecked": false,
+    "allCandidatesCompiledIntoWindowsClaimed": false,
+    "scope": "Fixed library lock source/vendor and notice superset includes development and other-target code"
+  },
+  "notices": {
+    "outputs": 710,
+    "metadataFiles": 147,
+    "licenseFiles": 158,
+    "supplementalFiles": 403,
+    "indexFiles": 2,
+    "generationOnly": true,
+    "newInstallerBuilt": false,
+    "oldInstallerOutputs": 697,
+    "previousTemporaryOutputs": 702,
+    "pending": 3
+  },
+  "sdkEvidence": {
+    "packageMetadataVersion": "Microsoft.Windows.SDK.CPP 10.0.26100.1",
+    "packageLicenseUrl": "https://aka.ms/WinSDKLicenseURL",
+    "licenseFinalUrl": "https://download.microsoft.com/download/0/F/F/0FF2B061-47DD-4F55-89B6-FD1D8C44F14D/sdk_license.rtf",
+    "licenseBytes": 246945,
+    "licenseSha256": "dd07eb178e00c6bba4148457fc00ff77cd4887eb521d504186fe59c9ec8bbe62",
+    "readOnlyRtfTextExtraction": true,
+    "licenseAccepted": false,
+    "distributableLibRuleObserved": true,
+    "ruleScope": "Only library code actually covered by the distributable-code grant; not every SDK file",
+    "producerExactSdkLicenseMappingComplete": false,
+    "staticDeploymentSupportedByOfficialDocs": true,
+    "staticDeploymentDoc": "https://learn.microsoft.com/en-us/cpp/windows/deployment-in-visual-cpp?view=msvc-170"
+  },
+  "signpath": {
+    "application": "received",
+    "review": "pending",
+    "resubmitted": false,
+    "signatureCompleted": false
+  },
+  "bge": {
+    "modelChanged": false,
+    "licenseReplyReceived": false,
+    "policy": "Retain pinned model and wait"
+  },
+  "appCodeChanged": false,
+  "newSoftwareTestsRun": false,
+  "oldSuccessfulAcceptanceRepeated": false,
+  "sourceDistributionPlan": "sharp-source-distribution-plan.md"
+}
