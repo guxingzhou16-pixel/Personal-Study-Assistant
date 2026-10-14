@@ -2,7 +2,7 @@
 
 核对日期：**2026-10-13**，历史安装与回归记录保留原日期。旧25b/v13限定迁移、新功能、恢复和卸载重装已完成；新2111裁剪候选仅补静态/原生CPU/PDF路径，未重复完整安装链。本表汇总已有清单，不替代逐项证据，也不自动发布。
 
-**最新分发入口：**用户已选择公开开源/NSIS/SignPath，仓库实际`private=false`；签名预检/三文件回执及15项相关规格通过，尚无真实签名。新2111候选140624396字节/472通知，独立Web/GUID排除、实际512维CPU/两页PDF和精确源码CI15/356/36通过；DirectML具体工程条件已核对，Canvas/Sharp/固定量化BGE三项保留。SignPath提交遭Captcha拒绝，无成功/批准回执。详见[本轮验证](signed-distribution-2026-10-13.md)、[分发报告](../releases/distribution-closeout-2026-10-13.md)、[源码材料](../releases/native-source-status-2026-10-13.md)与[签名政策](../releases/code-signing-policy.md)。以下旧包的未签名/五项待办/未授权描述是历史范围，不覆盖新授权，不等同新候选完整安装链通过。
+**最新分发入口：**用户已选择公开开源/NSIS/SignPath，仓库实际`private=false`；签名预检/三文件回执及15项相关规格通过，尚无真实签名。最新50da0f5通知候选140663578字节/695输出，223新增原文核对，11运行文件与已验2111一致；2111独立Web/GUID排除、实际512维CPU/两页PDF及精确CI15/356/36通过，不能冒称新SHA全链验收。DirectML当前条件已核对，Canvas/Sharp/固定量化BGE三项保留；BGE询证获单独授权后真实发送，尚未收到许可答复。SignPath提交遭Captcha拒绝，无成功/批准回执。详见[本轮验证](signed-distribution-2026-10-13.md)、[分发报告](../releases/distribution-closeout-2026-10-13.md)、[源码材料](../releases/native-source-status-2026-10-13.md)与[签名政策](../releases/code-signing-policy.md)。以下旧包的待办/未授权描述保留历史范围，不覆盖新授权，不等同新候选完整安装链通过。
 
 已接收[原独立验收](independent-acceptance-2026-10-08.md)、[修复复验](v12-fixes-2026-10-08.md)及[整合验收](final-acceptance-2026-10-10.md)。`53f66a6`是已完成限定生命周期的历史0.1.1候选；`7fdf3fe`保存引句核对版本；`36f28d8`包含共享提示最小修正并完成安装版AI补验。较早冻结 MIT 候选 `d2055b2`完成独立构建／实际载荷／项目全文核对，207个编译文件与36完全相同，新包未重复运行。该冻结包主库v12／活动v1／派生v2／备份format1不变；本轮授权分支已提交v13手动作答／复习，源码结果按[CI记录](github-ci-2026-10-12.md)另列，不倒写进旧包。旧报告、日志与包只对应各自源码。
 

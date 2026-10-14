@@ -4897,6 +4897,111 @@
       "crate": "web-time",
       "extraction": "Original unmodified member bytes from Cargo.lock checksum-verified source archive. Source code was not executed.",
       "provenance": "Candidate dependency superset including development and other-platform sources. Content-identical notice members may be shared by SHA-256; fixed member provenance is also retained in docs/releases/native-sources-0.1.1.json. Actual Windows compiled coverage remains pending."
+    },
+    {
+      "file": "canvas-rust-simd-d74c030d-LICENSE.txt",
+      "url": "https://api.github.com/repos/Nugine/simd/git/blobs/2c7eabb59093ea117d73b20effdd0414f87b2af2",
+      "sourceType": "official-fixed-git-blob-notice",
+      "revision": "d74c030d9dc4f3cae02146d1f497ff62726ef09a",
+      "sha256": "71674605ec4c087fe9eb534e3e4f9e26eb2e4aabcd76a29fd156c6a844d44b3d",
+      "size": 1062,
+      "gitBlob": "2c7eabb59093ea117d73b20effdd0414f87b2af2",
+      "upstreamPath": "LICENSE",
+      "extraction": "Official GitHub API base64 decoded once; exact Git blob and byte length verified. Failed raw endpoint requests preserved; no TLS checks disabled.",
+      "verifiedManifestProvenance": [
+        {
+          "name": "base64-simd",
+          "version": "0.8.0",
+          "repo": "Nugine/simd",
+          "revision": "d74c030d9dc4f3cae02146d1f497ff62726ef09a",
+          "path": "crates/base64-simd",
+          "status": "passed",
+          "matchesFixedGitSource": true,
+          "originalCargoTomlSha256": "ec2d42c2c4b7baaa2eb0796d7179424363f19d37c1e922fbfefe32791d39a651",
+          "fixedCargoTomlSha256": "ec2d42c2c4b7baaa2eb0796d7179424363f19d37c1e922fbfefe32791d39a651"
+        },
+        {
+          "name": "vsimd",
+          "version": "0.8.0",
+          "repo": "Nugine/simd",
+          "revision": "d74c030d9dc4f3cae02146d1f497ff62726ef09a",
+          "path": "crates/vsimd",
+          "status": "passed",
+          "matchesFixedGitSource": true,
+          "originalCargoTomlSha256": "cc626a72f9f89509460429bc40702d4b1d65118392790dea3e2cbf852884843d",
+          "fixedCargoTomlSha256": "cc626a72f9f89509460429bc40702d4b1d65118392790dea3e2cbf852884843d"
+        }
+      ],
+      "provenance": "Original base64-simd and vsimd Cargo.toml.orig matched exact VCS Cargo.toml. The fixed workspace LICENSE Git blob bytes are preserved unchanged for both manifest declarations."
+    },
+    {
+      "file": "canvas-rust-napi-rs-956e4525-LICENSE.txt",
+      "url": "https://api.github.com/repos/napi-rs/napi-rs/git/blobs/7fe7e35eff46457f65a4e30a717fada632de9e03",
+      "sourceType": "official-fixed-git-blob-notice",
+      "revision": "956e4525fea6a676ea3680b711382f167b899af9",
+      "sha256": "3f1ce66533302df3a32edbfdfc0b78f0dd34659e4c1f5817162e5ea3c2297215",
+      "size": 2138,
+      "gitBlob": "7fe7e35eff46457f65a4e30a717fada632de9e03",
+      "upstreamPath": "LICENSE",
+      "extraction": "Official GitHub API base64 decoded once; exact Git blob and byte length verified. Failed raw endpoint requests preserved; no TLS checks disabled.",
+      "verifiedManifestProvenance": [
+        {
+          "name": "napi-build",
+          "version": "2.4.1",
+          "repo": "napi-rs/napi-rs",
+          "revision": "956e4525fea6a676ea3680b711382f167b899af9",
+          "path": "crates/build",
+          "status": "passed",
+          "matchesFixedGitSource": true,
+          "originalCargoTomlSha256": "ed17f941a490bdd4042f810da4fdb2748a9c839c2598c1ebab4789e88f2a5014",
+          "fixedCargoTomlSha256": "ed17f941a490bdd4042f810da4fdb2748a9c839c2598c1ebab4789e88f2a5014"
+        },
+        {
+          "name": "napi-derive-backend",
+          "version": "6.1.2",
+          "repo": "napi-rs/napi-rs",
+          "revision": "956e4525fea6a676ea3680b711382f167b899af9",
+          "path": "crates/backend",
+          "status": "passed",
+          "matchesFixedGitSource": true,
+          "originalCargoTomlSha256": "0f485708c5ba5d9febb7b0be4f856f4e8a8bff137043ad29ad51de943e479d03",
+          "fixedCargoTomlSha256": "0f485708c5ba5d9febb7b0be4f856f4e8a8bff137043ad29ad51de943e479d03"
+        },
+        {
+          "name": "napi-derive",
+          "version": "3.6.3",
+          "repo": "napi-rs/napi-rs",
+          "revision": "956e4525fea6a676ea3680b711382f167b899af9",
+          "path": "crates/macro",
+          "status": "passed",
+          "matchesFixedGitSource": true,
+          "originalCargoTomlSha256": "eab022ba62c3c209566c3ebb1275833a2bbb9ea6f3fc1b8eed9c24a122e65765",
+          "fixedCargoTomlSha256": "eab022ba62c3c209566c3ebb1275833a2bbb9ea6f3fc1b8eed9c24a122e65765"
+        },
+        {
+          "name": "napi",
+          "version": "3.12.1",
+          "repo": "napi-rs/napi-rs",
+          "revision": "956e4525fea6a676ea3680b711382f167b899af9",
+          "path": "crates/napi",
+          "status": "passed",
+          "matchesFixedGitSource": true,
+          "originalCargoTomlSha256": "d426d42c7dada7a3a4ba286cc4f32e962df62c32b8e4e20292c7cd1742464bb0",
+          "fixedCargoTomlSha256": "d426d42c7dada7a3a4ba286cc4f32e962df62c32b8e4e20292c7cd1742464bb0"
+        },
+        {
+          "name": "napi-sys",
+          "version": "3.3.0",
+          "repo": "napi-rs/napi-rs",
+          "revision": "679eb79f5cf3c7c6b2850f4ab46092126f23dc5c",
+          "path": "crates/sys",
+          "status": "passed",
+          "matchesFixedGitSource": true,
+          "originalCargoTomlSha256": "c020ebb06188ea1624d7da32cbe1aa8ce0b6d5cc95c3883bcdb1b0a0c7069887",
+          "fixedCargoTomlSha256": "c020ebb06188ea1624d7da32cbe1aa8ce0b6d5cc95c3883bcdb1b0a0c7069887"
+        }
+      ],
+      "provenance": "Original crate Cargo.toml.orig matched exact VCS Cargo.toml. napi-sys alternate fixed revision has the same LICENSE Git blob; raw bytes reused rather than redownloaded."
     }
   ]
 }

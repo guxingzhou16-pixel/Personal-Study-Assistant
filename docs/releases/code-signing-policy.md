@@ -40,7 +40,7 @@ npm run desktop:dist:signed
 
 ## SignPath 申请材料与实际提交状态
 
-已使用用户提供的显示姓名/邮箱填写[官方表单](https://signpath.org/apply.html)，说明新项目/暂无外部用户信誉/无正式发布/仍在补分发条件，并请求资格预审与DirectML例外确认；必要行为/数据条款勾选，营销未选。一次自动提交返回“Failed to validate Captcha”，用户随后也报告同错误，**没有成功回执、账号批准或签名授权**。页面重连后原标签已丢失，个人填写材料保留在本机忽略目录的`signpath-application-paste.txt`，不公开姓名/邮箱，不经API绕过验证。维护者可在日常浏览器按以下资料重新填写；MFA及身份仍由本人完成。
+已使用用户提供的显示姓名/邮箱填写[官方表单](https://signpath.org/apply.html)，说明新项目/暂无外部用户信誉/无正式发布/仍在补分发条件，并请求资格预审与DirectML例外确认；必要行为/数据条款勾选，营销未选。一次自动提交返回“Failed to validate Captcha”，用户随后也报告同错误，**没有成功回执、账号批准或签名授权**。页面重连后原标签已丢失，个人填写材料保留在本机忽略目录的`signpath-application-paste.txt`。后续打开系统默认浏览器被工具策略阻止，未通过其他命令绕过；维护者可直接在日常浏览器打开上述官方链接，按材料重新填写。姓名/邮箱不公开，不经API绕过验证码，MFA及身份仍由本人完成。
 
 - Project name：Study Companion / 拾知。
 - Description：A local-first Windows study assistant connecting PDF/Markdown reading, source-grounded retrieval, notes, study plans and focus sessions. It supports local models and user-configured remote endpoints. Agent writes require explicit preview and confirmation.

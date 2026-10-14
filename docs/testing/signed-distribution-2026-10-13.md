@@ -2,7 +2,17 @@
 
 日期：2026-10-13。**签名预检/打包准备完成，自有可信签名与正式发布未完成。** 只补本轮变化影响路径；旧完整安装生命周期见[25b/v13记录](installed-v13-2026-10-12.md)，不重复计作本轮。
 
-## 固定新候选
+## 最新次级通知候选：50da0f5
+
+- 干净冻结源码`50da0f53fae63d1fb9539ff4129ed0ed14f0d7bb`，0.1.1，锁与原生依赖版本未变。双TypeScript/Vite/Electron/afterPack/NSIS构建成功，只提取卸载器文件，未在宿主执行安装器/应用或用户数据库。
+- 实物`release/nsis-rust-notices-f3a938dd-ad5d-439d-b9cf-e03b411d5aa1/StudyCompanion-0.1.1-win-x64-setup.exe`，140663578字节，SHA-256 `701e7baaf1515a6120bc83b40a3bfe700b1513c8c1485024598f622f5fec20e8`；五份保留产物与来源复制摘要一致。
+- 4776ASAR项，无独立Web/GUID；147元数据/158许可/388补充/2生成索引，共695通知输出，全部独立大小/摘要核对。223新增原文共674323字节，暂存与包内原字节匹配；793候选成员去重/复用后新增267归属引用，超集不等于实际链接清单。
+- 主程序、完整ASAR及9个原生文件，共11个运行文件与下方2111实物SHA完全一致。没有重复CPU/PDF推理，沿用相同运行字节的既有限定证据；不把此写成新完整UI/安装链或新SHA CI通过。相关15规则重新通过；Windows只读签名状态实际`NotSigned`，3pending保留。
+- 本次许可资产含上游CRLF/空白，源/暂存/实物均按原始摘要检查；普通文档/清单diff检查通过，未格式化许可原文。450条公开源/元数据库存已提交，最初对应2111相同依赖，不等于完整实物SBOM或相应源码承诺。
+
+回执：`rust-notice-candidate-final-location.json`、`rust-notice-candidate-signature.json`、`added-rust-notice-assets.json`；旧2111/25b及ZIP均未覆盖。当前代码与2111相比只有许可清单/原文和文档，应用/测试/打包JS/CI/锁文件没有改动。
+
+## 已验裁剪候选：2111
 
 - 干净源码`2111b3cc38c931b99618f6337874a8718b3b028a`，0.1.1；独立worktree复用锁完全相同的旧隔离npm依赖，物理复制、不使用junction，不重新下载已安装对象。
 - `desktop:dist`的双TypeScript/Vite/Electron/afterPack/NSIS通过；原单次纯文件卸载器提取保持，不在宿主执行安装器。
@@ -47,6 +57,8 @@
 - [x] 构建新规则候选、确认无独立Web/GUID、核对原文通知和摘要。
 - [x] 实际包内CPU与PDF相关最小检查，不读取用户DB。
 - [x] 精确源码远端CI，公开源码授权与实际读回。
+- [x] 后续50da0f5通知候选构建，695输出/223原文/五份复制产物及11运行文件相同字节核对。
+- [x] 用户另授权BGE五文件询证，真实[评论6147791372](https://github.com/huggingface/transformers.js/issues/1487#issuecomment-6147791372)创建并读回；等待答复/通知，未关闭模型许可。
 - [ ] Canvas/Sharp/固定量化BGE三项具体分发条件，见[源码材料状态](../releases/native-source-status-2026-10-13.md)。
 - [ ] 日常浏览器有效提交SignPath申请、取得成功回执并等待基金会审核；提交不代表批准。
 - [ ] 根据真实服务配置接入HSM或现有可信证书，三文件真签名/时间戳、干净Windows检查。

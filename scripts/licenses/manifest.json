@@ -2527,6 +2527,18 @@
           "sha256": "c2cfccb812fe482101a8f04597dfc5a9991a6b2748266c47ac91b6a5aae15383",
           "source": "https://static.crates.io/crates/windows-link/windows-link-0.2.1.crate",
           "description": "Original windows-link-0.2.1/license-mit bytes from checksum-verified windows-link@0.2.1 source archive (f0805222e57f7521d6a62e36fa9163bc891acd422f971defe97d64e70d0a4fe5). Candidate superset, including development/other-platform sources; this is not evidence of actual compiled inclusion. Identical bytes may reuse an existing original notice file."
+        },
+        {
+          "file": "assets/canvas-rust-simd-d74c030d-LICENSE.txt",
+          "sha256": "71674605ec4c087fe9eb534e3e4f9e26eb2e4aabcd76a29fd156c6a844d44b3d",
+          "source": "https://api.github.com/repos/Nugine/simd/git/blobs/2c7eabb59093ea117d73b20effdd0414f87b2af2",
+          "description": "Original fixed Nugine/simd workspace LICENSE, Git blob 2c7eabb59093ea117d73b20effdd0414f87b2af2. Covers dependency manifest provenance verified for base64-simd@0.8.0, vsimd@0.8.0; declarations mapped offline, not proof of every release DLL component."
+        },
+        {
+          "file": "assets/canvas-rust-napi-rs-956e4525-LICENSE.txt",
+          "sha256": "3f1ce66533302df3a32edbfdfc0b78f0dd34659e4c1f5817162e5ea3c2297215",
+          "source": "https://api.github.com/repos/napi-rs/napi-rs/git/blobs/7fe7e35eff46457f65a4e30a717fada632de9e03",
+          "description": "Original fixed napi-rs/napi-rs workspace LICENSE, Git blob 7fe7e35eff46457f65a4e30a717fada632de9e03. Covers dependency manifest provenance verified for napi-build@2.4.1, napi-derive-backend@6.1.2, napi-derive@3.6.3, napi@3.12.1, napi-sys@3.3.0; declarations mapped offline, not proof of every release DLL component."
         }
       ]
     },
