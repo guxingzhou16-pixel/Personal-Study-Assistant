@@ -2,7 +2,9 @@
 
 日期：2026-10-13。**签名预检/打包准备完成，自有可信签名与正式发布未完成。** 只补本轮变化影响路径；旧完整安装生命周期见[25b/v13记录](installed-v13-2026-10-12.md)，不重复计作本轮。
 
-## 最新次级通知候选：50da0f5
+2026-10-14 的最新77acd64/697通知与固定Canvas来源补验见[增量记录](native-notice-followup-2026-10-14.md)。本页保留50da0f5与2111各自字节/日期/验收范围，不追写它们已含两份新通知。
+
+## 已验次级通知候选：50da0f5
 
 - 干净冻结源码`50da0f53fae63d1fb9539ff4129ed0ed14f0d7bb`，0.1.1，锁与原生依赖版本未变。双TypeScript/Vite/Electron/afterPack/NSIS构建成功，只提取卸载器文件，未在宿主执行安装器/应用或用户数据库。
 - 实物`release/nsis-rust-notices-f3a938dd-ad5d-439d-b9cf-e03b411d5aa1/StudyCompanion-0.1.1-win-x64-setup.exe`，140663578字节，SHA-256 `701e7baaf1515a6120bc83b40a3bfe700b1513c8c1485024598f622f5fec20e8`；五份保留产物与来源复制摘要一致。

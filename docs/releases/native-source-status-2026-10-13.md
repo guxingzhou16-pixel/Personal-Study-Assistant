@@ -71,6 +71,6 @@
 
 ### 2026-10-14 增量：Canvas 声明图与缺失原文
 
-复用93份归档，离线Cargo图选出83个Windows普通/构建依赖；7项未带独立LICENSE的原manifest均与固定VCS源码匹配，补取得两份工作区许可共3200字节，napi-sys同Git blob复用。图解析不执行/编译源码，后续固定许可核对用了网络。新清单与[声明依赖图](canvas-rust-graph-0.1.1.json)保留来源/摘要，不代表Skia C++或运行时及发布DLL实际全覆盖。两份新原文尚未在旧50包内，新候选状态见[增量验证](../testing/native-notice-followup-2026-10-14.md)。
+复用93份归档，离线Cargo图选出83个Windows普通/构建依赖；7项未带独立LICENSE的原manifest均与固定VCS源码匹配，补取得两份工作区许可共3200字节，napi-sys同Git blob复用。图解析不执行/编译源码，后续固定许可核对用了网络。新清单与[声明依赖图](canvas-rust-graph-0.1.1.json)保留来源/摘要，不代表Skia C++或运行时及发布DLL实际全覆盖。两份新原文已入77acd64的697输出/390补充实物，与提交/源字节一致，11运行文件与2111相同；首次MIT复制EBUSY失败及新UUID打包重试成功均保留，不重跑旧功能。旧50包不追写新两份，见[增量验证](../testing/native-notice-followup-2026-10-14.md)。
 
 所有完成/剩余门槛以[分发收尾](distribution-closeout-2026-10-13.md)为准；签名申请依[政策与真实状态](code-signing-policy.md)处理，不重复已足够的旧软件/安装测试。

@@ -20,14 +20,20 @@
 
 ## 候选包与验证清单
 
-最新已验实物仍为 [50da0f5 的 695 份通知候选](signed-distribution-2026-10-13.md)。上述两份新增原文尚未进入该旧包。待冻结新提交并构建后，在本节记录新候选自身的来源、安装器大小/摘要及实物结果；不预先将预期数量写作通过。
+干净冻结源码 `77acd642c1eea6221ee0d80444140e51feffe691`，0.1.1，锁 SHA-256 仍为 `c8a2a811877bda4e2fd0623b5553bad26165d5b0773970f3a8458412a08bdd8e`。双 TypeScript/Vite/Electron 构建通过，首次打包在复制 MIT 文件时返回 `EBUSY`；失败日志、原输出及回执保留。随后源/目标 MIT 均可读且 1075 字节摘要相同，独立复制探针通过，没有定位到具体占用者。源码/编译结果未变，只重试打包到新 UUID，不重复编译或功能测试；afterPack/NSIS 成功。未运行安装器、应用或个人数据库。
+
+新实物：`release/nsis-canvas-notices-254f9869-6f74-45a2-8a3e-8770fd40a3f7/StudyCompanion-0.1.1-win-x64-setup.exe`，**140664359 字节**，SHA-256 **`926f585f1efe170a2c5fc154d50a5b9ccc8dd745c6f29639fd3a27da01b89e86`**。4776 个 ASAR 项；147 元数据/158 许可/390 补充/2 生成索引，共 **697** 份通知输出，全部独立大小与摘要核对。两份新增原文与固定源/提交 Git blob/实物完全相同，包内确切 Canvas 1.0.9 归属核对通过；此前 223 份原文仍保留。
+
+主程序、完整 ASAR 与 9 个原生文件共 11 份运行文件，实际逐 SHA 与已验 2111 原文件比较一致。没有重复 CPU/PDF、完整 UI 或安装链；只沿用相同运行字节的已有[限定证据](signed-distribution-2026-10-13.md)。项目 MIT 原字节 1075、五份保留产物与构建来源复制摘要通过；只读签名实际为 `NotSigned`，三项 pending 和构建时 `functionalAcceptance=pending` 保持原字节。新包的检查不追写到旧 50da0f5/695、2111/472 或 25b/385 候选。
+
+本轮新增数据与通知的独立 code review 为 APPROVE/0 问题，核对了 7 份固定 manifest、83/93 声明范围、139 个原始通知候选成员及两份新增字节。应用/测试/打包 JS/CI/锁文件相对 2111 没有修改。远端 CI 按最终授权推送的精确 SHA/run 另核对，回执 `canvas-notice-ci-final-jobs.json` 和 `canvas-notice-ci-final-job.log`；不预填未知 run 为成功。
 
 - [x] 固定 Windows 声明依赖图、93 → 83 的范围及 7 份原 manifest 核对。
 - [x] 两份固定 Git blob 许可全文取得、来源/字节/摘要与确切包归属核对。
-- [ ] 新提交的干净 NSIS 构建与两份新增原文实物核对。
-- [ ] 全部包内通知输出的独立大小/摘要、项目 MIT 原字节及三项 pending 保留。
-- [ ] 运行文件与已验 2111 实物的摘要比较，按实际变化决定相关检查范围。
-- [ ] 新安装器只读签名状态、五份保留产物复制摘要与对应远端 CI。
+- [x] 新提交的干净 NSIS 构建与两份新增原文实物核对；首次 `EBUSY` 失败原样保留。
+- [x] 697 份包内通知输出的独立大小/摘要、项目 MIT 原字节及三项 pending 保留。
+- [x] 11 份运行文件与已验 2111 实物的摘要比较，相同字节不重复旧验收。
+- [x] 新安装器只读签名状态 `NotSigned`、五份保留产物复制摘要。
 
 ## 外部依赖与剩余事项
 
@@ -37,4 +43,4 @@ SignPath 的自动和用户提交均曾遭 Captcha 拒绝；当前没有成功�
 
 Canvas 的 Skia/实际静态组件与运行时、Sharp 的编译对应/剩余版权及 LGPL 相应源码和修改库替换、固定量化 BGE 许可仍须闭合。三文件真签名及最终签名包的干净 Windows 验证依赖真实证书或服务配置；完整门槛见[分发收尾](../releases/distribution-closeout-2026-10-13.md)。
 
-本机原始回执：`canvas-cargo-graph-preparation.json`、`canvas-windows-cargo-tree.log`、`canvas-fixed-upstream-notice-recovery.json`、`added-canvas-fixed-notice-assets.json`，都在已忽略的本轮证据目录；来源代码/归档/凭据及个人资料不提交。
+本机原始回执：`canvas-cargo-graph-preparation.json`、`canvas-windows-cargo-tree.log`、`canvas-fixed-upstream-notice-recovery.json`、`added-canvas-fixed-notice-assets.json`、`canvas-fixed-notice-build-first-failure.json`、`canvas-fixed-notice-candidate-final-location.json`、`canvas-fixed-notice-candidate-signature.json`，都在已忽略的本轮证据目录；来源代码/归档/凭据及个人资料不提交。
