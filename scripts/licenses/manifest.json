@@ -2539,6 +2539,24 @@
           "sha256": "3f1ce66533302df3a32edbfdfc0b78f0dd34659e4c1f5817162e5ea3c2297215",
           "source": "https://api.github.com/repos/napi-rs/napi-rs/git/blobs/7fe7e35eff46457f65a4e30a717fada632de9e03",
           "description": "Original fixed napi-rs/napi-rs workspace LICENSE, Git blob 7fe7e35eff46457f65a4e30a717fada632de9e03. Covers dependency manifest provenance verified for napi-build@2.4.1, napi-derive-backend@6.1.2, napi-derive@3.6.3, napi@3.12.1, napi-sys@3.3.0; declarations mapped offline, not proof of every release DLL component."
+        },
+        {
+          "file": "assets/rust-1.98.1-COPYRIGHT.txt",
+          "sha256": "172020dbfd5b53a226dfde77616190a48dcff519b0bc0e6deb91a8450782c4af",
+          "source": "https://raw.githubusercontent.com/rust-lang/rust/48a229ceaefd4985c50990b14116b6d856af0985/COPYRIGHT",
+          "description": "Original Rust 1.98.1 notice, fixed commit 48a229ceaefd4985c50990b14116b6d856af0985. Runtime/compiler version matched Canvas Windows release job and embedded hash. Standard-library in-tree metadata and out-of-tree/runtime coverage remain separately scoped; this notice alone does not close distribution review."
+        },
+        {
+          "file": "assets/rust-1.98.1-LICENSE-MIT.txt",
+          "sha256": "b71bd43a069ca0641a9ecfe585ca7b3c53b5cc1608f8b68321168698e28b5ea1",
+          "source": "https://raw.githubusercontent.com/rust-lang/rust/48a229ceaefd4985c50990b14116b6d856af0985/LICENSE-MIT",
+          "description": "Original Rust 1.98.1 notice, fixed commit 48a229ceaefd4985c50990b14116b6d856af0985. Runtime/compiler version matched Canvas Windows release job and embedded hash. Standard-library in-tree metadata and out-of-tree/runtime coverage remain separately scoped; this notice alone does not close distribution review."
+        },
+        {
+          "file": "assets/rust-1.98.1-Unicode-3.0.txt",
+          "sha256": "f5062c9a188d81dfe66b56db4182dcf9e4b17c0d9b0d311a8e20b3a1b075c443",
+          "source": "https://raw.githubusercontent.com/rust-lang/rust/48a229ceaefd4985c50990b14116b6d856af0985/LICENSES/Unicode-3.0.txt",
+          "description": "Original Rust 1.98.1 notice, fixed commit 48a229ceaefd4985c50990b14116b6d856af0985. Runtime/compiler version matched Canvas Windows release job and embedded hash. Standard-library in-tree metadata and out-of-tree/runtime coverage remain separately scoped; this notice alone does not close distribution review."
         }
       ]
     },
@@ -2674,8 +2692,8 @@
     }
   ],
   "reviewIssues": [
-    "Canvas pinned root licenses, exact FreeType embedded notices and Chromium zlib SIMD/Intel/optimization source notices are retained. Actual binary/build coverage still requires review; glue-code notices are not external library licenses.",
-    "Sharp native dependencies: preserve the 29-library table and LGPL texts; matching complete source/build notices and replacement/redistribution conditions still need review before public distribution.",
+    "Canvas 1.0.9 release binary digest, Windows producer job, fixed Skia build sources and Rust 1.98.1 base/Unicode notices are mapped. Complete Skia embedded/C++/static runtime and out-of-tree standard-library notice coverage remain pending; fixed build provenance does not by itself close these conditions.",
+    "Sharp core DLL exactly matches official libvips 8.18.7 static developer archive. Isolated genuine binary-modification/load/restore test passed with unchanged addon and image bytes. Complete native/compiler/header notice and Corresponding Source coverage, C++ bridge rebuild and combined-library distribution conditions remain pending; no source rebuild is claimed.",
     "Fixed Xenova/bge-small-zh-v1.5 revision 75c43b069aac4d136ba6bc1122f995fedcfd2781 model card was obtained and Git-blob verified. It identifies the BAAI base model but contains no license field or quantized-weight grant. FlagEmbedding code MIT text is not a grant for these weights; license review remains pending."
   ]
 }

@@ -32,4 +32,6 @@ If a different upstream notice or permission is needed, please point us to the a
 
 ## 收到答复后
 
+2026-10-14只读复查：讨论仍有6条评论，最新为上述已发送询证；当前模型metadata仍为原revision、没有license字段或LICENSE文件。用户已选择**保留当前模型、等待上游答复**。不追加发送、不重新下载权重或替换缓存；此项继续未关闭，SignPath本轮再次提交按用户要求留在三项闭合之后。
+
 保存真实评论URL/时间/作者及所覆盖的版本/文件；取得指定原始通知并核对摘要，按现有清单入包。只有答复与必要通知完整覆盖固定文件后，才关闭对应分发项；不能借其他模型的MIT答复、issue关闭状态或本项目MIT替代。

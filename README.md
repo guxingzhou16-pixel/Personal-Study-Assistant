@@ -1,5 +1,7 @@
 # 私人学习助手（Study Companion）
 
+**2026-10-14 后续：**Sharp 官方 core DLL 与当前候选同字节，真实沙盒修改/加载/恢复验证通过；Canvas 发布摘要、生产日志及 Rust 1.98.1 基准通知已补核对。新临时目录只生成并核对 **700** 份通知，旧安装器仍 **697**，未重建或签名。完整静态/运行时及 Sharp 组合源码条件继续待补，[Canvas](docs/releases/canvas-distribution-inquiry.md)/[Sharp](docs/releases/sharp-distribution-inquiry.md) 询证草稿已准备、未发送；用户选择保留当前 BGE 等待答复，三项闭合后再尝试 SignPath。新结果、失败与接手清单见[后续核对](docs/testing/native-distribution-followup-2026-10-14.md)及[来源记录](docs/releases/native-windows-provenance-0.1.1.json)，不重复旧 CI/模型/安装全套。
+
 > **当前状态（2026-10-14）：软件核心、旧v13限定安装验收与发布准备已完成相关验证，安装包尚未正式发布。** 仓库已按用户授权公开，当前代码在`codex/structured-notes`；最新通知候选冻结`77acd64`，697份通知和新增两份原文实物核对通过，11个运行文件与已验2111一致。包摘要、83项声明依赖/7项原manifest及首次EBUSY失败记录见[增量验证](docs/testing/native-notice-followup-2026-10-14.md)；2111原CPU/PDF及CI15打包/签名、356核心、36桌面保留[原范围](docs/testing/signed-distribution-2026-10-13.md)，本轮CI按授权推送的精确SHA/run另验，不冒称新完整安装链通过。GUID不再随新包分发，DirectML当前范围已核对；Canvas/Sharp/固定量化BGE三项仍需闭合，BGE询证已获单独授权并[实际发送](docs/releases/bge-license-inquiry.md)，本日复查尚无答复。签名入口已实现，SignPath提交遭Captcha拒绝，无成功/批准回执，可信签名未完成；[分发进展](docs/releases/distribution-closeout-2026-10-13.md)、[源码材料](docs/releases/native-source-status-2026-10-13.md)与[签名政策](docs/releases/code-signing-policy.md)是接手入口。项目使用[MIT](LICENSE)，旧包/失败保留原范围，展示网站最后建设。
 
 私人学习助手是一款以本地数据和个人学习体验为中心的学习软件。它将资料阅读、可追溯的 AI 问答、学习笔记、计划和专注记录连在一起，帮助用户提升注意力和学习效率、理解知识、看见进步，并保持学习动力。第一版以编程与技术学习为主要场景，后续逐步扩展到跨学科资料。

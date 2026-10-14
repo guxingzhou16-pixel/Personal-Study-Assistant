@@ -1,0 +1,181 @@
+{
+  "format": 1,
+  "verifiedOn": "2026-10-14",
+  "applicationSourceBeforeThisIncrement": "825d80b9fcb6234d43fbd6c83c1b71afea16ecb6",
+  "unchangedInstallerSource": "77acd642c1eea6221ee0d80444140e51feffe691",
+  "completeDistributionReview": false,
+  "pending": [
+    "Canvas full embedded/static/runtime notice coverage",
+    "Sharp corresponding source and combined-library/runtime notice coverage",
+    "Fixed BGE five-file license evidence"
+  ],
+  "canvas": {
+    "sourceRevision": "b2723ffae4e74e8c9df752902b137ec4061530e9",
+    "releaseUrl": "https://github.com/Brooooooklyn/canvas/releases/tag/v1.0.9",
+    "binary": {
+      "name": "skia.win32-x64-msvc.node",
+      "bytes": 27436032,
+      "publishedDigest": "sha256:f69cac8093b0a4914d41a01add30a08cb739ecc254ad1d124b1804384af16586",
+      "matchesCurrentCandidate": true
+    },
+    "producer": {
+      "run": 34340650671,
+      "job": 102430380104,
+      "url": "https://github.com/Brooooooklyn/canvas/actions/runs/34340650671/job/102430380104",
+      "sourceLogSha256": "5a67809adcdd59b0ea2f43897f9df4da98917d602e7077591d48b0f6c0ae6c06",
+      "logIsDecodedSnapshot": true,
+      "rustVersion": "1.98.1",
+      "rustCommit": "48a229ceaefd4985c50990b14116b6d856af0985",
+      "rustCommitMatchesEmbeddedBinary": true,
+      "lockedBuildRecorded": true
+    },
+    "skia": {
+      "sourceRevision": "a9c42c9fce77cd748805df0ec67ef5718800b1e9",
+      "archiveBytes": 79689406,
+      "archiveSha256": "70a57fda737ea04d1d469421f911508e58fbc5f6ed89b1c44c3935ba031fcf97",
+      "sourceUrl": "https://codeload.github.com/google/skia/tar.gz/a9c42c9fce77cd748805df0ec67ef5718800b1e9",
+      "gnFilesRead": 97,
+      "noticeCandidates": 9,
+      "staticReleaseUrl": "https://github.com/Brooooooklyn/canvas/releases/tag/skia-a9c42c9f",
+      "staticLibraryMetadata": [
+        {
+          "name": "jsonreader-win32-x64-msvc.lib",
+          "bytes": 57362,
+          "publishedDigest": "sha256:b87d26851478892fa77388af77c81a37597158dd844fd6a47092381cb8c5a6fa"
+        },
+        {
+          "name": "skia-win32-x64-msvc.lib",
+          "bytes": 30655454,
+          "publishedDigest": "sha256:fb986a4648dbf14f379b72f083e6814b424e8f2d82434bdda73328bc867917ef"
+        },
+        {
+          "name": "skottie-win32-x64-msvc.lib",
+          "bytes": 10287442,
+          "publishedDigest": "sha256:c515a6473799a974a536b258359e16f81b1c94ce81cd9a1e67553060bf0e5297"
+        },
+        {
+          "name": "skparagraph-win32-x64-msvc.lib",
+          "bytes": 761522,
+          "publishedDigest": "sha256:c113fc141e02b0568795f8bd6baa874d4b5fc4f1f24f246800ad79d11e5cb703"
+        },
+        {
+          "name": "skresources-win32-x64-msvc.lib",
+          "bytes": 53444,
+          "publishedDigest": "sha256:ff908d723e3fe3111f36fa9d73229c5c6c14bce6504a3323f0aa0076d5c83c84"
+        },
+        {
+          "name": "sksg-win32-x64-msvc.lib",
+          "bytes": 8949942,
+          "publishedDigest": "sha256:dbb73893fc45ac540bc3079e9858275e9acd5bc1b4edcceefdbc62e961a1e7b5"
+        },
+        {
+          "name": "skshaper-win32-x64-msvc.lib",
+          "bytes": 8318082,
+          "publishedDigest": "sha256:2c456d69a987665a88203c4feb14d493c84d81c6a11e98b6a74e3b7d7e480796"
+        },
+        {
+          "name": "skunicode_core-win32-x64-msvc.lib",
+          "bytes": 17888,
+          "publishedDigest": "sha256:a6731425467555fad8402c48efec11b726b88aa69455f2316047a08ddc9f677d"
+        },
+        {
+          "name": "skunicode_icu-win32-x64-msvc.lib",
+          "bytes": 14133222,
+          "publishedDigest": "sha256:ab6d70f5a1c2560d8fb96703381b495a3350af3b7a6e9d62172f33a47356b735"
+        },
+        {
+          "name": "svg-win32-x64-msvc.lib",
+          "bytes": 9497708,
+          "publishedDigest": "sha256:a3f2d531454c82c88a6ff9b5d49d34ef760f1d69382508053b9cb87d068fa8a5"
+        }
+      ],
+      "staticLibrariesDownloadedByThisReview": false,
+      "fullLinkedObjectCoverageProven": false
+    },
+    "runtimeNotices": [
+      {
+        "file": "rust-1.98.1-COPYRIGHT.txt",
+        "bytes": 1571,
+        "sha256": "172020dbfd5b53a226dfde77616190a48dcff519b0bc0e6deb91a8450782c4af",
+        "reused": false,
+        "url": "https://raw.githubusercontent.com/rust-lang/rust/48a229ceaefd4985c50990b14116b6d856af0985/COPYRIGHT"
+      },
+      {
+        "file": "rust-1.98.1-LICENSE-MIT.txt",
+        "bytes": 1068,
+        "sha256": "b71bd43a069ca0641a9ecfe585ca7b3c53b5cc1608f8b68321168698e28b5ea1",
+        "reused": false,
+        "url": "https://raw.githubusercontent.com/rust-lang/rust/48a229ceaefd4985c50990b14116b6d856af0985/LICENSE-MIT"
+      },
+      {
+        "file": "rust-1.98.1-Unicode-3.0.txt",
+        "bytes": 1995,
+        "sha256": "f5062c9a188d81dfe66b56db4182dcf9e4b17c0d9b0d311a8e20b3a1b075c443",
+        "reused": false,
+        "url": "https://raw.githubusercontent.com/rust-lang/rust/48a229ceaefd4985c50990b14116b6d856af0985/LICENSES/Unicode-3.0.txt"
+      },
+      {
+        "file": "native-rust-dtoa-1.0.11-62c7a1e35f56.txt",
+        "bytes": 9723,
+        "sha256": "62c7a1e35f56406896d7aa7ca52d0cc0d272ac022b5d2796e7d6905db8a3636a",
+        "reused": true,
+        "url": "https://raw.githubusercontent.com/rust-lang/rust/48a229ceaefd4985c50990b14116b6d856af0985/LICENSE-APACHE",
+        "ownerReferenceAlreadyPresent": true
+      }
+    ],
+    "sourceExecuted": false
+  },
+  "sharp": {
+    "package": "@img/sharp-win32-x64@0.35.5",
+    "coreOfficialArchive": {
+      "url": "https://github.com/libvips/build-win64-mxe/releases/download/v8.18.7/vips-dev-x64-web-8.18.7-static.zip",
+      "bytes": 9398858,
+      "sha256": "a736af61d3b46499760efa606e469cb14e060445b1f6fd36a1fa2e75009e1197",
+      "coreDllMatchesCandidate": true,
+      "coreDllSha256": "06dab07cc386748513337a31672b1d5269fbc770a14ff403080575665bf0813f"
+    },
+    "replacementVerification": {
+      "environment": "isolated Windows Sandbox",
+      "networkingDisabled": true,
+      "packagedInputFilesChecked": 106,
+      "newProcesses": 3,
+      "versions": ["8.18.7", "8.18.8", "8.18.7"],
+      "modifiedCoreSha256": "d0f7f34eea095b768d848f207236d03d9a209ea8d8d46ce5cc3090f731c1548b",
+      "restoredCoreMatchesOriginal": true,
+      "pixelsEqual": true,
+      "pngSha256": "9e409971b7f7b7e523333e2c81da83f027a69b5711bd43704143e74f2b0012a0",
+      "addonSha256": "971048779f9c8598df14641dfc03c625885c93f473a788e65ca2deb50d0b083e",
+      "goldenReceiptSha256": "130bcbb247f89c899e9721ac727f279c965c3bfacdda6bfc1774168e7acbe5df",
+      "method": "One-byte change in the exported vips_version lookup table in a guest copy. Genuine binary modification/load/restore, not source compilation.",
+      "sourceRebuilt": false,
+      "allCombinedLibraryObligationsClosed": false,
+      "appOrInstallerExecuted": false,
+      "modelExecuted": false
+    }
+  },
+  "notices": {
+    "newOriginalFiles": 3,
+    "newOriginalBytes": 4634,
+    "apacheOriginalReused": true,
+    "generatedMetadata": 147,
+    "generatedLicenseFiles": 158,
+    "generatedSupplementalFiles": 393,
+    "generatedTotal": 700,
+    "pendingIssues": 3,
+    "generationOnly": true,
+    "newInstallerBuilt": false,
+    "oldInstallerNoticeOutputs": 697
+  },
+  "bge": {
+    "revision": "75c43b069aac4d136ba6bc1122f995fedcfd2781",
+    "commentUrl": "https://github.com/huggingface/transformers.js/issues/1487#issuecomment-6147791372",
+    "newReplyConfirmed": false,
+    "userDecision": "Retain current model and wait for upstream answer",
+    "modelChanged": false
+  },
+  "signpath": {
+    "retryCondition": "After all three distribution conditions close",
+    "retryExecutedThisIncrement": false,
+    "successfulSubmissionConfirmed": false
+  }
+}

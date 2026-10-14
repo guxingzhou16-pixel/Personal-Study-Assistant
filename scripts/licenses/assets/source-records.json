@@ -5002,6 +5002,54 @@
         }
       ],
       "provenance": "Original crate Cargo.toml.orig matched exact VCS Cargo.toml. napi-sys alternate fixed revision has the same LICENSE Git blob; raw bytes reused rather than redownloaded."
+    },
+    {
+      "file": "rust-1.98.1-COPYRIGHT.txt",
+      "url": "https://raw.githubusercontent.com/rust-lang/rust/48a229ceaefd4985c50990b14116b6d856af0985/COPYRIGHT",
+      "revision": "48a229ceaefd4985c50990b14116b6d856af0985",
+      "sourceType": "fixed-rust-runtime-notice",
+      "version": "1.98.1",
+      "sha256": "172020dbfd5b53a226dfde77616190a48dcff519b0bc0e6deb91a8450782c4af",
+      "size": 1571,
+      "reusedOriginalAsset": false,
+      "sourceArchiveSha256": "42727764a01a54db7423e43db08a9c818405679af6a9a677068e8cd4b8361242",
+      "sourceMember": "rust-std-1.98.1-x86_64-pc-windows-msvc/COPYRIGHT"
+    },
+    {
+      "file": "rust-1.98.1-LICENSE-MIT.txt",
+      "url": "https://raw.githubusercontent.com/rust-lang/rust/48a229ceaefd4985c50990b14116b6d856af0985/LICENSE-MIT",
+      "revision": "48a229ceaefd4985c50990b14116b6d856af0985",
+      "sourceType": "fixed-rust-runtime-notice",
+      "version": "1.98.1",
+      "sha256": "b71bd43a069ca0641a9ecfe585ca7b3c53b5cc1608f8b68321168698e28b5ea1",
+      "size": 1068,
+      "reusedOriginalAsset": false,
+      "sourceArchiveSha256": "42727764a01a54db7423e43db08a9c818405679af6a9a677068e8cd4b8361242",
+      "sourceMember": "rust-std-1.98.1-x86_64-pc-windows-msvc/LICENSE-MIT"
+    },
+    {
+      "file": "rust-1.98.1-Unicode-3.0.txt",
+      "url": "https://raw.githubusercontent.com/rust-lang/rust/48a229ceaefd4985c50990b14116b6d856af0985/LICENSES/Unicode-3.0.txt",
+      "revision": "48a229ceaefd4985c50990b14116b6d856af0985",
+      "sourceType": "fixed-rust-runtime-notice",
+      "version": "1.98.1",
+      "sha256": "f5062c9a188d81dfe66b56db4182dcf9e4b17c0d9b0d311a8e20b3a1b075c443",
+      "size": 1995,
+      "reusedOriginalAsset": false,
+      "sourceArchiveSha256": null,
+      "sourceMember": "LICENSES/Unicode-3.0.txt"
+    },
+    {
+      "file": "native-rust-dtoa-1.0.11-62c7a1e35f56.txt",
+      "url": "https://raw.githubusercontent.com/rust-lang/rust/48a229ceaefd4985c50990b14116b6d856af0985/LICENSE-APACHE",
+      "revision": "48a229ceaefd4985c50990b14116b6d856af0985",
+      "sourceType": "fixed-rust-runtime-notice",
+      "version": "1.98.1",
+      "sha256": "62c7a1e35f56406896d7aa7ca52d0cc0d272ac022b5d2796e7d6905db8a3636a",
+      "size": 9723,
+      "reusedOriginalAsset": true,
+      "sourceArchiveSha256": "42727764a01a54db7423e43db08a9c818405679af6a9a677068e8cd4b8361242",
+      "sourceMember": "rust-std-1.98.1-x86_64-pc-windows-msvc/LICENSE-APACHE"
     }
   ]
 }
