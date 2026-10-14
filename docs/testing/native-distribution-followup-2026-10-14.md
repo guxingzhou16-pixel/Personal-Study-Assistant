@@ -47,7 +47,9 @@
 | BGE      | 只读复查评论与当前 metadata；用户确认等待      | 固定五文件许可答复及指定通知                               |
 | SignPath | 既有材料和失败记录复用                         | 三项闭合后一次正常验证码提交及真实成功/审核回执            |
 
-已经写好两份完整询证草稿：[Canvas](../releases/canvas-distribution-inquiry.md)、[Sharp](../releases/sharp-distribution-inquiry.md)。当前**未发送**；AGENTS 3.33 要求分别取得对其它维护者发消息的许可。BGE 原评论已发送，无追加消息、无换模型。没有新标签、Release、可信签名或 main 合并。
+两份完整询证按 AGENTS 3.33 单独获用户授权后，已分别创建并全文读回：[Canvas #1360](https://github.com/Brooooooklyn/canvas/issues/1360)、[Sharp #432](https://github.com/lovell/sharp-libvips/issues/432)。两次连接器403均未创建；已有Git身份核对账号/仓库/重复后每份只POST一次，再按ID读回完整正文。实际全文、时间和摘要见[Canvas记录](../releases/canvas-distribution-inquiry.md)、[Sharp记录](../releases/sharp-distribution-inquiry.md)。没有把发送成功当作取得许可答复，也不授权追加其它消息。BGE 原评论保持等待，无追加消息、无换模型。没有新标签、Release、可信签名或 main 合并。
+
+验证脚本三轮静态复审已通过；最终数据复核完成700项输出、新原文、来源前缀/归属和黄金回执检查，未报告新问题，末轮总结任务因评审模型容量不足未完成。主维护者另完成原文Git blob/暂存字节、114本地链接与diff核对；本机 `review-status-final.json` 保留这一区别，不冒称末轮完整批准。
 
 ## 本机证据与接手顺序
 

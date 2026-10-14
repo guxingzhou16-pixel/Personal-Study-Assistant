@@ -1,6 +1,8 @@
-# Canvas 1.0.9 Windows 分发材料询证草稿
+# Canvas 1.0.9 Windows 分发材料询证记录
 
-日期：2026-10-14。**未发送。** 拟在 `Brooooooklyn/canvas` 新建一项公开 issue；按 AGENTS 3.33，对此维护者发消息须单独获用户许可。下方为完整拟发送正文，不含申请姓名、邮箱或本机路径。已有 [1343](https://github.com/Brooooooklyn/canvas/issues/1343) 针对旧 0.1.100 的请求没有评论，不能作为本版本答复。
+日期：2026-10-14。**用户已单独授权，两条中的这一条已创建并全文读回；尚无覆盖缺口的答复。** 实际 [issue1360](https://github.com/Brooooooklyn/canvas/issues/1360)，账号 `guxingzhou16-pixel`，创建于 `2026-10-14T07:31:39Z`；正文 SHA-256 `1afc9f9fc61b74c42beaded59b3969f59cb6251895b12a302fb71b8211ea8317`，取自已审阅提交 `e4b89ad64e8fdb694c0863c6be996fd524c5dd84`。下方为实际已发送全文，不含申请姓名、邮箱或本机路径。已有 [1343](https://github.com/Brooooooklyn/canvas/issues/1343) 针对旧 0.1.100 的请求没有评论，不能作为本版本答复。
+
+连接器首次返回403“Resource not accessible by integration”，未创建。随后核对已有Git登录的实际账号、仓库ID/公开/issue可用及本人无同正文/标题重复项，只POST一次；按issue number再次GET核对账号、完整正文/标题/摘要。没有保存凭据，未追加评论或扩大联系范围。本机回执 `upstream-inquiry-0-result.json` 留在本轮忽略证据目录。
 
 ## 标题
 
@@ -29,4 +31,4 @@ We will keep third-party terms distinct from our application MIT license and pre
 
 ## 收到答复后
 
-核对答复作者、版本/目标/实物摘要与所覆盖组件；保存原文 URL，取得指定通知并核对来源/摘要。缺少生产记录不能由今天重建的图替代；未得到明确覆盖的部分继续保留在分发门槛中。此草稿不授权发送，也不涉及 BGE 已发送评论的再次提交。
+核对答复作者、版本/目标/实物摘要与所覆盖组件；保存原文 URL，取得指定通知并核对来源/摘要。缺少生产记录不能由今天重建的图替代；未得到明确覆盖的部分继续保留在分发门槛中。这一条已授权并发送；不授权追加消息、其它维护者或 BGE 已发送评论的再次提交。

@@ -177,5 +177,31 @@
     "retryCondition": "After all three distribution conditions close",
     "retryExecutedThisIncrement": false,
     "successfulSubmissionConfirmed": false
-  }
+  },
+  "inquiries": [
+    {
+      "repository": "Brooooooklyn/canvas",
+      "sourceCommit": "e4b89ad64e8fdb694c0863c6be996fd524c5dd84",
+      "sender": "guxingzhou16-pixel",
+      "title": "1.0.9 Windows x64: producer source/notice mapping for Skia and static runtimes",
+      "bodySha256": "1afc9f9fc61b74c42beaded59b3969f59cb6251895b12a302fb71b8211ea8317",
+      "issueNumber": 1360,
+      "url": "https://github.com/Brooooooklyn/canvas/issues/1360",
+      "issueId": 5843801635,
+      "createdAt": "2026-10-14T07:31:39Z",
+      "readbackVerified": true
+    },
+    {
+      "repository": "lovell/sharp-libvips",
+      "sourceCommit": "e4b89ad64e8fdb694c0863c6be996fd524c5dd84",
+      "sender": "guxingzhou16-pixel",
+      "title": "Windows 0.35.5 / libvips 8.18.7: corresponding source and combined-library notice mapping",
+      "bodySha256": "e5722002e1494468a458364906a9d6db4f9aba937d28631300c580fd62f21523",
+      "issueNumber": 432,
+      "url": "https://github.com/lovell/sharp-libvips/issues/432",
+      "issueId": 5843812989,
+      "createdAt": "2026-10-14T07:32:33Z",
+      "readbackVerified": true
+    }
+  ]
 }

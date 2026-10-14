@@ -1,6 +1,8 @@
-# Sharp Windows 0.35.5 分发材料询证草稿
+# Sharp Windows 0.35.5 分发材料询证记录
 
-日期：2026-10-14。**未发送。** 拟在 `lovell/sharp-libvips` 新建一项公开 issue；按 AGENTS 3.33，对此维护者发消息须单独获用户许可。已有 [401](https://github.com/lovell/sharp-libvips/issues/401) 针对旧 Darwin 1.3.2，不能作为 Windows 当前库的答复。
+日期：2026-10-14。**用户已单独授权，两条中的这一条已创建并全文读回；尚无覆盖缺口的答复。** 实际 [issue432](https://github.com/lovell/sharp-libvips/issues/432)，账号 `guxingzhou16-pixel`，创建于 `2026-10-14T07:32:33Z`；正文 SHA-256 `e5722002e1494468a458364906a9d6db4f9aba937d28631300c580fd62f21523`，取自已审阅提交 `e4b89ad64e8fdb694c0863c6be996fd524c5dd84`。已有 [401](https://github.com/lovell/sharp-libvips/issues/401) 针对旧 Darwin 1.3.2，不能作为 Windows 当前库的答复。
+
+连接器首次返回403“Resource not accessible by integration”，未创建。随后核对已有Git登录账号、仓库ID/公开/issue可用及本人无同正文/标题重复项，只POST一次；按issue number再次GET核对账号、完整正文/标题/摘要。没有保存凭据，未联系被转介的其它仓库。本机回执 `upstream-inquiry-1-result.json` 留在本轮忽略证据目录。
 
 ## 标题
 
@@ -34,4 +36,4 @@ We are retaining all third-party terms separately from the application MIT licen
 
 ## 收到答复后
 
-核对答复与上述确切 Windows 版本/摘要对应；保存所指定原文、源包、必要构建材料与组合分发条件。替换测试结果只证明该副本在当前 ABI 下加载/运行，不能替代来源、源码重建或组合库义务。未覆盖的部分不关闭；此草稿不授权发送或联系其它仓库。
+核对答复与上述确切 Windows 版本/摘要对应；保存所指定原文、源包、必要构建材料与组合分发条件。替换测试结果只证明该副本在当前 ABI 下加载/运行，不能替代来源、源码重建或组合库义务。未覆盖的部分不关闭；这一条已授权并发送，不授权追加消息或联系其它仓库。
