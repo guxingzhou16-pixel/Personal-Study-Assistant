@@ -2526,7 +2526,7 @@
           "file": "assets/sharp-native-harfbuzz-14.5.0-c2cfccb812fe-COPYING.txt",
           "sha256": "c2cfccb812fe482101a8f04597dfc5a9991a6b2748266c47ac91b6a5aae15383",
           "source": "https://static.crates.io/crates/windows-link/windows-link-0.2.1.crate",
-          "description": "Original windows-link-0.2.1/license-mit bytes from checksum-verified windows-link@0.2.1 source archive (f0805222e57f7521d6a62e36fa9163bc891acd422f971defe97d64e70d0a4fe5). Candidate superset, including development/other-platform sources; this is not evidence of actual compiled inclusion. Identical bytes may reuse an existing original notice file."
+          "description": "Original windows-link-0.2.1/license-mit bytes from checksum-verified windows-link@0.2.1 source archive (f0805222e57f7521d6a62e36fa9163bc891acd422f971defe97d64e70d0a4fe5). Candidate superset, including development/other-platform sources; this is not evidence of actual compiled inclusion. Identical bytes may reuse an existing original notice file. Also byte-identical to fixed HarfBuzz 9cb1fee51069b206effb4736e443b038d230789d src/ms-use/COPYING (Git blob 9e841e7a26e4eb057b24511e7b92d42b257a80e5), required by the declared Skia USE generated-data table. Separate provenance recorded in source-records.json; no duplicate output."
         },
         {
           "file": "assets/canvas-rust-simd-d74c030d-LICENSE.txt",
@@ -2557,6 +2557,18 @@
           "sha256": "f5062c9a188d81dfe66b56db4182dcf9e4b17c0d9b0d311a8e20b3a1b075c443",
           "source": "https://raw.githubusercontent.com/rust-lang/rust/48a229ceaefd4985c50990b14116b6d856af0985/LICENSES/Unicode-3.0.txt",
           "description": "Original Rust 1.98.1 notice, fixed commit 48a229ceaefd4985c50990b14116b6d856af0985. Runtime/compiler version matched Canvas Windows release job and embedded hash. Standard-library in-tree metadata and out-of-tree/runtime coverage remain separately scoped; this notice alone does not close distribution review."
+        },
+        {
+          "file": "assets/rust-1.98.1-COPYRIGHT-library.html",
+          "sha256": "68129500b616d5838629e68f55ff3aed5e096dacf60ce9eb41bbe599a563afa6",
+          "source": "https://static.rust-lang.org/dist/2026-09-03/rustc-1.98.1-x86_64-pc-windows-msvc.tar.xz",
+          "description": "Original rustc-1.98.1 Windows archive member rustc/share/doc/rust/COPYRIGHT-library.html. Complete archive SHA-256 cb5370843a9d15ce6e6cf6461b4c997722220d268d0d813c2b2b86f3ed59ac24. Official generated standard-library source and external-dependency notice collection retained unchanged; not a final linked-object list or coverage of Skia/MSVC runtime terms."
+        },
+        {
+          "file": "assets/Unicode-17.0.0-ReadMe.txt",
+          "sha256": "9fe1a90bd32659d7953616283dc2bffaa165518aae9ace026040c42c559ba606",
+          "source": "https://www.unicode.org/Public/17.0.0/ucd/ReadMe.txt",
+          "description": "Original Unicode 17.0.0 UCD ReadMe containing the 2025 copyright notice; fixed HarfBuzz 9cb1fee generated tables identify this version. Unicode Terms of Use section 3.3 assigns Unicode License v3 to Public data; full v3 text is already retained in assets/icu-d578f2e-LICENSE.txt. Preserve this copyright statement and the existing complete license; no replacement model or extra grant is claimed."
         }
       ]
     },
@@ -2692,8 +2704,8 @@
     }
   ],
   "reviewIssues": [
-    "Canvas 1.0.9 release binary digest, Windows producer job, fixed Skia build sources and Rust 1.98.1 base/Unicode notices are mapped. Complete Skia embedded/C++/static runtime and out-of-tree standard-library notice coverage remain pending; fixed build provenance does not by itself close these conditions.",
-    "Sharp core DLL exactly matches official libvips 8.18.7 static developer archive. Isolated genuine binary-modification/load/restore test passed with unchanged addon and image bytes. Complete native/compiler/header notice and Corresponding Source coverage, C++ bridge rebuild and combined-library distribution conditions remain pending; no source rebuild is claimed.",
+    "Canvas fixed Skia/GN declared components and original notices are mapped conservatively. Rust 1.98.1 generated standard-library notices, fixed HarfBuzz Microsoft USE, and Unicode 17 copyright with existing ICU Unicode License v3 are retained. Static Windows runtime distribution conditions and any concrete separately licensed embedded exceptions still require coverage; exact linked SBOM or bit-identical rebuilding are not separate license requirements.",
+    "Sharp core DLL matches official libvips 8.18.7 and genuine modified-library loading was verified. Fixed sharp 0.35.5/dev 1.3.4 bridge sources and build rules correspond; five CPP sources and 348 Windows headers match retained archives. Remaining native/runtime/header notices, corresponding-source availability and applicable combined-library material remain pending. No source rebuild or Sigstore signature-chain verification is claimed.",
     "Fixed Xenova/bge-small-zh-v1.5 revision 75c43b069aac4d136ba6bc1122f995fedcfd2781 model card was obtained and Git-blob verified. It identifies the BAAI base model but contains no license field or quantized-weight grant. FlagEmbedding code MIT text is not a grant for these weights; license review remains pending."
   ]
 }

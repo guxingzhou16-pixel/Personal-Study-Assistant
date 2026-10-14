@@ -73,7 +73,9 @@ zlib材料来自Skia固定依赖 `646b7f569718921d7d4b5b8e22572ff6c76f2596`，�
 
 ## 4. 发布前尚需完成
 
-2026-10-14后续补核对Canvas发布实物/生产日志与Rust1.98.1基准通知；三份新原文4634字节和已有Apache复用后，只在新临时目录生成700输出并校验，旧77安装器仍697。Sharp官方core DLL与实物同字节，真实沙盒修改版本返回值/加载/恢复已通过；未源码重建或关闭全部组合分发条件。BGE按用户选择等待已发送询证的答复。三项pending保持，具体来源/失败/未重复的验收见[后续核对](testing/native-distribution-followup-2026-10-14.md)，未来包须携带新通知，不追写旧包成绩。
+2026-10-14前轮补核对Canvas发布实物/生产日志与Rust1.98.1基准通知；三份新原文4634字节和已有Apache复用后，在临时目录生成700输出，旧77安装器仍697。Sharp官方core DLL与实物同字节，真实沙盒修改/加载/恢复已通过；未源码重建或关闭全部组合分发条件，原范围见[前轮核对](testing/native-distribution-followup-2026-10-14.md)。
+
+本轮新增标准库详细版权HTML1512520字节和Unicode17原版权740字节，固定HarfBuzz Microsoft USE复用已有1141字节通知；只生成并核对702输出（147元数据/158许可/395补充/2索引），未重建安装器。Sharp bridge源码/recipe与固定dev1.3.4、五CPP及348 Windows headers已对应；未验证Sigstore签名链或源码重建。三项仍pending，具体缺口是Canvas静态runtime/具体嵌入例外、Sharp剩余runtime/组合材料/源码公开提供及BGE许可；不要把精确链接SBOM或位同重建另设为许可证未写出的条件。BGE保留原模型等待已发答复；新原文未来包须携带，旧包成绩不追改。见[本轮记录与清单](testing/signpath-retry-and-native-materials-2026-10-14.md)和[公开摘要](releases/native-materials-followup-0.1.1.json)。
 
 ### 当前执行入口（2026-10-13）
 

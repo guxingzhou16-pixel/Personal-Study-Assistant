@@ -5050,6 +5050,41 @@
       "reusedOriginalAsset": true,
       "sourceArchiveSha256": "42727764a01a54db7423e43db08a9c818405679af6a9a677068e8cd4b8361242",
       "sourceMember": "rust-std-1.98.1-x86_64-pc-windows-msvc/LICENSE-APACHE"
+    },
+    {
+      "file": "rust-1.98.1-COPYRIGHT-library.html",
+      "url": "https://static.rust-lang.org/dist/2026-09-03/rustc-1.98.1-x86_64-pc-windows-msvc.tar.xz",
+      "revision": "48a229ceaefd4985c50990b14116b6d856af0985",
+      "sourceType": "official-fixed-generated-stdlib-notice",
+      "version": "1.98.1",
+      "sha256": "68129500b616d5838629e68f55ff3aed5e096dacf60ce9eb41bbe599a563afa6",
+      "size": 1512520,
+      "sourceArchiveSha256": "cb5370843a9d15ce6e6cf6461b4c997722220d268d0d813c2b2b86f3ed59ac24",
+      "sourceMember": "rustc-1.98.1-x86_64-pc-windows-msvc/rustc/share/doc/rust/COPYRIGHT-library.html"
+    },
+    {
+      "file": "sharp-native-harfbuzz-14.5.0-c2cfccb812fe-COPYING.txt",
+      "url": "https://raw.githubusercontent.com/harfbuzz/harfbuzz/9cb1fee51069b206effb4736e443b038d230789d/src/ms-use/COPYING",
+      "revision": "9cb1fee51069b206effb4736e443b038d230789d",
+      "sourceType": "fixed-embedded-notice-mapping",
+      "version": "Skia a9c42c9 DEPS HarfBuzz",
+      "sha256": "c2cfccb812fe482101a8f04597dfc5a9991a6b2748266c47ac91b6a5aae15383",
+      "size": 1141,
+      "sourceGitBlob": "9e841e7a26e4eb057b24511e7b92d42b257a80e5",
+      "reusedOriginalAsset": true
+    },
+    {
+      "file": "Unicode-17.0.0-ReadMe.txt",
+      "url": "https://www.unicode.org/Public/17.0.0/ucd/ReadMe.txt",
+      "revision": "Unicode-17.0.0",
+      "sourceType": "official-fixed-unicode-data-notice",
+      "version": "17.0.0",
+      "sha256": "9fe1a90bd32659d7953616283dc2bffaa165518aae9ace026040c42c559ba606",
+      "size": 740,
+      "licenseTermsUrl": "https://www.unicode.org/copyright.html",
+      "existingLicenseAsset": "assets/icu-d578f2e-LICENSE.txt",
+      "existingLicenseSha256": "e55522d81edc687a341a4411e0776e54ca654e90147f354a90458aaced4116af",
+      "usedByFixedHarfBuzz": "9cb1fee51069b206effb4736e443b038d230789d"
     }
   ]
 }

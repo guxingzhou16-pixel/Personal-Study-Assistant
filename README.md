@@ -1,8 +1,8 @@
 # 私人学习助手（Study Companion）
 
-**2026-10-14 后续：**Sharp 官方 core DLL 与当前候选同字节，真实沙盒修改/加载/恢复验证通过；Canvas 发布摘要、生产日志及 Rust 1.98.1 基准通知已补核对。新临时目录只生成并核对 **700** 份通知，旧安装器仍 **697**，未重建或签名。完整静态/运行时及 Sharp 组合源码条件继续待补；用户另行授权的 [Canvas #1360](https://github.com/Brooooooklyn/canvas/issues/1360)/[Sharp #432](https://github.com/lovell/sharp-libvips/issues/432) 询证已发送并全文读回，等待生产材料；用户选择保留当前 BGE 等待答复，三项闭合后再尝试 SignPath。新结果、失败与接手清单见[后续核对](docs/testing/native-distribution-followup-2026-10-14.md)及[来源记录](docs/releases/native-windows-provenance-0.1.1.json)，不重复旧 CI/模型/安装全套。
+**2026-10-14 最新进展：SignPath 申请已收到、待审核。** 用户改为先重跑申请；正常Submit仍遇Captcha失败，随后用户手动提交并提供基金会确认邮件正文，尚无批准或可信签名。Sharp bridge 的固定发布源码/dev1.3.4、五个CPP和348份Windows头文件已对应；Canvas新增标准库详细版权和Unicode17原版权，Microsoft USE复用现有通知。新临时目录只生成并核对 **702** 份通知，旧安装器仍 **697**，未重建。Canvas静态运行时、Sharp剩余相应源码/组合材料及BGE许可继续待补；保留当前模型，等待已发询证，不重复申请或旧CI/模型/安装验收。接手见[本轮记录与测试清单](docs/testing/signpath-retry-and-native-materials-2026-10-14.md)、[公开来源摘要](docs/releases/native-materials-followup-0.1.1.json)和[签名政策](docs/releases/code-signing-policy.md)。
 
-> **当前状态（2026-10-14）：软件核心、旧v13限定安装验收与发布准备已完成相关验证，安装包尚未正式发布。** 仓库已按用户授权公开，当前代码在`codex/structured-notes`；最新通知候选冻结`77acd64`，697份通知和新增两份原文实物核对通过，11个运行文件与已验2111一致。包摘要、83项声明依赖/7项原manifest及首次EBUSY失败记录见[增量验证](docs/testing/native-notice-followup-2026-10-14.md)；2111原CPU/PDF及CI15打包/签名、356核心、36桌面保留[原范围](docs/testing/signed-distribution-2026-10-13.md)，本轮CI按授权推送的精确SHA/run另验，不冒称新完整安装链通过。GUID不再随新包分发，DirectML当前范围已核对；Canvas/Sharp/固定量化BGE三项仍需闭合，BGE询证已获单独授权并[实际发送](docs/releases/bge-license-inquiry.md)，本日复查尚无答复。签名入口已实现，SignPath提交遭Captcha拒绝，无成功/批准回执，可信签名未完成；[分发进展](docs/releases/distribution-closeout-2026-10-13.md)、[源码材料](docs/releases/native-source-status-2026-10-13.md)与[签名政策](docs/releases/code-signing-policy.md)是接手入口。项目使用[MIT](LICENSE)，旧包/失败保留原范围，展示网站最后建设。
+> **当前状态（2026-10-14）：软件核心、旧v13限定安装验收与发布准备已完成相关验证，安装包尚未正式发布。** 仓库已按用户授权公开，当前代码在`codex/structured-notes`；最新通知安装候选冻结`77acd64`，697份通知和新增两份原文实物核对通过，11个运行文件与已验2111一致；本轮702输出仅为通知生成。包摘要、83项声明依赖/7项原manifest及首次EBUSY失败记录见[增量验证](docs/testing/native-notice-followup-2026-10-14.md)；2111原CPU/PDF及CI15打包/签名、356核心、36桌面保留[原范围](docs/testing/signed-distribution-2026-10-13.md)，新提交远端CI按确切SHA/run另读，不用旧绿灯代替或冒称新完整安装链。GUID不再随新包分发，DirectML当前范围已核对；Canvas/Sharp/固定量化BGE三项仍需闭合，BGE询证已获单独授权并[实际发送](docs/releases/bge-license-inquiry.md)，本轮复查尚无答复。签名入口已实现，SignPath申请已有用户提供的基金会确认收到邮件，资格审核待处理，可信签名未完成；[分发进展](docs/releases/distribution-closeout-2026-10-13.md)、[源码材料](docs/releases/native-source-status-2026-10-13.md)与[签名政策](docs/releases/code-signing-policy.md)是接手入口。项目使用[MIT](LICENSE)，旧包/失败保留原范围，展示网站最后建设。
 
 私人学习助手是一款以本地数据和个人学习体验为中心的学习软件。它将资料阅读、可追溯的 AI 问答、学习笔记、计划和专注记录连在一起，帮助用户提升注意力和学习效率、理解知识、看见进步，并保持学习动力。第一版以编程与技术学习为主要场景，后续逐步扩展到跨学科资料。
 
@@ -33,7 +33,7 @@
 | 项目、任务、番茄钟与成果 | 已实现、相关验收通过 | 手动管理核心；真实五分钟计满（运行墙钟301.558秒）、成果草稿/保存、关闭休息提示 | 专注/签到/任务完成/掌握独立；提醒仅本次运行 |
 | 完整备份与恢复 | 已实现、相关验收通过 | v13作答快照、真实v12兼容/候选迁移；两库/资料实际重启往返 | 未加密，仅已保存内容；排除密钥/模型/索引，不合并 |
 | 历史管理与溯源 | 已实现 | 本轮核心、桌面删除/导出与来源保留 | 删除不撤回已发数据；旧引用仍须核对副本 |
-| Windows 安装包与发布 | 旧25b安装链、2111相关检查及77acd64通知包通过；源码已公开 | 最新4776项/697通知、两份固定原文/11运行文件一致；83声明/7原manifest；2111 CPU/PDF及CI15/356/36保留原范围 | 三项分发条件、SignPath有效提交/审核与真签名；最新包未重跑安装链，BGE询证待答复 |
+| Windows 安装包与发布 | 旧25b安装链、2111相关检查及77acd64通知包通过；源码已公开；SignPath申请已收到 | 4776项/697安装包通知、11运行文件一致；本轮702仅通知生成；bridge固定源/348headers；旧CPU/PDF/CI保留原范围 | 三项分发条件、SignPath资格审核与可信签名；最新包未重跑安装链，BGE询证待答复 |
 | OCR/更多格式/云同步/复杂积分/展示网站 | 规划中 | 没有本轮实现或验收 | 学习软件优先，展示网站最后建设 |
 
 **当前数据与验证基线：**主库v13、活动库v1、派生索引v2；备份format1接受真实12/1与13/1。阶段核心32文件356项、类型/桌面构建与格式检查通过；桌面/真实模型的具体范围逐项见[本轮产品验收](docs/testing/product-improvements-2026-10-12.md)。这是开发源码的记录，不能移作旧包或新发布包的成绩。
@@ -776,7 +776,7 @@ electron-builder.json  Windows x64、ASAR解包、当前用户NSIS与禁止自�
 | 5 | 专注后的手写成果与可关休息提醒 | 已完成：草稿→编辑→明确保存，取消零写入；真实计满与关闭提醒通过，不自动完成任务 |
 | 6 | 路线JSON结构/预算、编辑核对、勾选多步/完整预览/事务确认 | 已完成：非法输出保留，撤销/来源版本/项目/容量/回放及整批回滚通过；一次真实路线人工核对 |
 | 安装 | 冻结 25b 构建带 MIT 的 v13 setup，在真实 Sandbox 迁移、恢复、新流程、卸载与重装 | 已完成限定验收：真实五分钟 / PDF / 作答 / 批量任务 / 完整恢复 / 122 文件零差异 / 重装 CPU；6 原 FAIL 保留 |
-| 发布准备 | 裁剪独立Web/GUID、原文通知、签名预检、公开源码及许可询证 | 2111相关检查/CI通过，50da0f5补223原文、77acd64再补两份固定原文且697输出核对；83声明/450源记录可复用，BGE询证已发送；SignPath提交未成功 |
+| 发布准备 | 裁剪独立Web/GUID、原文通知、签名预检、公开源码及许可询证 | 旧77安装包697通知保留；本轮702仅通知生成、bridge固定源/348headers对应；SignPath申请已收到待审；BGE许可及剩余runtime/组合材料待补 |
 | 文档 | 当前状态、模块/数据边界、验收证据与交接同步 | 本轮整理：唯一当前表，旧阶段仅历史；实际体验记录不编造效率或学习效果 |
 
 **继续执行的门槛：**

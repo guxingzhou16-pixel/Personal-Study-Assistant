@@ -1,0 +1,215 @@
+{
+  "format": 1,
+  "verifiedOn": "2026-10-14",
+  "sourceBeforeThisIncrement": "25a5f1af331a37c4e117fa537c59b94f950d9d84",
+  "completeDistributionReview": false,
+  "signpath": {
+    "application": "received",
+    "review": "pending",
+    "evidence": "User-provided Foundation confirmation email body after manual submission",
+    "automaticAttempt": "Captcha validation failed",
+    "directSuccessPageReadback": false,
+    "browserReconnected": true,
+    "approved": false,
+    "signingCompleted": false,
+    "noRepeatSubmission": true
+  },
+  "canvas": {
+    "package": "@napi-rs/canvas-win32-x64-msvc@1.0.9",
+    "fixedSourceRevision": "b2723ffae4e74e8c9df752902b137ec4061530e9",
+    "fixedSkiaRevision": "a9c42c9fce77cd748805df0ec67ef5718800b1e9",
+    "conservativeComponentsReviewed": 17,
+    "existingNoticeReferencesChecked": 54,
+    "coverageMethod": "Use fixed declared source/GN/DEPS and retain a conservative superset of applicable original notices. Precise linked SBOM and bit-for-bit reconstruction are evidence improvements, not automatically legal prerequisites imposed here. Root licenses cannot replace known separately licensed embedded source.",
+    "rustCopyright": {
+      "archiveUrl": "https://static.rust-lang.org/dist/2026-09-03/rustc-1.98.1-x86_64-pc-windows-msvc.tar.xz",
+      "archiveBytes": 71317968,
+      "archiveSha256": "cb5370843a9d15ce6e6cf6461b4c997722220d268d0d813c2b2b86f3ed59ac24",
+      "member": "rustc-1.98.1-x86_64-pc-windows-msvc/rustc/share/doc/rust/COPYRIGHT-library.html",
+      "noticeAsset": {
+        "file": "rust-1.98.1-COPYRIGHT-library.html",
+        "bytes": 1512520,
+        "sha256": "68129500b616d5838629e68f55ff3aed5e096dacf60ce9eb41bbe599a563afa6",
+        "reused": false,
+        "url": "https://static.rust-lang.org/dist/2026-09-03/rustc-1.98.1-x86_64-pc-windows-msvc.tar.xz"
+      },
+      "sourceExecuted": false,
+      "compilerCopyrightNotIncluded": true,
+      "compilerCopyrightBytes": 15380909,
+      "scope": "Official generated standard-library in-tree and external dependency copyright collection; conservative notices, not a final linked-object list"
+    },
+    "microsoftUseNotice": {
+      "fixedHarfBuzz": "9cb1fee51069b206effb4736e443b038d230789d",
+      "noticeAsset": {
+        "file": "sharp-native-harfbuzz-14.5.0-c2cfccb812fe-COPYING.txt",
+        "bytes": 1141,
+        "sha256": "c2cfccb812fe482101a8f04597dfc5a9991a6b2748266c47ac91b6a5aae15383",
+        "reused": true,
+        "url": "https://raw.githubusercontent.com/harfbuzz/harfbuzz/9cb1fee51069b206effb4736e443b038d230789d/src/ms-use/COPYING"
+      },
+      "gitBlob": "9e841e7a26e4eb057b24511e7b92d42b257a80e5",
+      "assetAlreadyOwnedByCanvas": true,
+      "newOutput": false
+    },
+    "unicode17Notice": {
+      "noticeAsset": {
+        "file": "Unicode-17.0.0-ReadMe.txt",
+        "bytes": 740,
+        "sha256": "9fe1a90bd32659d7953616283dc2bffaa165518aae9ace026040c42c559ba606",
+        "reused": false,
+        "url": "https://www.unicode.org/Public/17.0.0/ucd/ReadMe.txt"
+      },
+      "usedByFixedHarfBuzz": "9cb1fee51069b206effb4736e443b038d230789d",
+      "license": "Unicode License v3",
+      "termsUrl": "https://www.unicode.org/copyright.html",
+      "existingCompleteLicenseAsset": "scripts/licenses/assets/icu-d578f2e-LICENSE.txt",
+      "existingCompleteLicenseSha256": "e55522d81edc687a341a4411e0776e54ca654e90147f354a90458aaced4116af"
+    },
+    "crt": {
+      "fixedNodeProducerImage": "win25-vs2026/20260824.214",
+      "fixedImageVersion": "20260824.214.3",
+      "fixedImageSoftwareUrl": "https://raw.githubusercontent.com/actions/runner-images/win25-vs2026/20260824.214/images/windows/Windows2025-VS2026-Readme.md",
+      "imageDeclaredVisualStudio": "Visual Studio Enterprise 2026 18.9.12112.369",
+      "imageDeclaredVcTools": "Microsoft.VisualStudio.Component.VC.Tools.x86.x64",
+      "imageDeclaredSdk": "Windows11SDK.26100",
+      "provenScope": "Image was observed for final .node producer job, not independently the Skia static-library producer. /MT, static_crt(true), and +crt-static are explicit fixed-source flags. Exact corresponding runtime redistribution conditions are not yet closed.",
+      "officialRedistributionUrl": "https://learn.microsoft.com/en-us/visualstudio/releases/2026/redistribution",
+      "officialEulaUrl": "https://visualstudio.microsoft.com/wp-content/uploads/2025/10/Visual_Studio_2026-License-Enterprise_Professional_ENU.docx",
+      "eulaBytesReadInMemory": 67523,
+      "eulaSha256ReadInMemory": "dd2ab92a7c2bb90dd509e16572707a34b13bc0bc09b9199d115f25594ac39053",
+      "eulaObservedScope": "Third-party distribution as part of an application is addressed, with separate downstream requirements. Application MIT does not replace Microsoft runtime terms. No claim that every statically linked runtime portion was matched to a covered file list.",
+      "stlLicenseContextUrl": "https://raw.githubusercontent.com/microsoft/STL/main/LICENSE.txt",
+      "stlScope": "Official current STL license includes the LLVM compiled-object exception; current main is context, not a pinned license for the shipped headers. Do not impose source rebuild/provision from a generic assumption that all C++ headers require it."
+    },
+    "remaining": "Static Windows runtime applicable distribution material and concrete separately licensed embedded exceptions remain under review"
+  },
+  "sharp": {
+    "nativePackage": "@img/sharp-win32-x64@0.35.5",
+    "fixedReleaseLineage": {
+      "nativePackage": {
+        "name": "@img/sharp-win32-x64",
+        "version": "0.35.5",
+        "metadataUrl": "https://registry.npmjs.org/@img/sharp-win32-x64/0.35.5",
+        "metadataResponseBytesPreviouslyRead": 2080,
+        "metadataResponseSha256PreviouslyRead": "dfde9d09f0a18e6400ce02a147280de1649fb86773d2ceb4ea6eb6e5d6377b8a",
+        "gitHead": "51a990faa26ade5586a4934ac9673c98d8893326",
+        "license": "Apache-2.0 AND LGPL-3.0-or-later",
+        "attestationUrl": "https://registry.npmjs.org/-/npm/v1/attestations/@img%2fsharp-win32-x64@0.35.5",
+        "attestationResponseBytesPreviouslyRead": 14273,
+        "attestationResponseSha256PreviouslyRead": "b4ee4f99bd57dd3605998cefb1018c371779d362f9be99784018dc54346d1a22",
+        "slsaSourceCommit": "51a990faa26ade5586a4934ac9673c98d8893326",
+        "slsaWorkflowRef": "refs/tags/v0.35.5",
+        "slsaWorkflowPath": ".github/workflows/ci.yml",
+        "slsaInvocationUrl": "https://github.com/lovell/sharp/actions/runs/36322847196/attempts/1",
+        "slsaSubjectSha512": "c7be9e1f4bc488795c310bbc63c21e9e7b5a002b5d7694fa5b4c265ed5ab9ca727288ecc1390dd82a8400fa48458e125d6fdb30ef9190e1140f4a9d4470a5faa"
+      },
+      "sharpTag": {
+        "refUrl": "https://api.github.com/repos/lovell/sharp/git/ref/tags/v0.35.5",
+        "annotatedTagObject": "9aac0c92b97e11d4e7d189ba81046271826118cf",
+        "tagObjectUrl": "https://api.github.com/repos/lovell/sharp/git/tags/9aac0c92b97e11d4e7d189ba81046271826118cf",
+        "resolvedCommit": "51a990faa26ade5586a4934ac9673c98d8893326",
+        "signatureCryptographicallyVerified": false
+      },
+      "sharpFixedPackage": {
+        "url": "https://raw.githubusercontent.com/lovell/sharp/51a990faa26ade5586a4934ac9673c98d8893326/package.json",
+        "bytesPreviouslyRead": 8115,
+        "sha256PreviouslyRead": "ad4a2535d72eb638053a38867b1abf43c328cd1c1dbae5cf4172d498365a8b97",
+        "explicitDevelopmentDependency": {
+          "@img/sharp-libvips-dev": "1.3.4",
+          "@img/sharp-libvips-win32-x64": "1.3.4"
+        },
+        "versionRangeUsedForDevPackage": false
+      },
+      "devPackage": {
+        "name": "@img/sharp-libvips-dev",
+        "version": "1.3.4",
+        "gitHead": "ebb95f8add54eee8bed840e3fb587e4cbec857d7",
+        "license": "LGPL-3.0-or-later",
+        "attestationUrl": "https://registry.npmjs.org/-/npm/v1/attestations/@img%2fsharp-libvips-dev@1.3.4",
+        "attestationResponseBytesPreviouslyRead": 14151,
+        "attestationResponseSha256PreviouslyRead": "5362f9df857659bcaba0507cca8d25e7ff8670b48486dfabc7b74d5170cd3a0e",
+        "slsaSourceCommit": "ebb95f8add54eee8bed840e3fb587e4cbec857d7",
+        "slsaWorkflowRef": "refs/tags/v1.3.4",
+        "slsaWorkflowPath": ".github/workflows/ci.yml",
+        "slsaInvocationUrl": "https://github.com/lovell/sharp-libvips/actions/runs/36315646015/attempts/1",
+        "slsaSubjectSha512": "b35548abaa7cde95868b5864ed52dd7d1888e8352894662a6e908dbb8cdd1086ca8e56dd47dcc716922263ac10b676e7e6349fbbdf84fcf482dbab6438d7abd9"
+      },
+      "producerVersions": {
+        "url": "https://raw.githubusercontent.com/lovell/sharp-libvips/ebb95f8add54eee8bed840e3fb587e4cbec857d7/versions.properties",
+        "bytesPreviouslyRead": 594,
+        "sha256PreviouslyRead": "c0ad634f7c2ac8994f831dd0bcb5c60043db7ba4ddd9cc2dbc3703b15f4ec7e5",
+        "VERSION_VIPS": "8.18.7"
+      },
+      "producerPopulate": {
+        "url": "https://raw.githubusercontent.com/lovell/sharp-libvips/ebb95f8add54eee8bed840e3fb587e4cbec857d7/populate-npm-workspace.sh",
+        "bytesPreviouslyRead": 2628,
+        "sha256PreviouslyRead": "a960e41223db945832cd63f92ed38e9c297f58a5f72c6f4adea80f805fc12589",
+        "cppSourceUrlTemplate": "https://raw.githubusercontent.com/libvips/libvips/v$VERSION_VIPS/cplusplus/$1.cpp",
+        "selectedCppSources": [
+          "VConnection",
+          "VError",
+          "VImage",
+          "VInterpolate",
+          "VRegion",
+          "vips-operators"
+        ],
+        "headerAssembly": "Copy Linux x64 common include, versions.json and notices to npm/dev, then copy Windows x64 include into npm/dev, replacing common files with Windows files where names coincide."
+      }
+    },
+    "devArchive": {
+      "url": "https://registry.npmjs.org/@img/sharp-libvips-dev/-/sharp-libvips-dev-1.3.4.tgz",
+      "bytes": 2009303,
+      "sha256": "e9dd5562c219d44cab7ce811906773a1354b583ed4bfa5115e1cdc954a0290aa",
+      "sha512IntegrityVerifiedByPriorReceipt": true,
+      "sha1VerifiedByPriorReceipt": true
+    },
+    "devArchiveMembers": 705,
+    "cppSourcesMatchFixedLibvips": 5,
+    "windowsHeadersCompared": 348,
+    "windowsVipsHeaders": 47,
+    "windowsGlibHeaders": 301,
+    "headerDifferences": 0,
+    "extraDevIncludeMembers": 347,
+    "extraDevMembersAllWindows": false,
+    "bridgeSourceAndPublicRecipeMapped": true,
+    "sourceRebuilt": false,
+    "existingModifiedCoreLibraryTestReused": true,
+    "sigstoreSignatureChainVerified": false,
+    "remaining": "Other runtime/header notices, applicable combined-library material and corresponding-source public availability"
+  },
+  "notices": {
+    "newOriginalFiles": 2,
+    "newOriginalBytes": 1513260,
+    "reusedNoticeFiles": 1,
+    "metadataFiles": 147,
+    "licenseFiles": 158,
+    "supplementalFiles": 395,
+    "indexFiles": 2,
+    "outputs": 702,
+    "generationOnly": true,
+    "oldInstallerNoticeOutputs": 697,
+    "installerBuilt": false,
+    "pendingIssues": 3
+  },
+  "bge": {
+    "revision": "75c43b069aac4d136ba6bc1122f995fedcfd2781",
+    "commentUrl": "https://github.com/huggingface/transformers.js/issues/1487#issuecomment-6147791372",
+    "replyReceivedThisCheck": false,
+    "modelChanged": false,
+    "policy": "Keep current pinned model and await upstream license reply"
+  },
+  "upstream": {
+    "canvasUrl": "https://github.com/Brooooooklyn/canvas/issues/1360",
+    "canvasNewReplies": 0,
+    "sharpUrl": "https://github.com/lovell/sharp-libvips/issues/432",
+    "sharpNewReplies": 0,
+    "additionalMessagesSent": false
+  },
+  "repeatedAcceptance": {
+    "scope": "Local notice-generation evidence before authorized source publication; a new push can trigger the existing remote workflow separately",
+    "fullCi": false,
+    "installerLifecycle": false,
+    "cpuOrModelQuality": false,
+    "modifiedLibraryLoadTest": false
+  }
+}

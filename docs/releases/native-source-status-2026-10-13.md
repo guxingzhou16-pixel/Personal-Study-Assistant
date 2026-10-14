@@ -4,6 +4,10 @@
 
 ## 已取得、校验并保留的初始库存
 
+最新Canvas材料和本轮汇总见[本轮记录](../testing/signpath-retry-and-native-materials-2026-10-14.md)及[公开摘要](native-materials-followup-0.1.1.json)：Rust标准库详细版权/Unicode17新增两份共1513260字节，Microsoft USE复用已有通知；本轮只生成702输出，旧安装器仍697，前轮临时700不追改。
+
+2026-10-14最新Sharp增量：首次取得`@img/sharp-libvips-dev@1.3.4`，2009303字节/SHA `e9dd5562c219d44cab7ce811906773a1354b583ed4bfa5115e1cdc954a0290aa`，npm SHA-512/SHA-1均匹配，705成员原字节保留。当前sharp0.35.5固定提交`51a990faa26ade5586a4934ac9673c98d8893326`准确钉dev1.3.4；dev发布声明指向`ebb95f8add54eee8bed840e3fb587e4cbec857d7`，固定打包脚本选择libvips8.18.7。五份bridge CPP与旧已校验libvips源一致，Windows static ZIP的348份include逐项与dev匹配（47 vips/301 GLib），额外347份include不称Windows来源。已定位对应源码和公开构建入口，不宣称源码重建或Sigstore签名链验证。本机新证据`artifacts/signpath-retry-2350d5e4-fae1-43b7-af14-21cf972becd8/sharp-dev-lineage.json`；原冻结ZIP未修改，新对象尚未公开分发。
+
 2026-10-14后续复用原归档，补取固定Skia完整源、官方Rust std/docs及Sharp static dev ZIP。Canvas实物/生产日志与编译器提交已核对，Sharp官方core DLL与候选同字节；新原文三份4634字节与既有Apache复用后，临时通知生成700通过。真实沙盒core DLL修改/加载/恢复已通过，未源码重建或关闭全部分发条件。新精确来源见[native-windows-provenance-0.1.1.json](native-windows-provenance-0.1.1.json)，接手先读[后续记录](../testing/native-distribution-followup-2026-10-14.md)；旧准备ZIP未加入新对象，保留原字节/摘要。
 
 | 材料                 | 实际结果                                                         | 来源和边界                                                                                                                                                                                      |
@@ -54,6 +58,8 @@
 1. 将原库/Rust/运行时头部版权与实际Windows构建组件映射，补齐非独立LICENSE文件对应的明确依据；源码超集不能冒充实物全链接列表。
 2. 核对适用LGPL共享库/组合分发方式，准备同批可取得的相应源码、必要通知及修改/调试与替换说明。源码、应用MIT和库许可分开。
 3. 包中的`sharp-win32-x64-0.35.5.node`依赖`libvips-42.dll`和`libvips-cpp-8.18.7.dll`，路径为`resources/app.asar.unpacked/node_modules/@img/sharp-win32-x64/lib/`。2026-10-14已在真实沙盒对core DLL副本修改版本表一byte，三新进程读到8.18.7→8.18.8→8.18.7，像素/PNG/原addon不变，恢复原摘要。此项实际修改/加载/恢复通过，不能用复制原DLL替代，也不必重做；尚未源码重建C++ bridge或关闭组合库及相应源码义务。
+
+当前原生包声明`Apache-2.0 AND LGPL-3.0-or-later`。工程分发核对按LGPLv3共享库机制、组合库及GPLv3相应源码提供分别记录；精确链接SBOM、重建后SHA相同是可选证明手段，不另设为许可证未写出的独立条件。候选超集可以保留，尚须证明所需版本/补丁/运行时/构建脚本可用，不能把“超集”本身当违规。源码材料及具体分发方式齐全后才关闭整项，不因没有执行位同重建而反复重跑应用层替换测试。
 
 ### Canvas
 

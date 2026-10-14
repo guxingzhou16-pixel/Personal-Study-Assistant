@@ -378,6 +378,15 @@
 - 首轮WinPS退出码核对失败及成功stdout保留；修正进程管线/独立UUID日志后完整通过，不放松退出码/像素/摘要。脚本静态复审通过，最终数据关键核对无新问题；末轮总结因评审模型容量不足未完成，另做原文/链接/diff检查并记录，不能写为该轮完整批准。
 - `docs/testing/native-distribution-followup-2026-10-14.md`、`native-windows-provenance-0.1.1.json` 为新交接；两个上游询证按3.33单独获许可后已发送并全文读回：Canvas#1360/Sharp#432，账号/完整正文/摘要匹配；连接器两次403未创建，已有Git身份每份单次POST，不保存凭据或追加消息。旧825 CI及77/50/2111/25b结果不追写，新通知生成不是新NSIS验收或分发条件全部闭合。保留他人README/AGENTS/未追踪文件。
 
+### 3.38 SignPath 已收到申请与原生材料增量（2026-10-14）
+
+- 用户最新要求先重跑SignPath、再逐步处理三项；旧“全部闭合后重试”是历史顺序。本轮正常Submit仍Captcha失败，用户本人手动提交并提供基金会确认邮件正文，明确已收到、待审核。证据为用户提供邮件，浏览器重连后未直读成功页；不是获批/账户/策略ID/证书或真签名。不要重复提交已收到的申请，个人字段/跟踪链接不进仓库。
+- Sharp原生0.35.5固定提交`51a990fa`准确钉dev1.3.4，发布声明与`ebb95f8`打包规则对应8.18.7；首次dev归档2009303字节/SHA`e9dd5562c219d44cab7ce811906773a1354b583ed4bfa5115e1cdc954a0290aa`，705成员。五CPP与旧源、348 Windows include（47 vips/301 GLib）逐项相同；额外347 include不全称Windows。bridge源码/公开recipe子项关闭；未源码重建或验证Sigstore签名链，旧修改库加载测试不重跑。
+- Canvas固定Rustc归档首次EOF截短/摘要不匹配，保留原失败；If-Range续传新文件71317968字节/SHA`cb5370843a9d15ce6e6cf6461b4c997722220d268d0d813c2b2b86f3ed59ac24`与channel一致，不安装/执行编译器。标准库COPYRIGHT-library原文1512520字节入清单；15380909字节编译器总版权不入包。固定HarfBuzz Microsoft USE通知复用同Gitblob原文，不新增文件；Unicode17原版权740字节与已有ICU完整Unicode License v3对应，不能只用Rust2024通知代替。
+- 独立只读整理17声明组件/54已有通知引用；保守GN/DEPS覆盖可用，不把精确链接SBOM或位同重建强设为许可证独立条件。候选超集须包含实际所需版本/补丁/运行时/构建材料，不把超集本身当违规。Canvas静态runtime/具体嵌入例外、Sharp剩余runtime/组合材料/源码提供及BGE固定五文件许可仍pending。
+- 新增两份原文共1513260字节，来源记录保留原396项并仅补三项。复用生成检查器/旧77 ASAR readonly，在新目录核对147元数据/158许可/395补充/2索引，共702输出，3pending；旧77安装器仍697、前轮临时700不追改。没有新安装器/应用/数据库/模型或上游消息，不重复本机全套/安装/CPU/PDF/质量/替换测试；更新申请政策按既有权限推送功能分支后，远端CI按新SHA/run单次核对，不为补写成绩反复触发。
+- 本轮接手入口`docs/testing/signpath-retry-and-native-materials-2026-10-14.md`、`docs/releases/native-materials-followup-0.1.1.json`与签名政策；本机`artifacts/signpath-retry-2350d5e4-fae1-43b7-af14-21cf972becd8/`保留邮件状态、首次失败/续传、bridge逐项和702输出回执。首次code-reviewer容量不足不能写成批准，数据检查/其它审阅另列范围；保留他人README/AGENTS/未追踪改动。
+
 ## 4. 产品范围与功能要求
 
 ### 4.1 资料导入与辅助阅读
