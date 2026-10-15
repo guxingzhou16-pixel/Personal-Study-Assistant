@@ -16,6 +16,30 @@ export default async function verifyPackage(context) {
     !projectLicense.equals(await readFile(licensePath))
   )
     throw new Error('Project license does not match the source LICENSE.');
+  const distributionMaterials = [];
+  for (const [source, target] of [
+    ['installation-terms.txt', 'INSTALLATION-TERMS.txt'],
+    [
+      'sharp-distribution-notice.txt',
+      'app.asar.unpacked/node_modules/@img/sharp-win32-x64/lib/SOURCE-NOTICE.txt',
+    ],
+  ]) {
+    const original = await readFile(
+      join(context.packager.projectDir, 'scripts', 'licenses', source),
+    );
+    const path = join(resources, target);
+    const installed = await lstat(path).catch((cause) => {
+      throw new Error(`Distribution material is missing: ${target}`, { cause });
+    });
+    if (!original.length || !installed.isFile() || !original.equals(await readFile(path)))
+      throw new Error(`Distribution material does not match its source: ${target}`);
+    if (
+      source === 'installation-terms.txt' &&
+      !original.subarray(0, 3).equals(Buffer.from([0xef, 0xbb, 0xbf]))
+    )
+      throw new Error('Distribution material needs a UTF-8 BOM for the Chinese NSIS license page.');
+    distributionMaterials.push({ file: `resources/${target}`, bytes: original.length });
+  }
   const archive = join(resources, 'app.asar');
   const entries = listPackage(archive, { isPack: false }).map((path) =>
     path.replaceAll('\\', '/').replace(/^\//, ''),
@@ -114,6 +138,7 @@ export default async function verifyPackage(context) {
     workers: 3,
     nativeRuntime: 'win32-x64',
     projectLicense: { license: 'MIT', file: 'resources/LICENSE.txt', bytes: projectLicense.length },
+    distributionMaterials,
     notices,
     functionalAcceptance: 'pending',
   };

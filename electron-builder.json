@@ -5,7 +5,14 @@
   "electronDist": "node_modules/electron/dist",
   "asar": true,
   "asarUnpack": ["dist-electron/*-worker.mjs", "node_modules/**/*"],
-  "extraResources": [{ "from": "LICENSE", "to": "LICENSE.txt" }],
+  "extraResources": [
+    { "from": "LICENSE", "to": "LICENSE.txt" },
+    { "from": "scripts/licenses/installation-terms.txt", "to": "INSTALLATION-TERMS.txt" },
+    {
+      "from": "scripts/licenses/sharp-distribution-notice.txt",
+      "to": "app.asar.unpacked/node_modules/@img/sharp-win32-x64/lib/SOURCE-NOTICE.txt"
+    }
+  ],
   "files": [
     "dist/**/*",
     "dist-electron/main.cjs",
@@ -28,6 +35,8 @@
     "requestedExecutionLevel": "asInvoker"
   },
   "nsis": {
+    "license": "scripts/licenses/installation-terms.txt",
+    "include": "scripts/installer.nsh",
     "artifactName": "StudyCompanion-${version}-win-${arch}-setup.${ext}",
     "oneClick": true,
     "perMachine": false,

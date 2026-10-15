@@ -1,0 +1,29 @@
+﻿拾知 / Study Companion：安装与第三方组件确认
+
+项目自有代码采用 MIT，全文在安装后的 resources/LICENSE.txt。
+第三方各自的许可、版权和通知在 resources/third-party/；项目 MIT 不替代它们。
+
+本确认中的 Microsoft 保护条件，仅涉及随应用分发、由 Microsoft 保留专有权利的标准运行库代码。
+项目 MIT、独立 MIT/Apache/LGPL 等开源许可（包括 Microsoft 自行开源代码的许可），以及法律强制授予的权利，不受额外限制。
+
+这些专有代码仅可在供应方授权及适用 Microsoft 条款允许的范围内随程序使用和分发。
+不得删除或改变原有权利通知、声称 Microsoft 背书、重授为项目 MIT，或在未获授权时单独提取、重打包为 Microsoft 开发工具或 Runtime 产品。
+
+不得规避这些专有代码适用的技术限制，或对其逆向工程、反编译、反汇编、试图导出源代码；适用法律或独立开源许可允许或要求的行为除外。
+本条不限制独立开源部分获准的修改、替换、调试和再分发。应遵守实际适用的进出口及其他法律。
+
+这些 Microsoft 专有代码按原样提供；本应用不代表 Microsoft 或其供应者另作担保或支持承诺，包括适销性、特定用途适用性及不侵权担保。
+在法律允许范围内，原许可的担保排除、救济和责任限制继续保留，包括对利润损失、后果性、特殊、间接或附带损害的限制；直接赔偿或救济以适用原许可的范围及限额为限。
+法律不能排除或限制的权利与责任不受影响。本确认不统一设定赔偿金额，也不扩大 Microsoft 或其供应者原本承担的责任。
+
+其中使用的 Sharp/libvips 含 LGPL 覆盖的库功能。您可以按其许可修改、替换库，并为调试这些修改进行逆向。
+对应及未组合的独立源码、修改和构建说明，免费提供在本软件同一 GitHub 版本下载页的 study-companion-0.1.1-native-source-companion.zip；详见随库 SOURCE-NOTICE.txt。
+下载页：https://github.com/guxingzhou16-pixel/Personal-Study-Assistant/releases
+
+标准运行库的分发范围及原条款参考：
+https://learn.microsoft.com/legal/windows-sdk/redist
+https://aka.ms/WinSDKLicenseURL
+https://visualstudio.microsoft.com/license-terms/vs2026-ga-pro-enterprise/
+
+选择“同意 / I Agree”仅接受上述实际组件条件及各自适用许可，不表示接受整个 Visual Studio 或 SDK 开发工具合同，也不取得单独分发 Microsoft 工具或 Runtime 产品的权利。
+不同意可取消安装；您已有的独立开源许可权利仍然有效。本版安装器要求图形确认，不支持 /S 或 --updated 自动安装；卸载仍可按原方式执行。

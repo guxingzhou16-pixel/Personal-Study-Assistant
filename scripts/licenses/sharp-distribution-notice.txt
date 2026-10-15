@@ -1,0 +1,38 @@
+Study Companion 0.1.1 — Sharp / libvips source and library notice
+
+This directory contains libvips-42.dll, libvips-cpp-8.18.7.dll and
+sharp-win32-x64-0.35.5.node. The combined libraries contain LGPL-covered
+library facilities; their original licenses continue to apply. Application
+MIT does not replace those licenses. GNU LGPL 2.1, LGPL 3 and GPL 3 texts,
+copyright notices and the package index are retained in resources/third-party/.
+
+The corresponding source, and the same LGPL-covered works in uncombined
+source form, are provided free beside this installer on its GitHub Release:
+https://github.com/guxingzhou16-pixel/Personal-Study-Assistant/releases
+Attachment: study-companion-0.1.1-native-source-companion.zip
+SHA-256: 3fecbcbc66cc30a8760ca7851831f950ff62a38cfaebd47ef1713a9e3637f0f3
+
+In that attachment, SOURCE-INDEX.json identifies fixed versions, inputs and
+uncombined source representations. original/native/ holds complete independent
+source archives. modified/<component>/ holds complete modified component
+file-content trees; the original 16 patches, two direct source changes and
+generated installation configuration are documented in MODIFICATIONS.md and
+BUILDING.md. original/build/, original/cargo/, original/runtime/ and original/dev/
+retain the associated build inputs. Sources are separate works even though
+delivered in one archive; this is not a claim of separately compiled DLLs or
+bit-identical rebuilding. Creation-time candidate/published flags and draft
+notices in the archive describe local assembly; the actual Release and this
+notice record its distribution with this installer.
+
+Sharp's fixed bridge/build source:
+https://github.com/lovell/sharp/tree/51a990faa26ade5586a4934ac9673c98d8893326
+Fixed packaging/build sources (also freely available from their original server):
+https://github.com/lovell/sharp-libvips/tree/ebb95f8add54eee8bed840e3fb587e4cbec857d7
+
+You may modify the LGPL-covered libraries and reverse engineer to debug those
+modifications as their licenses permit. With the application closed, preserve
+the original files and replace compatible libraries in this directory; maintain
+the required ABI, exports, calling convention and dependencies. No project
+signing key or approval is required for your modified version. Arbitrary or
+incompatible binaries are not guaranteed to work. Installation terms for other
+components do not withdraw these independent open-source rights.
