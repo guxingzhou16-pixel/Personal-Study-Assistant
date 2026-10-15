@@ -2775,15 +2775,14 @@
       "description": "Original code repository MIT license; not verified as the license asset of fixed Xenova quantized weights"
     },
     {
-      "file": "assets/Xenova-bge-small-zh-v1.5-75c43b0-README.md",
-      "sha256": "cb22054df1a98f7ee9d5b281d023e67c27cc316e1733baf03fc994d95c3048ab",
-      "source": "https://huggingface.co/Xenova/bge-small-zh-v1.5/resolve/75c43b069aac4d136ba6bc1122f995fedcfd2781/README.md?download=true",
-      "description": "Text recovered from official fixed-revision raw web response; normalized blank lines reconstructed only where the resulting Git blob equals the official resolve-cache ETag Fixed model card names BAAI/bge-small-zh-v1.5 as base model. No license field or weights grant appears in this README; not a substitute for weight-license review."
+      "file": "assets/bge-model-provenance.txt",
+      "sha256": "1cf370c0e9673c78346745aa321474c9df26594be9764f212e2f180905f359ef",
+      "source": "https://github.com/guxingzhou16-pixel/Personal-Study-Assistant",
+      "description": "Project-authored fixed-model provenance and direct Hugging Face download facts; not an upstream model license or confirmation that the five quantized model files are MIT-licensed. No model payload is bundled; external mirroring or bundling requires a separate scope review."
     }
   ],
   "reviewIssues": [
     "Canvas fixed Skia/GN declared components and original notices are mapped conservatively. Rust 1.98.1 generated standard-library notices, fixed HarfBuzz Microsoft USE, and Unicode 17 copyright with existing ICU Unicode License v3 are retained. Static Windows runtime distribution conditions and any concrete separately licensed embedded exceptions still require coverage; exact linked SBOM or bit-identical rebuilding are not separate license requirements.",
-    "Sharp fixed bridge sources and shared-library modification test are mapped. All 16 selected source patches apply to retained sources; nightly 2026-09-24 library lock vendor declarations and original runtime notices are mapped conservatively. Remaining native/compiler runtime terms, applicable uncombined-library material and corresponding-source public availability need coverage. No native source build or exact linked-object inventory is claimed. Upstream inquiry432 was closed for automated submission; user chose no additional inquiry.",
-    "Fixed Xenova/bge-small-zh-v1.5 revision 75c43b069aac4d136ba6bc1122f995fedcfd2781 model card was obtained and Git-blob verified. It identifies the BAAI base model but contains no license field or quantized-weight grant. FlagEmbedding code MIT text is not a grant for these weights; license review remains pending."
+    "Sharp fixed bridge sources and shared-library modification test are mapped. All 16 selected source patches apply to retained sources; nightly 2026-09-24 library lock vendor declarations and original runtime notices are mapped conservatively. Remaining native/compiler runtime terms, applicable uncombined-library material and corresponding-source public availability need coverage. No native source build or exact linked-object inventory is claimed. Upstream inquiry432 was closed for automated submission; user chose no additional inquiry."
   ]
 }

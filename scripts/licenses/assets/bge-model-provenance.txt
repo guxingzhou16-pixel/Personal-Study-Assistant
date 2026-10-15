@@ -1,0 +1,42 @@
+拾知：固定 BGE 模型来源与下载事实
+记录日期：2026-10-15
+
+本文件由拾知项目编写，随项目按 MIT 发布。它是来源与下载事实说明，
+不是上游模型许可证，不为下列模型文件新增授权。
+
+固定仓库：Xenova/bge-small-zh-v1.5
+固定 revision：75c43b069aac4d136ba6bc1122f995fedcfd2781
+基座模型：BAAI/bge-small-zh-v1.5
+
+以下文件名、字节数与 SHA-256 来自应用 electron/core/embedding-model.ts：
+
+config.json | 716 bytes | d4193ead3a810fd694fa8a31d7fc72fbaebc0668b603e398734bf2f6538ff42f
+tokenizer.json | 439125 bytes | 48cea5d44424912a6fd1ea647bf4fe50b55ab8b1e5879c3275f80e339e8fae26
+tokenizer_config.json | 367 bytes | e6f3b96db926a37d4039995fbf5ad17de158dfb8f6343d607e4dbaad18d75f5a
+special_tokens_map.json | 125 bytes | b6d346be366a7d1d48332dbc9fdf3bf8960b5d879522b7799ddba59e76237ee3
+onnx/model_quantized.onnx | 24010842 bytes | 15b717c382bcb518ba457b93ea6850ede7f4f1cd8937454aa06972366cd19bcc
+
+这五个模型文件不随拾知安装器或应用源码分发。用户在设置中主动点击下载后，
+应用直接从 Hugging Face 的固定仓库 revision 获取文件，允许上游存储/CDN 重定向，
+并核对上述大小和摘要；拾知不通过自有代理或镜像提供模型文件。推理只读取本地文件。
+
+BAAI 基座模型卡标注 MIT；固定 Xenova 量化版本的五文件独立 MIT 覆盖和完整通知
+仍未确认。软件及本说明的 MIT 不替代外部模型许可，运行库许可也不等于模型许可。
+发布者模型卡提供 Transformers.js 特征提取用法。Hugging Face 的公开仓库条款提供
+通过其服务和功能使用内容的依据；不能据此宣称已取得在 GitHub 等外部渠道镜像、
+捆绑或重新许可这五个文件的通用授权。
+
+原询证继续等待。回复未到本身不作为不含模型文件的应用首发必须等待条件，
+也不表示五文件已经获得明确 MIT 确认。未来若镜像、捆绑或上传模型文件，
+须先核对确切文件的适用外部分发授权及通知。
+
+固定量化模型卡：
+https://huggingface.co/Xenova/bge-small-zh-v1.5/blob/75c43b069aac4d136ba6bc1122f995fedcfd2781/README.md
+基座模型卡：
+https://huggingface.co/BAAI/bge-small-zh-v1.5
+Hugging Face 官方服务条款：
+https://huggingface.co/terms-of-service
+原询证：
+https://github.com/huggingface/transformers.js/issues/1487#issuecomment-6147791372
+
+本说明仅记录当前下载与分发范围，不替代上述来源的适用条款。

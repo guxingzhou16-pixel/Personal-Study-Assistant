@@ -883,15 +883,15 @@
       "provenance": "Chromium root BSD-style license referenced by the pinned zlib SIMD headers; origin revision explicitly recorded by fixed standalone Gitiles commit."
     },
     {
-      "file": "Xenova-bge-small-zh-v1.5-75c43b0-README.md",
-      "sha256": "cb22054df1a98f7ee9d5b281d023e67c27cc316e1733baf03fc994d95c3048ab",
-      "size": 1057,
-      "url": "https://huggingface.co/Xenova/bge-small-zh-v1.5/resolve/75c43b069aac4d136ba6bc1122f995fedcfd2781/README.md?download=true",
-      "revision": "75c43b069aac4d136ba6bc1122f995fedcfd2781",
-      "gitBlob": "e26ec7fcc01a7aff66171d44acff0a80fae865e1",
-      "sourceType": "official-fixed-model-card",
-      "extraction": "Text recovered from official fixed-revision raw web response; normalized blank lines reconstructed only where the resulting Git blob equals the official resolve-cache ETag",
-      "provenance": "Fixed model card names BAAI/bge-small-zh-v1.5 as base model. No license field or weights grant appears in this README; not a substitute for weight-license review.",
+      "file": "bge-model-provenance.txt",
+      "sha256": "1cf370c0e9673c78346745aa321474c9df26594be9764f212e2f180905f359ef",
+      "size": 2523,
+      "url": "https://github.com/guxingzhou16-pixel/Personal-Study-Assistant",
+      "modelRevision": "75c43b069aac4d136ba6bc1122f995fedcfd2781",
+      "sourceType": "project-authored-provenance",
+      "authoredOn": "2026-10-15",
+      "provenance": "Project-authored facts checked against electron/core/embedding-model.ts, direct upstream download code and release scope; replaces the full upstream model card in current packaging. Exact-file MIT coverage and notices remain unconfirmed; the original inquiry remains open.",
+      "licenseScope": "Project MIT covers this document only; this record is not an upstream model license or a grant to externally redistribute model files.",
       "additional": true
     },
     {
