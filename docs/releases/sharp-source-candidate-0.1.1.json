@@ -1,0 +1,253 @@
+{
+  "format": 1,
+  "verifiedOn": "2026-10-15",
+  "sourceBefore": "ed21320c0dd50a14f7d3456d4d36c5725899ef09",
+  "status": "assembled-local-candidate",
+  "published": false,
+  "completeDistributionReview": false,
+  "candidateDirectory": "artifacts/distribution-decision-604e6a5e-3f99-432c-bafe-d67cc511b3d0/sharp-source-candidate",
+  "inputs": {
+    "files": 758,
+    "bytes": 462358481,
+    "reusedCachedFiles": true,
+    "newDownloads": 0,
+    "originalArchivesAndPatchesModified": false
+  },
+  "output": {
+    "manifestFiles": 19401,
+    "manifestBytes": 721086874,
+    "sourceIndexBytes": 310596,
+    "sourceIndexSha256": "f11f318f9d6f7da31333381198eb90522e433f2cec15f88815dbdb01d76f1c63",
+    "sha256SumsBytes": 2548747,
+    "sha256SumsSha256": "ef9e18af5bff055b0a8450a25f92267079d69374297e867790438dddbba5d173",
+    "sha256SumsExcludesItself": true,
+    "archiveCreated": false
+  },
+  "sourceRepresentation": {
+    "modifiedComponents": 12,
+    "appliedOriginalPatches": 16,
+    "additionalSourceEdits": 2,
+    "licenseLinksMaterialized": 9,
+    "fullFileContentTrees": true,
+    "posixSymlinksReproduced": false,
+    "originalTarMetadataPreserved": true,
+    "unchangedLibraries": "Complete independent original source archives",
+    "partialTouchedFileDirectoriesNotUsed": true,
+    "compiledUncombinedDllProduced": false
+  },
+  "components": [
+    {
+      "library": "aom",
+      "version": "3.15.1",
+      "files": 1520,
+      "changedFiles": 1,
+      "patches": ["original/patches/aom/aom-3-fixes.patch"],
+      "textEdits": [],
+      "links": 0
+    },
+    {
+      "library": "cairo",
+      "version": "1.18.6",
+      "files": 4949,
+      "changedFiles": 5,
+      "patches": [
+        "original/patches/cairo/cairo-1-fixes.patch",
+        "original/patches/cairo/cairo-1-nanoserver-compat.patch"
+      ],
+      "textEdits": [],
+      "links": 0
+    },
+    {
+      "library": "fontconfig",
+      "version": "2.18.3",
+      "files": 712,
+      "changedFiles": 2,
+      "patches": ["original/patches/fontconfig/fontconfig-2-fixes.patch"],
+      "textEdits": [],
+      "links": 0
+    },
+    {
+      "library": "glib",
+      "version": "2.90.0",
+      "files": 2394,
+      "changedFiles": 9,
+      "patches": [
+        "original/patches/glib/glib-2-dllexport-static.patch",
+        "original/patches/glib/glib-2-fixes.patch",
+        "original/patches/glib/glib-2-without-gregex.patch",
+        "original/patches/glib/glib-2-without-win32appinfo.patch"
+      ],
+      "textEdits": [],
+      "links": 2
+    },
+    {
+      "library": "libheif",
+      "version": "1.23.5",
+      "files": 768,
+      "changedFiles": 1,
+      "patches": ["original/patches/libheif/libheif-1-fixes.patch"],
+      "textEdits": [],
+      "links": 0
+    },
+    {
+      "library": "mozjpeg",
+      "version": "0826579",
+      "files": 550,
+      "changedFiles": 11,
+      "patches": [
+        "original/patches/mozjpeg/mozjpeg-4-fixes.patch",
+        "original/patches/mozjpeg/mozjpeg-4-pr-453.patch"
+      ],
+      "textEdits": [],
+      "links": 0
+    },
+    {
+      "library": "proxy-libintl",
+      "version": "0.5",
+      "files": 5,
+      "changedFiles": 1,
+      "patches": ["original/patches/proxy-libintl/proxy-libintl-1-fixes.patch"],
+      "textEdits": [],
+      "links": 0
+    },
+    {
+      "library": "librsvg",
+      "version": "2.63.2",
+      "files": 2146,
+      "changedFiles": 9,
+      "patches": ["original/patches/librsvg/librsvg-2-fixes.patch"],
+      "textEdits": [],
+      "links": 7
+    },
+    {
+      "library": "uhdr",
+      "version": "2.0.2",
+      "files": 230,
+      "changedFiles": 2,
+      "patches": ["original/patches/uhdr/uhdr-1-fixes.patch"],
+      "textEdits": [
+        {
+          "kind": "uhdr-sed",
+          "file": "CMakeLists.txt",
+          "recipe": "build/uhdr.mk:16",
+          "effect": "CMAKE_CROSSCOMPILING AND UHDR_ENABLE_INSTALL -> FALSE",
+          "beforeSha256": "6d738ccf8db1a55cda70a84e5c8f37f9165929fd7b95cacef6cbc16400dcee1b",
+          "afterSha256": "ce2a0f1ae89768d276bc61f4096acb8aab91b5ea045333ce8b9702dfeba6d10c"
+        }
+      ],
+      "links": 0
+    },
+    {
+      "library": "libxml2",
+      "version": "2.15.4",
+      "files": 4426,
+      "changedFiles": 1,
+      "patches": ["original/patches/libxml2/libxml2-2-fixes.patch"],
+      "textEdits": [],
+      "links": 0
+    },
+    {
+      "library": "zlib-ng",
+      "version": "2.3.3",
+      "files": 355,
+      "changedFiles": 1,
+      "patches": ["original/patches/zlib-ng/zlib-ng-2-fixes.patch"],
+      "textEdits": [],
+      "links": 0
+    },
+    {
+      "library": "pango",
+      "version": "1.58.2",
+      "files": 584,
+      "changedFiles": 1,
+      "patches": [],
+      "textEdits": [
+        {
+          "kind": "pango-sed",
+          "file": "meson.build",
+          "recipe": "build/overrides.mk:491",
+          "effect": "Delete the subdir('utils') line and its immediately following line",
+          "beforeSha256": "f0c86e1c8812ef6a13844e062daa031aa84f5fbdbc1f210858729d19609acf11",
+          "afterSha256": "fda06ba08dadddaa4eabaa77e31d2aebdb5ffec222d501e19733e7a1e98a1ee3"
+        }
+      ],
+      "links": 0
+    }
+  ],
+  "fixedBuildInputs": {
+    "wrapper": "ef19ca09af2453d127453d677c849ccb37cf5694",
+    "mxe": "c36160b231e66e1cbe032ed54aef7617e8b259da",
+    "sharp": "51a990faa26ade5586a4934ac9673c98d8893326",
+    "sharpLibvips": "ebb95f8add54eee8bed840e3fb587e4cbec857d7",
+    "fullPackagingGitArchiveLocallyMirrored": false,
+    "upstreamFixedPackagingUrl": "https://github.com/lovell/sharp-libvips/tree/ebb95f8add54eee8bed840e3fb587e4cbec857d7",
+    "lockedNpmSourceSnapshotFiles": 47,
+    "devVersion": "1.3.4",
+    "nightly": "2026-09-24 / 6eeff9a52",
+    "librsvgCargoCandidates": 353
+  },
+  "buildAndNoticeDocuments": [
+    "SOURCE-INDEX.json",
+    "BUILDING.md",
+    "MODIFICATIONS.md",
+    "NOTICE-DRAFT.txt",
+    "SHA256SUMS"
+  ],
+  "generatedInstallEdit": {
+    "recipe": "build/overrides.mk:531",
+    "file": "librsvg-2.0.pc",
+    "effect": "Append -lntdll -luserenv -lsynchronization to Libs.private",
+    "generatedInstallOutputProduced": false
+  },
+  "canvas": {
+    "staticUcrtGrantLocated": true,
+    "grantUrl": "https://learn.microsoft.com/en-us/legal/windows-sdk/redist",
+    "fixedImage": "win25-vs2026/20260824.214",
+    "actualSelectedRuntimeComponentTermsMapped": false,
+    "downstreamConditionsImplemented": false,
+    "preciseLinkedObjectInventoryRequired": false,
+    "bitIdenticalRebuildRequired": false
+  },
+  "externalState": {
+    "canvasInquiryComments": 0,
+    "bgeDiscussionComments": 6,
+    "bgeLicenseReply": false,
+    "readOnlyCheckedOn": "2026-10-15",
+    "sharpInquiryClosed": true,
+    "additionalSharpInquiryAuthorized": false,
+    "signpathApplication": "received",
+    "signpathReview": "not-approved; user-provided review email recorded on 2026-10-15",
+    "newSignpathSubmission": false
+  },
+  "independentOutputAudit": {
+    "verifiedOn": "2026-10-15",
+    "status": "passed",
+    "actualFindings": 0,
+    "manifestFiles": 19401,
+    "modifiedFilesActuallyHashed": 18639,
+    "originalArchiveMemberRepresentations": 19224,
+    "retainedInputIdentityChecks": 758,
+    "oldLargeArchiveRehashes": 0,
+    "generatedFilesScannedForPrivateData": 4,
+    "receiptSha256": "a7393c765ac29804ff4b736a9d43694ff21db98526ee3152547d985ef66b61ff",
+    "comparatorCrlfCorrectionRecorded": true,
+    "legalOrFullDistributionApproval": false
+  },
+  "scope": {
+    "appCodeChanged": false,
+    "sourceCompiled": false,
+    "upstreamCodeExecuted": false,
+    "nativeLibraryExecuted": false,
+    "newInstallerBuilt": false,
+    "oldSuccessfulTestsRepeated": false,
+    "existingInstallerNoticeOutputs": 697,
+    "previousTemporaryNoticeOutputs": 710,
+    "pendingDistributionItems": 3
+  },
+  "remaining": [
+    "Applicable Canvas/Sharp runtime terms and required downstream conditions",
+    "Final prominent library notice and complete maintained public corresponding-source access",
+    "Pinned BGE five-file license evidence",
+    "Prepare and verify GitHub NSIS unsigned preview per user choice; trusted signing remains incomplete but is not a prerequisite for this preview"
+  ]
+}
