@@ -1857,6 +1857,36 @@
           "sha256": "ab6eec6caf0fa5775e411c7a8bc6a45c4ef2956b0980b157ab74fc5cd62a928b",
           "source": "https://static.rust-lang.org/dist/2026-09-24/rustc-nightly-src.tar.xz",
           "description": "Original notice from Rust 1.100.0-nightly 6eeff9a52c3e35c4c4cbf5651f342dcd2191866f source archive, SHA-256 f2c139528ba025f1141935df4f634e18db614b9b3b1cf2ea59e3675a6ade89f3, member rustc-nightly-src/library/compiler-builtins/LICENSE.txt. Standard-library lock vendor superset includes development/other-target code. Original bytes retained; no claim that every candidate was compiled into the Windows libvips binary."
+        },
+        {
+          "file": "assets/llvm-23.1.2-compiler-rt-LICENSE.txt",
+          "sha256": "1a8f1058753f1ba890de984e48f0242a3a5c29a6a8f2ed9fd813f36985387e8d",
+          "source": "https://raw.githubusercontent.com/llvm/llvm-project/llvmorg-23.1.2/compiler-rt/LICENSE.TXT",
+          "description": "Original compiler-rt 23.1.2 runtime notice from fixed upstream llvmorg-23.1.2; original bytes retained. The fixed Sharp Windows core recipe uses LLVM/MinGW runtimes. This ownership mapping does not claim an exact linked-object inventory or close Microsoft static-runtime terms, combined-library or public-source arrangements."
+        },
+        {
+          "file": "assets/llvm-23.1.2-libcxx-LICENSE.txt",
+          "sha256": "539dd7aed86e8a4f12cbdd0e6c50c189c7d74847e4fecc64ce2c6ee3a01da38b",
+          "source": "https://raw.githubusercontent.com/llvm/llvm-project/llvmorg-23.1.2/libcxx/LICENSE.TXT",
+          "description": "Original libcxx 23.1.2 runtime notice from fixed upstream llvmorg-23.1.2; original bytes retained. The fixed Sharp Windows core recipe uses LLVM/MinGW runtimes. This ownership mapping does not claim an exact linked-object inventory or close Microsoft static-runtime terms, combined-library or public-source arrangements."
+        },
+        {
+          "file": "assets/llvm-23.1.2-libcxxabi-LICENSE.txt",
+          "sha256": "e2b35be49f7284a45b7baca8fc7b3ab7440e7902392b2528a457816b5bb2a15c",
+          "source": "https://raw.githubusercontent.com/llvm/llvm-project/llvmorg-23.1.2/libcxxabi/LICENSE.TXT",
+          "description": "Original libcxxabi 23.1.2 runtime notice from fixed upstream llvmorg-23.1.2; original bytes retained. The fixed Sharp Windows core recipe uses LLVM/MinGW runtimes. This ownership mapping does not claim an exact linked-object inventory or close Microsoft static-runtime terms, combined-library or public-source arrangements."
+        },
+        {
+          "file": "assets/llvm-23.1.2-libunwind-LICENSE.txt",
+          "sha256": "b5efebcaca80879234098e52d1725e6d9eb8fb96a19fce625d39184b705f7b6d",
+          "source": "https://raw.githubusercontent.com/llvm/llvm-project/llvmorg-23.1.2/libunwind/LICENSE.TXT",
+          "description": "Original libunwind 23.1.2 runtime notice from fixed upstream llvmorg-23.1.2; original bytes retained. The fixed Sharp Windows core recipe uses LLVM/MinGW runtimes. This ownership mapping does not claim an exact linked-object inventory or close Microsoft static-runtime terms, combined-library or public-source arrangements."
+        },
+        {
+          "file": "assets/mingw-w64-57b5950-runtime-LICENSE.txt",
+          "sha256": "1db8da07b436c68833c0673ffee3d9fcb2526047f3820b81661865dfedc79a1f",
+          "source": "https://raw.githubusercontent.com/mingw-w64/mingw-w64/57b595039040eaa15bece85b7cc71d952281b269/COPYING.MinGW-w64-runtime/COPYING.MinGW-w64-runtime.txt",
+          "description": "Original mingw-w64 runtime 57b5950 runtime notice from fixed upstream 57b595039040eaa15bece85b7cc71d952281b269; original bytes retained. The fixed Sharp Windows core recipe uses LLVM/MinGW runtimes. This ownership mapping does not claim an exact linked-object inventory or close Microsoft static-runtime terms, combined-library or public-source arrangements."
         }
       ]
     },

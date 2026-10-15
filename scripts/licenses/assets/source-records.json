@@ -5597,6 +5597,51 @@
         "rustc-nightly-src/library/compiler-builtins/LICENSE.txt"
       ],
       "reusedOriginalAsset": false
+    },
+    {
+      "file": "llvm-23.1.2-compiler-rt-LICENSE.txt",
+      "url": "https://raw.githubusercontent.com/llvm/llvm-project/llvmorg-23.1.2/compiler-rt/LICENSE.TXT",
+      "revision": "llvmorg-23.1.2",
+      "sourceType": "fixed-native-runtime-license-text",
+      "version": "23.1.2",
+      "sha256": "1a8f1058753f1ba890de984e48f0242a3a5c29a6a8f2ed9fd813f36985387e8d",
+      "size": 16708
+    },
+    {
+      "file": "llvm-23.1.2-libcxx-LICENSE.txt",
+      "url": "https://raw.githubusercontent.com/llvm/llvm-project/llvmorg-23.1.2/libcxx/LICENSE.TXT",
+      "revision": "llvmorg-23.1.2",
+      "sourceType": "fixed-native-runtime-license-text",
+      "version": "23.1.2",
+      "sha256": "539dd7aed86e8a4f12cbdd0e6c50c189c7d74847e4fecc64ce2c6ee3a01da38b",
+      "size": 16703
+    },
+    {
+      "file": "llvm-23.1.2-libcxxabi-LICENSE.txt",
+      "url": "https://raw.githubusercontent.com/llvm/llvm-project/llvmorg-23.1.2/libcxxabi/LICENSE.TXT",
+      "revision": "llvmorg-23.1.2",
+      "sourceType": "fixed-native-runtime-license-text",
+      "version": "23.1.2",
+      "sha256": "e2b35be49f7284a45b7baca8fc7b3ab7440e7902392b2528a457816b5bb2a15c",
+      "size": 16706
+    },
+    {
+      "file": "llvm-23.1.2-libunwind-LICENSE.txt",
+      "url": "https://raw.githubusercontent.com/llvm/llvm-project/llvmorg-23.1.2/libunwind/LICENSE.TXT",
+      "revision": "llvmorg-23.1.2",
+      "sourceType": "fixed-native-runtime-license-text",
+      "version": "23.1.2",
+      "sha256": "b5efebcaca80879234098e52d1725e6d9eb8fb96a19fce625d39184b705f7b6d",
+      "size": 16706
+    },
+    {
+      "file": "mingw-w64-57b5950-runtime-LICENSE.txt",
+      "url": "https://raw.githubusercontent.com/mingw-w64/mingw-w64/57b595039040eaa15bece85b7cc71d952281b269/COPYING.MinGW-w64-runtime/COPYING.MinGW-w64-runtime.txt",
+      "revision": "57b595039040eaa15bece85b7cc71d952281b269",
+      "sourceType": "fixed-native-runtime-license-text",
+      "version": "57b5950",
+      "sha256": "1db8da07b436c68833c0673ffee3d9fcb2526047f3820b81661865dfedc79a1f",
+      "size": 12155
     }
   ]
 }
