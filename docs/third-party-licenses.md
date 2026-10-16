@@ -1,8 +1,14 @@
 # 第三方许可与分发说明
 
-核对日期：2026-10-14。**当前发布条件见[分发收尾](releases/distribution-closeout-2026-10-13.md)：新候选已排除独立Web/GUID，DirectML当前Windows ML分发范围已核对，余Canvas/Sharp/固定量化BGE三项。** 最新77acd64包147元数据/158许可/390补充/2索引，共697输出，本轮两份固定原文与源/提交/实物匹配，7份原manifest对应固定VCS，11运行文件与已验2111一致；声明图83项不代表实际全编译覆盖，详见[增量验证](testing/native-notice-followup-2026-10-14.md)。旧50da0f5的695/新增223原文、2111的472、25b/d205的385及待办保留各自原范围。仓库已按授权公开，BGE询证真实发送，本日无答复；SignPath提交遭Captcha失败，可信签名未完成。本文为工程证据，非法律认证。项目自有代码[MIT](../LICENSE)，第三方保留各自条款；`package.json`的`private: true`继续防止误发npm包，与GitHub可见性无关。
+**2026-10-16 最终交付：**[未签名预览版已公开](https://github.com/guxingzhou16-pixel/Personal-Study-Assistant/releases/tag/v0.1.1-preview.1)，固定f84285f的最终安装器已通过真实Sandbox许可页/安装/覆盖/重开/卸载及数据保护，同SHA CI复验通过；三个公开附件的匿名完整下载大小/SHA均已核对一致；首版本轮交付验收完成。当前依据见[最终包与发布记录](testing/github-preview-release-2026-10-15.md)。下文保留旧候选的日期与证据，旧pending/签名门槛不覆盖最新结果。
+
+**首版优先与适用范围（2026-10-15）：**当前目标是完成首版Windows/GitHub下载，签名后置；具体分发条件、执行顺序和完成标准按[首版发布计划](releases/v1-release-plan.md)。本文件保存实际组件的许可依据，不增加统一对象级SBOM、位同重建、每个上游单独审批或重复旧全量测试要求；当前三项缺口仍需履行具体适用条件，不能因未签名/预览标记而免除。
+
+以下为旧候选材料快照（2026-10-14），最终状态以上方本轮交付为准。**此前发布条件见[分发收尾](releases/distribution-closeout-2026-10-13.md)：新候选已排除独立Web/GUID，DirectML当前Windows ML分发范围已核对，余Canvas/Sharp/固定量化BGE三项。** 最新77acd64包147元数据/158许可/390补充/2索引，共697输出，本轮两份固定原文与源/提交/实物匹配，7份原manifest对应固定VCS，11运行文件与已验2111一致；声明图83项不代表实际全编译覆盖，详见[增量验证](testing/native-notice-followup-2026-10-14.md)。旧50da0f5的695/新增223原文、2111的472、25b/d205的385及待办保留各自原范围。仓库已按授权公开，BGE询证真实发送，本日无答复；SignPath Foundation本次因公开信誉不足未批准，依据为用户提供的审核邮件；首版保持NSIS/GitHub下载，签名后置，不重复相同申请。本文为工程证据，非法律认证。项目自有代码[MIT](../LICENSE)，第三方保留各自条款；`package.json`的`private: true`继续防止误发npm包，与GitHub可见性无关。
 
 ## 1. 安装包中如何查阅
+
+2026-10-15最新[源码材料核对](testing/distribution-material-decision-2026-10-14.md)已形成12个完整改后源码组件及来源/构建/修改/通知草稿；仍是本机candidate，不是新安装器或完整源码公开提供。Canvas静态UCRT依据与具体下游条款分开记录，三项pending不变；旧包697/前轮临时710保留原范围。
 
 新构建规则将项目许可证原字节复制到`resources/LICENSE.txt`，afterPack检查缺失、链接／目录、正文差异及ASAR元数据的MIT标识。最新d205目录／NSIS构建载荷／真实setup提取载荷的1075字节全文与源码一致，详见[MIT新包实物](testing/mit-package-2026-10-12.md)。旧36及更早包的原始文件和六项待办不改写。
 
@@ -73,7 +79,7 @@ zlib材料来自Skia固定依赖 `646b7f569718921d7d4b5b8e22572ff6c76f2596`，�
 
 ## 4. 发布前尚需完成
 
-2026-10-14最新材料见[本轮记录](testing/runtime-source-materials-2026-10-14.md)：nightly原文8份47148字节/24复用、临时710输出；16源码补丁已核对，未编译或执行。Sharp432为流程原因关闭，用户选择不追加，不代表授权答复。三项继续pending，source/未组合形式/运行时适用条款和SignPath批准/可信签名各自保留门槛。
+2026-10-14最新材料见[本轮记录](testing/runtime-source-materials-2026-10-14.md)：nightly原文8份47148字节/24复用、临时710输出；16源码补丁已核对，未编译或执行。Sharp432为流程原因关闭，用户选择不追加，不代表授权答复。三项继续pending，source/未组合形式/运行时适用条款仍需具体处理；SignPath与可信签名按首版发布计划后置。
 
 2026-10-14前轮补核对Canvas发布实物/生产日志与Rust1.98.1基准通知；三份新原文4634字节和已有Apache复用后，在临时目录生成700输出，旧77安装器仍697。Sharp官方core DLL与实物同字节，真实沙盒修改/加载/恢复已通过；未源码重建或关闭全部组合分发条件，原范围见[前轮核对](testing/native-distribution-followup-2026-10-14.md)。
 

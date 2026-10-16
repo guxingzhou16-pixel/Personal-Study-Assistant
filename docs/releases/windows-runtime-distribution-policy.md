@@ -1,6 +1,6 @@
 # Windows 标准运行库：分发角色与保护条件
 
-核对日期：**2026-10-15**。本页记录当前 Canvas/Sharp 完整 Windows 模块的分发依据与实施范围；实际安装界面、最终包及公开下载仍由发布验收确认。
+核对日期：**2026-10-15**。本页记录当前 Canvas/Sharp 完整 Windows 模块的分发依据与实施范围；最终f84285f的实际许可界面、安装和数据保护已通过，软件与源码已在同一Release公开。三个公开附件匿名完整下载已相同大小/SHA，确切范围见[发布验收](../testing/github-preview-release-2026-10-15.md)。
 
 ## 当前分发角色
 
@@ -22,14 +22,14 @@
 
 选择同意仅接受实际组件条件，不要求接受整个开发工具合同，不豁免真实适用责任。项目自有代码继续适用 MIT；不能把 Microsoft 专有代码重授 MIT，也不能把专有条件扩张为整个开源模块的禁令。
 
-`electron-builder.json` 已将正文接入 NSIS 许可页并复制为 `resources/INSTALLATION-TERMS.txt`。[安装钩子](../../scripts/installer.nsh)拒绝 `/S` 和更新自动安装路径，要求本版进行图形确认；该源码安排不等于真实许可页的同意、拒绝行为已经通过验证。
+`electron-builder.json` 将正文接入 NSIS 许可页并复制为 `resources/INSTALLATION-TERMS.txt`。[安装钩子](../../scripts/installer.nsh)拒绝 `/S` 和更新自动安装路径，要求本版进行图形确认。真实Sandbox已验证中文原文可读、实际同意/取消，两个自动参数退出1602；普通手动覆盖及卸载器仍按对应路径验证，不用源码检查冒充GUI。
 
-[Sharp 库旁通知](../../scripts/licenses/sharp-distribution-notice.txt)将复制到实际库目录的 `SOURCE-NOTICE.txt`，标明相应及未组合源码附件、固定来源、库替换位置和 LGPL 权利。独立源码形态及公开获取安排见 [Sharp 分发计划](sharp-source-distribution-plan.md)；[BGE 下载范围](bge-download-distribution-policy.md)另行记录，均不扩张本页结论。
+[Sharp 库旁通知](../../scripts/licenses/sharp-distribution-notice.txt)已进入实际库目录的 `SOURCE-NOTICE.txt`，原字节经安装器实提核对，标明相应及未组合源码附件、固定来源、库替换位置和 LGPL 权利。独立源码形态及公开获取安排见 [Sharp 分发计划](sharp-source-distribution-plan.md)；[BGE 下载范围](bge-download-distribution-policy.md)另行记录，均不扩张本页结论。
 
-## 发布前仍需确认
+## 本轮验收与范围
 
-- 最终包中的安装确认、库旁通知和原有许可字节/位置对应；实际图形许可页可查看、同意及取消，自动路径不会绕过确认。
-- 与二进制同页公开对应源码附件及清晰获取说明，核对实际下载可用性和摘要；现有本机材料不能冒充已经公开。
-- 按最终变更范围完成必要包验收，记录供应方信赖与未覆盖范围。本页不是对全部上游权利、合同效力或软件质量的保证。
+- 最终包的安装确认、库旁通知和原有许可字节/位置对应，实际图形许可、自动拒绝、首装/覆盖/重开/卸载及61数据文件零差异均已验证。
+- 对应源码和清晰说明已与二进制同页公开；安装器、源码附件和清单均已匿名完整下载并核对相同大小/摘要，不改写构建时的待办快照。
+- 当前具体保护与交付路径按上述角色依据履行；保留供应方信赖和未覆盖范围。本页不是对全部上游权利、合同效力或软件质量的保证。
 
-本页仅同步已核对依据与现有实现，没有运行安装器、模型或个人数据，也没有代表用户接受 Microsoft 合同。
+实际安装只在本轮专用Sandbox执行；宿主未安装应用、未打开个人学习数据或重新执行模型，未代表用户接受整个Microsoft开发工具合同。

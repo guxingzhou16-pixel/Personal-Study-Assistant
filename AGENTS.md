@@ -17,6 +17,7 @@
 9. **普通功能只做相关的简单基础验证。** 不默认每次跑完整测试套件或全局测验；完整回归放在阶段验收、发布前或用户明确要求时。
 10. **个人资料和密钥不得进入仓库。** 本机人格设定、数据库、模型缓存、备份及密钥不属于可提交的项目资产。
 11. **项目自有代码使用MIT。** 用户于2026-10-11明确选择，全文为根目录`LICENSE`。后续包须带`resources/LICENSE.txt`原字节；第三方保持各自许可与未关闭的分发条件。
+12. **当前主要目标是完成并发布首版 Windows 软件。** 2026-10-15用户要求简化流程；按`docs/releases/v1-release-plan.md`冻结现有功能并收尾。允许明确标为未签名的NSIS发行，可信签名/SignPath/Store不再是首版前置条件；实际分发许可、数据安全、最终包必要验证和下载可用性仍是门槛。不要新增统一SBOM/位同重建要求或默认重跑全部历史测试。
 
 ## 2. 项目身份、目标与交付形态
 
@@ -40,7 +41,9 @@
 
 ## 3. 当前状态与接手快照
 
-本节核对日期：**2026-10-14**。当前实现/验收入口为 README 顶部唯一状态表、当前执行计划、本轮产品记录及 `docs/testing/installed-v13-2026-10-12.md`；本章各小节是有日期的历史/增量快照，旧数量、阶段分工、包或许可记录不能覆盖本轮代码与授权。新任务先复核 Git 和实际源码。
+当前发布政策以`docs/releases/v1-release-plan.md`为准。SignPath本次未获批准，依据为`docs/releases/signpath-review-2026-10-15.md`，不再等待同一次审核；本章历史签名门槛与待审核快照不覆盖2026-10-15首版优先、允许未签名发行的最新决定。
+
+本节核对日期：**2026-10-16**。当前首版交付入口为README顶部唯一状态表、3.44和`docs/testing/github-preview-release-2026-10-15.md`（15日发布/安装，16日完成下载与文档）；旧安装/产品记录分别保留原范围。本章各小节为有日期的历史/增量快照，旧pending、阶段分工、包或许可记录不能覆盖最新代码与授权。新任务先复核Git，不重复已完成验收。
 
 ### 3.1 已交付并有历史验收记录
 
@@ -396,6 +399,47 @@
 - Sharp432已被维护者closed/not_planned并标llm-generated，要求真人自己的话/官方Question模板，自动化或LLM提交可能被关闭/屏蔽。先前自动询证未核对模板，现纠正；用户明确暂不追加询证，继续现有材料。不自动发帖/改帖/另账号/联系其它维护者，不把流程关闭当许可拒绝或许可授权。原评论/回执保留，接手不得继续等432给许可答复。
 - 相应源码/库修改/公开获取的准备见`docs/releases/sharp-source-distribution-plan.md`，人工事实页`sharp-human-followup-facts.md`不代写或代勾模板。全量来源/未组合形式/实际公开提供未全部证明，不能用新材料检查冒称整项闭合；BGE仍保留等待原询证。
 - 本轮入口`docs/testing/runtime-source-materials-2026-10-14.md`、`docs/releases/runtime-source-materials-0.1.1.json`；本机`artifacts/runtime-source-followup-41c2e6c4-6dbe-42f9-9cf8-03b20b48dad9/`保留GNU/git差异、nightly原文、SDK元数据/RTF和710输出。原文不格式化；只提交自己的数据/文档，保留他人README/AGENTS/未追踪工作。
+
+### 3.40 完整改后源码材料与实际运行库门槛（2026-10-15）
+
+- Sharp本机新candidate由758缓存输入/462358481字节组装，12完整组件文件内容树、16原补丁、Pango/UHDR两项直接源修改；19,401清单文件/721086874字节，SOURCE-INDEX与SHA256SUMS摘要见`docs/releases/sharp-source-candidate-0.1.1.json`。GLib2/librsvg7许可链接明确物化为原目标字节，原tar仍保留链接/权限元数据；原档/补丁不改，后续构建从原档独立解包，禁止修改candidate的original硬链接。
+- 前轮patch-copies只有触及文件，不是完整树。新材料包含独立原归档/改后源、wrapper/MXE/Cargo/nightly/dev/Windows输入及locked npm Sharp快照；固定sharp-libvips完整Git归档未本机镜像，公开固定源码入口已列。构建说明保留生成librsvg .pc安装修改；不是编译后的独立DLL、位同重建或§5/§6全部完成。NOTICE-DRAFT未随最终库分发，源码公开获取仍待落实，不创建发布链接或提前关闭Sharp。
+- Canvas SDK官方REDIST明确给公开SDK的ucrt/x64、um/x64静态库分发权；不再泛查“是否允许静态UCRT”。固定clang-cl/cc/find-msvc-tools和镜像只能支持VS2026/SDK26100家族，默认工具集/实际库目录及适用组件条款不能唯一对应；现有安装流程没有映射后的下游协议机制。不要强设精确对象SBOM、位同重建、完整编译器版权或Skia/.node同镜像为独立法律门槛，也不先替用户接受未确定责任条款。
+- 用户明确Sharp不追加询证；本日只读Canvas#1360无评论、BGE讨论仍6条/无固定五文件许可答复，保留模型等待。SignPath Foundation本次因公开信誉不足未批准，用户选择GitHub/NSIS未签名预览；不再Captcha或相同申请。应用/依赖/数据/IPC不改，未执行上游Make/编译/native/安装器/模型，不重跑旧已验收项目；697旧包和710前轮生成不追改。
+- 接手入口`docs/testing/distribution-material-decision-2026-10-14.md`（14日开工、15日续核）、源码分发计划及candidate公开摘要。本机`artifacts/distribution-decision-604e6a5e-3f99-432c-bafe-d67cc511b3d0/`保留已审脚本/输入、组装回执与新candidate；代码/Python预审限定通过，不冒称法律或整个项目认证。只提交自己的文档与摘要，保留他人README/AGENTS/未追踪工作。
+- 新产物独立核对19401清单文件/18639改后文件实际SHA/19224归档成员表示、758原输入身份及9links/2SED通过，实际问题0；独立比较器UHDR的CRLF/LF表示修正保留，未重跑旧GNU验收。回执SHA`a7393c765ac29804ff4b736a9d43694ff21db98526ee3152547d985ef66b61ff`，不代替许可条件。用户后续审核邮件说明Foundation本次因公开信誉不足未批准；审核结果与用户明确的GitHub/NSIS预览决定见`docs/releases/signpath-review-2026-10-15.md`，不能再列为待审核、自动重申请或购买服务。
+- 用户随后明确只让用户在GitHub下载软件、不要商店复杂流程。保持NSIS/GitHub Releases，首发明确未签名预览及SHA-256/可能未知发布者；不再将可信签名作为此次预览首发前提，也不称签名完成。不开发商店包/索取身份资料，继续完成实际许可/通知/源码和产物核对；此新决定覆盖旧“必须真签名后才能公开安装包”的首发限制，不豁免第三方权利。
+
+### 3.41 Runtime通知、BGE应用范围与源码附件（2026-10-15）
+
+- `5ed9a37`新增LLVM23.1.2四runtime原文和固定MinGW runtime汇总，共5份78978字节；source-records431→436、Sharp308→313refs，源/asset/Git/新输出逐项SHA相同。core是llvm-mingw、动态Windows UCRT，无GCC/libstdc++/winpthreads新待办；MSVC bridge/addon静态runtime推论与Canvas共用条件，不重做生产对象清单。
+- `e989e32`保留固定BGE五元组/缓存/功能，按实际源码/77ASAR/Hub下载路径核对当前不分发模型文件；1057B卡全文从当前资产/清单移出，原文留本机证据/旧Git/旧包。项目自写2523B provenance不是上游许可。436记录仅原位替换1条，其它435、6组supplement/Sharp313不变；3→2pending，只移出BGE应用二进制分发gate。五文件独立MIT/完整通知仍未确认，原询证继续；不可从此推定以后镜像/捆绑获授权，也不再把没回评论单独设不含模型应用的首发门槛。
+- 新纯通知输出147元数据+158许可+408补充+2索引=715/2pending；6新notice共81501B/旧卡不存在断言通过，未构建installer。旧77为697、前轮710/715的3pending生成保持当时范围，不补写其已包含新数据。未改App/依赖/模型或执行旧native/模型/安装测试。
+- 新源码companion ZIP在`artifacts/native-source-delivery-55aa2dc2-3272-4bbb-afea-eadb15cbd0a6/`，566036876B、19408成员、SHA`3fecbcbc66cc30a8760ca7851831f950ff62a38cfaebd47ef1713a9e3637f0f3`。首次CRC、原index/manifest及5许可回读和独立Windows SHA通过；只封装已审材料，旧462MB/source-candidate/原hardlinks不改，未公开或声称全部条件已履行。
+- 最新接手`docs/testing/preview-distribution-materials-2026-10-15.md`及`docs/releases/bge-download-distribution-policy.md`。剩Canvas/Sharp实际Windows runtime条件、最终显著通知/源码公开获取和NSIS/下载核对；可信签名不是本次GitHub预览前提。部分额外reviewer因team/usage限额未执行，root直接静态审阅与实际输出检查如实列范围，不借旧两类审查声称新全部批准；保留并行发布计划/历史评测及其它未提交工作。
+
+### 3.42 安装确认与源码通知收口（2026-10-15）
+
+- 干净e989e32实际NSIS为140677686B/SHA`440cb8ef4db8a4a9ac290d410321895311ed67c989f9f5388ec1f4f4082b207e`/NotSigned。实提715通知/2pending、MIT与包内来源通过，主EXE/ASAR/9native共11文件与77候选相同。首次7z列表控制台编码失败后显式UTF8继续，仅复用成功子归档；不是实际安装或旧模型重测。
+- Windows runtime按`docs/releases/windows-runtime-distribution-policy.md`保留完整模块供应方权限信赖/第三方委托范围；不要求接受整个工具合同、私有工具集版本或重新采购。实际新增安装前图形确认、安装后同文、Sharp三文件旁SOURCE-NOTICE。保护只限MS专有部分，MIT/Apache/LGPL/法定权利和源码修改调试不受额外限制；不移植Runtime产品禁分发条款作为本程序整体禁令。
+- `scripts/installer.nsh`的customInit只拒绝安装器/S或--updated，退出1602；本版要求手动图形确认，普通手动覆盖仍走许可页。卸载器及内部更新卸载不经过该guard。两份材料经afterPack普通文件/原字节检查，中文许可必须UTF8 BOM；缺失/篡改RED→GREEN，相关11项纯文件规格通过，generic reviewer/JS专项审阅和实际guest按自身范围分别记录，不将静态review冒称真实GUI通过。
+- LGPLv3§5/2.1§7的未组合形式可用现有独立完整源码，未查到必须另编DLL要求；已改组件指向完整改后树而非仅pristine源。最终库旁notice和同页源码附件需实际随包/公开；最终NSIS及Sandbox确认/拒绝/覆盖/卸载、下载仍待执行，接手`docs/testing/preview-distribution-materials-2026-10-15.md`。
+
+### 3.43 首版未签名预览实际交付（2026-10-15）
+
+- 最终源码f84285fdeab6ec0a24d874c30c5b94d9d4bc466b，干净独立worktree构建NSIS140690082B/SHA`9d95de53b1973a262639e085231d4c8c9b6dd497cf8b5efa73f2c03e54dde6d4`/NotSigned；实提715通知、两材料、MIT及包内来源通过，11运行文件与已验77相同。构建时2pending是后续安装同意/源码公开前快照，不改冻结包或伪造其字段，当前具体条件按最终发布回执判断。
+- 真实新Sandbox e6476ea2-b8c4-4e7d-916a-3585492d1588已通过/S与--updated退出1602、中文UIA/截图许可取消与同意、首装、取消覆盖、同意覆盖、3次正式EXE正常退出0/重开读回、实际注册卸载器/S及整个目录/两注册项移除；4791应用文件取消前后不变，覆盖/卸载61数据文件SHA差异0。只停止本次Sandbox，日志/截图/原agent脚本保留；未重跑旧模型/CPU/PDF/完整业务，不在宿主安装或读私人数据。
+- 已按授权推送f84285f。run38718969052首次17规则/356核心通过、35/36桌面，focus-outcomes45秒及清理超时；trace约36.94秒耗在同步夹具准备，不断言唯一I/O原因。保留首FAIL/trace；仅同SHA失败job新runner复验一次，attempt2/job116484224549实际17规则/32文件356核心/36桌面及Post全部成功，失败用例复验2.5秒。未改超时/断言/产品、不跳过测试，勿把首FAIL改成首次即绿。
+- Release413908521已公开，tag v0.1.1-preview.1实际指向f84285f；安装器、566036876B原生源码ZIP（SHA3fecbcbc66cc30a8760ca7851831f950ff62a38cfaebd47ef1713a9e3637f0f3）及221B SHA256SUMS同页提供，服务端摘要相同。安装器首次完整匿名下载已相同SHA，源码ZIP/清单匿名核对进行中；不提前声称最终三个下载回执已完成。链接与最终进度见docs/testing/github-preview-release-2026-10-15.md。
+- 本次仅限实际对象/用途的分发依据与材料：GUID排除/DirectML保留旧已核范围，Canvas/Sharp的原通知、专有runtime保护和源码/替换安排已落实；BGE不随包、模型卡全文移除，独立五文件MIT并未据此获确认。未来捆绑/镜像/依赖或用途变化重新核对；供应方权限信赖不是其私有合同全审计。可信签名仍未完成，按用户决定不阻塞首发，不再SignPath/Store/付费或重复询问既有推送/发布授权；main未合并、网站最后。
+
+### 3.44 首版交付校验完成（2026-10-16）
+
+- 15日公开的Release413908521 / tag v0.1.1-preview.1已完成三个附件完整匿名下载：安装器140690082B/SHA9d95…e6d4，独立完整原生源码566036876B/SHA3fec…f0f3，221B校验清单/SHA22a0…47c3；实际标签再次从Git远端读回f84285f。最终三个完整SHA见`docs/testing/github-preview-release-2026-10-15.md`与本机`public-download-receipt.json`，不是仅HEAD或服务端digest。
+- 源码前次传输中断在210779429B，未计PASS；保留前缀摘要，经HTTP206/精确范围仅续余355257447B，整个文件摘要相同。curl直连28、匿名API元数据rate-limit403和成功续传均保留，Git元数据替代查询不改变附件匿名性质；未重下通过的软件，不再启动旧完整测试或模型。
+- 当前首发必需项已完成：实际715通知/两材料/MIT、GUI确认/拒绝、首装/覆盖/重开/卸载和61数据文件零差异、同SHA CI attempt2的17规则/356核心/36桌面及Post、必要源码同页/实际tag/三个公开下载。首次CI FAIL、旧候选、构建时2pending与source-index创建时published:false不改写；当前具体条件与范围以最终回执为准。
+- GUID排除/DirectML旧已核范围维持；Canvas/Sharp依据与通知、MS专有保护和实际同意、Sharp独立完整源/显著notice/替换安排落实。BGE无权重随包/不复制原卡全文，独立五文件MIT未在本轮取得新明确依据，未来捆绑/镜像另核。供应方权利信赖不是其私有合同审计，不把范围关闭扩成无限授权。
+- 后续从本轮回执及Git接手，优先实际用户反馈；不再把SignPath/Captcha/Store/可信签名当首发待办。安装包仍NotSigned，main未合并，展示网站/新功能按用户后续范围另排。文档收尾只提交相关Markdown，不改变已发布f84285f或触发重复模型/安装验收，保留原有评测文档等无关工作。
 
 ## 4. 产品范围与功能要求
 
@@ -815,9 +859,11 @@ npx playwright test tests/rag.spec.ts
 
 当前状态只看README顶部表和当前执行计划，本节不维护第二份完成/待办清单。早期阶段0～6的范围和测试分工保留在README历史折叠清单与本章第3节。
 
+2026-10-15主要目标调整为完成首版公开下载，执行顺序与最终交付单集中于`docs/releases/v1-release-plan.md`：具体分发处理 → 冻结源码/NSIS构建 → 相关与最终包必要验证 → GitHub Release及下载核对。首版允许未签名发行，签名后续改善，软件功能不再扩张，网站最后建设。
+
 - 本轮六项改善有对应源码、相关检查与实际体验记录；有限模型人工通过不代表普遍正确。新功能每项报告改动、验证、未验部分、提交和下一步。
 - 未覆盖的复杂PDF侧栏、代表性资料与不同机器做定向补验；不默认重跑旧安装全链或在个人数据上迁移试错。
-- 当前v13旧25b包的新增流程/恢复/安装链已限定验收；新2111依赖裁剪候选的静态/包内CPU/PDF及源码CI另有证据，尚未签名或正式发布。最终包补齐许可/签名后按自身来源验证，不借旧包安装成绩。
+- 当前v13旧25b包的新增流程/恢复/安装链已限定验收；新2111依赖裁剪候选的静态/包内CPU/PDF及源码CI另有证据，尚未签名或正式发布。最终包补齐实际分发条件后按自身来源和影响范围验证，不借旧包安装成绩；不再等待可信签名或重复所有历史检查。
 - 分发许可、远端CI和发布授权按各自最新记录核对，不从其他对话推断权限。本会话已明确授权该分支推送/CI、公开源码及条件齐全后的发布，实际范围见3.33/3.34；main未合并、安装包未上传或建标签，不因已获授权跳过剩余条件。
 - OCR/更多格式/云同步/复杂积分及展示网站继续规划中；软件优先，网站最后。
 ## 14. Git、隐私与协作流程

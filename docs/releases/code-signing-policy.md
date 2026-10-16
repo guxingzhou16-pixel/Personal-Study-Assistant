@@ -1,10 +1,16 @@
 # Code signing policy / 代码签名政策
 
-2026-10-14最新状态：用户改为先重跑SignPath申请，再逐步处理Canvas/Sharp/BGE。本轮重新填写官方表单、核对离开输入框后字段仍保留，正常提交一次仍遭Captcha拒绝；用户随后手动提交，并提供确认邮件正文，明确说明基金会已收到申请、将在接下来几个工作日审核。**申请已收到，资格审核待处理；尚无获批账号/策略ID、证书或可信签名。** 回执依据是用户提供的邮件正文；手动提交后浏览器重连，未直接读回成功页面。旧失败保留，不重复提交已收到的申请。BGE仍按用户选择保留并等待答复，三项完整分发条件继续待补。
+2026-10-15最新状态：用户提供后续审核邮件正文，**SignPath Foundation本次未批准申请**，理由是项目当前公开使用/独立引用和社区信誉信号不足，并非软件质量判断。用户随后明确只通过GitHub下载软件，保持NSIS、不走商店。首发按未签名预览版/SHA-256透明说明，可信签名不再是此次首发前提。14日收件回执保留为历史；无证书、获批签名策略或可信签名，不重复Captcha或相同申请。付费未授权，三项实际分发条件继续处理，详见[审核结果与用户决定](signpath-review-2026-10-15.md)。
 
-核对日期：2026-10-14。**源码已按授权公开；SignPath已确认收到申请、尚待审核，可信签名未完成。** 当前没有可发布的已签名安装器；此文件是政策与交接材料，不是证书或服务授权证明。
+核对日期：2026-10-15。**源码已按授权公开；SignPath Foundation未批准本次申请，可信签名未完成。** 当前没有可发布的已签名安装器；此文件是政策与交接材料，不是证书或服务授权证明。
 
-## 签名范围与负责人
+## 当前发行决定（2026-10-15）
+
+用户已要求以完成并发布首版为主要目标、简化流程；当前采用**Windows x64 NSIS，允许明确标为未签名的公开发行**。不再以取得可信签名、SignPath获批或切换Store为首版门槛，按[首版发布执行计划](v1-release-plan.md)处理具体分发条件和最终包必要验证后交付。SignPath本次未批准，不继续等待同一次审核或重复相同申请。
+
+未签名不保证所有Windows设备均可运行；发布说明如实提示SmartScreen/设备策略可能阻止，不要求关闭安全保护或导入自签根证书。未来选择可信签名发行时，才执行下方证书、三文件签名、时间戳与回执要求；已有签名入口保留，不改造成绕过检查后宣称签名成功。[微软说明](https://learn.microsoft.com/en-us/windows/apps/package-and-deploy/smartscreen-reputation)
+
+## 签名范围与负责人（签名发行时适用）
 
 - 项目：拾知 / Study Companion；Windows x64，Electron + React + TypeScript，自有代码 MIT。
 - 代码库：[guxingzhou16-pixel/Personal-Study-Assistant](https://github.com/guxingzhou16-pixel/Personal-Study-Assistant)，已公开；当前完整源码在[`codex/structured-notes`](https://github.com/guxingzhou16-pixel/Personal-Study-Assistant/tree/codex/structured-notes)，默认main未合并。
@@ -33,7 +39,7 @@ npm run desktop:dist:signed
 
 | 路线                    | 官方确认的零预算部分                              | 下一步及限制                                                                                                                                                                                            |
 | ----------------------- | ------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| SignPath Foundation     | 合资格开源项目可申请免费签名，基金会保管证书/私钥 | 用户已选保留NSIS，源码已公开。尚无正式发布/外部信誉，许可有三项缺口；如实申请资格预审，用户提供确认邮件说明已收到申请、待审核。MFA/人工审批和DirectML的System Libraries例外仍须确认，Windows分发许可不是SignPath资格 |
+| SignPath Foundation     | 合资格开源项目可申请免费签名，基金会保管证书/私钥 | 本次信誉审核未批准，当前不可用；积累真实公开认可后可重新申请。付费订阅未授权，不能继续等同一次审核或重复申请 |
 | Microsoft Store 的 MSIX | 个人新注册免费，商店在审核后免费签名MSIX/AppX     | 可保留私有源码；本人完成账户/身份验证，取得应用身份后制作MSIX并另验数据位置、升级/卸载、CPU/PDF。旧NSIS验收不覆盖MSIX，把现有EXE上传商店仍需自备签名                                                    |
 
 依据：[SignPath 条件](https://signpath.org/terms.html)、[申请入口](https://signpath.org/apply.html)、[微软免费个人注册公告](https://blogs.windows.com/windowsdeveloper/2025/09/10/free-developer-registration-for-individual-developers-on-microsoft-store/)、[微软签名路线](https://learn.microsoft.com/en-us/windows/apps/package-and-deploy/code-signing-options)、[商店账户步骤](https://learn.microsoft.com/en-us/windows/apps/publish/partner-center/open-a-developer-account)。实际申请前再核对资格与费用。
@@ -45,6 +51,8 @@ npm run desktop:dist:signed
 已使用用户提供的显示姓名/邮箱填写[官方表单](https://signpath.org/apply.html)，说明新项目/暂无外部用户信誉/无正式发布/仍在补分发条件，并请求资格预审与DirectML例外确认；必要行为/数据条款勾选，营销未选。一次自动提交返回“Failed to validate Captcha”，用户随后也报告同错误，**没有成功回执、账号批准或签名授权**。页面重连后原标签已丢失，个人填写材料保留在本机忽略目录的`signpath-application-paste.txt`。后续打开系统默认浏览器被工具策略阻止，未通过其他命令绕过；维护者可直接在日常浏览器打开上述官方链接，按材料重新填写。姓名/邮箱不公开，不经API绕过验证码，MFA及身份仍由本人完成。
 
 上段为首次申请的历史记录。2026-10-14本轮重试按用户最新顺序执行：正常页面Submit仍返回Captcha错误，随后用户手动提交成功并提供邮件回执。邮件确认申请已经收到、会审核及后续邮件联系；没有提供审核批准、组织/项目/签名策略ID或证书。无需再次申请；等待服务方回复，有补充问题时由维护者提供真实材料。姓名、邮箱和邮件跟踪链接不进入仓库。
+
+2026-10-15用户提供审核结论：本次未批准，原因是公开信誉信号不足。上段“等待回复”已结束；后续条件变化后的新申请或转商店路线另作决定，不提交原表单重试。证据为用户提供正文，不冒称直接邮箱读回或审核通过。
 
 - Project name：Study Companion / 拾知。
 - Description：A local-first Windows study assistant connecting PDF/Markdown reading, source-grounded retrieval, notes, study plans and focus sessions. It supports local models and user-configured remote endpoints. Agent writes require explicit preview and confirmation.
@@ -67,4 +75,8 @@ npm run desktop:dist:signed
 
 ## 授权边界
 
+2026-10-15最新政策允许未签名NSIS首版发行，替代历史“可信签名完成后才首次发布”的前置约定；不得标成已签名或公众信任版本。已有公开/指定分支推送/条件齐全后发布授权继续按实际范围适用，不重复询问；本次只更新文档，不执行上传、标签、main合并、付费或身份提交。
+
 用户于2026-10-13要求完成签名/分发/发布，随后明确选择“保留NSIS，公开开源并申请SignPath”，并提供申请账户显示姓名。授权公开已执行并读回`private=false`，授权分支已推送且精确源码CI通过；首次申请失败见[历史验证](../testing/signed-distribution-2026-10-13.md)，2026-10-14用户提供确认邮件说明重试申请已收到、待审核。用户另明确允许一条BGE许可询证评论及两条Canvas/Sharp issue，均已发送并读回，范围见[后续核对](../testing/native-distribution-followup-2026-10-14.md)；不扩展为追加消息或其它联系人授权。不再重复询问上述授权。未授权付费、提交身份证明、合并main或建设展示网站；未齐条件的安装器不能发布为可信正式版。
+
+2026-10-15用户在审核未批准后明确要求只让用户在GitHub下载软件，保持NSIS。首发采用明确标示未签名的预览发布；原可信签名正式版门槛不再阻塞这次预览，但不冒称真签名完成。商店账号、身份验证和打包不开展。既有源码公开/分支推送授权有效，分发所需许可/通知/源码及实际产物核对仍须完成。

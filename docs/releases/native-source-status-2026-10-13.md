@@ -1,8 +1,12 @@
 # 原生组件源码材料：实际取得范围与剩余缺口
 
+**2026-10-16 最终交付：**[未签名预览版已公开](https://github.com/guxingzhou16-pixel/Personal-Study-Assistant/releases/tag/v0.1.1-preview.1)，固定f84285f的最终安装器已通过真实Sandbox许可页/安装/覆盖/重开/卸载及数据保护，同SHA CI复验通过；三个公开附件的匿名完整下载大小/SHA均已核对一致；首版本轮交付验收完成。当前依据见[最终包与发布记录](../testing/github-preview-release-2026-10-15.md)。下文保留旧候选的日期与证据，旧pending/签名门槛不覆盖最新结果。
+
 日期：2026-10-13。对应应用候选源码 `2111b3cc38c931b99618f6337874a8718b3b028a`。本页帮助接手者复用已取得的文件；**材料归档不是三项许可待办已关闭，也不是原生库重建成功。** 不重复下载通过校验的同一对象。
 
 ## 已取得、校验并保留的初始库存
+
+2026-10-15[最新材料](../testing/distribution-material-decision-2026-10-14.md)：758缓存输入已组装12完整改后组件，16补丁及Pango/UHDR两项直接源修改，19,401清单文件/721,086,874字节；原档不改，无新下载。相对来源索引/构建/修改/通知草稿已就绪，[候选数据](sharp-source-candidate-0.1.1.json)记录摘要。此前partial patch-copies及旧ZIP不能代替本材料；新材料尚未公开为最终相应源码，不关闭剩余runtime、通知和公开获取条件。Canvas已找到SDK静态UCRT授权清单，具体生产组件条款及下游履行仍待对应。SignPath Foundation本次未批准（公开信誉不足），用户选择GitHub/NSIS未签名预览，BGE仍保留等待原询证。
 
 最新[源码材料核对](../testing/runtime-source-materials-2026-10-14.md)：固定16补丁可应用，Rust nightly已含vendor且31 library lock/checksum声明对应；新增8原文47148字节/复用24，临时710输出，旧安装器697不改。Sharp432因自动提问关闭，用户选择不追加；相应源码/未组合材料及实际公开提供仍按[分发安排](sharp-source-distribution-plan.md)补齐，不重复下载已验证对象或旧测试。
 
