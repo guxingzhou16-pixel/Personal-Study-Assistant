@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="zh-CN" data-theme="light">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Pico CSS 本地组件参考 · 拾知</title>
+    <link rel="stylesheet" href="assets/pico/pico.min.css" />
+    <link rel="stylesheet" href="assets/showcase.css" />
+    <script src="assets/showcase.js" defer></script>
+  </head>
+  <body class="component-page pico-page">
+    <main class="component-shell">
+      <header class="reference-heading">
+        <a class="back-link" href="index.html">← 返回开源参考台</a>
+        <p class="eyebrow">PICO CSS / ORIGINAL CSS COMPONENTS</p>
+        <div class="heading-row">
+          <div>
+            <h1>给文字，一点呼吸。</h1>
+            <p class="lede">
+              语义化 HTML 的默认排版与控件。赤陶设计参考它的节奏，另行使用暖色与编辑式标题。
+            </p>
+          </div>
+          <button class="secondary" type="button" data-theme-toggle>切换为暗色</button>
+        </div>
+      </header>
+      <div class="component-layout">
+        <section aria-labelledby="pico-components">
+          <h2 id="pico-components">界面组件</h2>
+          <article>
+            <header>示例资料 / SEMANTIC HTML</header>
+            <h3>让阅读留在视线中央</h3>
+            <p>资料的标题、原文和来源需要容易辨认，工具只在需要时出现。</p>
+            <label for="pico-search"
+              >筛选右侧阅读片段<input
+                id="pico-search"
+                type="search"
+                placeholder="试试输入：证据"
+                data-snippet-search
+            /></label>
+            <div class="button-row">
+              <button type="button" data-bookmark aria-pressed="false">收藏这个片段</button
+              ><button class="secondary outline" type="button" data-clear-search>清空筛选</button>
+            </div>
+            <small class="action-status" data-action-status role="status"
+              >收藏只保留在当前页面。</small
+            >
+          </article>
+          <details>
+            <summary>为什么参考 Pico CSS？</summary>
+            <p>
+              标题、段落、表单与语义化卡片无需大量类名就能形成稳定秩序。此页使用上游默认配色，没有套用赤陶设计。
+            </p>
+          </details>
+        </section>
+        <section class="reading-demo" aria-labelledby="pico-reading">
+          <div class="reading-heading">
+            <h2 id="pico-reading">阅读片段</h2>
+            <span class="sample-label">示例内容</span>
+          </div>
+          <section class="snippet" data-snippet>
+            <p class="source-line">01 / 阅读与注意力</p>
+            <h3>好的界面知道何时退后。</h3>
+            <p>阅读时，留白不是空缺。它帮助眼睛辨认段落，也给理解留下停顿。</p>
+            <blockquote>先让内容可读，再让工具可见。</blockquote>
+          </section>
+          <section class="snippet" data-snippet>
+            <p class="source-line">02 / 检索与证据</p>
+            <h3>回答需要可以回到的来源。</h3>
+            <p>找到证据之后，再组织回答。保留原文和位置，才能继续求证。</p>
+          </section>
+          <p data-search-empty hidden>没有匹配的示例片段。</p>
+        </section>
+      </div>
+      <footer class="reference-footer">
+        <p>
+          <a href="https://github.com/picocss/pico">Pico CSS 源码 ↗</a> ·
+          <a href="assets/pico/LICENSE.md">MIT 许可证</a>
+        </p>
+        <p>静态 CSS 参考；不代表原项目完整应用已部署。</p>
+      </footer>
+    </main>
+  </body>
+</html>

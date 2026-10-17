@@ -1,0 +1,125 @@
+{
+  "$schema": "../handoff.schema.json",
+  "schemaVersion": 1,
+  "id": "shizhi.terra-island.v1",
+  "name": "赤陶 / Terra Studio",
+  "createdOn": "2026-10-17",
+  "status": "concept",
+  "runtime": "static-html",
+  "sampleDataOnly": true,
+  "entry": "index.html",
+  "preview": "../previews/02-terra-home.png",
+  "readerPreview": "../previews/02-terra-reader.png",
+  "handoff": "HANDOFF.md",
+  "sourceFiles": [
+    "index.html",
+    "../shared/variants.css",
+    "../shared/variants.js",
+    "../../2026-10-17-three-directions/shared/demo.css",
+    "../../2026-10-17-three-directions/shared/demo.js"
+  ],
+  "intent": {
+    "audience": "偏爱纸面阅读、编辑式排版和温暖学习空间的个人学习者",
+    "tone": "暖纸、朴素、沉静、有编辑工作室的秩序",
+    "memorableDetail": "在晴岛顶部导航和双列里，用宋体标题、米白纸面、陶土橙和暖棕构成编辑工作室"
+  },
+  "references": [
+    {
+      "title": "Pico CSS",
+      "url": "https://github.com/picocss/pico",
+      "appliedTo": "内容优先、清楚字阶、节制的表单和留白；暖纸、陶土配色与版面为本轮的视觉改写"
+    }
+  ],
+  "tokens": {
+    "colors": {
+      "--bg": "#faf6ef",
+      "--surface": "#fffaf3",
+      "--sidebar": "#faf6ef",
+      "--ink": "#493b31",
+      "--muted": "#88796b",
+      "--line": "#dfd2c3",
+      "--accent": "#ad5136",
+      "--accent-ink": "#fffaf3",
+      "--tint": "#f0e2d2",
+      "hero": "#eee2d2",
+      "focusCard": "#e9ddcd"
+    },
+    "typography": {
+      "body": "Segoe UI / Microsoft YaHei UI / Microsoft YaHei / sans-serif",
+      "heading": "Noto Serif SC / Songti SC / SimSun / serif",
+      "readingBodyPx": 14,
+      "note": "首页宋体类标题 36px；界面控件与阅读正文保留系统无衬线。字体只从系统取，不远程下载。"
+    },
+    "spacingPx": [8, 12, 18, 24, 28, 31, 38],
+    "radiusPx": [6, 14, 18]
+  },
+  "layout": {
+    "navigation": "87px 顶部导航；左品牌、中间胶囊页签、右搜索/个人入口，与第一轮晴岛一致",
+    "home": "居中最大约 1130px；欢迎横幅；下方左侧继续阅读/资料，右侧 300px 签到/手动计时，布局锁定晴岛",
+    "library": "保留晴岛资料卡与搜索/格式筛选的布局，只改视觉；宽屏三列、中屏两列、窄屏一列",
+    "reader": "沿用晴岛顶部导航、目录、阅读纸面与 305px 助手；原文位置和交互骨架不变",
+    "breakpoints": [
+      ">=1240px 阅读可并排助手",
+      "<1240px 助手浮层，内容缩进减小",
+      "900x640 顶部导航保持完整、主区滚动",
+      "<760px 首页纵向，签到/计时可双列",
+      "<=430px 签到/计时与资料均单列"
+    ]
+  },
+  "interactions": {
+    "workingDemo": [
+      "顶部导航与本轮三套风格、原晴岛对照互链",
+      "资料搜索/格式筛选",
+      "第一份资料阅读、目录与护眼",
+      "示例助手与引用定位",
+      "示例签到、手动计时，刷新重置",
+      "预设问题填入输入区",
+      "/ 搜索快捷键"
+    ],
+    "placeholder": [
+      "添加资料弹窗",
+      "个人设置弹窗",
+      "另外两份资料的阅读入口",
+      "问答提交只解释演示范围"
+    ],
+    "futureConcept": ["纸感与编辑式视觉候选，不新增正式笔记或出版功能"]
+  },
+  "productIntegration": [
+    {
+      "file": "src/App.tsx",
+      "role": "仓库根相对路径；采用晴岛顶部导航与首页双列时保留页面状态、启动加载和原有导航逻辑"
+    },
+    {
+      "file": "src/components/RecentReadings.tsx",
+      "role": "复用继续阅读卡片结构；页码、标题与阅读进度从真实数据读取"
+    },
+    {
+      "file": "src/components/StudyCalendar.tsx",
+      "role": "仅调整日历、签到和手动计时外观；保留现有行为和中断边界"
+    },
+    {
+      "file": "src/components/LibraryPage.tsx",
+      "role": "资料卡、筛选与搜索的视觉映射；保留真实导入、错误和取消状态"
+    },
+    {
+      "file": "src/components/ReadingPage.tsx",
+      "role": "阅读与助手的视觉映射；保留 PDF 原页、锚点、引用和位置保存逻辑"
+    },
+    {
+      "file": "src/styles.css",
+      "role": "提取所选风格的 token、字体和组件外观；不复制 demo HTML 或示例数据"
+    },
+    {
+      "file": "src/lib/desktop.ts",
+      "role": "保留唯一桌面桥接与真实数据调用，不新增设计 demo 后端"
+    }
+  ],
+  "validationReport": "../VALIDATION.md",
+  "limitations": [
+    "陶土橙用于重点操作，不把所有正文或卡片都染成橙色",
+    "字体依赖系统，宋体类缺失时外观会变化；正式字体选型需单独确认",
+    "全部交互作用于示例页面，刷新重置，没有个人记录",
+    "未验证正式 Electron、真实资料或模型",
+    "参考下载、版本和本地展示的实际状态见本轮 REFERENCES.md；浏览器检查见 VALIDATION.md"
+  ]
+}

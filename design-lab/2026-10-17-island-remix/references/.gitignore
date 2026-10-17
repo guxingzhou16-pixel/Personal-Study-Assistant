@@ -1,0 +1,3 @@
+# Full upstream checkouts are local reference material, not application source.
+upstream/
+*.zip

@@ -1,0 +1,537 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>拾知 · 一种排版，三种新气质</title>
+    <link rel="icon" href="data:," />
+    <style>
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        background: #f4f3ef;
+        color: #252621;
+        font:
+          14px/1.65 'Segoe UI',
+          'Microsoft YaHei UI',
+          sans-serif;
+        -webkit-font-smoothing: antialiased;
+      }
+      a {
+        color: inherit;
+        text-decoration: none;
+      }
+      a:focus-visible {
+        outline: 3px solid #284dc9;
+        outline-offset: 5px;
+      }
+      header,
+      main,
+      footer {
+        width: min(1320px, 90%);
+        margin-inline: auto;
+      }
+      header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        min-height: 81px;
+        gap: 20px;
+        border-bottom: 1px solid #d9dad2;
+      }
+      .brand {
+        display: flex;
+        gap: 18px;
+        align-items: center;
+      }
+      .brand strong {
+        font-size: 24px;
+        letter-spacing: 4px;
+      }
+      .brand span {
+        font-size: 10px;
+        padding-left: 18px;
+        border-left: 1px solid #c7c9c0;
+        color: #777a70;
+        letter-spacing: 2px;
+      }
+      .edition {
+        font-size: 10px;
+        color: #71766b;
+        letter-spacing: 1.2px;
+      }
+      .intro {
+        display: flex;
+        justify-content: space-between;
+        align-items: end;
+        gap: 36px;
+        padding: 35px 0 30px;
+      }
+      .eyebrow {
+        margin: 0 0 9px;
+        font-size: 9px;
+        letter-spacing: 2.5px;
+        color: #777d70;
+      }
+      h1 {
+        margin: 0;
+        font-size: clamp(29px, 3.2vw, 43px);
+        line-height: 1.35;
+        font-weight: 550;
+        letter-spacing: 1px;
+      }
+      .intro-copy {
+        margin: 0 0 3px;
+        max-width: 360px;
+        font-size: 12px;
+        line-height: 1.9;
+        color: #72766c;
+      }
+      .intro-copy strong {
+        color: #363b30;
+        font-weight: 550;
+      }
+      .directions {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 23px;
+      }
+      .direction {
+        min-width: 0;
+      }
+      .preview-link {
+        display: block;
+        padding: 14px;
+        background: var(--frame);
+        border: 1px solid var(--frame-line);
+        border-radius: 10px;
+        overflow: hidden;
+        transition: transform 0.18s ease;
+      }
+      .preview-link:hover {
+        transform: translateY(-4px);
+      }
+      .preview-link img {
+        display: block;
+        width: 100%;
+        height: auto;
+        aspect-ratio: 1.44;
+        object-fit: cover;
+        border: 1px solid var(--image-line);
+        border-radius: 3px;
+        box-shadow: 0 4px 12px #16181515;
+      }
+      .mono {
+        --frame: #242424;
+        --frame-line: #343434;
+        --image-line: #484848;
+        --button: #252525;
+        --button-ink: #ffffff;
+      }
+      .terra {
+        --frame: #e8dbd0;
+        --frame-line: #dfc9b9;
+        --image-line: #d3bca9;
+        --button: #a84a32;
+        --button-ink: #fff9f2;
+      }
+      .blue {
+        --frame: #dce3f7;
+        --frame-line: #b6c5ec;
+        --image-line: #7896e2;
+        --button: #244bd0;
+        --button-ink: #ffffff;
+      }
+      .direction-heading {
+        display: flex;
+        gap: 13px;
+        align-items: center;
+        padding-top: 17px;
+      }
+      .number {
+        font:
+          italic 29px Georgia,
+          serif;
+        color: #8a8c81;
+      }
+      h2 {
+        font-size: 23px;
+        font-weight: 600;
+        letter-spacing: 2px;
+        margin: 0;
+        line-height: 1.3;
+      }
+      .english {
+        display: block;
+        margin-top: 3px;
+        font-size: 8px;
+        letter-spacing: 2px;
+        color: #7b7f73;
+      }
+      .swatches {
+        margin-left: auto;
+        display: flex;
+        gap: 5px;
+      }
+      .swatches i {
+        width: 13px;
+        height: 13px;
+        border-radius: 50%;
+        background: var(--color);
+        border: 1px solid #25262122;
+      }
+      .description {
+        margin: 14px 0 12px;
+        min-height: 44px;
+        color: #6f7469;
+        font-size: 11px;
+        line-height: 1.85;
+      }
+      .tags {
+        display: flex;
+        gap: 6px;
+        flex-wrap: wrap;
+      }
+      .tags span {
+        border: 1px solid #d7d9ce;
+        color: #707868;
+        font-size: 9px;
+        padding: 2px 7px;
+        border-radius: 3px;
+      }
+      .open {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-top: 18px;
+        padding: 11px 14px;
+        background: var(--button);
+        color: var(--button-ink);
+        border-radius: 5px;
+        font-size: 11px;
+      }
+      .open span {
+        font-size: 16px;
+        line-height: 1;
+      }
+      .details {
+        display: flex;
+        justify-content: space-between;
+        gap: 8px;
+        margin-top: 11px;
+        font-size: 9px;
+        color: #7a8072;
+      }
+      .details a {
+        text-decoration: underline;
+        text-underline-offset: 3px;
+      }
+      .original {
+        margin-top: 30px;
+        display: grid;
+        grid-template-columns: 178px minmax(0, 1fr) auto;
+        gap: 25px;
+        align-items: center;
+        padding: 20px 23px;
+        background: #e9ede1;
+        border: 1px solid #d9dfcf;
+        border-radius: 9px;
+      }
+      .original img {
+        display: block;
+        width: 100%;
+        height: 108px;
+        object-fit: cover;
+        object-position: top;
+        border: 1px solid #cad1bc;
+        border-radius: 3px;
+      }
+      .original .eyebrow {
+        font-size: 8px;
+        margin-bottom: 5px;
+      }
+      .original h3 {
+        margin: 0 0 6px;
+        font-size: 17px;
+        font-weight: 550;
+        letter-spacing: 1px;
+      }
+      .original p {
+        margin: 0;
+        max-width: 650px;
+        font-size: 11px;
+        line-height: 1.85;
+        color: #6c7760;
+      }
+      .original-link {
+        border: 1px solid #9da98c;
+        padding: 9px 14px;
+        border-radius: 5px;
+        white-space: nowrap;
+        color: #526344;
+        font-size: 10px;
+      }
+      .utility {
+        display: flex;
+        justify-content: space-between;
+        gap: 25px;
+        margin: 24px 0 0;
+        font-size: 10px;
+        color: #7c8276;
+      }
+      .utility p {
+        margin: 0;
+        max-width: 700px;
+      }
+      .utility nav {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px 20px;
+        align-items: start;
+      }
+      .utility a {
+        text-decoration: underline;
+        text-underline-offset: 4px;
+        white-space: nowrap;
+      }
+      footer {
+        padding: 21px 0;
+        margin-top: 22px;
+        border-top: 1px solid #d9dad2;
+        display: flex;
+        justify-content: space-between;
+        gap: 15px;
+        font-size: 9px;
+        color: #898d82;
+        letter-spacing: 0.5px;
+      }
+      @media (max-width: 1000px) {
+        .directions {
+          gap: 16px;
+        }
+        .preview-link {
+          padding: 9px;
+        }
+        .swatches {
+          display: none;
+        }
+        .original {
+          grid-template-columns: 140px minmax(0, 1fr);
+          gap: 18px;
+        }
+        .original-link {
+          grid-column: 2;
+          justify-self: start;
+        }
+        .original img {
+          grid-row: span 2;
+        }
+      }
+      @media (max-width: 680px) {
+        header {
+          min-height: 70px;
+          flex-wrap: wrap;
+          padding-block: 15px;
+          gap: 8px;
+        }
+        .brand strong {
+          font-size: 21px;
+        }
+        .edition {
+          font-size: 8px;
+        }
+        .intro {
+          display: block;
+          padding-block: 29px;
+        }
+        .intro-copy {
+          margin-top: 20px;
+          max-width: 100%;
+        }
+        .directions {
+          grid-template-columns: 1fr;
+          gap: 30px;
+        }
+        .preview-link {
+          padding: 17px;
+        }
+        .swatches {
+          display: flex;
+        }
+        .description {
+          min-height: 0;
+        }
+        .original {
+          grid-template-columns: 1fr;
+          padding: 17px;
+          gap: 15px;
+        }
+        .original img {
+          width: min(100%, 260px);
+          height: 155px;
+          grid-row: auto;
+        }
+        .original-link {
+          grid-column: auto;
+        }
+        .utility,
+        footer {
+          flex-direction: column;
+          gap: 14px;
+        }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        * {
+          transition: none !important;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <a class="brand" href="index.html"><strong>拾知</strong><span>设计试验场</span></a>
+      <span class="edition">ISLAND REMIX / VOL. 02 / 2026.10.17</span>
+    </header>
+    <main>
+      <section class="intro">
+        <div>
+          <p class="eyebrow">SAME LAYOUT. THREE NEW EXPRESSIONS.</p>
+          <h1>一种排版，三种新气质。</h1>
+        </div>
+        <p class="intro-copy">
+          保留你喜欢的<strong>晴岛排版</strong>：顶部导航、欢迎横幅、阅读与日常双列。再试三种不同的颜色、字体与材质。
+        </p>
+      </section>
+      <section class="directions" aria-label="三套新增风格">
+        <article class="direction mono">
+          <a class="preview-link" href="01-mono/index.html" aria-label="打开玄墨交互 demo"
+            ><img
+              src="previews/01-mono-home.png"
+              alt="玄墨：黑白灰暗色界面，顶部导航、欢迎区与阅读日历双列"
+              width="1440"
+              height="1000"
+          /></a>
+          <div class="direction-heading">
+            <span class="number">01</span>
+            <div>
+              <h2>玄墨</h2>
+              <span class="english">MONO NOIR</span>
+            </div>
+            <div class="swatches" aria-label="黑、灰、白">
+              <i style="--color: #141414"></i><i style="--color: #777777"></i
+              ><i style="--color: #eeeeee"></i>
+            </div>
+          </div>
+          <p class="description">
+            把色彩收起来，让内容发声。深浅灰阶、克制线条与冷静留白，构成低照度下的学习空间。
+          </p>
+          <div class="tags">
+            <span>黑白灰暗色</span><span>灰阶层次</span><span>克制工具感</span>
+          </div>
+          <a class="open" href="01-mono/index.html">进入玄墨<span aria-hidden="true">↗</span></a>
+          <div class="details">
+            <a href="01-mono/HANDOFF.md">设计交接</a><a href="01-mono/design.json">JSON 档案</a
+            ><a href="previews/01-mono-reader.png">阅读预览</a>
+          </div>
+        </article>
+        <article class="direction terra">
+          <a class="preview-link" href="02-terra/index.html" aria-label="打开赤陶交互 demo"
+            ><img
+              src="previews/02-terra-home.png"
+              alt="赤陶：米白纸感、陶土橙与编辑工作室式标题，保留晴岛排版"
+              width="1440"
+              height="1000"
+          /></a>
+          <div class="direction-heading">
+            <span class="number">02</span>
+            <div>
+              <h2>赤陶</h2>
+              <span class="english">TERRA STUDIO</span>
+            </div>
+            <div class="swatches" aria-label="米白、陶土橙、暖棕">
+              <i style="--color: #faf6ef"></i><i style="--color: #ad5136"></i
+              ><i style="--color: #c6a78c"></i>
+            </div>
+          </div>
+          <p class="description">
+            像一间有日光的编辑工作室。暖纸、陶土与有分量的标题，让资料与摘记带一点出版物的质感。
+          </p>
+          <div class="tags">
+            <span>暖纸与陶土</span><span>编辑式标题</span><span>安静手作感</span>
+          </div>
+          <a class="open" href="02-terra/index.html">进入赤陶<span aria-hidden="true">↗</span></a>
+          <div class="details">
+            <a href="02-terra/HANDOFF.md">设计交接</a><a href="02-terra/design.json">JSON 档案</a
+            ><a href="previews/02-terra-reader.png">阅读预览</a>
+          </div>
+        </article>
+        <article class="direction blue">
+          <a class="preview-link" href="03-blue/index.html" aria-label="打开蓝调交互 demo"
+            ><img
+              src="previews/03-blue-home.png"
+              alt="蓝调：钴蓝、奶油黄、硬描边与几何图形，保留晴岛排版"
+              width="1440"
+              height="1000"
+          /></a>
+          <div class="direction-heading">
+            <span class="number">03</span>
+            <div>
+              <h2>蓝调</h2>
+              <span class="english">BLUE ATELIER</span>
+            </div>
+            <div class="swatches" aria-label="钴蓝、奶油黄、乳白">
+              <i style="--color: #2d53d7"></i><i style="--color: #f8e7a3"></i
+              ><i style="--color: #fffdf7"></i>
+            </div>
+          </div>
+          <p class="description">
+            像一张清楚又有劲的设计练习。钴蓝撞上奶油黄，配合硬描边和几何形状，让每个区域更鲜明。
+          </p>
+          <div class="tags">
+            <span>钴蓝与奶油黄</span><span>硬描边</span><span>图形工作室</span>
+          </div>
+          <a class="open" href="03-blue/index.html">进入蓝调<span aria-hidden="true">↗</span></a>
+          <div class="details">
+            <a href="03-blue/HANDOFF.md">设计交接</a><a href="03-blue/design.json">JSON 档案</a
+            ><a href="previews/03-blue-reader.png">阅读预览</a>
+          </div>
+        </article>
+      </section>
+      <section class="original" aria-label="晴岛原版排版对照">
+        <a href="../2026-10-17-three-directions/03-island/index.html" aria-label="打开晴岛原版"
+          ><img
+            src="../2026-10-17-three-directions/previews/03-island-home.png"
+            alt="第一轮晴岛原版：柔和绿、杏色和灰紫"
+            width="1440"
+            height="1000"
+        /></a>
+        <div>
+          <p class="eyebrow">LAYOUT REFERENCE / ORIGINAL</p>
+          <h3>晴岛原版 · 只作排版对照</h3>
+          <p>
+            你认可的第三版保持原样。上面三套都是额外新增的风格；沿用同一信息结构与示例内容，方便比较视觉气质。
+          </p>
+        </div>
+        <a class="original-link" href="../2026-10-17-three-directions/03-island/index.html"
+          >打开晴岛原版 ↗</a
+        >
+      </section>
+      <div class="utility">
+        <p>
+          概念演示 /
+          示例数据。每套都能切换首页、资料库与阅读区，体验筛选、签到、计时和引用定位；未接入正式软件。
+        </p>
+        <nav aria-label="参考与交接">
+          <a href="references/index.html">本地 GitHub 参考 ↗</a
+          ><a href="README.md">使用与 AI 交接 ↗</a><a href="REFERENCES.md">来源档案 ↗</a>
+        </nav>
+      </div>
+    </main>
+    <footer>
+      <span>拾知 / STUDY COMPANION — LOCAL UI DESIGN LAB</span
+      ><span>1 套原版对照 + 3 套新增风格 · 静态 HTML</span>
+    </footer>
+  </body>
+</html>
