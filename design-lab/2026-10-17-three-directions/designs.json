@@ -1,0 +1,38 @@
+{
+  "schemaVersion": 1,
+  "project": "Study Companion / 拾知",
+  "round": "2026-10-17-three-directions",
+  "status": "concept",
+  "gallery": "index.html",
+  "handoffSchema": "handoff.schema.json",
+  "selectedDesignId": null,
+  "designs": [
+    {
+      "id": "shizhi.paper-room.v1",
+      "name": "纸间 / Paper Room",
+      "entry": "01-paper/index.html",
+      "spec": "01-paper/design.json",
+      "handoff": "01-paper/HANDOFF.md",
+      "preview": "previews/01-paper-home.png",
+      "readerPreview": "previews/01-paper-reader.png"
+    },
+    {
+      "id": "shizhi.deep-work.v1",
+      "name": "深潜 / Deep Work",
+      "entry": "02-deep/index.html",
+      "spec": "02-deep/design.json",
+      "handoff": "02-deep/HANDOFF.md",
+      "preview": "previews/02-deep-home.png",
+      "readerPreview": "previews/02-deep-reader.png"
+    },
+    {
+      "id": "shizhi.sunny-isle.v1",
+      "name": "晴岛 / Sunny Isle",
+      "entry": "03-island/index.html",
+      "spec": "03-island/design.json",
+      "handoff": "03-island/HANDOFF.md",
+      "preview": "previews/03-island-home.png",
+      "readerPreview": "previews/03-island-reader.png"
+    }
+  ]
+}
