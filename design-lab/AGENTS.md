@@ -3,6 +3,7 @@
 本目录专门保存“拾知”Windows 桌面学习软件的视觉概念。继续遵守根目录的产品、安全和本地 Git 规则。
 
 - 用户在本目录请求设计 demo 时，优先静态 HTML / CSS / JavaScript，保持低成本，不接入 Electron、数据库或模型，不引入构建框架。
+- 2026-10-18 用户明确选定第一轮 `shizhi.sunny-isle.v1`（03 晴岛原版）替换正式 UI。正式维护先读 `selected-design.json`、`../docs/design/SUNNY_ISLE.md` 与对应交接；第二轮只保留参考。原 `design.json` 的 `concept` 是历史快照，不改其 schema，也不将 demo 当成正式运行入口。
 - 每轮使用 `YYYY-MM-DD-主题/`；每套使用独立目录，保留过去的设计。共享样式/交互可以放在该轮 `shared/`。
 - 明显标记“概念演示 / 示例数据”。截图、签到、时长、回答和资料都不能作为正式软件已有功能或验收成绩。
 - 每套设计必须有 `HANDOFF.md` 和 `design.json`：说明设计目的、参考链接、配色/字体/间距、布局、交互、实现范围、产品接入位置及验证限制。

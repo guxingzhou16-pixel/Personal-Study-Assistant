@@ -5,7 +5,7 @@
   "status": "concept",
   "gallery": "index.html",
   "handoffSchema": "handoff.schema.json",
-  "selectedDesignId": null,
+  "selectedDesignId": "shizhi.sunny-isle.v1",
   "designs": [
     {
       "id": "shizhi.paper-room.v1",

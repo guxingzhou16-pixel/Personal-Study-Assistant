@@ -2,16 +2,13 @@ import { useEffect, useRef, useState } from 'react';
 import {
   ArrowRight,
   BookOpen,
-  Check,
-  ChevronRight,
   CircleHelp,
   FolderOpen,
   Home,
-  Leaf,
   LoaderCircle,
   Settings as SettingsIcon,
   ShieldCheck,
-  Sparkles,
+  Sun,
   Target,
   Timer,
   NotebookPen,
@@ -25,6 +22,7 @@ import { StudyCalendar } from './components/StudyCalendar';
 import { ChatPage } from './components/ChatPage';
 import { desktop, errorMessage, isDesktop } from './lib/desktop';
 import { defaultSettings, type Bootstrap, type Settings, type CitationTarget } from './lib/types';
+import sunnyPlant from './assets/sunny-isle-plant.svg';
 
 type Page = 'home' | 'library' | 'chat' | 'settings';
 const pageLabels: Record<Page, string> = {
@@ -116,18 +114,17 @@ export default function App() {
       <a className="skip-link" href="#main-content">
         跳到主要内容
       </a>
-      <aside className="sidebar">
-        <div className="brand">
-          <div className="brand-mark">
-            <BookOpen size={22} />
-          </div>
-          <div>
+      <header className="app-header">
+        <button className="brand" onClick={() => navigate('home')} aria-label="拾知，返回学习首页">
+          <span className="brand-mark" aria-hidden="true">
+            <Sun size={24} strokeWidth={1.5} />
+          </span>
+          <span className="brand-name">
             <strong>拾知</strong>
-            <span>私人学习助手</span>
-          </div>
-        </div>
-        <p className="nav-caption">我的学习空间</p>
-        <nav aria-label="主导航">
+            <small>STUDY COMPANION</small>
+          </span>
+        </button>
+        <nav className="app-nav" aria-label="主导航">
           {[
             { id: 'home' as const, icon: Home },
             { id: 'library' as const, icon: FolderOpen },
@@ -141,58 +138,30 @@ export default function App() {
             >
               <Icon size={18} />
               {pageLabels[id]}
-              {page === id && <span className="nav-dot" />}
-            </button>
-          ))}
-          <div className="nav-divider" />
-          {[
-            { title: '学习笔记', icon: NotebookPen },
-            { title: '计划与打卡', icon: Target },
-            { title: '专注时光', icon: Timer },
-          ].map(({ title, icon: Icon }) => (
-            <button key={title} className="nav-item" disabled>
-              <Icon size={18} />
-              {title}
-              <span className="planned-tag">规划中</span>
             </button>
           ))}
         </nav>
-        <div className="sidebar-bottom">
-          <div className="local-caption">
-            <ShieldCheck size={16} />
-            <div>
-              <strong>{isDesktop ? '本地学习空间' : '界面预览'}</strong>
-              <p>{isDesktop ? '你的进步，留在你身边' : '本地保存需启动桌面版'}</p>
-            </div>
-          </div>
+        <div className="header-tools">
           <button
-            className={`nav-item ${page === 'settings' ? 'selected' : ''}`}
+            className={`profile-button ${page === 'settings' ? 'selected' : ''}`}
             onClick={() => navigate('settings')}
             aria-current={page === 'settings' ? 'page' : undefined}
+            aria-label="设置"
+            title="设置"
           >
+            <span className="profile-avatar" aria-hidden="true">
+              {Array.from(settings.displayName.trim())[0] ?? '知'}
+            </span>
             <SettingsIcon size={18} />
-            设置
           </button>
-          <div className="sidebar-version">
-            <span>STUDY COMPANION</span>
-            <span>v0.1.0</span>
-          </div>
         </div>
-      </aside>
+      </header>
       <div className="main-shell">
-        <header className="topbar">
-          <div>
-            我的空间
-            <ChevronRight size={14} />
-            <span>{sourceId ? '资料阅读' : pageLabels[page]}</span>
-          </div>
-          <span className="date">{date}</span>
-        </header>
         <main
           id="main-content"
           ref={mainRef}
           tabIndex={-1}
-          className={sourceId ? 'reader-main' : undefined}
+          className={sourceId ? 'reader-main' : page === 'chat' ? 'chat-main' : undefined}
         >
           {!boot && !failure && (
             <div className="center-state" role="status">
@@ -212,85 +181,72 @@ export default function App() {
           )}
           {boot && !failure && page === 'home' && (
             <div className="page home-page">
-              <div className="page-heading">
-                <div>
-                  <p className="eyebrow">A LITTLE KNOWLEDGE, EVERY DAY</p>
-                  <h1>{settings.displayName ? `${settings.displayName}，` : ''}开始今天的小进步</h1>
-                  <p className="muted">给自己留一点时间，把好奇变成理解。</p>
-                </div>
-                <span className="status-pill">
-                  <span />
-                  刚刚启程
-                </span>
-              </div>
               <section className="welcome-panel" aria-labelledby="welcome-title">
-                <div>
-                  <span className="small-label">
-                    <Leaf size={15} />
-                    从这里开始
-                  </span>
-                  <h2 id="welcome-title">
-                    把一份资料，
+                <div className="welcome-copy">
+                  <p className="eyebrow">YOUR OWN LITTLE LEARNING ISLAND</p>
+                  <h1 id="welcome-title">
+                    今天，也长出
                     <br />
-                    变成自己的知识。
-                  </h2>
+                    一点新想法
+                    <span className="heading-spark" aria-hidden="true">
+                      ✳
+                    </span>
+                  </h1>
+                  <p className="home-greeting">
+                    {settings.displayName
+                      ? `${settings.displayName}，欢迎回来。`
+                      : '欢迎回到你的学习小岛。'}
+                  </p>
                   <p>
-                    安静地阅读，带着问题思考。
+                    不用一下子读完整个世界。
                     <br />
-                    你的学习空间已经准备好了。
+                    从感兴趣的一页开始，就很好。
                   </p>
                   <button className="button primary" onClick={() => setPage('library')}>
                     打开我的资料库
                     <ArrowRight size={16} />
                   </button>
                 </div>
-                <div className="book-illustration" aria-hidden="true">
-                  <div className="book-back" />
-                  <div className="book-front">
-                    <BookOpen size={62} strokeWidth={1} />
-                    <span>
-                      KEEP
-                      <br />
-                      LEARNING.
-                    </span>
-                    <div className="book-line" />
-                  </div>
-                  <span className="book-spark">
-                    <Sparkles size={22} strokeWidth={1.5} />
-                  </span>
-                  <span className="book-leaf">
-                    <Leaf size={26} strokeWidth={1.3} />
-                  </span>
-                </div>
+                <img className="plant-illustration" src={sunnyPlant} alt="" aria-hidden="true" />
+                <span className="greeting-sticker" aria-hidden="true">
+                  保持好奇<small>STAY CURIOUS :)</small>
+                </span>
               </section>
               <div className="home-columns">
                 <section className="recent-section">
                   <div className="section-heading">
-                    <h2>最近阅读</h2>
+                    <h2>
+                      还想接着读 <BookOpen size={17} aria-hidden="true" />
+                    </h2>
                     <button className="text-button" onClick={() => setPage('library')}>
                       查看资料库
                       <ArrowRight size={14} />
                     </button>
                   </div>
                   <RecentReadings onOpen={openSource} />
+                  <section className="planned-section" aria-labelledby="planned-heading">
+                    <div className="section-heading">
+                      <h2 id="planned-heading">留给以后的好点子</h2>
+                    </div>
+                    <div className="planned-tools">
+                      {[
+                        { title: '学习笔记', icon: NotebookPen },
+                        { title: '学习计划', icon: Target },
+                        { title: '番茄专注', icon: Timer },
+                      ].map(({ title, icon: Icon }) => (
+                        <button key={title} disabled>
+                          <Icon size={18} aria-hidden="true" />
+                          <span>{title}</span>
+                          <span className="planned-tag">规划中</span>
+                        </button>
+                      ))}
+                    </div>
+                  </section>
                 </section>
                 <StudyCalendar
                   dailyGoalMinutes={settings.dailyGoalMinutes}
                   encouragement={encouragement}
                 />
-              </div>
-              <div className="journey">
-                <span className="small-label">让学习留下痕迹</span>
-                <ol>
-                  {['读一段资料', '问一个问题', '写下自己的理解', '回看今天的收获'].map(
-                    (step, index) => (
-                      <li key={step}>
-                        <span>{String(index + 1).padStart(2, '0')}</span>
-                        {step}
-                      </li>
-                    ),
-                  )}
-                </ol>
               </div>
             </div>
           )}
@@ -324,10 +280,10 @@ export default function App() {
         </main>
         <footer className="app-footer">
           <span>
-            <Check size={13} />
-            慢慢学，也是在向前走
+            <ShieldCheck size={14} aria-hidden="true" />
+            {isDesktop ? '本地学习空间' : '界面预览 · 本地保存需启动桌面版'}
           </span>
-          <span>属于你的学习空间</span>
+          <span className="footer-date">{date}</span>
         </footer>
       </div>
     </div>

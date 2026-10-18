@@ -175,8 +175,10 @@
 | --- | --- |
 | `README.md` | 面向项目使用与交接的简介、运行方式、完整规划、真实验证记录 |
 | `AGENTS.md` | 面向 AI 开发者的项目约定、模块边界、工作流程与接手信息 |
-| `design-lab/` | 独立 UI 概念与设计交接；每套保存 demo、截图、HANDOFF 和 JSON 档案，先读目录内 AGENTS，不当作正式功能 |
-| `src/App.tsx` | 工作台、导航、启动加载、页面切换和学习首页 |
+| `design-lab/` | 独立 UI 概念与交接；`selected-design.json` 登记已选晴岛原版及正式文件，历史 demo 仍为示例，先读目录内 AGENTS |
+| `docs/design/SUNNY_ISLE.md`、`docs/handoffs/2026-10-18-sunny-isle.md` | 正式视觉规范、更换方法、本次实施交接与实际验证 |
+| `src/App.tsx` | 晴岛顶部导航、欢迎区、启动加载、页面切换及聊天常驻 |
+| `src/assets/sunny-isle-plant.svg` | 欢迎区本地原创叠书植物，仅为静态装饰，不表示成长或掌握程度 |
 | `src/components/SettingsPage.tsx` | 偏好及模型表单、连接检测、密钥操作；输入密钥只作必要的临时传递 |
 | `src/components/EmbeddingSettings.tsx` | 独立模型下载/取消、进度和文件状态；不改变聊天配置 |
 | `src/components/LibraryPage.tsx` | 文件选择、导入状态、失败、搜索/格式筛选与真实资料列表 |
@@ -188,7 +190,9 @@
 | `src/lib/types.ts` | 共享数据类型、`DesktopApi`、`Reply<T>`、默认设置 |
 | `src/lib/desktop.ts` | 界面调用桌面桥接的唯一入口、错误文本与地址比较 |
 | `src/lib/calendar.ts` | 本地日期键、月历网格、相邻月份计算 |
-| `src/styles.css` | 全局样式、响应式布局、焦点与减少动画支持 |
+| `src/styles/tokens.css` | 正式晴岛基础语义色、字体、圆角和内容上限；局部装饰色和尺寸仍在对应 CSS／SVG |
+| `src/styles/study-home.css` | 真实最近资料、完整月历、签到及灰紫累计计时的首页样式 |
+| `src/styles.css` | 晴岛壳、通用控件与业务页样式、响应式、焦点及减少动画支持 |
 | `electron/main.ts` | 应用与窗口生命周期、IPC 注册、调用方校验、数据目录；当前也有学习心跳及睡眠暂停接入 |
 | `electron/preload.ts` | 沙箱内通过 `contextBridge` 暴露明确的桌面方法 |
 | `electron/core/settings.ts` | 运行时设置、地址、服务类型与模型配置校验 |
@@ -213,7 +217,7 @@
 | `electron/core/study-storage.ts` | 独立学习记录数据库，签到与累计时间 |
 | `electron/core/*.test.ts` | 数据迁移、设置、密钥、连接与资料迁移规格 |
 | `tests/desktop.spec.ts` | 已有桌面流程与开发模式验证 |
-| `tests/calendar.spec.ts` | 已验收的月历、4:5 布局、签到、计时和重启恢复流程 |
+| `tests/calendar.spec.ts` | 晴岛首页左右分列与右列上下布局、完整月历、签到、计时和重启恢复；旧 4:5 仅为历史 |
 | `tests/reading.spec.ts` | 已验收的导入、阅读、原文引用、重启恢复与独立解析取消 |
 | `tests/chat.spec.ts` | 双协议流式回答、停止/断流、迟到事件、退出恢复、密钥使用及目标地址确认 |
 | `tests/rag.spec.ts` | 中文/英文检索、无证据、PDF/Markdown 出处跳转、重启引用与实际索引进程取消/重建 |
@@ -396,7 +400,13 @@ npx playwright test tests/rag.spec.ts
 
 ## 12. 视觉、可访问性与性能
 
-独立视觉探索保存在 `design-lab/`，先读该目录的协作约定。每套设计交付可见 demo、截图、`HANDOFF.md` 与按 schema 编写的 `design.json`，在目录索引登记；统一标记示例内容。用户选定后再另行接入正式 React 界面，不把审美稿当作功能验收或主题系统已完成。
+2026-10-18 用户已选定第一轮 **03 晴岛原版**（`shizhi.sunny-isle.v1`）作为正式 UI 基线。先读 `design-lab/selected-design.json`、`docs/design/SUNNY_ISLE.md` 与 `docs/handoffs/2026-10-18-sunny-isle.md`，核对实际源码与验证；第二轮玄墨、赤陶、蓝调仍为参考。正式外观不代表主题切换、同屏阅读助手或其他概念功能已完成。
+
+独立视觉探索继续保存在 `design-lab/`，先读该目录协作约定。每套交付可见 demo、截图、`HANDOFF.md` 与按 schema 编写的 `design.json`，在目录索引登记；历史 demo 与 `concept` 档案保留为示例快照，不将其脚本或假资料复制进正式 React。
+
+- 晴岛采用顶部品牌／胶囊主导航／设置入口、薄荷欢迎区、原创本地叠书植物，首页左侧宽资料列、右侧完整月历与签到、下方灰紫累计计时。历史 4:5 日历布局只描述旧版本，不作为新外观的固定比例约束。
+- 基础语义 token 集中在 `src/styles/tokens.css`；`src/styles.css` 管理壳、通用控件与业务页，`src/styles/study-home.css` 专管真实首页模块。局部装饰色、尺寸及 SVG 填色仍有直接定义的值；换风格先改 token，再核对对应样式和资产，不增建主题框架或引入上游 UI 库。
+- 保持 `ChatPage` 常驻、离页仅隐藏；不得让 CSS 覆盖 `hidden`，也不为视觉重排更换聊天 `key`。保留原页 PDF、引用验证、独立阅读位置、设置/密钥和真实计时边界。
 
 - 保持清爽、安静、适合反复使用的学习工作台；界面优先展示真实的学习操作。
 - 中文文案简单清楚，错误消息说明恢复办法；产品界面不堆放无助于用户决策的技术实现细节。

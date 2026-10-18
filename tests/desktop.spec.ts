@@ -36,7 +36,7 @@ test('desktop navigation, persistent preferences, encrypted keys and model check
   }
   try {
     let page = await launch();
-    await expect(page.getByRole('heading', { name: '开始今天的小进步' })).toBeVisible();
+    await expect(page.getByRole('heading', { name: /今天，也长出\s*一点新想法/ })).toBeVisible();
     await page.keyboard.press('Tab');
     await expect(page.getByRole('link', { name: '跳到主要内容' })).toBeFocused();
     await page.keyboard.press('Enter');
@@ -57,7 +57,7 @@ test('desktop navigation, persistent preferences, encrypted keys and model check
     await expect(page.getByText('已保存。下次打开应用时会恢复这些设置。')).toBeVisible();
     await application!.close();
     page = await launch();
-    await expect(page.getByRole('heading', { name: '小舟，开始今天的小进步' })).toBeVisible();
+    await expect(page.getByText('小舟，欢迎回来。', { exact: true })).toBeVisible();
     await page.getByRole('button', { name: '设置', exact: true }).click();
     await expect(page.getByRole('spinbutton', { name: /每日学习目标/ })).toHaveValue('60');
     await expect(page.getByRole('combobox', { name: '模型名称', exact: true })).toHaveValue(
@@ -128,13 +128,18 @@ test('desktop navigation, persistent preferences, encrypted keys and model check
     await page.getByRole('button', { name: '删除密钥' }).click();
     await expect(page.getByText('此地址未保存密钥', { exact: true })).toBeVisible();
     await page.getByRole('button', { name: '学习首页', exact: true }).click();
-    await expect(page.getByRole('heading', { name: '小舟，开始今天的小进步' })).toBeVisible();
-    await expect(page.getByRole('heading', { name: '小舟，开始今天的小进步' })).toBeInViewport();
+    await expect(page.getByText('小舟，欢迎回来。', { exact: true })).toBeVisible();
+    await expect(page.getByRole('heading', { name: /今天，也长出\s*一点新想法/ })).toBeInViewport();
     await page.screenshot({ path: 'artifacts/desktop-home.png', fullPage: true });
     await page.setViewportSize({ width: 900, height: 640 });
     expect(
       await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth),
     ).toBe(true);
+    await page.getByRole('button', { name: '学习助手', exact: true }).click();
+    await expect(page.getByRole('heading', { name: '从一个具体的问题开始' })).toBeInViewport({
+      ratio: 1,
+    });
+    await expect(page.getByRole('textbox', { name: '输入学习问题' })).toBeInViewport({ ratio: 1 });
     await page.getByRole('button', { name: '设置', exact: true }).click();
     await page.getByRole('button', { name: '保存设置' }).focus();
     await expect(page.getByRole('button', { name: '保存设置' })).toBeInViewport();
@@ -162,13 +167,13 @@ test('development window can call the same isolated desktop API', async () => {
       },
     });
     const page = await application.firstWindow();
-    await expect(page.getByRole('heading', { name: '开始今天的小进步' })).toBeVisible();
+    await expect(page.getByRole('heading', { name: /今天，也长出\s*一点新想法/ })).toBeVisible();
     await page.getByRole('button', { name: '设置', exact: true }).click();
     await page.getByRole('textbox', { name: '怎么称呼你' }).fill('开发模式');
     await page.getByRole('button', { name: '保存设置' }).click();
     await expect(page.getByText('已保存。下次打开应用时会恢复这些设置。')).toBeVisible();
     await page.getByRole('button', { name: '学习首页', exact: true }).click();
-    await expect(page.getByRole('heading', { name: '开发模式，开始今天的小进步' })).toBeVisible();
+    await expect(page.getByText('开发模式，欢迎回来。', { exact: true })).toBeVisible();
   } finally {
     await application?.close();
     rmSync(dataDir, { recursive: true, force: true });

@@ -58,7 +58,7 @@ test('real desktop streams both protocols, stops, handles broken streams and res
   }
   try {
     let page = await launch();
-    await expect(page.getByRole('heading', { name: '开始今天的小进步' })).toBeVisible();
+    await expect(page.getByRole('heading', { name: /今天，也长出\s*一点新想法/ })).toBeVisible();
     await page.evaluate(async (baseUrl) => {
       const { settings } = await window.studyCompanion!.bootstrap();
       await window.studyCompanion!.saveSettings({
