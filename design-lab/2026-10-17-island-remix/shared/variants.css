@@ -1,0 +1,534 @@
+/* Same Sunny Isle grid and interactions; new type, palette, line and illustration. */
+body[data-variant] {
+  --hero-bg: #eee2d2;
+  --hero-ink: var(--ink);
+  --reading-card: #f2e8da;
+  --book-bg: #c89066;
+  --book-spine: #ad7150;
+  --book-ink: #5d3b28;
+  --book-shadow: #e4d1bb;
+  --tag-bg: #e4d5bf;
+  --soft-card-one: #f1e6db;
+  --soft-card-two: #efe4d1;
+  --focus-bg: #e9ddcd;
+  --focus-ink: #74543d;
+  --focus-button: #d8b99c;
+  --nav-bg: #eee7dc;
+  --nav-active: var(--surface);
+  --brand-bg: #ead5bf;
+  --sticker-line: #b99472;
+  --sticker-ink: #8b6342;
+  --tile-shadow: none;
+}
+body[data-variant='mono'] {
+  --bg: #101010;
+  --surface: #191919;
+  --sidebar: #101010;
+  --ink: #ededed;
+  --muted: #a6a6a6;
+  --line: #333333;
+  --accent: #ededed;
+  --accent-ink: #141414;
+  --tint: #2b2b2b;
+  --radius: 10px;
+  --hero-bg: #1b1b1b;
+  --reading-card: #191919;
+  --book-bg: #363636;
+  --book-spine: #242424;
+  --book-ink: #e1e1e1;
+  --book-shadow: #272727;
+  --tag-bg: #303030;
+  --soft-card-one: #1b1b1b;
+  --soft-card-two: #1b1b1b;
+  --focus-bg: #202020;
+  --focus-ink: #e0e0e0;
+  --focus-button: #ededed;
+  --nav-bg: #1d1d1d;
+  --nav-active: #393939;
+  --brand-bg: #2d2d2d;
+  --sticker-line: #5b5b5b;
+  --sticker-ink: #c0c0c0;
+  color-scheme: dark;
+}
+body[data-variant='terra'] {
+  --bg: #faf6ef;
+  --surface: #fffaf3;
+  --sidebar: #faf6ef;
+  --ink: #493b31;
+  --muted: #88796b;
+  --line: #dfd2c3;
+  --accent: #ad5136;
+  --accent-ink: #fffaf3;
+  --tint: #f0e2d2;
+  --radius: 12px;
+}
+body[data-variant='blue'] {
+  --bg: #f4f1e7;
+  --surface: #fffdf7;
+  --sidebar: #f4f1e7;
+  --ink: #222d48;
+  --muted: #69718a;
+  --line: #222d48;
+  --accent: #2d53d7;
+  --accent-ink: #ffffff;
+  --tint: #e3e9fa;
+  --radius: 6px;
+  --hero-bg: #e3e9fa;
+  --hero-ink: #293d87;
+  --reading-card: #fffdf7;
+  --book-bg: #2d53d7;
+  --book-spine: #203d9c;
+  --book-ink: #fffdf7;
+  --book-shadow: #a8b8eb;
+  --tag-bg: #e3e9fa;
+  --soft-card-one: #e8ecf9;
+  --soft-card-two: #f8edc5;
+  --focus-bg: #f8e7a3;
+  --focus-ink: #3c4155;
+  --focus-button: #2d53d7;
+  --nav-bg: #fffdf7;
+  --nav-active: #2d53d7;
+  --brand-bg: #f8e7a3;
+  --sticker-line: #222d48;
+  --sticker-ink: #2d53d7;
+  --tile-shadow: 4px 4px 0 #222d48;
+}
+body[data-variant] .design-bar {
+  background: #262626;
+  color: #eeeeee;
+}
+body[data-variant] .design-bar > span {
+  color: #bcbcbc;
+}
+body[data-variant] .design-switch a[aria-current] {
+  background: #505050;
+}
+body[data-variant] .design-switch a:hover {
+  background: #424242;
+}
+body[data-variant] .island-nav nav {
+  background: var(--nav-bg);
+}
+body[data-variant] .island-nav .nav-item.active {
+  background: var(--nav-active);
+  color: var(--ink);
+  box-shadow: none;
+}
+body[data-variant] .island-nav .brand-symbol {
+  background: var(--brand-bg);
+  color: var(--accent);
+}
+body[data-variant] .island-nav-end .avatar {
+  background: var(--brand-bg);
+  color: var(--accent);
+}
+body[data-variant] .island-greeting {
+  background: var(--hero-bg);
+  color: var(--hero-ink);
+  border: 1px solid var(--line);
+  box-shadow: var(--tile-shadow);
+}
+body[data-variant] .island-greeting p {
+  color: var(--muted);
+}
+body[data-variant] .island-greeting .eyebrow {
+  color: var(--muted);
+}
+body[data-variant] .heading-spark {
+  color: var(--accent);
+}
+body[data-variant] .greeting-sticker {
+  color: var(--sticker-ink);
+  border-color: var(--sticker-line);
+}
+body[data-variant] .sticker-number {
+  font:
+    20px/1 'Georgia',
+    serif;
+  letter-spacing: -1px;
+  margin-bottom: 5px;
+}
+body[data-variant] .greeting-sticker > span:last-child {
+  margin-top: 3px;
+  font-size: 6px;
+}
+body[data-variant] .island-reading {
+  background: var(--reading-card);
+  border-color: var(--line);
+  box-shadow: var(--tile-shadow);
+}
+body[data-variant] .island-book {
+  background: var(--book-bg);
+  color: var(--book-ink);
+  border-left-color: var(--book-spine);
+  box-shadow: 3px 5px 0 var(--book-shadow);
+}
+body[data-variant] .island-reading .chip {
+  background: var(--tag-bg);
+  color: var(--muted);
+}
+body[data-variant] .round-link {
+  color: var(--accent-ink);
+}
+body[data-variant] .island-grid .section-label h2 .icon {
+  color: var(--muted);
+}
+body[data-variant] .island-source-list .source-row {
+  background: var(--soft-card-one);
+  border: 1px solid var(--line);
+  box-shadow: var(--tile-shadow);
+}
+body[data-variant] .island-source-list .source-row:last-child {
+  background: var(--soft-card-two);
+}
+body[data-variant] .island-source-list .file-icon {
+  color: var(--accent);
+}
+body[data-variant] .island-week {
+  background: var(--surface);
+  box-shadow: var(--tile-shadow);
+}
+body[data-variant] .island-week .checkin {
+  background: var(--tint);
+  color: var(--ink);
+}
+body[data-variant] .island-focus {
+  background: var(--focus-bg);
+  border: 1px solid var(--line);
+  box-shadow: var(--tile-shadow);
+}
+body[data-variant] .focus-title h3,
+body[data-variant] .sun-token,
+body[data-variant] .island-focus .timer-display {
+  color: var(--focus-ink);
+}
+body[data-variant] .island-focus .timer-caption,
+body[data-variant] .island-focus .timer-hint {
+  color: var(--muted);
+}
+body[data-variant] .island-focus .button {
+  background: var(--focus-button);
+  color: var(--accent-ink);
+}
+body[data-variant] .library-card.sage {
+  --cover-bg: var(--hero-bg);
+  --cover-ink: var(--accent);
+}
+body[data-variant] .library-card.rose {
+  --cover-bg: var(--soft-card-one);
+  --cover-ink: var(--ink);
+}
+body[data-variant] .library-card.sand {
+  --cover-bg: var(--soft-card-two);
+  --cover-ink: var(--ink);
+}
+body[data-variant] .library-cover .pipeline > div {
+  background: var(--surface);
+  border-color: var(--line);
+  color: var(--accent);
+}
+body[data-variant] .pipeline i {
+  background: var(--muted);
+}
+body[data-variant] .pipeline i::after {
+  border-left-color: var(--muted);
+}
+body[data-variant] .library-cover .pipeline small {
+  color: var(--muted);
+}
+body[data-variant] .assistant-panel {
+  background: var(--surface);
+}
+
+/* 04 / Mono Noir: grayscale surfaces, fine lines and an engraved globe. */
+body[data-variant='mono'] .island-nav nav {
+  border-radius: 9px;
+}
+body[data-variant='mono'] .island-nav .nav-item {
+  border-radius: 6px;
+}
+body[data-variant='mono'] .brand-symbol {
+  border-radius: 8px;
+}
+body[data-variant='mono'] .island-greeting {
+  border-radius: 16px;
+}
+body[data-variant='mono'] .island-greeting h1 {
+  font-weight: 450;
+  letter-spacing: 0.8px;
+}
+body[data-variant='mono'] .island-greeting .button {
+  border-radius: 7px;
+  font-weight: 600;
+}
+body[data-variant='mono'] .greeting-sticker {
+  border-radius: 8px;
+  transform: none;
+  right: 31px;
+  top: 29px;
+  padding: 13px 14px;
+}
+body[data-variant='mono'] .sticker-number {
+  font-family: 'Consolas', monospace;
+  font-size: 18px;
+}
+body[data-variant='mono'] .island-reading,
+body[data-variant='mono'] .island-week,
+body[data-variant='mono'] .island-focus {
+  border-radius: 12px;
+}
+body[data-variant='mono'] .island-book {
+  transform: rotate(-3deg);
+  border-radius: 2px;
+  border: 1px solid #747474;
+  border-left: 6px solid var(--book-spine);
+}
+body[data-variant='mono'] .island-book > small {
+  letter-spacing: 1.2px;
+  color: #bcbcbc;
+}
+body[data-variant='mono'] .island-book > strong {
+  font-weight: 400;
+}
+body[data-variant='mono'] .island-source-list .source-row {
+  border-radius: 8px;
+}
+body[data-variant='mono'] .week-strip .today {
+  background: #eeeeee;
+  color: #151515;
+}
+body[data-variant='mono'] .week-strip > div {
+  border-radius: 8px;
+}
+body[data-variant='mono'] .island-week .checkin {
+  border: 1px solid #444444;
+  border-radius: 7px;
+}
+body[data-variant='mono'] .island-focus .button {
+  border-radius: 7px;
+}
+body[data-variant='mono'] .island-focus .timer-display {
+  font-family: 'Cascadia Code', 'Consolas', monospace;
+  font-size: 41px;
+  letter-spacing: -2px;
+}
+body[data-variant='mono'] .reading-article {
+  border-radius: 12px;
+}
+body[data-variant='mono'] .demo-dialog::backdrop {
+  background: #00000088;
+}
+body[data-variant='mono'].reading-soft .reading-article {
+  background: #242424;
+  color: #dedede;
+}
+body[data-variant='mono'].reading-soft .reading-article .article-meta,
+body[data-variant='mono'].reading-soft .reading-article .article-lede {
+  color: #aaaaaa;
+}
+
+/* 05 / Terra Studio: typeset warmth and clay rather than a pastel garden. */
+body[data-variant='terra'] .island-greeting h1,
+body[data-variant='terra'] .island-reading h2,
+body[data-variant='terra'] .reading-article h1 {
+  font-family: 'Noto Serif SC', 'Songti SC', 'SimSun', serif;
+  font-weight: 500;
+}
+body[data-variant='terra'] .island-greeting h1 {
+  font-size: 36px;
+  line-height: 1.4;
+  letter-spacing: 2px;
+}
+body[data-variant='terra'] .island-greeting {
+  border-radius: 18px;
+  border-color: #d6c1aa;
+}
+body[data-variant='terra'] .island-greeting .button {
+  border-radius: 6px;
+}
+body[data-variant='terra'] .island-nav .brand-symbol {
+  border-radius: 8px 8px 3px 3px;
+}
+body[data-variant='terra'] .island-nav nav {
+  border-radius: 8px;
+}
+body[data-variant='terra'] .island-nav .nav-item {
+  border-radius: 5px;
+}
+body[data-variant='terra'] .island-nav .nav-item.active {
+  color: var(--accent);
+}
+body[data-variant='terra'] .greeting-sticker {
+  border-radius: 50% 50% 3px 3px;
+  transform: rotate(6deg);
+  padding: 14px 13px;
+}
+body[data-variant='terra'] .island-reading {
+  border-radius: 14px;
+}
+body[data-variant='terra'] .island-book {
+  transform: rotate(-4deg);
+  border-radius: 2px 4px 4px 2px;
+}
+body[data-variant='terra'] .island-book > strong {
+  font-family: 'Georgia', serif;
+  font-weight: 400;
+  letter-spacing: -4px;
+}
+body[data-variant='terra'] .island-week {
+  border-radius: 14px;
+}
+body[data-variant='terra'] .island-focus {
+  border-radius: 14px;
+}
+body[data-variant='terra'] .island-focus .button {
+  color: #5c3d28;
+  border-radius: 6px;
+}
+body[data-variant='terra'] .island-focus .timer-display {
+  font-family: 'Georgia', serif;
+  letter-spacing: -2px;
+}
+body[data-variant='terra'] .reading-article {
+  border-radius: 6px;
+}
+
+/* 06 / Blue Atelier: ink outlines, cobalt and paper yellow, offset print. */
+body[data-variant='blue'] .island-nav {
+  border-bottom-width: 2px;
+}
+body[data-variant='blue'] .island-nav nav {
+  border: 2px solid var(--ink);
+  border-radius: 7px;
+  padding: 3px;
+}
+body[data-variant='blue'] .island-nav .nav-item {
+  border-radius: 4px;
+}
+body[data-variant='blue'] .island-nav .nav-item.active {
+  color: #ffffff;
+}
+body[data-variant='blue'] .island-nav .brand-symbol {
+  border: 2px solid var(--ink);
+  border-radius: 8px;
+}
+body[data-variant='blue'] .island-nav-end .avatar {
+  border: 2px solid var(--ink);
+}
+body[data-variant='blue'] .island-greeting {
+  border: 2px solid var(--ink);
+  border-radius: 10px;
+}
+body[data-variant='blue'] .island-greeting h1 {
+  font-weight: 750;
+  letter-spacing: -0.5px;
+}
+body[data-variant='blue'] .island-greeting .button {
+  border-radius: 6px;
+  border: 2px solid var(--ink);
+  box-shadow: 3px 3px 0 var(--ink);
+}
+body[data-variant='blue'] .heading-spark {
+  color: #b28b16;
+}
+body[data-variant='blue'] .greeting-sticker {
+  border: 2px solid var(--ink);
+  border-radius: 8px;
+  background: #f8e7a3;
+  padding: 13px 17px;
+  transform: rotate(8deg);
+}
+body[data-variant='blue'] .island-reading {
+  border: 2px solid var(--ink);
+  border-radius: 8px;
+}
+body[data-variant='blue'] .island-reading .chip {
+  background: var(--tint);
+  color: var(--accent);
+  border: 1px solid #c6cfee;
+}
+body[data-variant='blue'] .island-book {
+  border-radius: 2px;
+  transform: rotate(-4deg);
+  border: 2px solid var(--ink);
+  border-left: 6px solid var(--book-spine);
+}
+body[data-variant='blue'] .island-book > strong {
+  font-weight: 800;
+}
+body[data-variant='blue'] .round-link {
+  border: 2px solid var(--ink);
+  box-shadow: 2px 2px 0 var(--ink);
+}
+body[data-variant='blue'] .island-source-list .source-row {
+  border: 2px solid var(--ink);
+  border-radius: 7px;
+}
+body[data-variant='blue'] .island-week,
+body[data-variant='blue'] .island-focus {
+  border: 2px solid var(--ink);
+  border-radius: 8px;
+}
+body[data-variant='blue'] .week-strip .today {
+  border-radius: 7px;
+}
+body[data-variant='blue'] .island-week .checkin {
+  background: var(--surface);
+  color: var(--accent);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+}
+body[data-variant='blue'] .island-focus .button {
+  border: 2px solid var(--ink);
+  border-radius: 6px;
+  box-shadow: 2px 2px 0 var(--ink);
+}
+body[data-variant='blue'] .island-focus .timer-display {
+  font-weight: 650;
+}
+body[data-variant='blue'] .library-card {
+  border: 2px solid var(--ink);
+  box-shadow: 3px 3px 0 var(--ink);
+}
+body[data-variant='blue'] .reading-article {
+  border: 2px solid var(--ink);
+  border-radius: 8px;
+}
+body[data-variant='blue'] .evidence-card,
+body[data-variant='blue'] .ask-form {
+  border-radius: 7px;
+}
+
+@media (max-width: 759px) {
+  body[data-variant] .design-bar {
+    gap: 4px;
+    padding-inline: 10px;
+  }
+  body[data-variant] .design-switch {
+    gap: 2px;
+  }
+  body[data-variant] .design-switch a {
+    padding-inline: 6px;
+    font-size: 9px;
+  }
+  body[data-variant='terra'] .island-greeting h1 {
+    font-size: 30px;
+  }
+  body[data-variant] .island-greeting p {
+    max-width: 205px;
+  }
+  body[data-variant='mono'] .island-focus .timer-display {
+    font-size: 37px;
+  }
+}
+@media (max-width: 430px) {
+  body[data-variant='terra'] .island-greeting h1 {
+    font-size: 28px;
+  }
+  body[data-variant='blue'] .island-source-list .source-row {
+    padding-inline: 11px;
+  }
+  body[data-variant='blue'] .island-source-list .source-info strong {
+    font-size: 11px;
+  }
+}

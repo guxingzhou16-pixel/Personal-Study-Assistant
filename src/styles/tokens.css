@@ -1,0 +1,27 @@
+/* Sunny Isle is the selected visual baseline. Keep product data out of this file. */
+:root {
+  --font-sans: 'Segoe UI', 'Microsoft YaHei UI', 'Microsoft YaHei', sans-serif;
+  --background: #f8f7f2;
+  --surface: #fffef9;
+  --ink: #334b40;
+  --muted: #718075;
+  --line: #e2e5da;
+  --accent: #365646;
+  --accent-hover: #294737;
+  --accent-ink: #f6f8ed;
+  --mint: #e7eddc;
+  --mint-soft: #f0f3e8;
+  --apricot: #f6bf75;
+  --rose-soft: #f0e9e4;
+  --sand-soft: #f1eddd;
+  --lavender: #eae7f1;
+  --lavender-button: #c5bdd6;
+  --lavender-ink: #625975;
+  --focus-ring: #52774f;
+  --danger: #974b3d;
+  --danger-surface: #fff5ef;
+  --radius-control: 10px;
+  --radius-card: 18px;
+  --radius-hero: 23px;
+  --content-width: 1200px;
+}

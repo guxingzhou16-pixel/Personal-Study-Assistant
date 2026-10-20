@@ -1,0 +1,5 @@
+# Preserve upstream bytes and the hashes recorded in sources.lock.json.
+**/references/upstream/**
+**/references/assets/halfmoon/**
+**/references/assets/pico/**
+**/references/assets/neo-brutalism-css/**

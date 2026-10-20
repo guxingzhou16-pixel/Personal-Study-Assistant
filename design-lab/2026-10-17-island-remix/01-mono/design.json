@@ -1,0 +1,125 @@
+{
+  "$schema": "../handoff.schema.json",
+  "schemaVersion": 1,
+  "id": "shizhi.mono-island.v1",
+  "name": "玄墨 / Mono Noir",
+  "createdOn": "2026-10-17",
+  "status": "concept",
+  "runtime": "static-html",
+  "sampleDataOnly": true,
+  "entry": "index.html",
+  "preview": "../previews/01-mono-home.png",
+  "readerPreview": "../previews/01-mono-reader.png",
+  "handoff": "HANDOFF.md",
+  "sourceFiles": [
+    "index.html",
+    "../shared/variants.css",
+    "../shared/variants.js",
+    "../../2026-10-17-three-directions/shared/demo.css",
+    "../../2026-10-17-three-directions/shared/demo.js"
+  ],
+  "intent": {
+    "audience": "喜欢暗色工具、希望减少彩色干扰的个人学习者",
+    "tone": "冷静、克制、低照度、纯灰阶",
+    "memorableDetail": "同一晴岛双列骨架，用黑白灰表面、细线与等宽数字建立层次，不使用彩色强调"
+  },
+  "references": [
+    {
+      "title": "Halfmoon",
+      "url": "https://github.com/halfmoonui/halfmoon",
+      "appliedTo": "暗色表面分层、灰阶边界和工具组件的状态表达；本 demo 保留晴岛布局，不复制参考项目页面"
+    }
+  ],
+  "tokens": {
+    "colors": {
+      "--bg": "#101010",
+      "--surface": "#191919",
+      "--sidebar": "#101010",
+      "--ink": "#ededed",
+      "--muted": "#a6a6a6",
+      "--line": "#333333",
+      "--accent": "#ededed",
+      "--accent-ink": "#141414",
+      "--tint": "#2b2b2b",
+      "hero": "#1b1b1b",
+      "focusCard": "#202020"
+    },
+    "typography": {
+      "body": "Segoe UI / Microsoft YaHei UI / Microsoft YaHei / sans-serif",
+      "heading": "Segoe UI / Microsoft YaHei UI / sans-serif",
+      "readingBodyPx": 14,
+      "note": "首页标题沿用晴岛无衬线，计时和辅助数字用系统等宽字体；纯灰阶区分信息，不以彩色表达状态。"
+    },
+    "spacingPx": [8, 12, 18, 24, 28, 31, 38],
+    "radiusPx": [8, 12, 16]
+  },
+  "layout": {
+    "navigation": "87px 顶部导航；左品牌、中间胶囊页签、右搜索/个人入口，与第一轮晴岛一致",
+    "home": "居中最大约 1130px；欢迎横幅；下方左侧继续阅读/资料，右侧 300px 签到/手动计时，布局锁定晴岛",
+    "library": "保留晴岛资料卡与搜索/格式筛选的布局，只改视觉；宽屏三列、中屏两列、窄屏一列",
+    "reader": "沿用晴岛顶部导航、目录、阅读纸面与 305px 助手；原文位置和交互骨架不变",
+    "breakpoints": [
+      ">=1240px 阅读可并排助手",
+      "<1240px 助手浮层，内容缩进减小",
+      "900x640 顶部导航保持完整、主区滚动",
+      "<760px 首页纵向，签到/计时可双列",
+      "<=430px 签到/计时与资料均单列"
+    ]
+  },
+  "interactions": {
+    "workingDemo": [
+      "顶部导航与本轮三套风格、原晴岛对照互链",
+      "资料搜索/格式筛选",
+      "第一份资料阅读、目录与护眼",
+      "示例助手与引用定位",
+      "示例签到、手动计时，刷新重置",
+      "预设问题填入输入区",
+      "/ 搜索快捷键"
+    ],
+    "placeholder": [
+      "添加资料弹窗",
+      "个人设置弹窗",
+      "另外两份资料的阅读入口",
+      "问答提交只解释演示范围"
+    ],
+    "futureConcept": ["纯灰阶暗色视觉候选，尚未实现正式产品暗色主题"]
+  },
+  "productIntegration": [
+    {
+      "file": "src/App.tsx",
+      "role": "仓库根相对路径；采用晴岛顶部导航与首页双列时保留页面状态、启动加载和原有导航逻辑"
+    },
+    {
+      "file": "src/components/RecentReadings.tsx",
+      "role": "复用继续阅读卡片结构；页码、标题与阅读进度从真实数据读取"
+    },
+    {
+      "file": "src/components/StudyCalendar.tsx",
+      "role": "仅调整日历、签到和手动计时外观；保留现有行为和中断边界"
+    },
+    {
+      "file": "src/components/LibraryPage.tsx",
+      "role": "资料卡、筛选与搜索的视觉映射；保留真实导入、错误和取消状态"
+    },
+    {
+      "file": "src/components/ReadingPage.tsx",
+      "role": "阅读与助手的视觉映射；保留 PDF 原页、锚点、引用和位置保存逻辑"
+    },
+    {
+      "file": "src/styles.css",
+      "role": "提取所选风格的 token、字体和组件外观；不复制 demo HTML 或示例数据"
+    },
+    {
+      "file": "src/lib/desktop.ts",
+      "role": "保留唯一桌面桥接与真实数据调用，不新增设计 demo 后端"
+    }
+  ],
+  "validationReport": "../VALIDATION.md",
+  "limitations": [
+    "灰阶靠明度、字重和边界共同区分，选中、错误与禁用不得只改变颜色",
+    "首页为本轮原创灰阶经纬球与叠书 SVG，长时间阅读需另验真实 PDF",
+    "全部交互作用于示例页面，刷新重置，没有个人记录",
+    "未验证正式 Electron、真实资料或模型",
+    "参考下载、版本和本地展示的实际状态见本轮 REFERENCES.md；浏览器检查见 VALIDATION.md"
+  ]
+}

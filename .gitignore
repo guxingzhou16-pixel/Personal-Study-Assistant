@@ -31,6 +31,8 @@ credentials.enc.json*
 /test-results/
 /playwright-report/
 /artifacts/
+/public/pdfjs/
+/coverage/
 
 # 系统文件
 .DS_Store

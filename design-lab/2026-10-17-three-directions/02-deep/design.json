@@ -1,0 +1,96 @@
+{
+  "$schema": "../handoff.schema.json",
+  "schemaVersion": 1,
+  "id": "shizhi.deep-work.v1",
+  "name": "深潜 / Deep Work",
+  "createdOn": "2026-10-17",
+  "status": "concept",
+  "runtime": "static-html",
+  "sampleDataOnly": true,
+  "entry": "index.html",
+  "preview": "../previews/02-deep-home.png",
+  "readerPreview": "../previews/02-deep-reader.png",
+  "handoff": "HANDOFF.md",
+  "sourceFiles": ["index.html", "../shared/demo.css", "../shared/demo.js"],
+  "intent": {
+    "audience": "经常在技术资料、阅读和问答之间切换的学习者",
+    "tone": "专注、专业、可核对、较高信息密度",
+    "memorableDetail": "墨色四栏工作区与克制酸橙绿；原文与证据助手始终有明确边界"
+  },
+  "references": [
+    {
+      "title": "Linear UI redesign",
+      "url": "https://linear.app/now/how-we-redesigned-the-linear-ui",
+      "appliedTo": "Electron 环境下的侧栏、对齐、表面和分栏层级；本轮配色与学习流程独立设计"
+    }
+  ],
+  "tokens": {
+    "colors": {
+      "--bg": "#171c20",
+      "--surface": "#1c2227",
+      "--sidebar": "#14191d",
+      "--ink": "#e4e9e4",
+      "--muted": "#98a39f",
+      "--line": "#30383c",
+      "--accent": "#cee996",
+      "--accent-ink": "#222d1b",
+      "--tint": "#2b352b",
+      "iconRail": "#101518",
+      "activeDocument": "#202820"
+    },
+    "typography": {
+      "body": "Segoe UI / Microsoft YaHei UI / Microsoft YaHei / sans-serif",
+      "heading": "Segoe UI / Microsoft YaHei UI / sans-serif",
+      "readingBodyPx": 14,
+      "note": "首页标题 31px，正文标题 32px；数据使用 Cascadia Code / Consolas / monospace，不给所有文本套等宽字体。"
+    },
+    "spacingPx": [8, 12, 16, 21, 23, 30],
+    "radiusPx": [4, 6, 8]
+  },
+  "layout": {
+    "navigation": "54px 图标轨 + 186px 资料导航；底部本地工作区标识",
+    "home": "问题导向标题、资料/页码/计时数据条、当前资料与检索示意、最近打开；宽屏默认展示助手",
+    "library": "同一工作区内搜索和三列资料卡片；切换资料库时收起助手",
+    "reader": "112px 目录 + 正文 + 278px 助手；用细线与不同墨色区分栏目",
+    "breakpoints": [
+      ">=1240px 首页/阅读默认并排助手",
+      "<1240px 助手按需浮层",
+      "900x640 保留图标轨和导航，正文可滚动",
+      "<760px 合并为单图标侧栏",
+      "<=430px 资料库单列"
+    ]
+  },
+  "interactions": {
+    "workingDemo": [
+      "切页与三套风格互链",
+      "资料搜索/格式/主题筛选",
+      "第一份资料阅读、目录和护眼",
+      "来源卡片/[1] 定位示例原文",
+      "主页手动计时，刷新重置",
+      "助手展开/收起",
+      "预设问题填入输入区",
+      "/ 搜索快捷键"
+    ],
+    "placeholder": ["添加资料弹窗", "个人设置弹窗", "另外两份资料的阅读入口", "静态问答提交提示"],
+    "futureConcept": ["阅读与检索证据常驻并排布局，尚未接入正式软件"]
+  },
+  "productIntegration": [
+    { "file": "src/App.tsx", "role": "导航轨和工作区框架；不要因此增加多窗口/任意网页能力" },
+    { "file": "src/components/LibraryPage.tsx", "role": "紧凑资料列表、筛选和状态" },
+    { "file": "src/components/ReadingPage.tsx", "role": "目录和正文布局；保留现有 PDF 原页能力" },
+    { "file": "src/components/ChatPage.tsx", "role": "证据助手的视觉容器；保留请求和远程发送确认" },
+    {
+      "file": "src/components/EvidenceCards.tsx",
+      "role": "来源卡片样式；有效跳转仍通过已有 resolveCitation"
+    },
+    { "file": "src/styles.css", "role": "深色 token、分栏、焦点和响应式" }
+  ],
+  "validationReport": "../VALIDATION.md",
+  "limitations": [
+    "较高信息密度需要在正式使用中验证",
+    "主页未展示签到，不等于取消现有签到功能",
+    "并排问答为静态示例，不读取模型或密钥",
+    "数据条只描述示例数量/页码/计时，不代表掌握度",
+    "未验证 Electron、持久化或真实模型"
+  ]
+}

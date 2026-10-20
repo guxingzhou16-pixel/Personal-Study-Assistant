@@ -1,0 +1,179 @@
+{
+  "schemaVersion": 1,
+  "retrievedOn": "2026-10-17",
+  "scope": "Local CSS component references, not deployed upstream applications and not the Study Companion application.",
+  "downloadMethod": "Commit SHA resolved using GitHub API; complete ZIP snapshots downloaded from codeload.github.com with the pinned SHA. All entry paths were validated before extraction.",
+  "hashAlgorithm": "SHA-256",
+  "sourceSnapshotsIgnoredByGit": true,
+  "runtimeDependencies": [],
+  "projects": [
+    {
+      "id": "halfmoon",
+      "repository": "https://github.com/halfmoonui/halfmoon",
+      "branchAtRetrieval": "master",
+      "revision": "cf038207614636028d363ca5c746f532b2d1426b",
+      "packageVersion": "2.0.2",
+      "license": "MIT",
+      "licensePath": "assets/halfmoon/LICENSE",
+      "commitApi": "https://api.github.com/repos/halfmoonui/halfmoon/commits/cf038207614636028d363ca5c746f532b2d1426b",
+      "archiveUrl": "https://codeload.github.com/halfmoonui/halfmoon/zip/cf038207614636028d363ca5c746f532b2d1426b",
+      "archiveSha256": "07a487acc818ee4259ba1cc533faa01c3ef4d67355f032d000f4d7868cff0346",
+      "localSourceDirectory": "upstream/halfmoon",
+      "localShowcase": "halfmoon.html",
+      "files": [
+        {
+          "sourcePath": "css/halfmoon.min.css",
+          "localPath": "assets/halfmoon/halfmoon.min.css",
+          "sourceSha256": "463785cdccdeb991c2c92f86bf3fa495e113cc117fa3ce19447ba4cdeff2bfaa",
+          "sha256": "e61a9b8f35ad921d7344937b51f2a002e813f62c702e0bdb2ab7923e5168f870",
+          "bytes": 369124,
+          "adaptation": "Removed the sourceMappingURL comment only; style declarations are unchanged."
+        },
+        {
+          "sourcePath": "LICENSE",
+          "localPath": "assets/halfmoon/LICENSE",
+          "sourceSha256": "e61a4ed14f5814381a8989f40d9432944647d21424f73f4b6fe8e23c5ad74c9b",
+          "sha256": "e61a4ed14f5814381a8989f40d9432944647d21424f73f4b6fe8e23c5ad74c9b",
+          "bytes": 1068,
+          "adaptation": null
+        }
+      ]
+    },
+    {
+      "id": "pico",
+      "repository": "https://github.com/picocss/pico",
+      "branchAtRetrieval": "main",
+      "revision": "a07563ddc856e6ed31a740e33b0397814227d469",
+      "packageVersion": "2.1.1",
+      "license": "MIT",
+      "licensePath": "assets/pico/LICENSE.md",
+      "commitApi": "https://api.github.com/repos/picocss/pico/commits/a07563ddc856e6ed31a740e33b0397814227d469",
+      "archiveUrl": "https://codeload.github.com/picocss/pico/zip/a07563ddc856e6ed31a740e33b0397814227d469",
+      "archiveSha256": "01ff43dcc59f6ad76b59b0fe04053059f44980af89f37075b347e7b1feb47602",
+      "localSourceDirectory": "upstream/pico",
+      "localShowcase": "pico.html",
+      "files": [
+        {
+          "sourcePath": "css/pico.min.css",
+          "localPath": "assets/pico/pico.min.css",
+          "sourceSha256": "fbc9a63fc9fc9f72d12fd7fc9806e11fa9f77ae4f9cad146b27003a1119ba3db",
+          "sha256": "fbc9a63fc9fc9f72d12fd7fc9806e11fa9f77ae4f9cad146b27003a1119ba3db",
+          "bytes": 83319,
+          "adaptation": null
+        },
+        {
+          "sourcePath": "LICENSE.md",
+          "localPath": "assets/pico/LICENSE.md",
+          "sourceSha256": "afaff063e044233f917b7807dccab022f09dca474f92b642846bee4850655bbf",
+          "sha256": "afaff063e044233f917b7807dccab022f09dca474f92b642846bee4850655bbf",
+          "bytes": 1066,
+          "adaptation": null
+        }
+      ]
+    },
+    {
+      "id": "neo-brutalism-css",
+      "repository": "https://github.com/quak-smauga/Neo-brutalism-CSS",
+      "branchAtRetrieval": "master",
+      "revision": "cf19c9a4270eb6ebbed2aeb9f72a0ff54643fb33",
+      "packageVersion": null,
+      "license": "MIT",
+      "licensePath": "assets/neo-brutalism-css/LICENSE",
+      "commitApi": "https://api.github.com/repos/quak-smauga/Neo-brutalism-CSS/commits/cf19c9a4270eb6ebbed2aeb9f72a0ff54643fb33",
+      "archiveUrl": "https://codeload.github.com/quak-smauga/Neo-brutalism-CSS/zip/cf19c9a4270eb6ebbed2aeb9f72a0ff54643fb33",
+      "archiveSha256": "4fd90314f09e57bc01a799283740d6a56e5e611120604f4c576d99402e93f6de",
+      "localSourceDirectory": "upstream/neo-brutalism-css",
+      "localShowcase": "neo-brutalism.html",
+      "files": [
+        {
+          "sourcePath": "styles/main.css",
+          "localPath": "assets/neo-brutalism-css/styles/main.css",
+          "sourceSha256": "1b7e7d394dcc33f420d2008d77d364383c3e682a7e056771f76685c635464ac6",
+          "sha256": "1b7e7d394dcc33f420d2008d77d364383c3e682a7e056771f76685c635464ac6",
+          "bytes": 271,
+          "adaptation": null
+        },
+        {
+          "sourcePath": "styles/variables.css",
+          "localPath": "assets/neo-brutalism-css/styles/variables.css",
+          "sourceSha256": "103d1aace162b9e21e62dba875365310986143c463ae36cd0c63f6b17fb3ae14",
+          "sha256": "214b7831be5ec4c41c3923319692f34715fedd71361211d8246e8db3ef0e2e8a",
+          "bytes": 917,
+          "adaptation": "Removed the initial Google Fonts @import to prevent a remote request. All remaining declarations are unchanged."
+        },
+        {
+          "sourcePath": "styles/reset.css",
+          "localPath": "assets/neo-brutalism-css/styles/reset.css",
+          "sourceSha256": "800c05fa41e630bbe390ae816385e895d88d80f85dfc12cad7dcf457ac5f3f46",
+          "sha256": "800c05fa41e630bbe390ae816385e895d88d80f85dfc12cad7dcf457ac5f3f46",
+          "bytes": 431,
+          "adaptation": null
+        },
+        {
+          "sourcePath": "styles/typography.css",
+          "localPath": "assets/neo-brutalism-css/styles/typography.css",
+          "sourceSha256": "d045f45708bbf09526e675e8febfa8766670630bb98a4a40aa4b973e3d819d43",
+          "sha256": "d045f45708bbf09526e675e8febfa8766670630bb98a4a40aa4b973e3d819d43",
+          "bytes": 1355,
+          "adaptation": null
+        },
+        {
+          "sourcePath": "styles/neo-brutalism.css",
+          "localPath": "assets/neo-brutalism-css/styles/neo-brutalism.css",
+          "sourceSha256": "e632af43937ec9bf42c8860241820a2ab56feea57f82eb6426ea776a7e49a1d9",
+          "sha256": "e632af43937ec9bf42c8860241820a2ab56feea57f82eb6426ea776a7e49a1d9",
+          "bytes": 3155,
+          "adaptation": null
+        },
+        {
+          "sourcePath": "styles/layout.css",
+          "localPath": "assets/neo-brutalism-css/styles/layout.css",
+          "sourceSha256": "556428b26bc4600cd7f3b1edf08d5df48fa9b165757d96b5a6e7d02f5abbf703",
+          "sha256": "556428b26bc4600cd7f3b1edf08d5df48fa9b165757d96b5a6e7d02f5abbf703",
+          "bytes": 1951,
+          "adaptation": null
+        },
+        {
+          "sourcePath": "styles/components.css",
+          "localPath": "assets/neo-brutalism-css/styles/components.css",
+          "sourceSha256": "e71b9d5d7af4ce6c11b5d94dee323d827a78f1014199ff1c53b341641818882d",
+          "sha256": "e71b9d5d7af4ce6c11b5d94dee323d827a78f1014199ff1c53b341641818882d",
+          "bytes": 7526,
+          "adaptation": null
+        },
+        {
+          "sourcePath": "styles/animations.css",
+          "localPath": "assets/neo-brutalism-css/styles/animations.css",
+          "sourceSha256": "4e0089fd98c6731d93451afb088a29a49403f9ea279acaac7dc76d5007f1cb4e",
+          "sha256": "4e0089fd98c6731d93451afb088a29a49403f9ea279acaac7dc76d5007f1cb4e",
+          "bytes": 2862,
+          "adaptation": null
+        },
+        {
+          "sourcePath": "styles/responsive.css",
+          "localPath": "assets/neo-brutalism-css/styles/responsive.css",
+          "sourceSha256": "53498e043814854f8e43ba568b26a286c1bf61afaf5e5808227a2a9e3bbe4157",
+          "sha256": "53498e043814854f8e43ba568b26a286c1bf61afaf5e5808227a2a9e3bbe4157",
+          "bytes": 1757,
+          "adaptation": null
+        },
+        {
+          "sourcePath": "styles/utilities.css",
+          "localPath": "assets/neo-brutalism-css/styles/utilities.css",
+          "sourceSha256": "712c43607a095bb97184d35f13e54e05ba228d0d40e8632010328244cb92580a",
+          "sha256": "712c43607a095bb97184d35f13e54e05ba228d0d40e8632010328244cb92580a",
+          "bytes": 4422,
+          "adaptation": null
+        },
+        {
+          "sourcePath": "LICENSE",
+          "localPath": "assets/neo-brutalism-css/LICENSE",
+          "sourceSha256": "7bdaf14147d112a0efe51cc918ecde3d8982820ebaa4ad4bdbe13e62f6263923",
+          "sha256": "7bdaf14147d112a0efe51cc918ecde3d8982820ebaa4ad4bdbe13e62f6263923",
+          "bytes": 1068,
+          "adaptation": null
+        }
+      ]
+    }
+  ]
+}

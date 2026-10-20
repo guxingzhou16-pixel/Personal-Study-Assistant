@@ -32,18 +32,178 @@ export interface AppFailure {
   code: string;
   message: string;
 }
+
+export interface StudyDay {
+  day: string;
+  checkedIn: boolean;
+  studySeconds: number;
+}
+
+export interface StudyOverview {
+  today: StudyDay;
+  days: StudyDay[];
+  running: boolean;
+}
 export type Reply<T> = { ok: true; value: T } | { ok: false; error: AppFailure };
+export type SourceKind = 'pdf' | 'markdown';
+export interface OutlineEntry {
+  anchor: string;
+  title: string;
+  depth: number;
+  page?: number;
+  line?: number;
+}
+export interface ReadingPosition {
+  page: number;
+  anchor: string;
+  offset: number;
+  zoom: number;
+  tone: 'paper' | 'warm';
+}
+export interface Source {
+  id: string;
+  name: string;
+  kind: SourceKind;
+  bytes: number;
+  pageCount: number;
+  textStatus: 'ready' | 'partial' | 'none';
+  importedAt: string;
+  openedAt: string | null;
+  outline: OutlineEntry[];
+  position: ReadingPosition;
+}
+export interface SourceSegment extends OutlineEntry {
+  text: string;
+}
+export interface ParsedDocument {
+  pageCount: number;
+  textStatus: Source['textStatus'];
+  outline: OutlineEntry[];
+  segments: SourceSegment[];
+}
+export interface OpenDocument {
+  source: Source;
+  text?: string;
+  data?: Uint8Array;
+}
+export interface ImportProgress {
+  file: string;
+  current: number;
+  total: number;
+  message: string;
+}
+export interface ImportReport {
+  added: number;
+  duplicates: number;
+  cancelled: boolean;
+  failures: { file: string; message: string }[];
+}
+export interface ChatTurn {
+  id: string;
+  conversationId: string;
+  question: string;
+  answer: string;
+  status: 'streaming' | 'completed' | 'stopped' | 'error' | 'interrupted';
+  notice: string;
+  provider: Provider;
+  baseUrl: string;
+  model: string;
+  createdAt: string;
+  revision: number;
+  mode: 'chat' | 'sources';
+  evidence: Evidence[];
+}
+export interface Evidence {
+  number: number;
+  sourceId: string;
+  sourceName: string;
+  kind: SourceKind;
+  anchor: string;
+  title: string;
+  page?: number;
+  line?: number;
+  start: number;
+  end: number;
+  text: string;
+}
+export interface EvidencePreview {
+  id: string;
+  question: string;
+  sourceId: string | null;
+  sourceCount: number;
+  notice: string;
+  hits: Evidence[];
+}
+export interface RetrievalProgress {
+  current: number;
+  total: number;
+  message: string;
+}
+export interface EmbeddingStatus {
+  state: 'missing' | 'downloading' | 'invalid' | 'ready';
+  name: string;
+  dimensions: number;
+  bytes: number;
+  revision: string;
+  message: string;
+}
+export interface CitationTarget {
+  sourceId: string;
+  anchor: string;
+  page: number;
+}
+export interface ConversationSummary {
+  id: string;
+  title: string;
+  updatedAt: string;
+}
+export interface Conversation extends ConversationSummary {
+  turns: ChatTurn[];
+}
+export interface ChatRequest {
+  conversationId: string;
+  question: string;
+  consentEndpoint?: string;
+  expectedProfile?: string;
+  retrievalId?: string;
+}
 export interface DesktopApi {
   bootstrap(): Promise<Bootstrap>;
   saveSettings(settings: Settings): Promise<Settings>;
   storeApiKey(baseUrl: string, key: string): Promise<void>;
   removeApiKey(baseUrl: string): Promise<void>;
   hasApiKey(baseUrl: string): Promise<boolean>;
+  studyOverview(year: number, month: number): Promise<StudyOverview>;
+  checkIn(year: number, month: number): Promise<StudyOverview>;
+  setStudyRunning(running: boolean, year: number, month: number): Promise<StudyOverview>;
   checkConnection(
     provider: Provider,
     profile: ModelProfile,
     key?: string,
   ): Promise<ConnectionReport>;
+  listSources(): Promise<Source[]>;
+  importSources(): Promise<ImportReport>;
+  cancelImport(): Promise<void>;
+  onImportProgress(listener: (progress: ImportProgress) => void): () => void;
+  openSource(id: string): Promise<OpenDocument>;
+  saveReadingPosition(id: string, position: ReadingPosition): Promise<void>;
+  copyCitation(id: string, anchor: string, quote: string): Promise<void>;
+  listConversations(): Promise<ConversationSummary[]>;
+  createConversation(): Promise<Conversation>;
+  getConversation(id: string): Promise<Conversation>;
+  sendChat(request: ChatRequest): Promise<ChatTurn>;
+  stopChat(id: string): Promise<void>;
+  activeChat(): Promise<ChatTurn | null>;
+  onChatUpdate(listener: (turn: ChatTurn) => void): () => void;
+  prepareQuestion(question: string, sourceId: string | null): Promise<EvidencePreview>;
+  cancelRetrieval(): Promise<void>;
+  rebuildIndex(): Promise<string>;
+  onRetrievalProgress(listener: (progress: RetrievalProgress) => void): () => void;
+  resolveCitation(turnId: string, number: number): Promise<CitationTarget>;
+  embeddingStatus(): Promise<EmbeddingStatus>;
+  downloadEmbedding(): Promise<EmbeddingStatus>;
+  cancelEmbeddingDownload(): Promise<void>;
+  onEmbeddingProgress(listener: (progress: RetrievalProgress) => void): () => void;
 }
 
 declare global {

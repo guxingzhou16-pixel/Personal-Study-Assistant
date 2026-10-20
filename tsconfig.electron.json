@@ -10,5 +10,5 @@
     "noUnusedLocals": true,
     "noUnusedParameters": true
   },
-  "include": ["electron", "tests", "src/lib/types.ts", "playwright.config.ts"]
+  "include": ["electron", "tests", "src/lib/types.ts", "playwright*.config.ts"]
 }

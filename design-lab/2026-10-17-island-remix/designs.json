@@ -1,0 +1,50 @@
+{
+  "schemaVersion": 1,
+  "project": "Study Companion / 拾知",
+  "round": "2026-10-17-island-remix",
+  "status": "concept",
+  "gallery": "index.html",
+  "handoffSchema": "handoff.schema.json",
+  "selectedDesignId": null,
+  "layoutReference": {
+    "id": "shizhi.sunny-isle.v1",
+    "name": "晴岛 / Sunny Isle",
+    "role": "original-layout-reference-only",
+    "entry": "../2026-10-17-three-directions/03-island/index.html",
+    "spec": "../2026-10-17-three-directions/03-island/design.json",
+    "preview": "../2026-10-17-three-directions/previews/03-island-home.png",
+    "countedAsNewDesign": false
+  },
+  "designs": [
+    {
+      "id": "shizhi.mono-island.v1",
+      "name": "玄墨 / Mono Noir",
+      "entry": "01-mono/index.html",
+      "spec": "01-mono/design.json",
+      "handoff": "01-mono/HANDOFF.md",
+      "preview": "previews/01-mono-home.png",
+      "readerPreview": "previews/01-mono-reader.png"
+    },
+    {
+      "id": "shizhi.terra-island.v1",
+      "name": "赤陶 / Terra Studio",
+      "entry": "02-terra/index.html",
+      "spec": "02-terra/design.json",
+      "handoff": "02-terra/HANDOFF.md",
+      "preview": "previews/02-terra-home.png",
+      "readerPreview": "previews/02-terra-reader.png"
+    },
+    {
+      "id": "shizhi.blue-island.v1",
+      "name": "蓝调 / Blue Atelier",
+      "entry": "03-blue/index.html",
+      "spec": "03-blue/design.json",
+      "handoff": "03-blue/HANDOFF.md",
+      "preview": "previews/03-blue-home.png",
+      "readerPreview": "previews/03-blue-reader.png"
+    }
+  ],
+  "referenceGallery": "references/index.html",
+  "references": "REFERENCES.md",
+  "validationReport": "VALIDATION.md"
+}

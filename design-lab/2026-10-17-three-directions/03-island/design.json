@@ -1,0 +1,111 @@
+{
+  "$schema": "../handoff.schema.json",
+  "schemaVersion": 1,
+  "id": "shizhi.sunny-isle.v1",
+  "name": "晴岛 / Sunny Isle",
+  "createdOn": "2026-10-17",
+  "status": "concept",
+  "runtime": "static-html",
+  "sampleDataOnly": true,
+  "entry": "index.html",
+  "preview": "../previews/03-island-home.png",
+  "readerPreview": "../previews/03-island-reader.png",
+  "handoff": "HANDOFF.md",
+  "sourceFiles": ["index.html", "../shared/demo.css", "../shared/demo.js"],
+  "intent": {
+    "audience": "希望获得温和陪伴、减少开启学习阻力的个人学习者",
+    "tone": "明亮、亲近、轻松、有成人文具的趣味",
+    "memorableDetail": "顶部胶囊导航、原创叠书盆栽、薄荷/杏色/灰紫拼色，不用经验值或排名制造激励"
+  },
+  "references": [
+    {
+      "title": "mymind",
+      "url": "https://mymind.com/",
+      "appliedTo": "私人的资料空间和降低整理负担的产品语气；插画、拼色和顶部导航为本轮原创"
+    }
+  ],
+  "tokens": {
+    "colors": {
+      "--bg": "#f8f7f2",
+      "--surface": "#fffef9",
+      "--sidebar": "#f8f7f2",
+      "--ink": "#334b40",
+      "--muted": "#718075",
+      "--line": "#e2e5da",
+      "--accent": "#365646",
+      "--accent-ink": "#f6f8ed",
+      "--tint": "#e4ecdc",
+      "hero": "#e7eddc",
+      "apricot": "#f6bf75",
+      "focusCard": "#eae7f1",
+      "focusButton": "#c5bdd6"
+    },
+    "typography": {
+      "body": "Segoe UI / Microsoft YaHei UI / Microsoft YaHei / sans-serif",
+      "heading": "Segoe UI / Microsoft YaHei UI / sans-serif",
+      "readingBodyPx": 14,
+      "note": "首页标题 34px / 1.45，主体采用中等字重；书封 RAG 使用 Segoe UI 大字，避免幼儿化字体。"
+    },
+    "spacingPx": [8, 12, 18, 24, 28, 31, 38],
+    "radiusPx": [12, 14, 18, 23, 26]
+  },
+  "layout": {
+    "navigation": "87px 顶部导航；左品牌、中间胶囊页签、右搜索/个人入口",
+    "home": "居中约 1130px 内容；带插画的欢迎区；主阅读/资料 + 300px 签到/计时区",
+    "library": "柔和拼色封面；宽屏三列，中屏两列、窄屏一列",
+    "reader": "保留顶部导航；目录、圆角阅读纸面、宽屏 305px 助手；小窗口按需浮层",
+    "breakpoints": [
+      ">=1240px 阅读可并排助手",
+      "<1240px 助手浮层，内容缩进减小",
+      "900x640 顶部导航保持完整、主区滚动",
+      "<760px 首页纵向，签到/计时可双列",
+      "<=430px 签到/计时与资料均单列"
+    ]
+  },
+  "interactions": {
+    "workingDemo": [
+      "顶部导航与三套风格互链",
+      "资料搜索/格式筛选",
+      "第一份资料阅读、目录和护眼",
+      "示例助手、引用定位",
+      "签到和手动计时，刷新重置",
+      "预设问题填入输入区",
+      "/ 搜索快捷键"
+    ],
+    "placeholder": [
+      "添加资料弹窗",
+      "个人设置弹窗",
+      "另外两份资料的阅读入口",
+      "问答提交只显示演示范围"
+    ],
+    "futureConcept": ["明亮陪伴式主题、同屏阅读与助手为视觉提议，尚未接入正式软件"]
+  },
+  "productIntegration": [
+    { "file": "src/App.tsx", "role": "将导航改为顶部布局时保留页面状态和已有启动加载" },
+    {
+      "file": "src/components/RecentReadings.tsx",
+      "role": "继续阅读卡片；所有页码来自真实阅读状态"
+    },
+    {
+      "file": "src/components/StudyCalendar.tsx",
+      "role": "圆润日历、签到和计时外观；不要把计时升级成已完成番茄钟"
+    },
+    {
+      "file": "src/components/LibraryPage.tsx",
+      "role": "拼色卡片；动态数量、导入失败和取消仍须保留"
+    },
+    {
+      "file": "src/components/ReadingPage.tsx",
+      "role": "正文与可收起助手布局；不以 HTML 替代正式 PDF 原页"
+    },
+    { "file": "src/styles.css", "role": "大圆角、拼色、顶部导航与减少动画" }
+  ],
+  "validationReport": "../VALIDATION.md",
+  "limitations": [
+    "欢迎插画只用于首页，正式阅读页保持安静",
+    "无等级、连胜或虚构掌握率",
+    "所有行为只作用于示例页面，未保存学习记录",
+    "窄屏为审美参考的可用退化，不改变 Windows 桌面优先路线",
+    "未验证 Electron、真实资料或模型"
+  ]
+}

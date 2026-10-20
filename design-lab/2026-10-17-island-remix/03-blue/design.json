@@ -1,0 +1,125 @@
+{
+  "$schema": "../handoff.schema.json",
+  "schemaVersion": 1,
+  "id": "shizhi.blue-island.v1",
+  "name": "蓝调 / Blue Atelier",
+  "createdOn": "2026-10-17",
+  "status": "concept",
+  "runtime": "static-html",
+  "sampleDataOnly": true,
+  "entry": "index.html",
+  "preview": "../previews/03-blue-home.png",
+  "readerPreview": "../previews/03-blue-reader.png",
+  "handoff": "HANDOFF.md",
+  "sourceFiles": [
+    "index.html",
+    "../shared/variants.css",
+    "../shared/variants.js",
+    "../../2026-10-17-three-directions/shared/demo.css",
+    "../../2026-10-17-three-directions/shared/demo.js"
+  ],
+  "intent": {
+    "audience": "喜欢鲜明图形、清楚操作边界与设计工作室感的个人学习者",
+    "tone": "鲜明、理性、有节奏、图形感强",
+    "memorableDetail": "晴岛骨架里使用钴蓝、奶油黄、2px 硬描边和 4px 偏移阴影，强调卡片分工"
+  },
+  "references": [
+    {
+      "title": "Neo-brutalism CSS",
+      "url": "https://github.com/quak-smauga/Neo-brutalism-CSS",
+      "appliedTo": "硬描边、偏移阴影、平涂色块和清楚的按钮轮廓；保留晴岛排版并降低阅读页装饰强度"
+    }
+  ],
+  "tokens": {
+    "colors": {
+      "--bg": "#f4f1e7",
+      "--surface": "#fffdf7",
+      "--sidebar": "#f4f1e7",
+      "--ink": "#222d48",
+      "--muted": "#69718a",
+      "--line": "#222d48",
+      "--accent": "#2d53d7",
+      "--accent-ink": "#ffffff",
+      "--tint": "#e3e9fa",
+      "hero": "#e3e9fa",
+      "focusCard": "#f8e7a3"
+    },
+    "typography": {
+      "body": "Segoe UI / Microsoft YaHei UI / Microsoft YaHei / sans-serif",
+      "heading": "Segoe UI / Microsoft YaHei UI / sans-serif",
+      "readingBodyPx": 14,
+      "note": "首页无衬线粗体标题 34px；正文保持晴岛阅读字号，靠字重、蓝色和描边形成图形节奏。"
+    },
+    "spacingPx": [8, 12, 18, 24, 28, 31, 38],
+    "radiusPx": [4, 8, 10]
+  },
+  "layout": {
+    "navigation": "87px 顶部导航；左品牌、中间胶囊页签、右搜索/个人入口，与第一轮晴岛一致",
+    "home": "居中最大约 1130px；欢迎横幅；下方左侧继续阅读/资料，右侧 300px 签到/手动计时，布局锁定晴岛",
+    "library": "保留晴岛资料卡与搜索/格式筛选的布局，只改视觉；宽屏三列、中屏两列、窄屏一列",
+    "reader": "沿用晴岛顶部导航、目录、阅读纸面与 305px 助手；原文位置和交互骨架不变",
+    "breakpoints": [
+      ">=1240px 阅读可并排助手",
+      "<1240px 助手浮层，内容缩进减小",
+      "900x640 顶部导航保持完整、主区滚动",
+      "<760px 首页纵向，签到/计时可双列",
+      "<=430px 签到/计时与资料均单列"
+    ]
+  },
+  "interactions": {
+    "workingDemo": [
+      "顶部导航与本轮三套风格、原晴岛对照互链",
+      "资料搜索/格式筛选",
+      "第一份资料阅读、目录与护眼",
+      "示例助手与引用定位",
+      "示例签到、手动计时，刷新重置",
+      "预设问题填入输入区",
+      "/ 搜索快捷键"
+    ],
+    "placeholder": [
+      "添加资料弹窗",
+      "个人设置弹窗",
+      "另外两份资料的阅读入口",
+      "问答提交只解释演示范围"
+    ],
+    "futureConcept": ["硬描边图形视觉候选，不引入游戏化数值或奖励"]
+  },
+  "productIntegration": [
+    {
+      "file": "src/App.tsx",
+      "role": "仓库根相对路径；采用晴岛顶部导航与首页双列时保留页面状态、启动加载和原有导航逻辑"
+    },
+    {
+      "file": "src/components/RecentReadings.tsx",
+      "role": "复用继续阅读卡片结构；页码、标题与阅读进度从真实数据读取"
+    },
+    {
+      "file": "src/components/StudyCalendar.tsx",
+      "role": "仅调整日历、签到和手动计时外观；保留现有行为和中断边界"
+    },
+    {
+      "file": "src/components/LibraryPage.tsx",
+      "role": "资料卡、筛选与搜索的视觉映射；保留真实导入、错误和取消状态"
+    },
+    {
+      "file": "src/components/ReadingPage.tsx",
+      "role": "阅读与助手的视觉映射；保留 PDF 原页、锚点、引用和位置保存逻辑"
+    },
+    {
+      "file": "src/styles.css",
+      "role": "提取所选风格的 token、字体和组件外观；不复制 demo HTML 或示例数据"
+    },
+    {
+      "file": "src/lib/desktop.ts",
+      "role": "保留唯一桌面桥接与真实数据调用，不新增设计 demo 后端"
+    }
+  ],
+  "validationReport": "../VALIDATION.md",
+  "limitations": [
+    "硬描边与偏移阴影集中在首页工具和卡片，阅读正文避免连续视觉噪声",
+    "钴蓝操作与奶油黄辅助区须区分角色，不能只靠颜色表示状态",
+    "全部交互作用于示例页面，刷新重置，没有个人记录",
+    "未验证正式 Electron、真实资料或模型",
+    "参考下载、版本和本地展示的实际状态见本轮 REFERENCES.md；浏览器检查见 VALIDATION.md"
+  ]
+}

@@ -1,0 +1,115 @@
+import { useEffect, useState } from 'react';
+import { Download, LoaderCircle, Square } from 'lucide-react';
+import { desktop, errorMessage, isDesktop } from '../lib/desktop';
+import type { EmbeddingStatus, RetrievalProgress } from '../lib/types';
+
+// Download lifecycle stays independent of the chat settings form. Selecting a
+// cloud chat provider does not select, upload to, or reconfigure this local model.
+export function EmbeddingSettings() {
+  const [status, setStatus] = useState<EmbeddingStatus | null>(null);
+  const [progress, setProgress] = useState<RetrievalProgress | null>(null);
+  const [busy, setBusy] = useState(false);
+  const [notice, setNotice] = useState('');
+  const downloading = busy || status?.state === 'downloading';
+  useEffect(() => {
+    if (!isDesktop) return;
+    let active = true;
+    const read = () =>
+      void desktop
+        .embeddingStatus()
+        .then((value) => {
+          if (active) setStatus(value);
+        })
+        .catch((error) => {
+          if (active) setNotice(errorMessage(error));
+        });
+    read();
+    // A download continues when navigating away. Read the final status after
+    // returning, without starting another request or relying on a mounted form.
+    const timer = downloading ? setInterval(read, 2000) : undefined;
+    const stop = desktop.onEmbeddingProgress(setProgress);
+    return () => {
+      active = false;
+      clearInterval(timer);
+      stop();
+    };
+  }, [downloading]);
+  async function download() {
+    setBusy(true);
+    setNotice('');
+    setProgress(null);
+    try {
+      setStatus(await desktop.downloadEmbedding());
+      setNotice('检索模型已下载并校验，资料问答会自动使用混合检索。');
+    } catch (error) {
+      setNotice(errorMessage(error));
+      try {
+        setStatus(await desktop.embeddingStatus());
+      } catch (failure) {
+        setNotice(errorMessage(failure));
+      }
+    } finally {
+      setBusy(false);
+    }
+  }
+  return (
+    <section className="settings-section embedding-settings" aria-labelledby="embedding-heading">
+      <div className="section-heading">
+        <h2 id="embedding-heading">本地语义检索</h2>
+        <span>资料留在本机</span>
+      </div>
+      <p>
+        让表达不同但意思相关的原文也能被找到。检索模型独立运行，无需安装
+        Ollama；聊天模型仍按上方配置使用。
+      </p>
+      <p className="field-hint">
+        {status
+          ? `${status.name} · ${Math.ceil(status.bytes / 1024 / 1024)} MB · MIT 许可证 · 下载来源 Hugging Face`
+          : '中文 BGE-small 量化模型 · 约 24 MB · 下载来源 Hugging Face'}
+      </p>
+      <p className="field-hint">
+        点击下载只获取模型文件，不上传资料。首次检索会在后台建立向量索引，可能需要等待；可取消，模型不可用时仍能关键词检索。
+      </p>
+      <p role="status">
+        {downloading
+          ? (progress?.message ?? '正在准备下载…')
+          : (status?.message ?? (isDesktop ? '正在检查本地模型…' : '请在桌面版下载检索模型。'))}
+      </p>
+      {downloading && progress && (
+        <progress aria-label="模型下载进度" max={progress.total} value={progress.current} />
+      )}
+      <div className="connection-footer">
+        {downloading ? (
+          <button
+            type="button"
+            className="button secondary"
+            onClick={() =>
+              void desktop
+                .cancelEmbeddingDownload()
+                .catch((error) => setNotice(errorMessage(error)))
+            }
+          >
+            <Square size={15} />
+            取消模型下载
+          </button>
+        ) : (
+          <button
+            type="button"
+            className="button secondary"
+            disabled={!isDesktop || !status || status.state === 'ready'}
+            onClick={() => void download()}
+          >
+            <Download size={16} />
+            {status?.state === 'ready' ? '模型已就绪' : '下载检索模型'}
+          </button>
+        )}
+        {downloading && <LoaderCircle size={16} className="spin" aria-hidden="true" />}
+      </div>
+      {notice && (
+        <p className="field-hint" role="status">
+          {notice}
+        </p>
+      )}
+    </section>
+  );
+}

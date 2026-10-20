@@ -7,6 +7,18 @@ import type {
   Provider,
   Reply,
   Settings,
+  Source,
+  ImportReport,
+  ImportProgress,
+  OpenDocument,
+  StudyOverview,
+  ConversationSummary,
+  Conversation,
+  ChatTurn,
+  EvidencePreview,
+  RetrievalProgress,
+  CitationTarget,
+  EmbeddingStatus,
 } from '../src/lib/types';
 
 async function call<T>(channel: string, ...args: unknown[]): Promise<T> {
@@ -21,7 +33,57 @@ const api: DesktopApi = {
   storeApiKey: (baseUrl: string, key: string) => call<void>('study:store-key', baseUrl, key),
   removeApiKey: (baseUrl: string) => call<void>('study:remove-key', baseUrl),
   hasApiKey: (baseUrl: string) => call<boolean>('study:has-key', baseUrl),
+  studyOverview: (year, month) => call<StudyOverview>('study:overview', year, month),
+  checkIn: (year, month) => call<StudyOverview>('study:check-in', year, month),
+  setStudyRunning: (running, year, month) =>
+    call<StudyOverview>('study:set-running', running, year, month),
   checkConnection: (provider: Provider, profile: ModelProfile, key?: string) =>
     call<ConnectionReport>('study:check-connection', provider, profile, key),
+  listSources: () => call<Source[]>('study:list-sources'),
+  importSources: () => call<ImportReport>('study:import-sources'),
+  cancelImport: () => call<void>('study:cancel-import'),
+  onImportProgress: (listener) => {
+    const receive = (_event: Electron.IpcRendererEvent, progress: ImportProgress) =>
+      listener(progress);
+    ipcRenderer.on('study:import-progress', receive);
+    return () => {
+      ipcRenderer.removeListener('study:import-progress', receive);
+    };
+  },
+  openSource: (id) => call<OpenDocument>('study:open-source', id),
+  saveReadingPosition: (id, position) => call<void>('study:save-reading-position', id, position),
+  copyCitation: (id, anchor, quote) => call<void>('study:copy-citation', id, anchor, quote),
+  listConversations: () => call<ConversationSummary[]>('study:list-conversations'),
+  createConversation: () => call<Conversation>('study:create-conversation'),
+  getConversation: (id) => call<Conversation>('study:get-conversation', id),
+  sendChat: (request) => call<ChatTurn>('study:send-chat', request),
+  stopChat: (id) => call<void>('study:stop-chat', id),
+  activeChat: () => call<ChatTurn | null>('study:active-chat'),
+  onChatUpdate: (listener) => {
+    const receive = (_event: Electron.IpcRendererEvent, turn: ChatTurn) => listener(turn);
+    ipcRenderer.on('study:chat-update', receive);
+    return () => ipcRenderer.removeListener('study:chat-update', receive);
+  },
+  prepareQuestion: (question, sourceId) =>
+    call<EvidencePreview>('study:prepare-question', question, sourceId),
+  cancelRetrieval: () => call<void>('study:cancel-retrieval'),
+  rebuildIndex: () => call<string>('study:rebuild-index'),
+  onRetrievalProgress: (listener) => {
+    const receive = (_event: Electron.IpcRendererEvent, progress: RetrievalProgress) =>
+      listener(progress);
+    ipcRenderer.on('study:retrieval-progress', receive);
+    return () => ipcRenderer.removeListener('study:retrieval-progress', receive);
+  },
+  resolveCitation: (turnId, number) =>
+    call<CitationTarget>('study:resolve-citation', turnId, number),
+  embeddingStatus: () => call<EmbeddingStatus>('study:embedding-status'),
+  downloadEmbedding: () => call<EmbeddingStatus>('study:download-embedding'),
+  cancelEmbeddingDownload: () => call<void>('study:cancel-embedding-download'),
+  onEmbeddingProgress: (listener) => {
+    const receive = (_event: Electron.IpcRendererEvent, progress: RetrievalProgress) =>
+      listener(progress);
+    ipcRenderer.on('study:embedding-progress', receive);
+    return () => ipcRenderer.removeListener('study:embedding-progress', receive);
+  },
 };
 contextBridge.exposeInMainWorld('studyCompanion', api);

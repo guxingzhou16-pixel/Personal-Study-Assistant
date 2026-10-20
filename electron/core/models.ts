@@ -80,7 +80,7 @@ export async function checkConnection(
   if (!models.length) message = '服务已连接，但没有返回模型。请先安装模型或检查账户权限。';
   else if (!profile.model)
     message = `服务已连接，发现 ${models.length} 个模型。请选择一个模型并保存。`;
-  else if (selectedModelAvailable) message = '服务已连接，所选模型存在。聊天生成将在后续阶段接入。';
+  else if (selectedModelAvailable) message = '服务已连接，所选模型存在。可以前往学习助手提问。';
   else message = '服务已连接，但找不到所选模型。请从列表选择或检查模型名。';
   return { models, selectedModelAvailable, message };
 }
