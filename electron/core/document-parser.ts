@@ -1,12 +1,83 @@
 import { readFile } from 'node:fs/promises';
 import { unified } from 'unified';
 import remarkParse from 'remark-parse';
+import remarkGfm from 'remark-gfm';
 import { toString } from 'mdast-util-to-string';
-import type { Heading } from 'mdast';
+import type { Heading, Root } from 'mdast';
 import type { ParsedDocument, OutlineEntry, SourceSegment } from '../../src/lib/types';
 import { AppError } from './errors';
 
-export function parseMarkdown(data: Uint8Array): ParsedDocument {
+export interface MarkdownSelectionMap {
+  anchor: string;
+  legacyText: string;
+  spans: { start: number; end: number; legacyStart: number }[];
+}
+export type ParserResult = ParsedDocument & { markdownSelections?: MarkdownSelectionMap[] };
+interface MarkdownNode {
+  type: string;
+  value?: string;
+  children?: MarkdownNode[];
+}
+interface Token {
+  text: string;
+  literal: boolean;
+}
+function visibleTokens(node: MarkdownNode): Token[] {
+  if (node.type === 'html' || node.type === 'image') return [];
+  if (node.type === 'break') return [{ text: '\n', literal: false }];
+  if (node.value !== undefined) return [{ text: node.value, literal: true }];
+  const separator =
+    node.type === 'tableRow'
+      ? '\t'
+      : ['table', 'list', 'listItem', 'blockquote'].includes(node.type)
+        ? '\n'
+        : '';
+  return (node.children ?? []).flatMap((child, index) => [
+    ...(index && separator ? [{ text: separator, literal: false }] : []),
+    ...visibleTokens(child),
+  ]);
+}
+function markdownSections(tree: Root, render: (node: MarkdownNode) => Token[]) {
+  const outline: OutlineEntry[] = [];
+  const sections: { segment: SourceSegment; tokens: Token[] }[] = [];
+  let current: SourceSegment = {
+    anchor: 'md-line-1',
+    title: '文档开头',
+    depth: 1,
+    line: 1,
+    text: '',
+  };
+  let tokens: Token[] = [];
+  const save = () => {
+    if (current.text.trim()) sections.push({ segment: current, tokens });
+  };
+  for (const node of tree.children) {
+    if (node.type === 'heading') {
+      save();
+      const heading = node as Heading;
+      const line = heading.position!.start.line;
+      const entry = {
+        anchor: `md-line-${line}`,
+        title: toString(heading).slice(0, 200) || '无标题章节',
+        depth: heading.depth,
+        line,
+      };
+      outline.push(entry);
+      current = { ...entry, text: '' };
+      tokens = [];
+    }
+    if (node.type !== 'html') {
+      const content = [...render(node), { text: '\n', literal: false }];
+      tokens.push(...content);
+      current.text += content.map((token) => token.text).join('');
+    }
+  }
+  save();
+  if (!outline.length) outline.push({ anchor: 'md-line-1', title: '文档开头', depth: 1, line: 1 });
+  return { outline, sections };
+}
+
+export function parseMarkdown(data: Uint8Array): ParserResult {
   let text: string;
   try {
     text = new TextDecoder('utf-8', { fatal: true }).decode(data);
@@ -15,36 +86,43 @@ export function parseMarkdown(data: Uint8Array): ParsedDocument {
   }
   if (!text.trim() || text.includes('\0'))
     throw new AppError('markdownContent', 'Markdown 为空或包含二进制内容。');
-  const tree = unified().use(remarkParse).parse(text);
-  const outline: OutlineEntry[] = [];
-  const segments: SourceSegment[] = [];
-  let current: SourceSegment = {
-    anchor: 'md-line-1',
-    title: '文档开头',
-    depth: 1,
-    line: 1,
-    text: '',
-  };
-  for (const node of tree.children) {
-    if (node.type === 'heading') {
-      if (current.text.trim()) segments.push(current);
-      const heading = node as Heading;
-      const line = heading.position!.start.line;
-      const entry: OutlineEntry = {
-        anchor: `md-line-${line}`,
-        title: toString(heading).slice(0, 200) || '无标题章节',
-        depth: heading.depth,
-        line,
-      };
-      outline.push(entry);
-      current = { ...entry, text: '' };
+  const legacy = markdownSections(unified().use(remarkParse).parse(text), (node) => [
+    { text: toString(node), literal: true },
+  ]);
+  const current = markdownSections(
+    unified().use(remarkParse).use(remarkGfm).parse(text),
+    visibleTokens,
+  );
+  const markdownSelections: MarkdownSelectionMap[] = [];
+  for (const { segment, tokens } of current.sections) {
+    const old = legacy.sections.find((entry) => entry.segment.anchor === segment.anchor)?.segment;
+    if (!old) continue;
+    const spans: MarkdownSelectionMap['spans'] = [];
+    let offset = 0,
+      legacyOffset = 0;
+    let mapped = true;
+    for (const token of tokens) {
+      if (token.literal && token.text) {
+        const start = old.text.indexOf(token.text, legacyOffset);
+        if (start < 0) {
+          mapped = false;
+          break;
+        }
+        spans.push({ start: offset, end: offset + token.text.length, legacyStart: start });
+        legacyOffset = start + token.text.length;
+      }
+      offset += token.text.length;
     }
-    // HTML remains untrusted input. It is omitted from searchable evidence and skipped by the reader.
-    if (node.type !== 'html') current.text += `${toString(node)}\n`;
+    if (mapped) markdownSelections.push({ anchor: segment.anchor, legacyText: old.text, spans });
   }
-  if (current.text.trim()) segments.push(current);
-  if (!outline.length) outline.push({ anchor: 'md-line-1', title: '文档开头', depth: 1, line: 1 });
-  return { pageCount: 1, textStatus: segments.length ? 'ready' : 'none', outline, segments };
+  const segments = current.sections.map((entry) => entry.segment);
+  return {
+    pageCount: 1,
+    textStatus: segments.length ? 'ready' : 'none',
+    outline: current.outline,
+    segments,
+    markdownSelections,
+  };
 }
 
 export async function parsePdf(

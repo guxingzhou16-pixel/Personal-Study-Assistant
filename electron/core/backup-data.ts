@@ -15,6 +15,8 @@ import { ChatStorage, chatId } from './chat-storage';
 import { DOCUMENT_LIMITS, sourceId } from './documents';
 import { parsePractice } from '../../src/lib/practice';
 import { ReviewStorage } from './review-storage';
+import { parseLearningPlan } from '../../src/lib/learning-plan';
+import { localEvidenceExplanation, onlyOverrideEvidence } from './evidence-policy';
 
 export const MAIN_DATABASE = 'study-companion.sqlite3';
 export const ACTIVITY_DATABASE = 'study-activity.sqlite3';
@@ -227,6 +229,22 @@ export function inspectDatabases(directory: string): {
         invalid('回答快照与所属会话用途不一致。');
       if (turn.practiceRequest && turn.status === 'completed' && turn.evidence.length)
         parsePractice(turn.answer, turn.evidence);
+      if (
+        turn.learningRequest?.format === 'steps-v1' &&
+        turn.status === 'completed' &&
+        turn.evidence.length &&
+        !(
+          onlyOverrideEvidence(turn.evidence) &&
+          turn.answer === localEvidenceExplanation.answer &&
+          turn.notice === localEvidenceExplanation.notice
+        )
+      ) {
+        try {
+          parseLearningPlan(turn.answer, turn.evidence, turn.learningRequest.minutes);
+        } catch {
+          invalid('已完成的结构化学习路线格式、引用或时间预算无效。');
+        }
+      }
       validateProvider(turn.provider);
       validateProfile({ baseUrl: turn.baseUrl, model: turn.model });
     }

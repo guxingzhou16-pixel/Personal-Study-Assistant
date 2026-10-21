@@ -346,8 +346,8 @@ function registerHandlers(
   handle('study:save-reading-position', (id, position) =>
     database.saveReadingPosition(id, position),
   );
-  handle('study:copy-citation', (id, anchor, quote) =>
-    clipboard.writeText(files.citation(id, anchor, quote)),
+  handle('study:copy-citation', async (id, anchor, quote) =>
+    clipboard.writeText(await files.citation(id, anchor, quote)),
   );
   handle('study:read-selection', async (id, anchor, quote) => {
     await files.verify(id);
@@ -500,7 +500,12 @@ function registerHandlers(
   );
   handle('study:prepare-reading-question', async (question, id, anchor, quote) => {
     await files.verify(id);
-    return retrieval.prepare(question, id, retrievalProgress, files.selection(id, anchor, quote));
+    return retrieval.prepare(
+      question,
+      id,
+      retrievalProgress,
+      await files.selection(id, anchor, quote),
+    );
   });
   handle('study:prepare-practice', (request) => practice.prepare(request, retrievalProgress));
   handle('study:send-practice', (request) => {

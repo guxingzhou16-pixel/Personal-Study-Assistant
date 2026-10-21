@@ -2,6 +2,8 @@ import { randomUUID } from 'node:crypto';
 import type { DatabaseSync } from 'node:sqlite';
 import type { ChatTurn, Conversation, ConversationSummary } from '../../src/lib/types';
 import { AppError } from './errors';
+import { record, validateProfile, validateProvider } from './settings';
+import { DOCUMENT_LIMITS, sourceId } from './documents';
 import { readNoteSnapshot } from './note-storage';
 import { readLearningRequest } from './learning-input';
 import { readLearningMemories } from './memory-storage';
@@ -41,7 +43,81 @@ export const LEARNING_AGENT_MIGRATION = `
 
 function decodeTurn(row: Record<string, unknown>): ChatTurn {
   try {
-    const { noteSnapshot, learningRequest, learningMemories, practiceRequest, ...fields } = row;
+    const { noteSnapshot, learningRequest, learningMemories, practiceRequest } = row;
+    const text = (value: unknown, limit: number): string => {
+      if (typeof value !== 'string' || value.length > limit || value.includes('\0'))
+        throw new Error('Invalid stored text');
+      return value;
+    };
+    const id = chatId(row.id);
+    const conversationId = chatId(row.conversationId);
+    const question = text(row.question, 4000);
+    const answer = text(row.answer, 64000);
+    const notice = text(row.notice, 64000);
+    const createdAt = text(row.createdAt, 100);
+    const revision = row.revision;
+    const mode = row.mode;
+    const status = row.status;
+    if (
+      !question.trim() ||
+      !Number.isFinite(Date.parse(createdAt)) ||
+      typeof revision !== 'number' ||
+      !Number.isSafeInteger(revision) ||
+      revision < 0 ||
+      (mode !== 'chat' && mode !== 'sources') ||
+      (status !== 'streaming' &&
+        status !== 'completed' &&
+        status !== 'stopped' &&
+        status !== 'error' &&
+        status !== 'interrupted')
+    )
+      throw new Error('Invalid stored turn');
+    const provider = validateProvider(row.provider);
+    const profile = validateProfile({ baseUrl: row.baseUrl, model: row.model });
+    const evidence: unknown = JSON.parse(String(row.evidence));
+    if (!Array.isArray(evidence) || evidence.length > 4 || (mode === 'chat' && evidence.length))
+      throw new Error('Invalid stored evidence');
+    for (const [index, value] of evidence.entries()) {
+      const hit = record(value);
+      sourceId(hit.sourceId);
+      const excerpt = text(hit.text, 800);
+      if (
+        hit.number !== index + 1 ||
+        !text(hit.sourceName, 200).trim() ||
+        typeof hit.start !== 'number' ||
+        !Number.isSafeInteger(hit.start) ||
+        hit.start < 0 ||
+        typeof hit.end !== 'number' ||
+        !Number.isSafeInteger(hit.end) ||
+        hit.end <= hit.start ||
+        hit.end > DOCUMENT_LIMITS.markdown ||
+        !excerpt.trim() ||
+        excerpt.length !== hit.end - hit.start
+      )
+        throw new Error('Invalid stored evidence');
+      text(hit.title, 200);
+      if (hit.kind === 'pdf') {
+        if (
+          typeof hit.page !== 'number' ||
+          !Number.isInteger(hit.page) ||
+          hit.page < 1 ||
+          hit.page > DOCUMENT_LIMITS.pages ||
+          hit.anchor !== `page-${hit.page}` ||
+          hit.line !== undefined
+        )
+          throw new Error('Invalid PDF evidence');
+      } else if (hit.kind === 'markdown') {
+        if (
+          typeof hit.line !== 'number' ||
+          !Number.isInteger(hit.line) ||
+          hit.line < 1 ||
+          hit.line > DOCUMENT_LIMITS.markdown + 1 ||
+          hit.anchor !== `md-line-${hit.line}` ||
+          hit.page !== undefined
+        )
+          throw new Error('Invalid Markdown evidence');
+      } else throw new Error('Invalid evidence kind');
+    }
     if (learningRequest !== null && (noteSnapshot !== null || row.mode !== 'sources'))
       throw new Error('Conflicting learning snapshots');
     if (learningMemories !== null && learningRequest === null)
@@ -55,8 +131,19 @@ function decodeTurn(row: Record<string, unknown>): ChatTurn {
     )
       throw new Error('Conflicting practice snapshot');
     return {
-      ...fields,
-      evidence: JSON.parse(String(row.evidence)),
+      id,
+      conversationId,
+      question,
+      answer,
+      status,
+      notice,
+      provider,
+      baseUrl: profile.baseUrl,
+      model: profile.model,
+      createdAt,
+      revision,
+      mode,
+      evidence,
       ...(noteSnapshot !== null
         ? { noteSnapshot: readNoteSnapshot(JSON.parse(String(noteSnapshot))) }
         : {}),
@@ -69,7 +156,7 @@ function decodeTurn(row: Record<string, unknown>): ChatTurn {
       ...(practiceRequest !== null
         ? { practiceRequest: readPracticeRequest(JSON.parse(String(practiceRequest))) }
         : {}),
-    } as unknown as ChatTurn;
+    };
   } catch {
     throw new AppError('chatCorrupt', '回答或学习内容快照格式损坏，请保留数据并检查备份。');
   }

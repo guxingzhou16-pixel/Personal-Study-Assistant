@@ -2,7 +2,7 @@ import { DatabaseSync } from 'node:sqlite';
 import type { Evidence, EvidencePreview, RetrievalProgress } from '../../src/lib/types';
 import type { EmbeddingEncoder } from './embeddings';
 import { AppError } from './errors';
-import { chunks, retrieve } from './retrieval';
+import { chunks, matchesNamedQuery, namedQueryTerms, retrieve } from './retrieval';
 import { openVectorIndex } from './vector-index';
 import { vectorPolicy } from './embedding-model';
 
@@ -126,6 +126,7 @@ async function vectorCandidates(
   question: string,
   scope: string | null,
   keywordSources: ReadonlySet<string>,
+  identifiers: string[],
 ): Promise<Evidence[]> {
   if (!question.trim()) return [];
   // Long questions use all windows, then average normalized vectors. Nothing is
@@ -177,7 +178,7 @@ async function vectorCandidates(
     ranked.sort((a, b) => b.score - a.score);
     if (ranked.length > vectorPolicy.candidateLimit) ranked.pop();
   }
-  return ranked.map((entry) => {
+  return ranked.flatMap((entry) => {
     const source = main.prepare('SELECT name, kind FROM sources WHERE id = ?').get(entry.sourceId);
     const segment = main
       .prepare('SELECT * FROM source_segments WHERE source_id = ? AND anchor = ?')
@@ -185,19 +186,23 @@ async function vectorCandidates(
     if (!source || !segment)
       throw new AppError('embeddingVectors', '向量缓存中的资料不存在，请重建检索索引。');
     const text = String(segment.text).slice(entry.start, entry.end);
-    return {
-      number: 0,
-      sourceId: entry.sourceId,
-      sourceName: String(source.name),
-      kind: source.kind as Evidence['kind'],
-      anchor: entry.anchor,
-      title: String(segment.title),
-      start: entry.start,
-      end: entry.end,
-      text,
-      ...(segment.page === null ? {} : { page: Number(segment.page) }),
-      ...(segment.line === null ? {} : { line: Number(segment.line) }),
-    };
+    if (!matchesNamedQuery(question, `${source.name}\n${segment.title}\n${text}`, identifiers))
+      return [];
+    return [
+      {
+        number: 0,
+        sourceId: entry.sourceId,
+        sourceName: String(source.name),
+        kind: source.kind as Evidence['kind'],
+        anchor: entry.anchor,
+        title: String(segment.title),
+        start: entry.start,
+        end: entry.end,
+        text,
+        ...(segment.page === null ? {} : { page: Number(segment.page) }),
+        ...(segment.line === null ? {} : { line: Number(segment.line) }),
+      },
+    ];
   });
 }
 function overlaps(left: Evidence, right: Evidence): boolean {
@@ -252,6 +257,10 @@ export async function retrieveHybrid(
       question,
       scope,
       new Set(keyword.hits.map((hit) => hit.sourceId)),
+      namedQueryTerms(
+        question,
+        keyword.hits.map((hit) => `${hit.sourceName}\n${hit.title}\n${hit.text}`).join('\n'),
+      ),
     );
     return {
       ...keyword,

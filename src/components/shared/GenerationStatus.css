@@ -1,0 +1,26 @@
+.generation-status {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 14px;
+  padding: 14px 16px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--theme-surface-muted, #f2f6ee);
+  font-size: 13px;
+}
+.generation-status p {
+  margin: 0 0 6px;
+}
+.generation-status > div {
+  flex: 1;
+  min-width: 160px;
+}
+.generation-status time {
+  font-variant-numeric: tabular-nums;
+}
+.generation-status > button {
+  min-height: 40px;
+}

@@ -809,6 +809,9 @@
   color: var(--theme-muted, #8b9485);
   text-decoration: none;
 }
+.external-reference small::after {
+  content: ' 外部链接';
+}
 .inline-link {
   padding: 0;
   background: transparent;
@@ -1365,6 +1368,7 @@ h2 {
   margin-top: 6px;
 }
 .daily-section {
+  position: relative;
   min-width: 0;
 }
 .calendar-panel {

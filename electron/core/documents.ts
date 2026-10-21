@@ -5,25 +5,22 @@ import { mkdir, readFile, rename, rm, stat } from 'node:fs/promises';
 import { basename, extname, join } from 'node:path';
 import { Transform } from 'node:stream';
 import { pipeline } from 'node:stream/promises';
-import type {
-  ImportProgress,
-  ImportReport,
-  OpenDocument,
-  ParsedDocument,
-  SourceKind,
-} from '../../src/lib/types';
+import type { ImportProgress, ImportReport, OpenDocument, SourceKind } from '../../src/lib/types';
 import { AppError, failure } from './errors';
 import type { Storage } from './storage';
+import { backupLimits } from '../../src/lib/backup';
+import type { ParserResult } from './document-parser';
 
 export const DOCUMENT_LIMITS = {
   pdf: 50 * 1024 * 1024,
   markdown: 5 * 1024 * 1024,
   files: 20,
   pages: 1000,
+  sources: backupLimits.files - 2,
 };
 type ParserMessage =
   | { type: 'progress'; message: string }
-  | { type: 'result'; result: ParsedDocument }
+  | { type: 'result'; result: ParserResult }
   | { type: 'error'; code: string; message: string };
 export interface ParserProcess {
   on(event: 'message', listener: (message: ParserMessage) => void): unknown;
@@ -45,6 +42,7 @@ function fileKind(path: string): SourceKind {
 }
 export class Documents {
   private active: AbortController | undefined;
+  private markdownCompatibility?: { id: string; result: ParserResult };
   constructor(
     private readonly storage: Storage,
     private readonly directory: string,
@@ -119,6 +117,7 @@ export class Documents {
             notify('已有相同内容，保留原有阅读进度。');
             continue;
           }
+          this.storage.ensureSourceCapacity();
           notify('分析目录与文字…');
           const parsed = await this.parse(staged, kind, controller.signal, notify);
           controller.signal.throwIfAborted();
@@ -158,7 +157,7 @@ export class Documents {
     kind: SourceKind,
     signal: AbortSignal,
     progress: (message: string) => void,
-  ): Promise<ParsedDocument> {
+  ): Promise<ParserResult> {
     return new Promise((resolve, reject) => {
       // PDF/native decompression stays in another process: cancelling it cannot terminate the main process.
       const worker = this.launchParser(this.workerPath, [
@@ -167,7 +166,7 @@ export class Documents {
         String(DOCUMENT_LIMITS.pages),
       ]);
       let finished = false;
-      const finish = (error?: unknown, result?: ParsedDocument) => {
+      const finish = (error?: unknown, result?: ParserResult) => {
         if (finished) return;
         finished = true;
         clearTimeout(timer);
@@ -240,11 +239,11 @@ export class Documents {
     if (bytes !== source.bytes || hash.digest('hex') !== id)
       throw new AppError('sourceChanged', '资料副本已被修改，请重新导入后再检索和引用。');
   }
-  selection(
+  async selection(
     input: unknown,
     anchorInput: unknown,
     quoteInput: unknown,
-  ): import('../../src/lib/types').ReadingSelection {
+  ): Promise<import('../../src/lib/types').ReadingSelection> {
     const id = sourceId(input);
     const source = this.storage.getSource(id);
     if (!source) throw new AppError('sourceMissing', '这份资料不存在。');
@@ -263,7 +262,41 @@ export class Documents {
       .map((part) => part.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'))
       .join('\\s+');
     const match = quote ? new RegExp(pattern, 'u').exec(segment.text) : null;
-    if (!match) throw new AppError('citation', '请选择同一页或同一章节内的原文，再复制引用。');
+    let start = match?.index ?? -1;
+    let end = start + (match?.[0].length ?? 0);
+    if (!match && quote && source.kind === 'markdown') {
+      await this.verify(id);
+      if (this.markdownCompatibility?.id !== id) {
+        const result = await this.parse(
+          this.filePath(id, 'markdown'),
+          'markdown',
+          new AbortController().signal,
+          () => {},
+        );
+        this.markdownCompatibility = { id, result };
+      }
+      const parsed = this.markdownCompatibility.result;
+      const original = parsed.markdownSelections?.find(
+        (entry) => entry.anchor === segment.anchor && entry.legacyText === segment.text,
+      );
+      const canonical = parsed.segments.find((entry) => entry.anchor === segment.anchor);
+      const selected = original && canonical ? new RegExp(pattern, 'u').exec(canonical.text) : null;
+      if (selected && original) {
+        const first = original.spans.find(
+          (span) => span.start <= selected.index && span.end > selected.index,
+        );
+        const lastOffset = selected.index + selected[0].length;
+        const last = original.spans.find(
+          (span) => span.start < lastOffset && span.end >= lastOffset,
+        );
+        if (first && last) {
+          start = first.legacyStart + selected.index - first.start;
+          end = last.legacyStart + lastOffset - last.start;
+        }
+      }
+    }
+    if (start < 0 || end <= start)
+      throw new AppError('citation', '请选择同一页或同一章节内的原文，再复制引用。');
     return {
       sourceId: id,
       sourceName: source.name,
@@ -272,13 +305,13 @@ export class Documents {
       title: segment.title,
       ...(segment.page ? { page: segment.page } : {}),
       ...(segment.line ? { line: segment.line } : {}),
-      text: match[0],
-      start: match.index,
-      end: match.index + match[0].length,
+      text: segment.text.slice(start, end),
+      start,
+      end,
     };
   }
-  citation(input: unknown, anchorInput: unknown, quoteInput: unknown): string {
-    const selection = this.selection(input, anchorInput, quoteInput);
+  async citation(input: unknown, anchorInput: unknown, quoteInput: unknown): Promise<string> {
+    const selection = await this.selection(input, anchorInput, quoteInput);
     const location =
       selection.kind === 'pdf'
         ? `第 ${selection.page} 页`

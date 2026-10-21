@@ -177,7 +177,7 @@ export class PlanningStorage {
     const tasks = this.db
       .prepare(
         `SELECT * FROM daily_tasks WHERE day = ?
-        ORDER BY CASE status WHEN 'todo' THEN 0 ELSE 1 END, created_at, id`,
+        ORDER BY CASE status WHEN 'todo' THEN 0 ELSE 1 END, created_at, rowid`,
       )
       .all(day)
       .map(decodeTask);

@@ -162,12 +162,14 @@ test('connects import, reading, cited question, note, feedback, route, confirmed
     ).toEqual([]);
     expect(await page.evaluate(() => window.studyCompanion!.listMemories())).toEqual([]);
     const route = page.getByRole('region', { name: '结构化学习路线', exact: true });
+    await route.getByRole('checkbox', { name: '选择步骤 1 生成任务', exact: true }).check();
+    await route.getByRole('checkbox', { name: '选择步骤 3 生成任务', exact: true }).check();
     await route
       .getByRole('textbox', { name: '步骤 1 标题', exact: true })
       .fill('核对原子性定义（我编辑）');
     await route.getByRole('spinbutton', { name: '步骤 1 预计分钟', exact: true }).fill('9');
     await expect(
-      route.getByRole('button', { name: '核对并确认路线建议', exact: true }),
+      route.getByRole('button', { name: '预览所选步骤任务', exact: true }),
     ).toBeDisabled();
     await expect(route.getByText(/步骤合计31分钟/)).toBeVisible();
     await route.getByRole('spinbutton', { name: '步骤 2 预计分钟', exact: true }).fill('7');
@@ -177,7 +179,6 @@ test('connects import, reading, cited question, note, feedback, route, confirmed
     await expect(route.getByRole('textbox', { name: '步骤 1 标题', exact: true })).toHaveValue(
       '核对原子性定义（我编辑）',
     );
-    await route.getByRole('button', { name: '核对并确认路线建议', exact: true }).click();
     await route.getByRole('checkbox', { name: '选择步骤 1 生成任务', exact: true }).check();
     await route.getByRole('checkbox', { name: '选择步骤 3 生成任务', exact: true }).check();
     await route.getByRole('button', { name: '预览所选步骤任务', exact: true }).click();

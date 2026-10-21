@@ -19,24 +19,24 @@ import {
   MessageCircle,
   Brain,
 } from 'lucide-react';
-import { SettingsPage } from './components/SettingsPage';
-import { LibraryPage } from './components/LibraryPage';
-import { ReadingPage } from './components/ReadingPage';
-import './components/ReadingWorkspace.css';
-import { RecentReadings } from './components/RecentReadings';
-import { TodayTasks } from './components/TodayTasks';
-import { HomeStudyFlow } from './components/HomeStudyFlow';
-import { FirstUseGuide } from './components/FirstUseGuide';
-import { ReviewsPage } from './components/ReviewsPage';
-import { ReviewDue } from './components/ReviewDue';
-import { StudyCalendar } from './components/StudyCalendar';
-import { ChatPage } from './components/ChatPage';
-import { NotesPage } from './components/NotesPage';
-import { AgentPage } from './components/AgentPage';
-import { MemoryPage } from './components/MemoryPage';
-import { PlanningPage, type PlanningTarget } from './components/PlanningPage';
-import { FocusPage } from './components/FocusPage';
-import { BackupPanel, BackupBusyDialog } from './components/BackupPanel';
+import { SettingsPage } from './components/settings/SettingsPage';
+import { LibraryPage } from './components/library/LibraryPage';
+import { ReadingPage } from './components/reader/ReadingPage';
+import './components/reader/ReadingWorkspace.css';
+import { RecentReadings } from './components/home/RecentReadings';
+import { TodayTasks } from './components/home/TodayTasks';
+import { HomeStudyFlow } from './components/home/HomeStudyFlow';
+import { FirstUseGuide } from './components/home/FirstUseGuide';
+import { ReviewsPage } from './components/reviews/ReviewsPage';
+import { ReviewDue } from './components/home/ReviewDue';
+import { StudyCalendar } from './components/home/StudyCalendar';
+import { ChatPage } from './components/chat/ChatPage';
+import { NotesPage } from './components/notes/NotesPage';
+import { AgentPage } from './components/agent/AgentPage';
+import { MemoryPage } from './components/memory/MemoryPage';
+import { PlanningPage, type PlanningTarget } from './components/planning/PlanningPage';
+import { FocusPage } from './components/focus/FocusPage';
+import { BackupPanel, BackupBusyDialog } from './components/backup/BackupPanel';
 import { useBackupState } from './lib/useBackupState';
 import { desktop, errorMessage, isDesktop } from './lib/desktop';
 import {
@@ -84,6 +84,7 @@ const readerBackLabels = {
 
 export default function App() {
   const mainRef = useRef<HTMLElement>(null);
+  const navigationIntent = useRef(0);
   const [page, setPage] = useState<Page>('home');
   const [sourceId, setSourceId] = useState<string | null>(null);
   const [readerPanel, setReaderPanel] = useState<'chat' | 'notes' | null>(null);
@@ -170,6 +171,7 @@ export default function App() {
     setBoot((previous) => (previous ? { ...previous, settings, hasApiKey } : previous));
   }
   function navigate(next: Page) {
+    navigationIntent.current++;
     setReaderPanel(null);
     setReaderRestore(undefined);
     setReaderBookmark(null);
@@ -178,6 +180,7 @@ export default function App() {
     setPage(next);
   }
   function openSource(id: string) {
+    navigationIntent.current++;
     setReaderPanel(null);
     setReaderRestore(undefined);
     setReaderBookmark(null);
@@ -189,10 +192,20 @@ export default function App() {
   async function openCitation(
     turnId: string,
     number: number,
-    returnTo: 'chat' | 'notes' | 'agent' = 'chat',
+    returnTo: 'chat' | 'notes' | 'agent' | 'reviews' = 'chat',
   ) {
-    const target = await desktop.resolveCitation(turnId, number);
-    if (sourceId && readerPanel) {
+    const intent = ++navigationIntent.current;
+    let target: CitationTarget;
+    try {
+      target = await (returnTo === 'reviews'
+        ? desktop.resolveReviewCitation(turnId, number)
+        : desktop.resolveCitation(turnId, number));
+    } catch (error) {
+      if (navigationIntent.current !== intent) return;
+      throw error;
+    }
+    if (navigationIntent.current !== intent) return;
+    if (returnTo !== 'reviews' && sourceId && readerPanel) {
       if (!readerBookmark && readerPosition.current)
         setReaderBookmark({ id: sourceId, position: readerPosition.current });
       setReaderRestore(undefined);
@@ -200,6 +213,9 @@ export default function App() {
       setSourceId(target.sourceId);
       return;
     }
+    setReaderPanel(null);
+    setReaderRestore(undefined);
+    setReaderBookmark(null);
     setCitationTarget(target);
     setSourceId(target.sourceId);
     setReaderReturn(returnTo);
@@ -207,6 +223,7 @@ export default function App() {
   }
   function askSource(selection?: ReadingSelection) {
     if (!sourceId) return;
+    navigationIntent.current++;
     setReaderPanel('chat');
     if (selection) {
       setSelectionQuestion((previous) => ({ selection, sequence: (previous?.sequence ?? 0) + 1 }));
@@ -216,6 +233,7 @@ export default function App() {
   }
   function takeNote(selection?: ReadingSelection) {
     if (!sourceId) return;
+    navigationIntent.current++;
     setReaderPanel('notes');
     if (selection)
       setSelectionNote((previous) => ({ selection, sequence: (previous?.sequence ?? 0) + 1 }));
@@ -226,6 +244,7 @@ export default function App() {
     navigate('notes');
   }
   function openNoteSource(id: string) {
+    navigationIntent.current++;
     setCitationTarget(null);
     setReaderReturn('notes');
     setSourceId(id);
@@ -412,6 +431,19 @@ export default function App() {
                   按自己的节奏
                 </span>
               </div>
+              <FirstUseGuide
+                settings={settings}
+                onSettings={() => navigate('settings')}
+                onRead={openSource}
+                onAsk={(id) => {
+                  setQuestionSource((previous) => ({
+                    id,
+                    sequence: (previous?.sequence ?? 0) + 1,
+                    question: '为什么需要用自己的话复述，并核对原文？',
+                  }));
+                  navigate('chat');
+                }}
+              />
               <section className="welcome-panel" aria-labelledby="welcome-title">
                 <div>
                   <span className="small-label">
@@ -476,19 +508,6 @@ export default function App() {
                 />
               </div>
               <HomeStudyFlow settings={settings} onNavigate={navigate} />
-              <FirstUseGuide
-                settings={settings}
-                onSettings={() => navigate('settings')}
-                onRead={openSource}
-                onAsk={(id) => {
-                  setQuestionSource((previous) => ({
-                    id,
-                    sequence: (previous?.sequence ?? 0) + 1,
-                    question: '为什么需要用自己的话复述，并核对原文？',
-                  }));
-                  navigate('chat');
-                }}
-              />
               <ReviewDue onOpen={() => navigate('reviews')} />
             </div>
           )}
@@ -515,14 +534,20 @@ export default function App() {
               <button
                 className="toolbar-button"
                 aria-pressed={readerPanel === 'chat'}
-                onClick={() => setReaderPanel('chat')}
+                onClick={() => {
+                  navigationIntent.current++;
+                  setReaderPanel('chat');
+                }}
               >
                 问答
               </button>
               <button
                 className="toolbar-button"
                 aria-pressed={readerPanel === 'notes'}
-                onClick={() => setReaderPanel('notes')}
+                onClick={() => {
+                  navigationIntent.current++;
+                  setReaderPanel('notes');
+                }}
               >
                 笔记草稿
               </button>
@@ -530,6 +555,7 @@ export default function App() {
                 <button
                   className="text-button"
                   onClick={() => {
+                    navigationIntent.current++;
                     setSourceId(readerBookmark.id);
                     setCitationTarget(null);
                     setReaderRestore(readerBookmark.position);
@@ -539,7 +565,13 @@ export default function App() {
                   返回选中原文
                 </button>
               )}
-              <button className="text-button" onClick={() => setReaderPanel(null)}>
+              <button
+                className="text-button"
+                onClick={() => {
+                  navigationIntent.current++;
+                  setReaderPanel(null);
+                }}
+              >
                 收起侧栏
               </button>
             </div>
@@ -562,16 +594,7 @@ export default function App() {
             <div hidden={page !== 'reviews'}>
               <ReviewsPage
                 visible={page === 'reviews'}
-                onCitation={async (id, number) => {
-                  const target = await desktop.resolveReviewCitation(id, number);
-                  setReaderPanel(null);
-                  setReaderRestore(undefined);
-                  setReaderBookmark(null);
-                  setCitationTarget(target);
-                  setSourceId(target.sourceId);
-                  setReaderReturn('reviews');
-                  setPage('library');
-                }}
+                onCitation={(id, number) => openCitation(id, number, 'reviews')}
               />
             </div>
           )}

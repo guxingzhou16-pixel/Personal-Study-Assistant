@@ -58,7 +58,12 @@ test('real CPU model retrieves a Chinese synonym offline, opens its citation, re
     }, endpoint);
     await page.reload();
     await page.getByRole('button', { name: '设置', exact: true }).click();
-    await expect(page.getByRole('button', { name: '模型已就绪', exact: true })).toBeVisible();
+    const verified = page.getByRole('button', { name: '模型文件已校验', exact: true });
+    await expect(verified).toBeVisible();
+    await expect(verified).toBeDisabled();
+    expect(await page.evaluate(() => window.studyCompanion!.embeddingStatus())).toMatchObject({
+      state: 'ready',
+    });
     await page.getByRole('button', { name: '学习助手', exact: true }).click();
     await page.getByRole('combobox', { name: '问答方式' }).selectOption('sources');
     await page.getByRole('textbox', { name: '输入学习问题' }).fill('怎样让查找更迅速？');
@@ -66,6 +71,18 @@ test('real CPU model retrieves a Chinese synonym offline, opens its citation, re
     await expect(page.locator('.evidence-preview')).toContainText('数据库索引使查询更快。');
     await expect(page.locator('.evidence-preview')).toContainText('混合检索');
     expect(calls).toBe(0);
+    for (const question of [
+      '请用 demo 解释数据库索引',
+      '请帮我 review 一下数据库索引',
+      '请 Describe 数据库索引',
+    ]) {
+      const casual = await page.evaluate(
+        (question) => window.studyCompanion!.prepareQuestion(question, null),
+        question,
+      );
+      expect(casual.notice).toContain('混合检索');
+      expect(casual.hits.some((hit) => hit.text.includes('数据库索引使查询更快。'))).toBe(true);
+    }
     await page.getByRole('button', { name: '发送问题', exact: true }).click();
     await expect(page.getByTestId('chat-answer')).toContainText('索引使查询更快。');
     expect(sentEvidence).toContain('数据库索引使查询更快。');

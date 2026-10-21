@@ -5,7 +5,7 @@ import { sourceId as validateSourceId } from './documents';
 
 const segmenter = new Intl.Segmenter('zh', { granularity: 'word' });
 const stopWords = new Set(
-  '的 了 吗 呢 是 和 与 或 一个 一下 这个 这些 什么 怎么 为什么 如何 请 解释 介绍 根据 资料 说明 区别 有什么 有哪些 a an the is are of to how what explain please in and or'.split(
+  '的 了 吗 呢 是 和 与 或 一个 一下 这个 这些 什么 怎么 为什么 如何 请 解释 介绍 根据 资料 说明 区别 有什么 有哪些 用 帮 我 给 个 举例 例子 请用 帮我 a an the is are of to how what explain please in and or demo review example examples summarize summary illustrate walkthrough show step by eli5'.split(
     ' ',
   ),
 );
@@ -18,6 +18,34 @@ function words(text: string, query = false): string[] {
         .filter((word) => !query || !stopWords.has(word)),
     ),
   ];
+}
+export function namedQueryTerms(question: string, context = ''): string[] {
+  const technical = (word: string) => /^[A-Z][A-Z0-9_]+$|[a-z][A-Z]|[A-Za-z]\d|_/.test(word);
+  const observed = new Set(
+    (context.match(/[A-Za-z][A-Za-z0-9_]*/g) ?? [])
+      .filter(technical)
+      .map((word) => word.toLowerCase()),
+  );
+  return (question.normalize('NFKC').match(/[A-Za-z][A-Za-z0-9_]*/g) ?? []).filter(
+    (word) =>
+      word.length > 1 &&
+      !stopWords.has(word.toLowerCase()) &&
+      (technical(word) || observed.has(word.toLowerCase())),
+  );
+}
+export function matchesNamedQuery(
+  question: string,
+  text: string,
+  identifiers = namedQueryTerms(question),
+): boolean {
+  if (!identifiers.length) return true;
+  const present = new Set(
+    text
+      .normalize('NFKC')
+      .toLowerCase()
+      .match(/[a-z][a-z0-9_]*/g) ?? [],
+  );
+  return identifiers.some((word) => present.has(word.toLowerCase()));
 }
 function indexTerms(text: string): string {
   const result = words(text);
@@ -152,6 +180,8 @@ export function retrieve(
       throw error;
     }
     const terms = words(question, true).slice(0, 24);
+    const explanatory = /为什么|为何|原因|怎么会/.test(question);
+    const topic = terms.find((term) => term.length > 1);
     const groups = comparisonTerms(question);
     const distinctTerms = groups.map((group, index) =>
       group.filter((term) => groups.every((other, i) => i === index || !other.includes(term))),
@@ -180,10 +210,15 @@ export function retrieve(
         ORDER BY score, chunks_fts.rowid LIMIT 40`,
         )
         .all(...(sourceId ? [expression, sourceId] : [expression]));
+      const identifiers = namedQueryTerms(
+        question,
+        rows.map((row) => `${row.name}\n${row.title}\n${row.excerpt}`).join('\n'),
+      );
       for (const row of rows) {
         const text = String(row.excerpt);
         const normalized = `${row.title}\n${text}`.normalize('NFKC').toLowerCase();
         const normalizedTitle = String(row.title).normalize('NFKC').toLowerCase();
+        if (!matchesNamedQuery(question, `${row.name}\n${normalized}`, identifiers)) continue;
         const matchedGroups = groups.flatMap((_, index) =>
           matchesGroup(normalized, index) ? [index] : [],
         );
@@ -199,7 +234,11 @@ export function retrieve(
               groups[index].length,
           ),
         );
-        if (coverage < 0.5) continue;
+        if (
+          coverage < 0.5 &&
+          !(explanatory && row.page !== null && topic && normalized.includes(topic))
+        )
+          continue;
         candidates.push({
           coverage,
           fullCoverage,
@@ -232,9 +271,30 @@ export function retrieve(
     });
     const hits: Evidence[] = [];
     const coveredGroups = new Set<number>();
+    const relevant = candidates.filter((entry) => entry.fullCoverage >= 0.5);
+    const first = relevant[0]?.evidence;
+    // A why-question may need the definition on a neighboring PDF page. Admit
+    // at most one companion from the same source, sharing the primary concept.
+    const companion =
+      !groups.length &&
+      explanatory &&
+      topic &&
+      first?.page &&
+      first.text.normalize('NFKC').toLowerCase().includes(topic)
+        ? candidates.find(
+            ({ evidence, fullCoverage }) =>
+              fullCoverage < 0.5 &&
+              evidence.sourceId === first.sourceId &&
+              evidence.page &&
+              Math.abs(evidence.page - first.page!) === 1 &&
+              evidence.text.normalize('NFKC').toLowerCase().includes(topic),
+          )
+        : undefined;
     for (const candidate of [
       ...reserved,
-      ...candidates.filter((entry) => entry.fullCoverage >= 0.5),
+      ...relevant.slice(0, 1),
+      ...(companion ? [companion] : []),
+      ...relevant.slice(1),
     ]) {
       const { evidence } = candidate;
       if (

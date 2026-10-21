@@ -10,7 +10,7 @@ import {
 } from '../../src/lib/types';
 import { AppError } from './errors';
 import { record, validateSettings } from './settings';
-import { sourceId } from './documents';
+import { DOCUMENT_LIMITS, sourceId } from './documents';
 import {
   CHAT_MIGRATION,
   NOTE_FEEDBACK_MIGRATION,
@@ -173,6 +173,16 @@ export class Storage {
     const row = this.db.prepare('SELECT * FROM sources WHERE id = ?').get(sourceId(input));
     return row ? this.source(row) : undefined;
   }
+  ensureSourceCapacity(): void {
+    const count = Number(this.db.prepare('SELECT count(*) AS count FROM sources').get()!.count);
+    if (count >= DOCUMENT_LIMITS.sources)
+      throw new AppError(
+        'sourceLimit',
+        count > DOCUMENT_LIMITS.sources
+          ? '现有资料已超过 10000 份支持上限，全部保留且仍可阅读；已停止新增导入。完整备份暂不可用，请先退出应用并完整复制学习数据目录留存，再联系维护者处理，勿删除原数据。'
+          : '资料已达到 10000 份上限，不能继续新增；已有资料与阅读进度保留，仍可导出完整备份。',
+      );
+  }
   addSource(
     input: { id: string; name: string; kind: Source['kind']; bytes: number } & ParsedDocument,
   ): void {
@@ -186,6 +196,7 @@ export class Storage {
     };
     this.db.exec('BEGIN IMMEDIATE;');
     try {
+      this.ensureSourceCapacity();
       this.db
         .prepare('INSERT INTO sources VALUES (?, ?, ?, ?, ?, ?, ?, NULL, ?, ?)')
         .run(

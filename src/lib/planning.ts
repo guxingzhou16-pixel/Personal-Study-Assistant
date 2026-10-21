@@ -3,7 +3,7 @@ import type { ProjectDraft, TaskDraft } from './types';
 export const planningLimits = {
   title: 120,
   goal: 2000,
-  details: 4000,
+  details: 8000,
   projects: 200,
   tasks: 5000,
   minMinutes: 5,

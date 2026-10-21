@@ -24,6 +24,7 @@ export interface SearchProcess {
   on(event: 'message', listener: (message: SearchMessage) => void): unknown;
   on(event: 'error', listener: () => void): unknown;
   on(event: 'exit', listener: (code: number | null) => void): unknown;
+  on(event: 'spawn', listener: () => void): unknown;
   kill(): boolean;
 }
 export type SearchLauncher = (modulePath: string, args: string[]) => SearchProcess;
@@ -193,29 +194,65 @@ export class SearchService {
         ...(probe ? ['probe'] : []),
       ]);
       let finished = false;
+      let settled = false;
       let resultReceived = false;
       let exited = false;
+      let outcome: { error?: unknown; result?: Omit<EvidencePreview, 'id'> } | undefined;
+      let exitTimer: ReturnType<typeof setTimeout> | undefined;
       const cleanup = () => {
         if (staged)
           void rm(staged, { force: true }).catch(() => {
             /* Cancelled derived staging files are safe to keep if Windows still holds them. */
           });
       };
+      const complete = () => {
+        if (!exited || !finished) return;
+        clearTimeout(exitTimer);
+        if (this.active === cancel) this.active = undefined;
+        if (settled) {
+          cleanup();
+          return;
+        }
+        settled = true;
+        try {
+          if (outcome!.error) throw outcome!.error;
+          if (staged) renameSync(staged, indexPath);
+          resolve(outcome!.result!);
+        } catch (error) {
+          reject(error);
+        } finally {
+          cleanup();
+        }
+      };
       const finish = (error?: unknown, result?: Omit<EvidencePreview, 'id'>) => {
         if (finished) return;
         finished = true;
+        outcome = { error, result };
         clearTimeout(timer);
-        worker.kill();
-        this.active = undefined;
-        if (exited) cleanup();
-        if (error) reject(error);
-        else resolve(result!);
+        if (exited) complete();
+        else {
+          exitTimer = setTimeout(() => {
+            settled = true;
+            reject(
+              new AppError(
+                'indexExitTimeout',
+                '检索进程尚未退出，已暂停新的索引与备份操作；请退出并重启应用后重试。',
+              ),
+            );
+          }, 5000);
+          worker.kill();
+        }
       };
       const timer = setTimeout(
         () => finish(new AppError('indexTimeout', '索引处理超过 5 分钟，请缩小资料规模后重试。')),
         300_000,
       );
-      this.active = () => finish(new AppError('cancelled', '已取消资料检索，原资料和旧索引保留。'));
+      const cancel = () =>
+        finish(new AppError('cancelled', '已取消资料检索，原资料和旧索引保留。'));
+      this.active = cancel;
+      worker.on('spawn', () => {
+        if (finished && !exited) worker.kill();
+      });
       worker.on('message', (message) => {
         if (finished) return;
         if (message.type === 'progress') progress(message.progress);
@@ -236,7 +273,6 @@ export class SearchService {
               this.checkEvidence(hit);
             }
             if (finished) return;
-            if (staged) renameSync(staged, indexPath);
             finish(undefined, result);
           })().catch((error) => finish(error));
         }
@@ -244,11 +280,11 @@ export class SearchService {
       worker.on('error', () =>
         finish(new AppError('indexProcess', '检索进程无法启动，请重新构建或检查安装文件。')),
       );
-      worker.on('exit', () => {
+      worker.on('exit', (code) => {
         exited = true;
-        if (!finished && !resultReceived)
+        if (!finished && (!resultReceived || code !== 0))
           finish(new AppError('indexProcess', '检索进程意外退出，请重建索引后重试。'));
-        if (finished) cleanup();
+        complete();
       });
     });
   }
