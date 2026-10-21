@@ -1,0 +1,58 @@
+{
+  "checks": [
+    {
+      "scene": 1,
+      "noHorizontalOverflow": true
+    },
+    {
+      "scene": 2,
+      "noHorizontalOverflow": true
+    },
+    {
+      "scene": 3,
+      "noHorizontalOverflow": true
+    },
+    {
+      "scene": 4,
+      "noHorizontalOverflow": true
+    },
+    {
+      "scene": 5,
+      "noHorizontalOverflow": true
+    },
+    {
+      "scene": 6,
+      "noHorizontalOverflow": true
+    },
+    {
+      "scene": 7,
+      "noHorizontalOverflow": true
+    },
+    {
+      "scene": 8,
+      "noHorizontalOverflow": true
+    },
+    {
+      "scene": 9,
+      "noHorizontalOverflow": true
+    },
+    {
+      "scene": 10,
+      "noHorizontalOverflow": true
+    },
+    {
+      "scene": 11,
+      "noHorizontalOverflow": true
+    },
+    {
+      "scene": 12,
+      "noHorizontalOverflow": true
+    }
+  ],
+  "errors": [],
+  "networkRequests": [],
+  "fileUrl": true,
+  "sizes": ["1280x900", "900x640", "390x844"],
+  "reducedMotion": "system and demo control passed",
+  "halfSpeed": "480ms page token passed"
+}

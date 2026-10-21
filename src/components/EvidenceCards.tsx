@@ -10,7 +10,7 @@ export function EvidenceCards({
   return (
     <ol className="evidence-list" aria-label="检索到的原文证据">
       {hits.map((hit) => (
-        <li key={hit.number}>
+        <li key={hit.number} data-motion="fade">
           <div className="evidence-location">
             <strong>
               [{hit.number}] {hit.sourceName}

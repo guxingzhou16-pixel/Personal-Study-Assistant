@@ -16,6 +16,8 @@
 
 维护先读 [设计规范](docs/design/SUNNY_ISLE.md)、[本次交接与验证](docs/handoffs/2026-10-18-sunny-isle.md) 和 [机器可读选定档案](design-lab/selected-design.json)。基础语义色、字体、圆角定义在 `src/styles/tokens.css`；首页模块样式位于 `src/styles/study-home.css`，其余正式样式在 `src/styles.css`。局部装饰色、尺寸与 SVG 填色仍需在对应文件核对。
 
+2026-10-21 增加晴岛全功能动效：导航、资料、月历计时、阅读、聊天检索及设置使用统一的轻移、淡入和状态反馈，跟随系统减少动态效果。[离线动效演示](design-lab/2026-10-21-sunny-motion/index.html) 提供 12 组可操作示例、半速与重播；[动效规范](docs/design/SUNNY_MOTION.md)和[实施交接](docs/handoffs/2026-10-21-sunny-motion.md)说明正式接入及验证。此次不更新已发布安装包。
+
 [UI 设计试验场](design-lab/README.md) 保留 [第一轮纸间、深潜、晴岛](design-lab/2026-10-17-three-directions/index.html) 与 [第二轮玄墨、赤陶、蓝调](design-lab/2026-10-17-island-remix/index.html) 的静态 demo、截图和交接档案。历史示例不等于真实功能；第二轮 GitHub UI 参考仅在 [本地参考台](design-lab/2026-10-17-island-remix/references/index.html) 展示，未引入正式程序。
 
 ## 下载与开始使用
@@ -363,6 +365,8 @@ src/                    React 工作台与设置界面
   assets/sunny-isle-plant.svg 本地原创欢迎区叠书植物
   styles/tokens.css     晴岛语义色、字体、圆角和内容上限
   styles/study-home.css 最近阅读、完整月历、签到与累计计时布局
+  styles/motion.css     动效参数、操作反馈、折叠与减少动态效果
+  lib/motion.ts         原生 WAAPI 控制器、语义状态触发与清理
   styles.css            应用壳与资料库、阅读、助手、设置共用视觉
   components/LibraryPage.tsx 本机资料库、导入进度与搜索过滤
   components/ReadingPage.tsx 阅读位置、目录、护眼和引用复制
@@ -550,6 +554,11 @@ design-lab/selected-design.json 正式选定方案与源码入口
 
 - **维护与交接：**语义 token、通用页面、真实首页分别位于 `src/styles/tokens.css`、`src/styles.css`、`src/styles/study-home.css`。设计规范在 `docs/design/SUNNY_ISLE.md`，机器可读入口是 `design-lab/selected-design.json`；保留历史 demo 为概念快照，明确正式实现与同屏助手等概念的区别。
 - **本次验证：**`npm run desktop:build`（含两套 TypeScript 检查、生产界面及全部 Electron 入口）通过；最终定向真实 Electron 流程 **6 条通过（30.3 秒）**，覆盖导航／设置密钥／开发桥接、月历计时持久化、双协议聊天、阅读重启及 RAG 出处跳转。采用自动资料、模拟模型和假密钥；未做完整回归、真实聊天／BGE 门禁或安装包验证。具体命令与截图检查状态见 [交接记录](docs/handoffs/2026-10-18-sunny-isle.md)。
+
+**2026-10-21，晴岛全功能动效：**接入当前 main 的全部可用界面，使用 CSS 与原生 Web Animations API，无新增依赖、IPC 或数据库变化。导航选中连续移动、页面按方向轻入场，状态反馈与阅读折叠统一；计时秒数、进度消息与流式正文不反复入场。支持系统减少动态效果和中断动画，保留聊天常驻及 PDF 文字层。
+
+- **验证：**类型检查与桌面构建通过；导航、日历、阅读、聊天、检索、模型下载取消及新增正常／减少动效流程最终 **10 条 Electron 流程通过（53.1 秒）**，使用临时数据、合成资料和模拟服务。独立演示的 12 场景、离线打开、半速、系统／本页减少动态效果，以及 1280／900／390 宽度检查通过，无脚本异常或网络请求；已归档截图、WebM、设计规范与机器档案。未运行完整核心回归、真实模型、其他系统 DPI／硬件、安装包或远端 CI 验证。
+- **维护：**修改正式动效后运行 `node scripts/build-motion-demo.mjs` 更新演示副本，SHA-256 保存在演示 `assets/sources.json`。详见 [交接](docs/handoffs/2026-10-21-sunny-motion.md)。
 
 尚未交付：真实 RAG 生成/引用语义评测、笔记、Agent、记忆、计划、任务、番茄钟、主题切换、完整备份、安装包和展示网站。使用方式、维护模块与后续约定见本文前部；后续功能继续补充真实验收记录。
 

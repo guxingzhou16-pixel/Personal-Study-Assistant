@@ -1,0 +1,156 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "拾知动效设计交接接口 v2",
+  "description": "本轮新增的静态动效档案。资产路径相对于本JSON，product路径相对于仓库根；不修改历史v1样式档案。",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "$schema",
+    "schemaVersion",
+    "id",
+    "name",
+    "createdOn",
+    "status",
+    "baseDesignId",
+    "scope",
+    "entry",
+    "handoff",
+    "preview",
+    "video",
+    "validationReport",
+    "demo",
+    "product",
+    "tokens",
+    "motions",
+    "references",
+    "limitations"
+  ],
+  "properties": {
+    "$schema": {
+      "const": "./handoff.schema.json"
+    },
+    "schemaVersion": {
+      "const": 2
+    },
+    "id": {
+      "const": "shizhi.sunny-motion.v1"
+    },
+    "name": {
+      "type": "string"
+    },
+    "createdOn": {
+      "type": "string",
+      "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$"
+    },
+    "status": {
+      "enum": ["implemented"]
+    },
+    "baseDesignId": {
+      "type": "string"
+    },
+    "scope": {
+      "type": "string"
+    },
+    "entry": {
+      "type": "string"
+    },
+    "handoff": {
+      "type": "string"
+    },
+    "preview": {
+      "type": "string"
+    },
+    "video": {
+      "type": "string"
+    },
+    "validationReport": {
+      "type": "string"
+    },
+    "demo": {
+      "type": "object"
+    },
+    "product": {
+      "type": "object"
+    },
+    "tokens": {
+      "type": "object"
+    },
+    "motions": {
+      "type": "array",
+      "minItems": 12,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "title",
+          "trigger",
+          "effect",
+          "durationMs",
+          "productSelectors",
+          "interruption",
+          "reducedMotion"
+        ],
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "trigger": {
+            "type": "string"
+          },
+          "effect": {
+            "type": "string"
+          },
+          "durationMs": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 320
+            }
+          },
+          "productSelectors": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "type": "string"
+            }
+          },
+          "interruption": {
+            "type": "string"
+          },
+          "reducedMotion": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "references": {
+      "type": "array",
+      "minItems": 3,
+      "items": {
+        "type": "object",
+        "required": ["title", "url", "appliedTo"],
+        "properties": {
+          "title": {
+            "type": "string"
+          },
+          "url": {
+            "type": "string",
+            "pattern": "^https://"
+          },
+          "appliedTo": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "limitations": {
+      "type": "array"
+    }
+  }
+}

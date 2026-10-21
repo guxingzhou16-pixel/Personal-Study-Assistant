@@ -4,6 +4,8 @@
 
 本规范描述正式 React 界面的视觉和维护边界。原始 [晴岛 demo](../../design-lab/2026-10-17-three-directions/03-island/index.html) 和 [概念 JSON](../../design-lab/2026-10-17-three-directions/03-island/design.json) 继续作为历史快照；正式状态从 [选定档案](../../design-lab/selected-design.json) 进入，实际验证见 [本次交接](../handoffs/2026-10-18-sunny-isle.md)。
 
+2026-10-21 同一晴岛基线增加全功能动效，详见[动效设计与维护规范](SUNNY_MOTION.md)及[实施交接](../handoffs/2026-10-21-sunny-motion.md)。本文件继续负责静态外观，动效扩展不改变配色或产品能力。
+
 ## 正式窗口快照
 
 以下来自隔离测试数据目录的真实 Electron 窗口。首页保留真实空态；截图不代表软件预置学习资料或进度。后续视觉变更需同步更新这些快照与选定档案。

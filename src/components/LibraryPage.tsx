@@ -67,7 +67,7 @@ export function LibraryPage({ onOpen }: { onOpen: (id: string) => void }) {
       source.name.toLocaleLowerCase().includes(query.trim().toLocaleLowerCase()),
   );
   return (
-    <div className="page library-page">
+    <div className="page library-page" data-motion="page">
       <div className="page-heading">
         <div>
           <p className="eyebrow">A PLACE FOR YOUR CURIOSITY</p>
@@ -76,6 +76,8 @@ export function LibraryPage({ onOpen }: { onOpen: (id: string) => void }) {
         </div>
         <button
           className="button primary"
+          data-motion="state"
+          data-motion-key={busy}
           disabled={!isDesktop || busy}
           onClick={() => void importFiles()}
         >
@@ -91,7 +93,7 @@ export function LibraryPage({ onOpen }: { onOpen: (id: string) => void }) {
         </p>
       </div>
       {busy && (
-        <div className="import-progress" role="status">
+        <div className="import-progress" role="status" data-motion="fade">
           <LoaderCircle className="spin" size={18} />
           <div>
             <strong>
@@ -112,7 +114,7 @@ export function LibraryPage({ onOpen }: { onOpen: (id: string) => void }) {
         </div>
       )}
       {report && (
-        <div className="import-report" role="status">
+        <div className="import-report" role="status" data-motion="fade">
           <p>
             {report.cancelled
               ? `导入已取消：已完成 ${report.added} 份，${report.duplicates} 份重复。`
@@ -130,7 +132,7 @@ export function LibraryPage({ onOpen }: { onOpen: (id: string) => void }) {
         </div>
       )}
       {error && (
-        <div className="feedback error" role="alert">
+        <div className="feedback error" role="alert" data-motion="fade" data-motion-key={error}>
           {error}
           <button
             className="text-button"
@@ -149,7 +151,7 @@ export function LibraryPage({ onOpen }: { onOpen: (id: string) => void }) {
           正在整理资料…
         </p>
       ) : sources.length === 0 ? (
-        <section className="library-empty">
+        <section className="library-empty" data-motion="fade">
           <div className="library-symbol">
             <BookOpen size={38} strokeWidth={1.3} />
           </div>
@@ -190,9 +192,9 @@ export function LibraryPage({ onOpen }: { onOpen: (id: string) => void }) {
             </select>
             <span>{filtered.length} 份资料</span>
           </div>
-          <div className="source-list">
+          <div className="source-list" data-motion="fade" data-motion-key={`${query}:${kind}`}>
             {filtered.map((source) => (
-              <article className="source-card" key={source.id}>
+              <article className="source-card" key={source.id} data-motion="fade">
                 <div className={`source-icon ${source.kind}`}>
                   <FileText size={24} />
                   <span>{source.kind === 'pdf' ? 'PDF' : 'MD'}</span>
@@ -226,7 +228,7 @@ export function LibraryPage({ onOpen }: { onOpen: (id: string) => void }) {
             ))}
           </div>
           {filtered.length === 0 && (
-            <div className="empty-reading">
+            <div className="empty-reading" data-motion="fade">
               <FolderOpen size={28} />
               <p>没有找到匹配的资料，换个关键词试试。</p>
             </div>

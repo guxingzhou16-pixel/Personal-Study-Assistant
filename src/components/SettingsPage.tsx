@@ -133,7 +133,7 @@ export function SettingsPage({ boot, onSaved }: Props) {
   }
 
   return (
-    <div className="page settings-page">
+    <div className="page settings-page" data-motion="page">
       <div className="page-heading">
         <div>
           <p className="eyebrow">YOUR OWN PACE</p>
@@ -199,7 +199,12 @@ export function SettingsPage({ boot, onSaved }: Props) {
             </label>
             <p className="field-hint">保存后用于学习助手的新回答，实际表达由所选模型决定。</p>
           </section>
-          <section className="settings-section" aria-labelledby="models-heading">
+          <section
+            className="settings-section"
+            aria-labelledby="models-heading"
+            data-motion="fade"
+            data-motion-key={draft.provider}
+          >
             <div className="section-heading">
               <h2 id="models-heading">模型连接</h2>
               <span>使用你自己的模型</span>
@@ -305,6 +310,8 @@ export function SettingsPage({ boot, onSaved }: Props) {
               <div
                 className={`notice ${report.selectedModelAvailable ? 'success' : 'info'}`}
                 role="status"
+                data-motion="fade"
+                data-motion-key={report.message}
               >
                 <PlugZap size={17} />
                 <div>
@@ -359,6 +366,8 @@ export function SettingsPage({ boot, onSaved }: Props) {
             <div
               className={`notice ${notice.kind}`}
               role={notice.kind === 'error' ? 'alert' : 'status'}
+              data-motion="fade"
+              data-motion-key={notice.text}
             >
               {notice.text}
             </div>

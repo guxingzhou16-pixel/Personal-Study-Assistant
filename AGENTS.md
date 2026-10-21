@@ -192,6 +192,8 @@
 | `src/lib/calendar.ts` | 本地日期键、月历网格、相邻月份计算 |
 | `src/styles/tokens.css` | 正式晴岛基础语义色、字体、圆角和内容上限；局部装饰色和尺寸仍在对应 CSS／SVG |
 | `src/styles/study-home.css` | 真实最近资料、完整月历、签到及灰紫累计计时的首页样式 |
+| `src/styles/motion.css`、`src/lib/motion.ts` | 语义动效标记、原生 WAAPI、导航胶囊、局部折叠、减少动态效果与中断清理；不监听流式正文或周期进度 |
+| `docs/design/SUNNY_MOTION.md`、`docs/handoffs/2026-10-21-sunny-motion.md` | 全功能动效规范与验证；离线演示副本由 `scripts/build-motion-demo.mjs` 从正式源码生成 |
 | `src/styles.css` | 晴岛壳、通用控件与业务页样式、响应式、焦点及减少动画支持 |
 | `electron/main.ts` | 应用与窗口生命周期、IPC 注册、调用方校验、数据目录；当前也有学习心跳及睡眠暂停接入 |
 | `electron/preload.ts` | 沙箱内通过 `contextBridge` 暴露明确的桌面方法 |
@@ -399,6 +401,8 @@ npx playwright test tests/rag.spec.ts
 - GitHub Actions 配置存在不等于远端通过，推送后才会触发相应流程；不要为了验证 CI 自行突破推送约定。
 
 ## 12. 视觉、可访问性与性能
+
+2026-10-21 晴岛增加统一动效，维护先读 `docs/design/SUNNY_MOTION.md` 与本次交接。`data-motion-key` 只表达操作／语义状态，不能绑定每秒计时、下载进度或流式答案；聊天继续常驻，PDF 画布与文字层不加几何变换。减少动态效果必须同时取消 WAAPI、CSS 循环与交互缩放／位移；不要全局清除 PDF transform。离线演示在 `design-lab/2026-10-21-sunny-motion/`，源码改变后运行 `node scripts/build-motion-demo.mjs` 更新副本与摘要。
 
 2026-10-18 用户已选定第一轮 **03 晴岛原版**（`shizhi.sunny-isle.v1`）作为正式 UI 基线。先读 `design-lab/selected-design.json`、`docs/design/SUNNY_ISLE.md` 与 `docs/handoffs/2026-10-18-sunny-isle.md`，核对实际源码与验证；第二轮玄墨、赤陶、蓝调仍为参考。正式外观不代表主题切换、同屏阅读助手或其他概念功能已完成。
 

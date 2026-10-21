@@ -2,11 +2,22 @@ import { useEffect, useRef, useState } from 'react';
 import { getDocument, GlobalWorkerOptions, TextLayer, type PDFDocumentProxy } from 'pdfjs-dist';
 import workerUrl from 'pdfjs-dist/build/pdf.worker.mjs?url';
 import { errorMessage } from '../lib/desktop';
+import { emphasizeReadingTarget } from '../lib/motion';
 
 GlobalWorkerOptions.workerSrc = workerUrl;
 const assetRoot = new URL(`${import.meta.env.BASE_URL}pdfjs/`, window.location.href).href;
 
-export function PdfPage({ data, page, zoom }: { data: Uint8Array; page: number; zoom: number }) {
+export function PdfPage({
+  data,
+  page,
+  zoom,
+  highlight = false,
+}: {
+  data: Uint8Array;
+  page: number;
+  zoom: number;
+  highlight?: boolean;
+}) {
   const outer = useRef<HTMLDivElement>(null);
   const canvas = useRef<HTMLCanvasElement>(null);
   const layer = useRef<HTMLDivElement>(null);
@@ -15,6 +26,13 @@ export function PdfPage({ data, page, zoom }: { data: Uint8Array; page: number; 
   const [size, setSize] = useState({ width: 595, height: 842, scale: 1 });
   const [error, setError] = useState('');
   const [rendering, setRendering] = useState(true);
+  const highlighted = useRef(false);
+  useEffect(() => {
+    if (!rendering && !error && highlight && !highlighted.current) {
+      emphasizeReadingTarget(canvas.current?.parentElement ?? null);
+      highlighted.current = true;
+    }
+  }, [rendering, error, highlight]);
   useEffect(() => {
     const element = outer.current!;
     const observer = new ResizeObserver((entries) =>
@@ -105,17 +123,18 @@ export function PdfPage({ data, page, zoom }: { data: Uint8Array; page: number; 
   return (
     <div className="pdf-viewport" ref={outer}>
       {error && (
-        <p className="feedback error" role="alert">
+        <p className="feedback error" role="alert" data-motion="fade">
           {error}
         </p>
       )}
       {rendering && !error && (
-        <p className="pdf-loading" role="status">
+        <p className="pdf-loading" role="status" data-motion="fade">
           正在铺开第 {page} 页…
         </p>
       )}
       <div
         className="pdf-page"
+        data-motion={rendering ? undefined : 'fade'}
         style={
           {
             width: size.width,

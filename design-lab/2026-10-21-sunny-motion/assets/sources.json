@@ -1,0 +1,13 @@
+{
+  "generator": "scripts/build-motion-demo.mjs",
+  "sources": [
+    {
+      "path": "src/lib/motion.ts",
+      "sha256": "fd0b7fb514412ad386a9a898379f670935de2aa6e494e1536204102f6e001ffe"
+    },
+    {
+      "path": "src/styles/motion.css",
+      "sha256": "269398a6c4f87787f1e75540676bd23dc661948ecef6b03ee023dc30dc17c5d7"
+    }
+  ]
+}
