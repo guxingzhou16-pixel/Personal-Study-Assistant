@@ -17,6 +17,8 @@
 
 ## 交付与审查
 
+- 0.1.2维护预览准备：[发行说明](releases/0.1.2-preview.md)，最终验证与发布结果另行记录。
+
 - 当前本地主线与更新量：[首版发布以来的更新统计及最新导航合并](testing/main-update-summary-2026-10-22.md)。
 - 最新主线整合：[设置更新入口、分支合并与相关回归](testing/updates-integration-2026-10-22.md)。
 - 最新独立复验：[2026-10-22 测试与代码规范审查](testing/latest-code-review-2026-10-22.md)。

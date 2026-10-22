@@ -43,6 +43,7 @@
 
 本节核对日期：**2026-10-22**。当前软件为 Electron 桌面应用，首版 0.1.1 未签名预览已交付；发布对象与证据见 [最终交付回执](docs/testing/github-preview-release-2026-10-15.md)。后续修复、目录整理、晴岛界面／动效与设置更新入口已整合，未更新发行附件，先检查 Git 状态再判断当前版本。最新范围与验证见[更新与分支整合交接](docs/testing/updates-integration-2026-10-22.md)。
 
+- 2026-10-22用户明确要求推送全部已整合更新并发布小版本，当前准备0.1.2未签名预览；实际交付按本轮独立包与发布回执记录，不覆盖旧报告的版本范围。
 - 当前数据：主库 v13、活动库 v1、派生索引 v2；备份 format 1 支持真实 12/1 和 13/1。
 - 日常阅读：根目录 README → [文档索引](docs/README.md) → [架构地图](docs/CODEMAPS/architecture.md)。
 - 历史源码交接：[全局审查修复](docs/testing/full-code-review-fixes-2026-10-16.md)、[试用反馈优化](docs/testing/user-trial-fixes-2026-10-16.md)。当前独立审查及实际回归按最新整合报告解释，不借历史成绩覆盖未验证范围。

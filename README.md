@@ -13,6 +13,8 @@
 
 ## 功能实现与验收状态
 
+正在准备 **0.1.2 维护预览版**，包含上述已整合更新；[发行说明](docs/releases/0.1.2-preview.md)。实际发布与安装验证结果将在交付回执中另行记录。
+
 首版 **0.1.1 未签名 Windows x64 预览版已公开交付**：[下载页面](https://github.com/guxingzhou16-pixel/Personal-Study-Assistant/releases/tag/v0.1.1-preview.1)。交付对象为 `f84285f`，安装与下载证据见[最终交付回执](docs/testing/github-preview-release-2026-10-15.md)。
 
 2026-10-22 已整合审查修复、体验优化、目录整理、晴岛界面与动效，并新增设置中的软件更新入口。当前源码与上述已发布安装包不同，尚未重新打包发布。合并对象、验证及发布边界见[本轮交接](docs/testing/updates-integration-2026-10-22.md)；历史修复细节保留在[全局修复交接](docs/testing/full-code-review-fixes-2026-10-16.md)与[试用优化交接](docs/testing/user-trial-fixes-2026-10-16.md)。

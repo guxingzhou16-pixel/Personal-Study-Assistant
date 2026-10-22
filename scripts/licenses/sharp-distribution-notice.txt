@@ -1,4 +1,4 @@
-Study Companion 0.1.1 — Sharp / libvips source and library notice
+Study Companion 0.1.2 — Sharp / libvips source and library notice
 
 This directory contains libvips-42.dll, libvips-cpp-8.18.7.dll and
 sharp-win32-x64-0.35.5.node. The combined libraries contain LGPL-covered
