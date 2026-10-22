@@ -137,3 +137,43 @@ test('a failed check can be retried and switching settings reuses a successful c
     await app.close();
   }
 });
+
+test('checking public release metadata does not block an otherwise idle learning backup', async () => {
+  const { app, page } = await launch();
+  const destination = mkdtempSync(join(tmpdir(), 'study-updates-backup-'));
+  try {
+    await app.evaluate(({ net, dialog }, destination) => {
+      const state = { waiting: false, release: () => {} };
+      (globalThis as unknown as { heldUpdate: typeof state }).heldUpdate = state;
+      net.fetch = async () =>
+        new Promise<Response>((resolve) => {
+          state.waiting = true;
+          state.release = () => resolve(new Response('[]', { status: 200 }));
+        });
+      dialog.showOpenDialog = async () => ({ canceled: false, filePaths: [destination] });
+    }, destination);
+    await page.getByRole('button', { name: '设置', exact: true }).click();
+    await expect
+      .poll(() =>
+        app.evaluate(
+          () => (globalThis as unknown as { heldUpdate: { waiting: boolean } }).heldUpdate.waiting,
+        ),
+      )
+      .toBe(true);
+    await page.getByRole('button', { name: '导出完整备份', exact: true }).click();
+    await expect(page.getByText('备份已导出', { exact: true })).toBeVisible({ timeout: 10_000 });
+    await app.evaluate(() =>
+      (globalThis as unknown as { heldUpdate: { release(): void } }).heldUpdate.release(),
+    );
+    await expect(
+      page
+        .getByRole('region', { name: '软件更新' })
+        .getByText('暂无可用的 Windows 安装包', { exact: true }),
+    ).toBeVisible();
+    expect(
+      (await page.evaluate(() => window.studyCompanion!.backupState())).lastExport,
+    ).not.toBeNull();
+  } finally {
+    await app.close();
+  }
+});
