@@ -24,6 +24,25 @@ export interface Bootstrap {
   hasApiKey: boolean;
 }
 
+export interface AppVersionInfo {
+  version: string;
+  packaged: boolean;
+}
+export interface AppRelease {
+  version: string;
+  tag: string;
+  name: string;
+  notes: string;
+  publishedAt: string;
+  prerelease: boolean;
+}
+export interface AppUpdateReport {
+  current: AppVersionInfo;
+  status: 'available' | 'current' | 'ahead' | 'development' | 'no-release';
+  release: AppRelease | null;
+  checkedAt: string;
+}
+
 export interface ConnectionReport {
   models: string[];
   selectedModelAvailable: boolean;
