@@ -1,0 +1,18 @@
+{
+  "schemaVersion": 2,
+  "round": "2026-10-21-sunny-motion",
+  "selectedDesignId": "shizhi.sunny-motion.v1",
+  "baseDesignId": "shizhi.sunny-isle.v1",
+  "designs": [
+    {
+      "id": "shizhi.sunny-motion.v1",
+      "name": "晴岛全功能动效 / Sunny Motion",
+      "entry": "index.html",
+      "manifest": "design.json",
+      "handoff": "HANDOFF.md",
+      "preview": "previews/01-overview.png",
+      "video": "previews/motion-overview.webm"
+    }
+  ],
+  "sampleDataOnly": true
+}

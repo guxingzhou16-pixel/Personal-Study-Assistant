@@ -96,7 +96,11 @@ export function EmbeddingSettings() {
       {downloading && progress && (
         <progress aria-label="模型下载进度" max={progress.total} value={progress.current} />
       )}
-      <div className="connection-footer">
+      <div
+        className="connection-footer"
+        data-motion="state"
+        data-motion-key={downloading ? 'downloading' : status?.state}
+      >
         {downloading ? (
           <button
             type="button"
@@ -124,7 +128,7 @@ export function EmbeddingSettings() {
         {downloading && <LoaderCircle size={16} className="spin" aria-hidden="true" />}
       </div>
       {notice && (
-        <p className="field-hint" role="status">
+        <p className="field-hint" role="status" data-motion="fade" data-motion-key={notice}>
           {notice}
         </p>
       )}

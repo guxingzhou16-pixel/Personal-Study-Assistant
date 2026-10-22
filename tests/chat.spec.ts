@@ -90,6 +90,14 @@ test('real desktop streams both protocols, stops, handles broken streams and res
     await page.getByRole('textbox', { name: '输入学习问题' }).fill('停止测试');
     await page.getByRole('button', { name: '发送问题', exact: true }).click();
     await expect(page.getByTestId('chat-answer').last()).toHaveText('正在逐步解释');
+    const composer = await page.getByRole('textbox', { name: '输入学习问题' }).elementHandle();
+    await page.getByRole('button', { name: '学习首页', exact: true }).click();
+    await page.getByRole('button', { name: '资料库', exact: true }).click();
+    await page.getByRole('button', { name: '学习助手', exact: true }).click();
+    expect(
+      await composer!.evaluate((element) => element === document.getElementById('chat-question')),
+    ).toBe(true);
+    await expect(page.getByTestId('chat-answer').last()).toHaveText('正在逐步解释');
     await page.getByRole('button', { name: '停止生成', exact: true }).click();
     await expect(page.getByText('已停止生成，保留已收到的内容。')).toBeVisible();
     await expect.poll(() => stoppedConnection).toBe(true);

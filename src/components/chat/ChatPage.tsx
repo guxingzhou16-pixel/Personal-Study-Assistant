@@ -457,7 +457,7 @@ export function ChatPage({
           模型设置
         </button>
       </div>
-      <p className="chat-scope">
+      <p className="chat-scope" data-motion="fade" data-motion-key={mode}>
         {practicing
           ? `${practiceLabels[mode]} · 先预览原文，再生成 3 项练习。参考答案由你对照出处核查，不自动评分或记录掌握。`
           : mode === 'sources'
@@ -552,7 +552,11 @@ export function ChatPage({
             <span>{profile.model || '尚未选择模型'}</span>
             <small>{profile.baseUrl}</small>
           </div>
-          <div className="chat-retrieval-controls">
+          <div
+            className="chat-retrieval-controls"
+            data-motion="fade"
+            data-motion-key={`${mode}:${scope}`}
+          >
             <label>
               问答方式
               <select
@@ -603,6 +607,8 @@ export function ChatPage({
           </div>
           <div
             className="chat-transcript"
+            data-motion="fade"
+            data-motion-key={conversation?.id ?? 'empty'}
             ref={transcript}
             tabIndex={0}
             aria-label="聊天内容"
@@ -627,7 +633,7 @@ export function ChatPage({
             )}
             {conversation?.turns.map((turn) => (
               <article className="chat-turn" key={turn.id}>
-                <div className="chat-question">
+                <div className="chat-question" data-motion="reveal">
                   <span>我</span>
                   <p>{turn.question}</p>
                 </div>
@@ -651,11 +657,19 @@ export function ChatPage({
                       onOpenCitation={(number) => void openEvidence(turn.id, number)}
                     />
                   </div>
-                  <p className="chat-turn-status" role="status">
+                  <p
+                    className="chat-turn-status"
+                    role="status"
+                    data-motion="state"
+                    data-motion-key={turn.status}
+                  >
                     {labels[turn.status]}
                   </p>
                   {turn.notice && (
-                    <p className={`chat-turn-notice ${turn.status === 'error' ? 'is-error' : ''}`}>
+                    <p
+                      className={`chat-turn-notice ${turn.status === 'error' ? 'is-error' : ''}`}
+                      data-motion="fade"
+                    >
                       {turn.notice}
                     </p>
                   )}
@@ -669,7 +683,13 @@ export function ChatPage({
               </article>
             ))}
             {preview && previewValid && (
-              <div className="evidence-preview" role="region" aria-label="本次检索证据">
+              <div
+                className="evidence-preview"
+                role="region"
+                aria-label="本次检索证据"
+                data-motion="fade"
+                data-motion-key={preview.id}
+              >
                 <h2>本次检索原文</h2>
                 <p>
                   {preview.hits.length
@@ -689,18 +709,23 @@ export function ChatPage({
             }}
           >
             {error && (
-              <p className="chat-error" role="alert">
+              <p className="chat-error" role="alert" data-motion="fade" data-motion-key={error}>
                 {error}
               </p>
             )}
             {!isDesktop && <p className="chat-error">请启动桌面版以保存会话并连接模型。</p>}
             {indexNotice && (
-              <p className="chat-index-notice" role="status">
+              <p
+                className="chat-index-notice"
+                role="status"
+                data-motion="fade"
+                data-motion-key={indexNotice}
+              >
                 {indexNotice}
               </p>
             )}
             {searching && (
-              <div className="chat-index-progress" role="status">
+              <div className="chat-index-progress" role="status" data-motion="fade">
                 <span>{progress?.message ?? '正在准备索引和检索原文…'}</span>
                 <button
                   type="button"
@@ -712,7 +737,7 @@ export function ChatPage({
               </div>
             )}
             {remote && needsModel && (
-              <label className="chat-consent">
+              <label className="chat-consent" data-motion="fade" data-motion-key={consentSignature}>
                 <input
                   type="checkbox"
                   checked={consent}
@@ -777,7 +802,11 @@ export function ChatPage({
                 }
               }}
             />
-            <div className="chat-actions">
+            <div
+              className="chat-actions"
+              data-motion="state"
+              data-motion-key={active ? 'running' : 'idle'}
+            >
               <small>
                 {mode !== 'chat'
                   ? '先检索原文，Ctrl + Enter 发送 · 引用编号可打开出处'

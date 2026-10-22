@@ -21,6 +21,7 @@ import type {
   ReadingSelection,
 } from '../../lib/types';
 import { PdfPage } from './PdfPage';
+import { emphasizeReadingTarget } from '../../lib/motion';
 
 function heading(level: number) {
   return function MarkdownHeading({
@@ -146,14 +147,18 @@ export function ReadingPage({
   useEffect(() => {
     if (!document || !scroll.current) return;
     const root = scroll.current;
-    const target = root.querySelector<HTMLElement>(`[id="${document.source.position.anchor}"]`);
+    const initialHeading = root.querySelector<HTMLElement>(
+      `[id="${document.source.position.anchor}"]`,
+    );
     if (document.source.kind === 'markdown') {
-      if (target)
+      if (initialHeading)
         root.scrollTop +=
-          target.getBoundingClientRect().top -
+          initialHeading.getBoundingClientRect().top -
           root.getBoundingClientRect().top +
           document.source.position.offset;
       else root.scrollTop = document.source.position.offset;
+      if (target)
+        emphasizeReadingTarget(root.querySelector<HTMLElement>(`[id="${target.anchor}"]`));
     }
     ready.current = true;
   }, [document]);
@@ -193,6 +198,7 @@ export function ReadingPage({
     if (root && target) {
       root.scrollTop += target.getBoundingClientRect().top - root.getBoundingClientRect().top - 20;
       update({ ...latest.current, anchor, offset: 0 });
+      emphasizeReadingTarget(target);
     }
   }
   function selectQuote() {
@@ -243,7 +249,7 @@ export function ReadingPage({
   }
   if (!document)
     return (
-      <div className="center-state" role={error ? 'alert' : 'status'}>
+      <div className="center-state" role={error ? 'alert' : 'status'} data-motion="fade">
         {error ? (
           <>
             <p>{error}</p>
@@ -264,8 +270,9 @@ export function ReadingPage({
     <section
       className={`reader ${position.tone === 'warm' ? 'reader-warm' : ''}`}
       aria-label={`阅读 ${source.name}`}
+      data-motion="fade"
     >
-      <header className="reader-header">
+      <header className="reader-header" data-motion="page">
         <button className="icon-button" aria-label={backLabel} onClick={() => void leave(onBack)}>
           <ArrowLeft size={18} />
         </button>
@@ -351,28 +358,32 @@ export function ReadingPage({
         <p className="reader-notice">部分页面没有可提取文字；这些页可阅读原页，OCR 暂不可用。</p>
       )}
       <div className="reader-body">
-        {toc && (
-          <aside className="reader-outline" aria-label="资料目录">
-            <p className="small-label">阅读路线</p>
-            <nav>
-              {source.outline.map((entry, index) => (
-                <button
-                  key={`${entry.anchor}-${index}`}
-                  className={
-                    position.anchor === entry.anchor ||
-                    (source.kind === 'pdf' && position.page === entry.page)
-                      ? 'active'
-                      : ''
-                  }
-                  style={{ paddingLeft: 12 + Math.min(entry.depth - 1, 4) * 12 }}
-                  onClick={() => jump(entry.anchor, entry.page)}
-                >
-                  {entry.title}
-                </button>
-              ))}
-            </nav>
-          </aside>
-        )}
+        <aside
+          className="reader-outline"
+          aria-label="资料目录"
+          hidden={!toc}
+          inert={!toc}
+          aria-hidden={!toc}
+        >
+          <p className="small-label">阅读路线</p>
+          <nav>
+            {source.outline.map((entry, index) => (
+              <button
+                key={`${entry.anchor}-${index}`}
+                className={
+                  position.anchor === entry.anchor ||
+                  (source.kind === 'pdf' && position.page === entry.page)
+                    ? 'active'
+                    : ''
+                }
+                style={{ paddingLeft: 12 + Math.min(entry.depth - 1, 4) * 12 }}
+                onClick={() => jump(entry.anchor, entry.page)}
+              >
+                {entry.title}
+              </button>
+            ))}
+          </nav>
+        </aside>
         <div
           className="reader-scroll"
           ref={scroll}
@@ -383,7 +394,12 @@ export function ReadingPage({
           aria-label="资料正文"
         >
           {source.kind === 'pdf' && document.data ? (
-            <PdfPage data={document.data} page={position.page} zoom={position.zoom} />
+            <PdfPage
+              data={document.data}
+              page={position.page}
+              zoom={position.zoom}
+              highlight={target?.page === position.page}
+            />
           ) : (
             <article className="markdown-reading">
               <ReactMarkdown
@@ -425,7 +441,9 @@ export function ReadingPage({
           <NotebookPen size={14} />
           加入笔记草稿
         </button>
-        <span role="status">{copyStatus}</span>
+        <span role="status" data-motion="state" data-motion-key={copyStatus}>
+          {copyStatus}
+        </span>
       </footer>
     </section>
   );

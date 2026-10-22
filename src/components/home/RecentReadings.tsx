@@ -23,13 +23,13 @@ export function RecentReadings({ onOpen }: { onOpen: (id: string) => void }) {
   }, []);
   if (error)
     return (
-      <p className="feedback error" role="alert">
+      <p className="feedback error" role="alert" data-motion="fade">
         最近阅读无法加载：{error}
       </p>
     );
   if (!sources.length)
     return (
-      <div className="empty-reading">
+      <div className="empty-reading" data-motion="fade">
         <FolderOpen size={30} strokeWidth={1.4} />
         <h3>还没有阅读中的资料</h3>
         <p>导入一份资料，给今天留一个小小的开始。</p>
@@ -41,6 +41,8 @@ export function RecentReadings({ onOpen }: { onOpen: (id: string) => void }) {
       {sources.map((source, index) => (
         <button
           type="button"
+          data-motion="fade"
+          data-motion-delay={index * 40}
           className={`recent-document ${index === 0 ? 'recent-feature' : 'recent-row'}`}
           key={source.id}
           onClick={() => onOpen(source.id)}

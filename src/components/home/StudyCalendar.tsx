@@ -33,6 +33,7 @@ export function StudyCalendar({
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [feedback, setFeedback] = useState('');
+  const [monthDirection, setMonthDirection] = useState('forward');
   const requestId = useRef(0);
   const busyRef = useRef(false);
 
@@ -104,7 +105,12 @@ export function StudyCalendar({
   }
 
   return (
-    <section className="daily-section" aria-labelledby="study-calendar-heading">
+    <section
+      className="daily-section"
+      aria-labelledby="study-calendar-heading"
+      data-motion="reveal"
+      data-motion-delay="80"
+    >
       <div className="section-heading">
         <h2 id="study-calendar-heading">学习日历</h2>
         <Leaf size={17} />
@@ -122,6 +128,7 @@ export function StudyCalendar({
               disabled={showingCurrentMonth || busy}
               onClick={() => {
                 const [year, month] = today.split('-').map(Number);
+                setMonthDirection(currentMonth > today.slice(0, 7) ? 'back' : 'forward');
                 setSelected({ year, month });
               }}
             >
@@ -132,7 +139,10 @@ export function StudyCalendar({
               className="calendar-arrow"
               aria-label="上个月"
               disabled={busy || (selected.year === 1970 && selected.month === 1)}
-              onClick={() => setSelected(adjacentMonth(selected.year, selected.month, -1))}
+              onClick={() => {
+                setMonthDirection('back');
+                setSelected(adjacentMonth(selected.year, selected.month, -1));
+              }}
             >
               <ChevronLeft size={17} />
             </button>
@@ -141,7 +151,10 @@ export function StudyCalendar({
               className="calendar-arrow"
               aria-label="下个月"
               disabled={busy || (selected.year === 2100 && selected.month === 12)}
-              onClick={() => setSelected(adjacentMonth(selected.year, selected.month, 1))}
+              onClick={() => {
+                setMonthDirection('forward');
+                setSelected(adjacentMonth(selected.year, selected.month, 1));
+              }}
             >
               <ChevronRight size={17} />
             </button>
@@ -160,7 +173,11 @@ export function StudyCalendar({
               ))}
             </tr>
           </thead>
-          <tbody>
+          <tbody
+            data-motion="month"
+            data-motion-key={currentMonth}
+            data-motion-direction={monthDirection}
+          >
             {weeks.map((week) => (
               <tr key={week[0].key}>
                 {week.map((date) => (
@@ -168,6 +185,8 @@ export function StudyCalendar({
                     <span
                       className={`calendar-day ${date.key === today ? 'is-today' : ''} ${signed.has(date.key) ? 'is-signed' : ''}`}
                       aria-current={date.key === today ? 'date' : undefined}
+                      data-motion={date.key === today ? 'state' : undefined}
+                      data-motion-key={date.key === today ? signed.has(date.key) : undefined}
                       aria-label={`${date.key}${date.key === today ? ' 今天' : ''}${signed.has(date.key) ? ' 已签到' : ''}`}
                     >
                       <span>{date.day}</span>
@@ -198,6 +217,8 @@ export function StudyCalendar({
           <button
             type="button"
             className={`check-in-button ${overview?.today.checkedIn ? 'checked-in' : ''}`}
+            data-motion="state"
+            data-motion-key={overview?.today.checkedIn}
             disabled={!overview || busy || overview.today.checkedIn}
             onClick={() => void action('check-in')}
           >
@@ -220,6 +241,8 @@ export function StudyCalendar({
           <button
             type="button"
             className="study-timer-button"
+            data-motion="state"
+            data-motion-key={overview?.running}
             disabled={!overview || busy}
             onClick={() => void action('timer')}
           >
@@ -232,7 +255,7 @@ export function StudyCalendar({
         </span>
       </div>
       {error && (
-        <div className="study-error" role="alert">
+        <div className="study-error" role="alert" data-motion="fade" data-motion-key={error}>
           {error}
           <button
             className="text-button"

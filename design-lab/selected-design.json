@@ -12,6 +12,14 @@
   "originalSpecStatus": "historical-concept-snapshot",
   "designDoc": "docs/design/SUNNY_ISLE.md",
   "handoff": "docs/handoffs/2026-10-18-sunny-isle.md",
+  "motion": {
+    "id": "shizhi.sunny-motion.v1",
+    "manifest": "design-lab/2026-10-21-sunny-motion/design.json",
+    "demo": "design-lab/2026-10-21-sunny-motion/index.html",
+    "designDoc": "docs/design/SUNNY_MOTION.md",
+    "handoff": "docs/handoffs/2026-10-21-sunny-motion.md",
+    "video": "design-lab/2026-10-21-sunny-motion/previews/motion-overview.webm"
+  },
   "screenshots": [
     "docs/design/assets/sunny-isle-home.png",
     "docs/design/assets/sunny-isle-chat-900.png"

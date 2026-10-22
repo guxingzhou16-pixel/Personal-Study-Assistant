@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>晴岛 · 动效设计室</title>
+    <link rel="stylesheet" href="lab.css" />
+    <link rel="stylesheet" href="assets/motion.css" />
+    <script src="assets/runtime.js" defer></script>
+    <script src="lab.js" defer></script>
+  </head>
+  <body>
+    <div class="motion-lab" id="lab">
+      <header class="lab-header">
+        <a class="lab-brand" href="../README.md"
+          ><span>☼</span><strong>晴岛<small>MOTION STUDY / 01</small></strong></a
+        >
+        <span class="sample-label">概念演示 · 全部为示例数据</span>
+        <a class="doc-link" href="HANDOFF.md">设计与交接 ↗</a>
+      </header>
+      <main>
+        <div class="intro">
+          <div>
+            <p class="eyebrow">A LITTLE MOVEMENT. A CLEARER MOMENT.</p>
+            <h1>让每一步，自然发生<span>✳</span></h1>
+            <p>轻一点，快一点。让界面跟上你的想法。</p>
+          </div>
+          <div class="intro-note">
+            <span>借鉴 Apple 的连贯与响应</span><strong>保留晴岛的安静</strong
+            ><small>同一动效代码 · 正式软件与本页共用</small>
+          </div>
+        </div>
+        <div class="workbench">
+          <aside class="scene-menu" aria-label="动效场景">
+            <p class="eyebrow">EXPLORE THE DETAILS</p>
+            <div id="scene-list"></div>
+            <div class="menu-note">不是每一秒都需要动。<br />只在变化值得留意时，轻轻回应。</div>
+          </aside>
+          <section class="workspace" aria-labelledby="scene-title">
+            <div class="scene-heading">
+              <div>
+                <span id="scene-number">01 / 12</span>
+                <h2 id="scene-title">页面与导航</h2>
+              </div>
+              <span class="duration" id="scene-duration">240 ms</span>
+            </div>
+            <div class="demo-window">
+              <div class="window-toolbar">
+                <span class="window-dots" aria-hidden="true"><i></i><i></i><i></i></span>
+                <nav class="app-nav" aria-label="示例主导航">
+                  <button class="nav-item" aria-current="page" data-tab="home">学习首页</button
+                  ><button class="nav-item" data-tab="library">资料库</button
+                  ><button class="nav-item" data-tab="chat">学习助手</button
+                  ><span class="nav-indicator" aria-hidden="true"></span>
+                </nav>
+                <span class="window-avatar" aria-hidden="true">知</span>
+              </div>
+              <div class="demo-screen" id="screen"></div>
+              <div class="window-footer">
+                <span>◌ 示例学习空间</span><span>所有反馈均为演示，不会保存学习记录</span>
+              </div>
+            </div>
+            <div class="playback">
+              <div class="play-actions">
+                <button class="primary" id="play">播放主动作 <span>→</span></button
+                ><button class="secondary" id="replay">↺ 重置场景</button>
+              </div>
+              <div class="preferences">
+                <label><input type="checkbox" id="slow" />半速查看</label
+                ><label><input type="checkbox" id="reduce" />减少动态效果</label>
+              </div>
+            </div>
+            <p class="playback-status" id="playback-status" role="status">
+              点击「播放主动作」，或直接操作示例界面。
+            </p>
+            <div class="principles">
+              <div>
+                <span>01 / INTENT</span>
+                <p id="scene-intent"></p>
+              </div>
+              <div>
+                <span>02 / INTERRUPTION</span>
+                <p>随时再次操作。新状态立即生效，动画不会锁住界面。</p>
+              </div>
+              <div>
+                <span>03 / COMFORT</span>
+                <p>跟随系统减少动态效果；本页也可以单独预览。</p>
+              </div>
+            </div>
+          </section>
+        </div>
+        <footer class="lab-footer">
+          <span>拾知 / Sunny Isle</span><span>100 ms 按下 · 180 ms 反馈 · 240 ms 切页</span
+          ><a href="REFERENCES.md">参考案例与设计依据 ↗</a>
+        </footer>
+      </main>
+    </div>
+  </body>
+</html>

@@ -136,7 +136,7 @@ export function SettingsPage({ boot, onSaved }: Props) {
   }
 
   return (
-    <div className="page settings-page">
+    <div className="page settings-page" data-motion="page">
       <div className="page-heading">
         <div>
           <p className="eyebrow">YOUR OWN PACE</p>
@@ -232,7 +232,12 @@ export function SettingsPage({ boot, onSaved }: Props) {
               点击“保存设置”后应用主题。界面主题与助手回应风格分别选择，阅读护眼仍在阅读器中设置。
             </p>
           </section>
-          <section className="settings-section" aria-labelledby="models-heading">
+          <section
+            className="settings-section"
+            aria-labelledby="models-heading"
+            data-motion="fade"
+            data-motion-key={draft.provider}
+          >
             <div className="section-heading">
               <h2 id="models-heading">模型连接</h2>
               <span>使用你自己的模型</span>
@@ -338,6 +343,8 @@ export function SettingsPage({ boot, onSaved }: Props) {
               <div
                 className={`notice ${report.selectedModelAvailable ? 'success' : 'info'}`}
                 role="status"
+                data-motion="fade"
+                data-motion-key={report.message}
               >
                 <PlugZap size={17} />
                 <div>
@@ -392,6 +399,8 @@ export function SettingsPage({ boot, onSaved }: Props) {
             <div
               className={`notice ${notice.kind}`}
               role={notice.kind === 'error' ? 'alert' : 'status'}
+              data-motion="fade"
+              data-motion-key={notice.text}
             >
               {notice.text}
             </div>

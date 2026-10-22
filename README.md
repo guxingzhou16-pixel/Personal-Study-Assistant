@@ -32,6 +32,8 @@
 
 当前整合采用晴岛视觉，同时保留已交付的笔记、计划、专注、阅读侧栏和复习；不能沿用旧设计稿把这些能力标为规划中。界面变更参考[晴岛规范](docs/design/SUNNY_ISLE.md)及[设计档案](design-lab/README.md)，日常代码位置仍以[前端地图](docs/CODEMAPS/frontend.md)为准。设计实验不进入软件运行时，也不代表已经发布新版安装器。
 
+动效约定见 [SUNNY_MOTION](docs/design/SUNNY_MOTION.md)，支持系统减少动画偏好；正式界面不运行设计实验脚本。
+
 ## 本地运行
 
 要求：Windows 10/11、Node.js **24.16 或更新的受支持版本**、npm。当前使用预编译 Electron，不需要 Rust 或 C++ 编译工具。维护分支为 `codex/structured-notes`；已有该工作区无需重新下载项目。

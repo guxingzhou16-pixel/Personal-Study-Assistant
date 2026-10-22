@@ -49,6 +49,7 @@ import {
   type TaskDraft,
 } from './lib/types';
 import sunnyPlant from './assets/sunny-isle-plant.svg';
+import { mountMotion } from './lib/motion';
 
 type Page =
   | 'home'
@@ -82,6 +83,7 @@ const readerBackLabels = {
 };
 
 export default function App() {
+  const shellRef = useRef<HTMLDivElement>(null);
   const mainRef = useRef<HTMLElement>(null);
   const navigationIntent = useRef(0);
   const [page, setPage] = useState<Page>('home');
@@ -125,6 +127,10 @@ export default function App() {
   const [boot, setBoot] = useState<Bootstrap | null>(null);
   const [failure, setFailure] = useState<string | null>(null);
   const [attempt, setAttempt] = useState(0);
+  useLayoutEffect(() => {
+    const motion = mountMotion(shellRef.current!);
+    return motion.dispose;
+  }, []);
   const backup = useBackupState(true);
   const theme = boot?.settings.theme ?? defaultSettings.theme;
   const previousPage = useRef(page);
@@ -170,6 +176,20 @@ export default function App() {
     setBoot((previous) => (previous ? { ...previous, settings, hasApiKey } : previous));
   }
   function navigate(next: Page) {
+    const order: Page[] = [
+      'home',
+      'library',
+      'chat',
+      'notes',
+      'agent',
+      'memories',
+      'reviews',
+      'planning',
+      'focus',
+      'settings',
+    ];
+    shellRef.current!.dataset.motionDirection =
+      sourceId || order.indexOf(next) < order.indexOf(page) ? 'back' : 'forward';
     navigationIntent.current++;
     setReaderPanel(null);
     setReaderRestore(undefined);
@@ -179,6 +199,7 @@ export default function App() {
     setPage(next);
   }
   function openSource(id: string) {
+    shellRef.current!.dataset.motionDirection = 'forward';
     navigationIntent.current++;
     setReaderPanel(null);
     setReaderRestore(undefined);
@@ -217,6 +238,7 @@ export default function App() {
     setReaderBookmark(null);
     setCitationTarget(target);
     setSourceId(target.sourceId);
+    shellRef.current!.dataset.motionDirection = 'forward';
     setReaderReturn(returnTo);
     setPage('library');
   }
@@ -308,7 +330,7 @@ export default function App() {
   }[settings.responseStyle];
 
   return (
-    <div className="app-shell">
+    <div className="app-shell" ref={shellRef}>
       <a className="skip-link" href="#main-content">
         跳到主要内容
       </a>
@@ -323,6 +345,7 @@ export default function App() {
           </span>
         </button>
         <nav className="app-nav" aria-label="主导航">
+          <span className="nav-indicator" aria-hidden="true" />
           {[
             { id: 'home' as const, icon: Home },
             { id: 'library' as const, icon: FolderOpen },
@@ -387,16 +410,22 @@ export default function App() {
           id="main-content"
           ref={mainRef}
           tabIndex={-1}
-          className={sourceId ? `reader-main${readerPanel ? ' reading-workspace' : ''}` : page === 'chat' ? 'chat-main' : undefined}
+          className={
+            sourceId
+              ? `reader-main${readerPanel ? ' reading-workspace' : ''}`
+              : page === 'chat'
+                ? 'chat-main'
+                : undefined
+          }
         >
           {!boot && !failure && (
-            <div className="center-state" role="status">
+            <div className="center-state" role="status" data-motion="fade">
               <LoaderCircle className="spin" size={26} />
               <h2>正在打开你的学习空间…</h2>
             </div>
           )}
           {failure && (
-            <div className="center-state" role="alert">
+            <div className="center-state" role="alert" data-motion="fade">
               <CircleHelp size={32} />
               <h2>暂时无法打开学习空间</h2>
               <p>{failure}</p>
@@ -406,7 +435,7 @@ export default function App() {
             </div>
           )}
           {boot && !failure && page === 'home' && (
-            <div className="page home-page">
+            <div className="page home-page" data-motion="page">
               <FirstUseGuide
                 settings={settings}
                 onSettings={() => navigate('settings')}
@@ -420,7 +449,11 @@ export default function App() {
                   navigate('chat');
                 }}
               />
-              <section className="welcome-panel" aria-labelledby="welcome-title">
+              <section
+                className="welcome-panel"
+                aria-labelledby="welcome-title"
+                data-motion="reveal"
+              >
                 <div className="welcome-copy">
                   <p className="eyebrow">YOUR OWN LITTLE LEARNING ISLAND</p>
                   <h1 id="welcome-title">
@@ -459,7 +492,7 @@ export default function App() {
                 onFocusTask={focusTask}
               />
               <div className="home-columns">
-                <section className="recent-section">
+                <section className="recent-section" data-motion="reveal" data-motion-delay="40">
                   <div className="section-heading">
                     <h2>
                       还想接着读 <BookOpen size={17} aria-hidden="true" />

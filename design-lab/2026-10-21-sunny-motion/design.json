@@ -1,0 +1,215 @@
+{
+  "$schema": "./handoff.schema.json",
+  "schemaVersion": 2,
+  "id": "shizhi.sunny-motion.v1",
+  "name": "晴岛全功能动效 / Sunny Motion",
+  "createdOn": "2026-10-21",
+  "status": "implemented",
+  "baseDesignId": "shizhi.sunny-isle.v1",
+  "scope": "main 5ba3b1b 的全部可用功能；不扩展其他分支的规划能力",
+  "entry": "index.html",
+  "handoff": "HANDOFF.md",
+  "preview": "previews/01-overview.png",
+  "video": "previews/motion-overview.webm",
+  "validationReport": "validation.json",
+  "demo": {
+    "runtime": "static-html",
+    "sampleDataOnly": true,
+    "offline": true,
+    "controls": ["逐场景操作", "主动作", "场景重置", "半速", "减少动态效果"],
+    "generatedSources": "assets/sources.json"
+  },
+  "product": {
+    "controller": "src/lib/motion.ts",
+    "styles": "src/styles/motion.css",
+    "designDoc": "docs/design/SUNNY_MOTION.md",
+    "handoff": "docs/handoffs/2026-10-21-sunny-motion.md",
+    "publicApiChanges": false,
+    "newDependencies": []
+  },
+  "tokens": {
+    "durationMs": {
+      "press": 100,
+      "release": 160,
+      "feedback": 180,
+      "page": 240,
+      "month": 220,
+      "disclosure": 200
+    },
+    "easing": "cubic-bezier(0.22, 1, 0.36, 1)",
+    "distancePx": 8,
+    "hoverLiftPx": 2,
+    "pressScale": 0.985,
+    "maxStaggerMs": 120
+  },
+  "motions": [
+    {
+      "id": "navigation",
+      "title": "页面与导航",
+      "trigger": "导航、设置、资料打开／返回",
+      "effect": "方向轻移与导航胶囊承接",
+      "durationMs": [240],
+      "productSelectors": [".page", ".chat-container", ".reader-header", ".nav-indicator"],
+      "interruption": "新操作立即执行；替换该元素旧动画，退出／隐藏／减少动态效果时取消；不等待动画完成执行业务",
+      "reducedMotion": "不启动WAAPI；取消进行中动画，关闭循环、位移、缩放及CSS过渡；保留文字、颜色、焦点与原操作"
+    },
+    {
+      "id": "startup",
+      "title": "启动与重试",
+      "trigger": "加载、失败、重试结果节点出现",
+      "effect": "轻淡入，不增加业务等待",
+      "durationMs": [180, 240],
+      "productSelectors": [".center-state"],
+      "interruption": "新操作立即执行；替换该元素旧动画，退出／隐藏／减少动态效果时取消；不等待动画完成执行业务",
+      "reducedMotion": "不启动WAAPI；取消进行中动画，关闭循环、位移、缩放及CSS过渡；保留文字、颜色、焦点与原操作"
+    },
+    {
+      "id": "reading",
+      "title": "首页与最近阅读",
+      "trigger": "首页及真实最近阅读节点出现",
+      "effect": "分组入场与资料卡悬停／按下反馈",
+      "durationMs": [100, 160, 240],
+      "productSelectors": [
+        ".welcome-panel",
+        ".recent-section",
+        ".daily-section",
+        ".recent-document"
+      ],
+      "interruption": "新操作立即执行；替换该元素旧动画，退出／隐藏／减少动态效果时取消；不等待动画完成执行业务",
+      "reducedMotion": "不启动WAAPI；取消进行中动画，关闭循环、位移、缩放及CSS过渡；保留文字、颜色、焦点与原操作"
+    },
+    {
+      "id": "calendar",
+      "title": "月历与签到",
+      "trigger": "切月与签到结果变化",
+      "effect": "日期主体方向切换，成功后更新今日标记",
+      "durationMs": [180, 220],
+      "productSelectors": [".month-calendar tbody", ".calendar-day", ".check-in-button"],
+      "interruption": "新操作立即执行；替换该元素旧动画，退出／隐藏／减少动态效果时取消；不等待动画完成执行业务",
+      "reducedMotion": "不启动WAAPI；取消进行中动画，关闭循环、位移、缩放及CSS过渡；保留文字、颜色、焦点与原操作"
+    },
+    {
+      "id": "timer",
+      "title": "手动学习计时",
+      "trigger": "running 状态改变",
+      "effect": "状态淡入，秒数文本稳定更新",
+      "durationMs": [160, 180],
+      "productSelectors": [".study-timer-button"],
+      "interruption": "新操作立即执行；替换该元素旧动画，退出／隐藏／减少动态效果时取消；不等待动画完成执行业务",
+      "reducedMotion": "不启动WAAPI；取消进行中动画，关闭循环、位移、缩放及CSS过渡；保留文字、颜色、焦点与原操作"
+    },
+    {
+      "id": "import",
+      "title": "导入与取消",
+      "trigger": "导入开始、结束、取消或失败",
+      "effect": "区域与真实报告淡入，进度文本不重播",
+      "durationMs": [180],
+      "productSelectors": [".import-progress", ".import-report", ".feedback"],
+      "interruption": "新操作立即执行；替换该元素旧动画，退出／隐藏／减少动态效果时取消；不等待动画完成执行业务",
+      "reducedMotion": "不启动WAAPI；取消进行中动画，关闭循环、位移、缩放及CSS过渡；保留文字、颜色、焦点与原操作"
+    },
+    {
+      "id": "search",
+      "title": "搜索与筛选",
+      "trigger": "搜索字符串或格式改变",
+      "effect": "结果短淡入，新卡片独立出现",
+      "durationMs": [180],
+      "productSelectors": [".source-list", ".source-card", ".empty-reading"],
+      "interruption": "新操作立即执行；替换该元素旧动画，退出／隐藏／减少动态效果时取消；不等待动画完成执行业务",
+      "reducedMotion": "不启动WAAPI；取消进行中动画，关闭循环、位移、缩放及CSS过渡；保留文字、颜色、焦点与原操作"
+    },
+    {
+      "id": "reader",
+      "title": "阅读与出处",
+      "trigger": "进入、目录／护眼变化、渲染完成、复制与出处定位",
+      "effect": "标题轻入场、局部折叠、颜色过渡、PDF仅淡入、目标内描边",
+      "durationMs": [180, 200, 240],
+      "productSelectors": [
+        ".reader",
+        ".reader-header",
+        ".reader-outline",
+        ".pdf-page",
+        ".reader-selection",
+        "[data-reading-heading]"
+      ],
+      "interruption": "新操作立即执行；替换该元素旧动画，退出／隐藏／减少动态效果时取消；不等待动画完成执行业务",
+      "reducedMotion": "不启动WAAPI；取消进行中动画，关闭循环、位移、缩放及CSS过渡；保留文字、颜色、焦点与原操作"
+    },
+    {
+      "id": "chat",
+      "title": "聊天与会话",
+      "trigger": "会话切换、提问与轮次终止状态变化",
+      "effect": "问题轻入场、状态短淡入；答案片段不动画",
+      "durationMs": [180, 240],
+      "productSelectors": [
+        ".chat-transcript",
+        ".chat-question",
+        ".chat-turn-status",
+        ".chat-actions"
+      ],
+      "interruption": "新操作立即执行；替换该元素旧动画，退出／隐藏／减少动态效果时取消；不等待动画完成执行业务",
+      "reducedMotion": "不启动WAAPI；取消进行中动画，关闭循环、位移、缩放及CSS过渡；保留文字、颜色、焦点与原操作"
+    },
+    {
+      "id": "evidence",
+      "title": "资料问答与证据",
+      "trigger": "模式／范围、检索／重建、预览、原文折叠",
+      "effect": "工具和证据入场，原生details局部展开／收起",
+      "durationMs": [180, 200],
+      "productSelectors": [
+        ".chat-retrieval-controls",
+        ".evidence-preview",
+        ".evidence-list",
+        ".chat-index-progress"
+      ],
+      "interruption": "新操作立即执行；替换该元素旧动画，退出／隐藏／减少动态效果时取消；不等待动画完成执行业务",
+      "reducedMotion": "不启动WAAPI；取消进行中动画，关闭循环、位移、缩放及CSS过渡；保留文字、颜色、焦点与原操作"
+    },
+    {
+      "id": "settings",
+      "title": "设置与密钥",
+      "trigger": "服务切换、连接检测、保存或删除密钥结果",
+      "effect": "表单与真实反馈短淡入",
+      "durationMs": [180],
+      "productSelectors": [".settings-section", ".notice"],
+      "interruption": "新操作立即执行；替换该元素旧动画，退出／隐藏／减少动态效果时取消；不等待动画完成执行业务",
+      "reducedMotion": "不启动WAAPI；取消进行中动画，关闭循环、位移、缩放及CSS过渡；保留文字、颜色、焦点与原操作"
+    },
+    {
+      "id": "download",
+      "title": "模型下载",
+      "trigger": "下载、取消、失败与就绪切换",
+      "effect": "状态反馈；原生进度条跟随真实进度",
+      "durationMs": [160, 180],
+      "productSelectors": [
+        ".embedding-settings .connection-footer",
+        ".embedding-settings progress"
+      ],
+      "interruption": "新操作立即执行；替换该元素旧动画，退出／隐藏／减少动态效果时取消；不等待动画完成执行业务",
+      "reducedMotion": "不启动WAAPI；取消进行中动画，关闭循环、位移、缩放及CSS过渡；保留文字、颜色、焦点与原操作"
+    }
+  ],
+  "references": [
+    {
+      "title": "Apple / Enhance your UI animations and transitions",
+      "url": "https://developer.apple.com/videos/play/wwdc2024/10145/",
+      "appliedTo": "页面与资料的连续衔接"
+    },
+    {
+      "title": "Apple / Animate with springs",
+      "url": "https://developer.apple.com/videos/play/wwdc2023/10158/",
+      "appliedTo": "自然减速与轻量反馈"
+    },
+    {
+      "title": "Apple / Designing Fluid Interfaces",
+      "url": "https://developer.apple.com/videos/play/wwdc2018/803/",
+      "appliedTo": "即时响应与可中断交互"
+    }
+  ],
+  "limitations": [
+    "示例数据不等于正式学习记录；演示中的模拟进度不得复制到产品",
+    "本轮不发布安装包、不验证真实模型质量",
+    "CSS details-content 与离散display在当前Electron/Chromium验证，其他浏览器需另测",
+    "具体实际运行结果见产品交接和validation.json"
+  ]
+}

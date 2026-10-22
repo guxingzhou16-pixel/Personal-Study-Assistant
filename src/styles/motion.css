@@ -1,0 +1,142 @@
+:root {
+  --motion-press: 100ms;
+  --motion-release: 160ms;
+  --motion-feedback: 180ms;
+  --motion-page: 240ms;
+  --motion-month: 220ms;
+  --motion-disclosure: 200ms;
+  --motion-ease: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+button {
+  transition:
+    transform var(--motion-release) var(--motion-ease),
+    background-color var(--motion-release) ease-out,
+    border-color var(--motion-release) ease-out,
+    color var(--motion-release) ease-out,
+    opacity var(--motion-release) ease-out;
+}
+button:enabled:active {
+  transform: scale(0.985);
+  transition-duration: var(--motion-press);
+}
+.recent-document,
+.source-card {
+  transition:
+    transform var(--motion-release) var(--motion-ease),
+    border-color var(--motion-release) ease-out;
+}
+@media (hover: hover) {
+  .recent-document:enabled:hover,
+  .source-card:has(button:hover) {
+    transform: translateY(-2px);
+  }
+  .recent-document:enabled:active {
+    transform: translateY(0) scale(0.985);
+  }
+}
+.app-nav {
+  position: relative;
+  isolation: isolate;
+}
+.nav-indicator {
+  position: absolute;
+  top: 5px;
+  bottom: 5px;
+  border-radius: 23px;
+  background: var(--surface);
+  box-shadow: 0 2px 5px #34462c08;
+  transform-origin: left center;
+  pointer-events: none;
+  opacity: 0;
+}
+.app-nav .nav-item {
+  position: relative;
+  z-index: 1;
+}
+.app-nav .nav-item.selected {
+  background: transparent;
+  box-shadow: none;
+}
+.reader,
+.reader-scroll,
+.markdown-reading,
+.reader-toolbar,
+.calendar-day,
+.provider {
+  transition:
+    background-color var(--motion-feedback) ease-out,
+    color var(--motion-feedback) ease-out,
+    border-color var(--motion-feedback) ease-out;
+}
+.reader-outline {
+  transition:
+    opacity var(--motion-disclosure) var(--motion-ease),
+    transform var(--motion-disclosure) var(--motion-ease),
+    display var(--motion-disclosure) allow-discrete;
+}
+.reader-outline[hidden] {
+  opacity: 0;
+  transform: translateX(-8px);
+}
+@starting-style {
+  .reader-outline:not([hidden]) {
+    opacity: 0;
+    transform: translateX(-8px);
+  }
+}
+/* Keep native details/summary semantics; only the local disclosure changes height. */
+details::details-content {
+  interpolate-size: allow-keywords;
+  block-size: 0;
+  opacity: 0;
+  overflow: clip;
+  transition:
+    block-size var(--motion-disclosure) var(--motion-ease),
+    opacity var(--motion-release) ease-out,
+    content-visibility var(--motion-disclosure) allow-discrete;
+}
+details[open]::details-content {
+  block-size: auto;
+  opacity: 1;
+}
+progress::-webkit-progress-value {
+  transition: width var(--motion-release) linear;
+}
+
+/* The demo can preview preferences without changing the operating system. */
+[data-motion-slow='true'] {
+  --motion-press: 200ms;
+  --motion-release: 320ms;
+  --motion-feedback: 360ms;
+  --motion-page: 480ms;
+  --motion-month: 440ms;
+  --motion-disclosure: 400ms;
+}
+[data-motion-reduced='true'] *,
+[data-motion-reduced='true'] *::before,
+[data-motion-reduced='true'] *::after,
+[data-motion-reduced='true'] *::details-content {
+  animation: none !important;
+  transition: none !important;
+}
+[data-motion-reduced='true'] button:enabled:active,
+[data-motion-reduced='true'] .recent-document:enabled:hover,
+[data-motion-reduced='true'] .source-card:has(button:hover) {
+  transform: none;
+}
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after,
+  *::details-content {
+    animation: none !important;
+    transition: none !important;
+    scroll-behavior: auto !important;
+  }
+  button:enabled:active,
+  .recent-document:enabled:hover,
+  .source-card:has(button:hover) {
+    transform: none;
+  }
+}
