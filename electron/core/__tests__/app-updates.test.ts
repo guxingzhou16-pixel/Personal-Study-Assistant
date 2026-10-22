@@ -204,6 +204,12 @@ it('bounds response bytes and cancels the stream when metadata is too large', as
   expect(cancel).toHaveBeenCalledOnce();
 });
 
+it('reports invalid UTF-8 metadata as malformed data rather than a network failure', async () => {
+  const { service, download } = fixture();
+  download.mockResolvedValueOnce(new Response(new Uint8Array([0xc3, 0x28])));
+  await expect(service.check()).rejects.toMatchObject({ code: 'updateData' });
+});
+
 it('limits notes as inert text and allows nullable GitHub name/body fields', async () => {
   const data = { ...release(), name: null, body: null };
   expect((await fixture([data]).service.check()).release).toMatchObject({
