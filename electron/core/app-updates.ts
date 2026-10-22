@@ -139,7 +139,11 @@ async function readMetadata(response: Response, signal: AbortSignal): Promise<un
         await reader.cancel();
         throw dataError();
       }
-      body += decoder.decode(next.value, { stream: true });
+      try {
+        body += decoder.decode(next.value, { stream: true });
+      } catch {
+        throw dataError();
+      }
     }
     try {
       body += decoder.decode();
