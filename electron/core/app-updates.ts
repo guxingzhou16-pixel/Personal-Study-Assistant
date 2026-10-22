@@ -248,6 +248,7 @@ export class AppUpdates {
       throw new AppError('updateNetwork', '检查更新失败，请检查网络后重试；学习资料仍保存在本机。');
     } finally {
       clearTimeout(timer!);
+      controller.abort();
     }
   }
 
