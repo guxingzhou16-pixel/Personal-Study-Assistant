@@ -218,7 +218,7 @@ export function ChatPage({
   }, [applyTurn, openConversation, refresh, restoreActive]);
   useEffect(() => {
     if (visible && followOutput.current && transcript.current)
-      transcript.current.scrollTop = transcript.current.scrollHeight;
+      transcript.current.scrollTop = conversation?.turns.length ? transcript.current.scrollHeight : 0;
   }, [conversation, preview, visible]);
   useEffect(() => {
     if (visible && isDesktop)

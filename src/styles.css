@@ -1772,7 +1772,9 @@ select:hover {
     padding: 27px 32px;
   }
   .nav-item {
-    padding-inline: 17px;
+    padding-inline: 10px;
+    font-size: 13px;
+    gap: 6px;
   }
 }
 @media (max-width: 800px) {
