@@ -65,6 +65,7 @@ export class ChatService {
       throw new AppError('validation', '聊天请求包含不支持的字段。');
     const question = string(request.question, '问题', 4000);
     if (!question) throw new AppError('question', '请先输入问题。');
+    if (question.includes('\0')) throw new AppError('question', '问题不能包含空字符。');
     const noteSnapshot = context?.kind === 'note' ? context.note : undefined;
     const learningRequest =
       context?.kind === 'learning'

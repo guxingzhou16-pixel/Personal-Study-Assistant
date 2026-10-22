@@ -16,16 +16,34 @@ export type ParserResult = ParsedDocument & { markdownSelections?: MarkdownSelec
 interface MarkdownNode {
   type: string;
   value?: string;
+  alt?: string | null;
+  position?: Root['position'];
   children?: MarkdownNode[];
 }
 interface Token {
   text: string;
   literal: boolean;
+  legacyUnsafe?: boolean;
+  sourceStart?: number;
+  sourceEnd?: number;
+}
+function literalToken(node: MarkdownNode): Token {
+  return {
+    text: toString(node),
+    literal: true,
+    sourceStart: node.position?.start.offset,
+    sourceEnd: node.position?.end.offset,
+  };
+}
+function legacyTokens(node: MarkdownNode): Token[] {
+  if (node.value !== undefined || node.alt) return [literalToken(node)];
+  return (node.children ?? []).flatMap(legacyTokens);
 }
 function visibleTokens(node: MarkdownNode): Token[] {
-  if (node.type === 'html' || node.type === 'image') return [];
+  if (node.type === 'html' || node.type === 'image' || node.type === 'imageReference')
+    return [{ text: '', literal: false, legacyUnsafe: true }];
   if (node.type === 'break') return [{ text: '\n', literal: false }];
-  if (node.value !== undefined) return [{ text: node.value, literal: true }];
+  if (node.value !== undefined) return [literalToken(node)];
   const separator =
     node.type === 'tableRow'
       ? '\t'
@@ -86,34 +104,71 @@ export function parseMarkdown(data: Uint8Array): ParserResult {
   }
   if (!text.trim() || text.includes('\0'))
     throw new AppError('markdownContent', 'Markdown 为空或包含二进制内容。');
-  const legacy = markdownSections(unified().use(remarkParse).parse(text), (node) => [
-    { text: toString(node), literal: true },
-  ]);
+  const legacy = markdownSections(unified().use(remarkParse).parse(text), (node) => {
+    const tokens = legacyTokens(node);
+    const original = toString(node);
+    return tokens.map((token) => token.text).join('') === original
+      ? tokens
+      : [{ text: original, literal: true }];
+  });
   const current = markdownSections(
     unified().use(remarkParse).use(remarkGfm).parse(text),
     visibleTokens,
   );
   const markdownSelections: MarkdownSelectionMap[] = [];
   for (const { segment, tokens } of current.sections) {
-    const old = legacy.sections.find((entry) => entry.segment.anchor === segment.anchor)?.segment;
+    // Legacy text includes HTML and image alt text; text search cannot prove the visible occurrence.
+    if (tokens.some((token) => token.legacyUnsafe)) continue;
+    const old = legacy.sections.find((entry) => entry.segment.anchor === segment.anchor);
     if (!old) continue;
     const spans: MarkdownSelectionMap['spans'] = [];
     let offset = 0,
-      legacyOffset = 0;
+      legacyOffset = 0,
+      legacyIndex = 0;
     let mapped = true;
     for (const token of tokens) {
       if (token.literal && token.text) {
-        const start = old.text.indexOf(token.text, legacyOffset);
-        if (start < 0) {
+        const { sourceStart, sourceEnd } = token;
+        if (sourceStart === undefined || sourceEnd === undefined) {
           mapped = false;
           break;
         }
+        while (
+          legacyIndex < old.tokens.length &&
+          (old.tokens[legacyIndex].sourceEnd ?? -1) <= sourceStart
+        ) {
+          legacyOffset += old.tokens[legacyIndex].text.length;
+          legacyIndex++;
+        }
+        const original = old.tokens[legacyIndex];
+        const oldStart = original?.sourceStart;
+        const oldEnd = original?.sourceEnd;
+        if (
+          oldStart === undefined ||
+          oldEnd === undefined ||
+          oldStart > sourceStart ||
+          oldEnd < sourceEnd
+        ) {
+          mapped = false;
+          break;
+        }
+        const sameNode =
+          oldStart === sourceStart && oldEnd === sourceEnd && original.text === token.text;
+        // A split GFM leaf maps only when both values preserve their exact source text.
+        const rawSlice =
+          text.slice(oldStart, oldEnd) === original.text &&
+          text.slice(sourceStart, sourceEnd) === token.text;
+        if (!sameNode && !rawSlice) {
+          mapped = false;
+          break;
+        }
+        const start = legacyOffset + (sameNode ? 0 : sourceStart - oldStart);
         spans.push({ start: offset, end: offset + token.text.length, legacyStart: start });
-        legacyOffset = start + token.text.length;
       }
       offset += token.text.length;
     }
-    if (mapped) markdownSelections.push({ anchor: segment.anchor, legacyText: old.text, spans });
+    if (mapped)
+      markdownSelections.push({ anchor: segment.anchor, legacyText: old.segment.text, spans });
   }
   const segments = current.sections.map((entry) => entry.segment);
   return {

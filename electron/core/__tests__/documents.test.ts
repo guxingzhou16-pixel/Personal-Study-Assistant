@@ -119,6 +119,110 @@ it('uses visible GFM boundaries for new Markdown evidence and maps old selection
   ).rejects.toThrow('同一页或同一章节');
 });
 
+it('rejects ambiguous legacy Markdown selections when an image alt duplicates visible table text', async () => {
+  const { storage, documents, sources } = context();
+  const original =
+    '# 图片同文\n\n| 方法 | 行动 |\n|---|---|\n| ![主动回忆](local.png)主动回忆 | 独立回答 |\n';
+  const id = createHash('sha256').update(original).digest('hex');
+  const parsed = parseMarkdown(utf8(original));
+  expect(parsed.segments[0].text).toContain('主动回忆\t独立回答');
+  const legacyText = '图片同文\n| 方法 | 行动 |\n|---|---|\n| 主动回忆主动回忆 | 独立回答 |\n';
+  storage.addSource({
+    id,
+    name: '旧版图片资料.md',
+    kind: 'markdown',
+    bytes: Buffer.byteLength(original),
+    ...parsed,
+    segments: [{ ...parsed.segments[0], text: legacyText }],
+  });
+  mkdirSync(sources, { recursive: true });
+  writeFileSync(join(sources, `${id}.md`), original);
+  const before = storage.getSegment(id, 'md-line-1');
+
+  await expect(documents.selection(id, 'md-line-1', '主动回忆\t独立回答')).rejects.toMatchObject({
+    code: 'citation',
+  });
+  expect(storage.getSegment(id, 'md-line-1')).toEqual(before);
+});
+
+it('rejects ambiguous legacy Markdown selections when inline HTML duplicates visible list text', async () => {
+  const { storage, documents, sources } = context();
+  const original = '# H\n\nprefix <span title="alpha"></span>\n\n- alpha\n- beta\n';
+  const id = createHash('sha256').update(original).digest('hex');
+  const parsed = parseMarkdown(utf8(original));
+  expect(parsed.segments[0].text).toBe('H\nprefix \nalpha\nbeta\n');
+  const legacyText = 'H\nprefix <span title="alpha"></span>\nalphabeta\n';
+  storage.addSource({
+    id,
+    name: '旧版 HTML 资料.md',
+    kind: 'markdown',
+    bytes: Buffer.byteLength(original),
+    ...parsed,
+    segments: [{ ...parsed.segments[0], text: legacyText }],
+  });
+  mkdirSync(sources, { recursive: true });
+  writeFileSync(join(sources, `${id}.md`), original);
+  const before = storage.getSegment(id, 'md-line-1');
+
+  await expect(documents.selection(id, 'md-line-1', 'alpha\nbeta')).rejects.toMatchObject({
+    code: 'citation',
+  });
+  expect(storage.getSegment(id, 'md-line-1')).toEqual(before);
+});
+
+it('maps legacy Markdown table punctuation to the source cell rather than the separator row', async () => {
+  const { storage, documents, sources } = context();
+  const original = '# H\n\n| Name | Action |\n|---|---|\n| - | word |\n';
+  const id = createHash('sha256').update(original).digest('hex');
+  const parsed = parseMarkdown(utf8(original));
+  const legacyText = 'H\n| Name | Action |\n|---|---|\n| - | word |\n';
+  storage.addSource({
+    id,
+    name: '旧版表格资料.md',
+    kind: 'markdown',
+    bytes: Buffer.byteLength(original),
+    ...parsed,
+    segments: [{ ...parsed.segments[0], text: legacyText }],
+  });
+  mkdirSync(sources, { recursive: true });
+  writeFileSync(join(sources, `${id}.md`), original);
+  const before = storage.getSegment(id, 'md-line-1');
+
+  const selected = await documents.selection(id, 'md-line-1', '-\tword');
+  expect(selected).toMatchObject({
+    text: '- | word',
+    start: legacyText.indexOf('- | word'),
+    end: legacyText.indexOf('- | word') + '- | word'.length,
+  });
+  expect(storage.getSegment(id, 'md-line-1')).toEqual(before);
+});
+
+it('rejects legacy table code transformed by GFM even when its text uniquely matches syntax elsewhere', async () => {
+  const { storage, documents, sources } = context();
+  const original = '# H\n\n| Code | Action |\n|---|---|\n| `---\\|---` | word |\n';
+  const id = createHash('sha256').update(original).digest('hex');
+  const parsed = parseMarkdown(utf8(original));
+  expect(parsed.segments[0].text).toContain('---|---\tword');
+  const legacyText = 'H\n| Code | Action |\n|---|---|\n| ---\\|--- | word |\n';
+  expect(legacyText.indexOf('---|---')).toBe(legacyText.lastIndexOf('---|---'));
+  storage.addSource({
+    id,
+    name: '旧版转义代码资料.md',
+    kind: 'markdown',
+    bytes: Buffer.byteLength(original),
+    ...parsed,
+    segments: [{ ...parsed.segments[0], text: legacyText }],
+  });
+  mkdirSync(sources, { recursive: true });
+  writeFileSync(join(sources, `${id}.md`), original);
+  const before = storage.getSegment(id, 'md-line-1');
+
+  await expect(documents.selection(id, 'md-line-1', '---|---\tword')).rejects.toMatchObject({
+    code: 'citation',
+  });
+  expect(storage.getSegment(id, 'md-line-1')).toEqual(before);
+});
+
 describe('document parsing and stable evidence locations', () => {
   it('keeps duplicate Chinese headings distinct and ignores headings inside fenced code', () => {
     const parsed = parseMarkdown(
