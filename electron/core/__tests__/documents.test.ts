@@ -145,6 +145,31 @@ it('rejects ambiguous legacy Markdown selections when an image alt duplicates vi
   expect(storage.getSegment(id, 'md-line-1')).toEqual(before);
 });
 
+it('rejects ambiguous legacy Markdown selections when inline HTML duplicates visible list text', async () => {
+  const { storage, documents, sources } = context();
+  const original = '# H\n\nprefix <span title="alpha"></span>\n\n- alpha\n- beta\n';
+  const id = createHash('sha256').update(original).digest('hex');
+  const parsed = parseMarkdown(utf8(original));
+  expect(parsed.segments[0].text).toBe('H\nprefix \nalpha\nbeta\n');
+  const legacyText = 'H\nprefix <span title="alpha"></span>\nalphabeta\n';
+  storage.addSource({
+    id,
+    name: '旧版 HTML 资料.md',
+    kind: 'markdown',
+    bytes: Buffer.byteLength(original),
+    ...parsed,
+    segments: [{ ...parsed.segments[0], text: legacyText }],
+  });
+  mkdirSync(sources, { recursive: true });
+  writeFileSync(join(sources, `${id}.md`), original);
+  const before = storage.getSegment(id, 'md-line-1');
+
+  await expect(documents.selection(id, 'md-line-1', 'alpha\nbeta')).rejects.toMatchObject({
+    code: 'citation',
+  });
+  expect(storage.getSegment(id, 'md-line-1')).toEqual(before);
+});
+
 describe('document parsing and stable evidence locations', () => {
   it('keeps duplicate Chinese headings distinct and ignores headings inside fenced code', () => {
     const parsed = parseMarkdown(
