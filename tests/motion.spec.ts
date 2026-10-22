@@ -22,14 +22,19 @@ test('navigation indicator follows the selected button when all learning entries
     await page.setViewportSize({ width: 900, height: 640 });
     await page.emulateMedia({ reducedMotion: 'reduce' });
     await page.getByRole('button', { name: '学习计划', exact: true }).click();
-    await expect.poll(async () => {
-      const indicator = await page.locator('.nav-indicator').boundingBox();
-      const selected = await page.locator('.nav-item[aria-current="page"]').boundingBox();
-      if (!indicator || !selected) return false;
-      return ['x', 'y', 'width', 'height'].every((key) =>
-        Math.abs(indicator[key as keyof typeof indicator] - selected[key as keyof typeof selected]) < 1,
-      );
-    }).toBe(true);
+    await expect
+      .poll(async () => {
+        const indicator = await page.locator('.nav-indicator').boundingBox();
+        const selected = await page.locator('.nav-item[aria-current="page"]').boundingBox();
+        if (!indicator || !selected) return false;
+        return ['x', 'y', 'width', 'height'].every(
+          (key) =>
+            Math.abs(
+              indicator[key as keyof typeof indicator] - selected[key as keyof typeof selected],
+            ) < 1,
+        );
+      })
+      .toBe(true);
   } finally {
     await app.close();
   }
