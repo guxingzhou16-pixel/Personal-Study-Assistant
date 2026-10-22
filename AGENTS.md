@@ -46,6 +46,8 @@
 - 当前数据：主库 v13、活动库 v1、派生索引 v2；备份 format 1 支持真实 12/1 和 13/1。
 - 日常阅读：根目录 README → [文档索引](docs/README.md) → [架构地图](docs/CODEMAPS/architecture.md)。
 - 历史源码交接：[全局审查修复](docs/testing/full-code-review-fixes-2026-10-16.md)、[试用反馈优化](docs/testing/user-trial-fixes-2026-10-16.md)。当前独立审查及实际回归按最新整合报告解释，不借历史成绩覆盖未验证范围。
+- 2026-10-22独立复验绑定`cfc2597`，434核心／55普通桌面／1真实BGE／20打包规则及类型、构建、格式检查通过；实际范围与未执行项见[独立审查报告](docs/testing/latest-code-review-2026-10-22.md)，不等于新安装包或真实聊天语义通过。
+- 本次将`codex/sunny-isle-navigation`的`3f341d6`快进合入本地`main`，构建、93方法连接规格与14条相关Electron流程通过；首版以来变化及统计口径见[主线更新汇总](docs/testing/main-update-summary-2026-10-22.md)。旧434／55成绩仍仅绑定`cfc2597`，本轮没有推送或更新发行附件。
 - 原 3.1～3.44 和完整接手快照保留在 [2026-10-21 归档](docs/archive/AGENTS-history-2026-10-21.md)。旧 pending、包、测试次数和授权均按原日期／对象解释，不覆盖本轮明确要求。
 
 ## 4. 产品范围与功能要求
