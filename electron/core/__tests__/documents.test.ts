@@ -197,6 +197,32 @@ it('maps legacy Markdown table punctuation to the source cell rather than the se
   expect(storage.getSegment(id, 'md-line-1')).toEqual(before);
 });
 
+it('rejects legacy table code transformed by GFM even when its text uniquely matches syntax elsewhere', async () => {
+  const { storage, documents, sources } = context();
+  const original = '# H\n\n| Code | Action |\n|---|---|\n| `---\\|---` | word |\n';
+  const id = createHash('sha256').update(original).digest('hex');
+  const parsed = parseMarkdown(utf8(original));
+  expect(parsed.segments[0].text).toContain('---|---\tword');
+  const legacyText = 'H\n| Code | Action |\n|---|---|\n| ---\\|--- | word |\n';
+  expect(legacyText.indexOf('---|---')).toBe(legacyText.lastIndexOf('---|---'));
+  storage.addSource({
+    id,
+    name: '旧版转义代码资料.md',
+    kind: 'markdown',
+    bytes: Buffer.byteLength(original),
+    ...parsed,
+    segments: [{ ...parsed.segments[0], text: legacyText }],
+  });
+  mkdirSync(sources, { recursive: true });
+  writeFileSync(join(sources, `${id}.md`), original);
+  const before = storage.getSegment(id, 'md-line-1');
+
+  await expect(documents.selection(id, 'md-line-1', '---|---\tword')).rejects.toMatchObject({
+    code: 'citation',
+  });
+  expect(storage.getSegment(id, 'md-line-1')).toEqual(before);
+});
+
 describe('document parsing and stable evidence locations', () => {
   it('keeps duplicate Chinese headings distinct and ignores headings inside fenced code', () => {
     const parsed = parseMarkdown(
