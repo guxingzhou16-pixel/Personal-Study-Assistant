@@ -79,7 +79,7 @@ export async function streamChat(
       }
     }
     if (content !== undefined && content !== null) {
-      if (typeof content !== 'string') throw badStream();
+      if (typeof content !== 'string' || content.includes('\0')) throw badStream();
       receivedCharacters += content.length;
       if (receivedCharacters > 64_000)
         throw new AppError('responseSize', '回答超过长度上限，已停止接收。请缩小问题范围。');
