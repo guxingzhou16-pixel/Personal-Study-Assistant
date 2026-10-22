@@ -24,8 +24,7 @@ interface Token {
   legacyUnsafe?: boolean;
 }
 function visibleTokens(node: MarkdownNode): Token[] {
-  if (node.type === 'html') return [];
-  if (node.type === 'image' || node.type === 'imageReference')
+  if (node.type === 'html' || node.type === 'image' || node.type === 'imageReference')
     return [{ text: '', literal: false, legacyUnsafe: true }];
   if (node.type === 'break') return [{ text: '\n', literal: false }];
   if (node.value !== undefined) return [{ text: node.value, literal: true }];
@@ -98,7 +97,7 @@ export function parseMarkdown(data: Uint8Array): ParserResult {
   );
   const markdownSelections: MarkdownSelectionMap[] = [];
   for (const { segment, tokens } of current.sections) {
-    // Legacy text includes image alt text; a text search cannot prove which occurrence was visible.
+    // Legacy text includes HTML and image alt text; text search cannot prove the visible occurrence.
     if (tokens.some((token) => token.legacyUnsafe)) continue;
     const old = legacy.sections.find((entry) => entry.segment.anchor === segment.anchor)?.segment;
     if (!old) continue;
