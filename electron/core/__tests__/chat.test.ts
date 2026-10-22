@@ -177,6 +177,67 @@ it('rejects invalid input, an absent model, and unknown conversations before net
   chat.close();
 });
 
+it('rejects NUL in a user question before storing a turn or using the model', () => {
+  const { storage } = setup();
+  const transport = vi.fn();
+  const chat = new ChatService(storage, { load: () => undefined }, () => {}, transport);
+  const conversation = storage.chat.create();
+  try {
+    expect(() =>
+      chat.send({ conversationId: conversation.id, question: '问题\0内容' }),
+    ).toThrow();
+    expect(storage.chat.get(conversation.id).turns).toHaveLength(0);
+    expect(transport).not.toHaveBeenCalled();
+  } finally {
+    chat.close();
+  }
+});
+
+it.each(['ollama', 'openai'] as const)(
+  'keeps readable saved text after rejecting a NUL delta in a %s stream',
+  async (provider) => {
+    const { storage, path } = setup();
+    storage.saveSettings({
+      ...defaultSettings,
+      provider,
+      [provider]: { baseUrl: 'http://127.0.0.1:11434', model: 'local' },
+    });
+    const frame = (content: string, done: boolean) =>
+      provider === 'ollama'
+        ? JSON.stringify({ message: { content }, done }) + '\n'
+        : 'data: ' +
+          JSON.stringify({ choices: [{ delta: { content }, finish_reason: done ? 'stop' : null }] }) +
+          '\n\n';
+    const request = vi
+      .spyOn(globalThis, 'fetch')
+      .mockResolvedValue(new Response(frame('正常内容', false) + frame('异常\0内容', true)));
+    const chat = new ChatService(storage, { load: () => undefined }, () => {});
+    const conversation = storage.chat.create();
+    try {
+      const turn = chat.send({ conversationId: conversation.id, question: '保留正常回答' });
+      await expect.poll(() => chat.current()).toBeNull();
+      const expected = {
+        id: turn.id,
+        question: '保留正常回答',
+        answer: '正常内容',
+        status: 'error',
+        notice: expect.stringContaining('流式格式无法识别'),
+      };
+      expect(storage.chat.get(conversation.id).turns[0]).toMatchObject(expected);
+      chat.close();
+      storage.close();
+      stores.pop();
+      const reopened = new Storage(path);
+      stores.push(reopened);
+      expect(reopened.chat.get(conversation.id).turns[0]).toMatchObject(expected);
+      expect(request).toHaveBeenCalledOnce();
+    } finally {
+      chat.close();
+      request.mockRestore();
+    }
+  },
+);
+
 it('uses the exact consented endpoint key and selected style, and rejects stale model settings', async () => {
   const { storage } = setup();
   const baseUrl = 'https://models.example/v1';
