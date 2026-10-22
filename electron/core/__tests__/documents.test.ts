@@ -119,6 +119,33 @@ it('uses visible GFM boundaries for new Markdown evidence and maps old selection
   ).rejects.toThrow('同一页或同一章节');
 });
 
+it('rejects ambiguous legacy Markdown selections when an image alt duplicates visible table text', async () => {
+  const { storage, documents, sources } = context();
+  const original =
+    '# 图片同文\n\n| 方法 | 行动 |\n|---|---|\n| ![主动回忆](local.png)主动回忆 | 独立回答 |\n';
+  const id = createHash('sha256').update(original).digest('hex');
+  const parsed = parseMarkdown(utf8(original));
+  expect(parsed.segments[0].text).toContain('主动回忆\t独立回答');
+  const legacyText =
+    '图片同文\n| 方法 | 行动 |\n|---|---|\n| 主动回忆主动回忆 | 独立回答 |\n';
+  storage.addSource({
+    id,
+    name: '旧版图片资料.md',
+    kind: 'markdown',
+    bytes: Buffer.byteLength(original),
+    ...parsed,
+    segments: [{ ...parsed.segments[0], text: legacyText }],
+  });
+  mkdirSync(sources, { recursive: true });
+  writeFileSync(join(sources, `${id}.md`), original);
+  const before = storage.getSegment(id, 'md-line-1');
+
+  await expect(
+    documents.selection(id, 'md-line-1', '主动回忆\t独立回答'),
+  ).rejects.toMatchObject({ code: 'citation' });
+  expect(storage.getSegment(id, 'md-line-1')).toEqual(before);
+});
+
 describe('document parsing and stable evidence locations', () => {
   it('keeps duplicate Chinese headings distinct and ignores headings inside fenced code', () => {
     const parsed = parseMarkdown(
