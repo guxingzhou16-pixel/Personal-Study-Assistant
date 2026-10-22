@@ -52,7 +52,7 @@ export function FirstUseGuide({
     }
   }
   return (
-    <details className="first-use-guide" open={!settings[settings.provider].model}>
+    <details className="first-use-guide">
       <summary>第一次使用：用一份示例开始学习</summary>
       <p>示例由本项目原创，以 MIT 许可提供。模型不可用时，阅读和手写笔记仍可继续。</p>
       <ol>

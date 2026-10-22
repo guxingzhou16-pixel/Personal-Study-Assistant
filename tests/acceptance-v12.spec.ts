@@ -1,3 +1,4 @@
+import { openPage } from './helpers/navigation';
 import {
   test,
   expect,
@@ -44,10 +45,7 @@ async function launch(): Promise<Page> {
   return page;
 }
 async function nav(page: Page, name: string) {
-  await page
-    .getByRole('navigation', { name: '主导航' })
-    .getByRole('button', { name, exact: true })
-    .click();
+  await openPage(page, name);
 }
 function day() {
   const now = new Date();
@@ -78,7 +76,7 @@ test('completes a manual project, task, real timer, review and check-in without 
     const date = new Date();
     return window.studyCompanion!.studyOverview(date.getFullYear(), date.getMonth() + 1);
   });
-  await page.getByRole('button', { name: /设定目标 在学习计划/ }).click();
+  await openPage(page, '学习计划');
   await page.getByRole('button', { name: '新建项目', exact: true }).click();
   await page.getByLabel('标题', { exact: true }).fill('事务验证项目');
   await page.getByRole('textbox', { name: '学习目标', exact: true }).fill('用失败实验核对原子性');
@@ -103,6 +101,14 @@ test('completes a manual project, task, real timer, review and check-in without 
         (await page.evaluate(() => window.studyCompanion!.focusOverview())).current?.elapsedMs ?? 0,
     )
     .toBeGreaterThanOrEqual(2000);
+  const running = (await page.evaluate(() => window.studyCompanion!.focusOverview())).current!;
+  await nav(page, '学习首页');
+  await nav(page, '资料库');
+  const stillRunning = (await page.evaluate(() => window.studyCompanion!.focusOverview())).current!;
+  expect(stillRunning.id).toBe(running.id);
+  expect(stillRunning.status).toBe('running');
+  expect(stillRunning.elapsedMs).toBeGreaterThanOrEqual(running.elapsedMs);
+  await nav(page, '专注时光');
   await page.getByRole('button', { name: '暂停', exact: true }).click();
   const paused = (await page.evaluate(() => window.studyCompanion!.focusOverview())).current!;
   expect(paused.status).toBe('paused');

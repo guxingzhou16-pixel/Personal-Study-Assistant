@@ -1,3 +1,4 @@
+import { openPage } from './helpers/navigation';
 import { randomUUID } from 'node:crypto';
 import { test, expect, _electron as electron } from '@playwright/test';
 import { createServer } from 'node:http';
@@ -59,7 +60,7 @@ test('runs feedback, route, explicit memory/task proposals and route deletion th
   try {
     const page = await app.firstWindow();
     await expect(page.getByRole('heading', { name: /今天，也长出\s*一点新想法/ })).toBeVisible();
-    await page.getByRole('button', { name: '学习笔记', exact: true }).click();
+    await openPage(page, '学习笔记');
     await page
       .getByRole('complementary', { name: '笔记列表' })
       .getByRole('button', { name: /事务笔记/ })
@@ -86,7 +87,7 @@ test('runs feedback, route, explicit memory/task proposals and route deletion th
         citations: [1],
       })),
     });
-    await page.getByRole('button', { name: '学习路线', exact: true }).click();
+    await openPage(page, '学习路线');
     await page.getByRole('textbox', { name: '学习目标', exact: true }).fill('核对事务原子性');
     await page.getByRole('textbox', { name: '用来查找原文的概念或问题', exact: true }).fill('事务');
     await page.getByRole('spinbutton', { name: '可用时间（分钟）', exact: true }).fill('30');

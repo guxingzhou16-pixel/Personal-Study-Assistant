@@ -1,0 +1,115 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Sunny Isle navigation archive v3",
+  "type": "object",
+  "required": [
+    "schemaVersion",
+    "designId",
+    "name",
+    "baseDesignId",
+    "date",
+    "status",
+    "pathBase",
+    "runtime",
+    "baseline",
+    "layout",
+    "states",
+    "contracts",
+    "implementation",
+    "documents",
+    "preview",
+    "verification"
+  ],
+  "properties": {
+    "$schema": { "type": "string" },
+    "schemaVersion": { "const": 3 },
+    "designId": { "const": "shizhi.sunny-navigation.v1" },
+    "name": { "type": "string" },
+    "baseDesignId": { "const": "shizhi.sunny-isle.v1" },
+    "date": { "type": "string", "pattern": "^\\d{4}-\\d{2}-\\d{2}$" },
+    "status": { "enum": ["concept", "implemented"] },
+    "pathBase": { "const": "repository-root" },
+    "runtime": { "const": "electron-react-typescript" },
+    "baseline": { "type": "string", "pattern": "^[0-9a-f]{40}$" },
+    "layout": {
+      "type": "object",
+      "required": [
+        "topLeft",
+        "primary",
+        "topRight",
+        "homeBelowReadings",
+        "settingsTools",
+        "secondaryParents",
+        "firstUseGuideDefault",
+        "summaryDefault"
+      ],
+      "properties": {
+        "primary": { "type": "array", "items": { "type": "string" }, "minItems": 3, "maxItems": 3 },
+        "settingsTools": {
+          "type": "array",
+          "items": { "type": "string" },
+          "minItems": 4,
+          "maxItems": 4
+        },
+        "firstUseGuideDefault": { "const": "collapsed" },
+        "summaryDefault": { "const": "expanded" }
+      }
+    },
+    "states": {
+      "type": "array",
+      "minItems": 5,
+      "items": {
+        "type": "object",
+        "required": ["name", "behavior"],
+        "properties": { "name": { "type": "string" }, "behavior": { "type": "string" } }
+      }
+    },
+    "contracts": {
+      "type": "object",
+      "required": [
+        "reads",
+        "refresh",
+        "internalChanges",
+        "unchanged",
+        "newDependencies",
+        "newPersistentPreferences",
+        "reducedMotion"
+      ],
+      "properties": {
+        "newDependencies": { "const": false },
+        "newPersistentPreferences": { "const": false }
+      }
+    },
+    "implementation": { "$ref": "#/$defs/paths" },
+    "documents": { "$ref": "#/$defs/paths" },
+    "preview": {
+      "type": "object",
+      "required": [
+        "data",
+        "entry",
+        "styles",
+        "script",
+        "asset",
+        "assetSource",
+        "assetSha256",
+        "screenshots",
+        "network",
+        "electronBridge"
+      ],
+      "properties": {
+        "data": { "const": "example-only" },
+        "assetSha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+        "screenshots": { "$ref": "#/$defs/paths" },
+        "network": { "const": "none" },
+        "electronBridge": { "const": false }
+      }
+    },
+    "verification": {
+      "type": "object",
+      "required": ["report", "desktopSpec", "previewReport", "targetSizes", "limitations"]
+    }
+  },
+  "$defs": {
+    "paths": { "type": "array", "minItems": 1, "items": { "type": "string", "minLength": 1 } }
+  }
+}

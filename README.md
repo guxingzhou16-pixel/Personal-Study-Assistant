@@ -41,6 +41,8 @@
 
 动效约定见 [SUNNY_MOTION](docs/design/SUNNY_MOTION.md)，支持系统减少动画偏好；正式界面不运行设计实验脚本。
 
+2026-10-22 导航整理：顶部只保留学习首页、资料库、学习助手；设置移至左上品牌旁，右侧仅头像。首页最近阅读下方显示路线／笔记摘要，无记录时明确提示；首次使用引导默认收起。专注、计划、复习和记忆从设置的学习工具进入。[设计规范](docs/design/SUNNY_NAVIGATION.md) · [实施交接与验证](docs/handoffs/2026-10-22-sunny-navigation.md) · [独立布局预览](design-lab/2026-10-22-sunny-navigation/index.html)。构建与30项相关桌面规格通过，模型使用模拟服务；本轮仅本地源码交付，未合并 main 或更新安装包。
+
 ## 本地运行
 
 要求：Windows 10/11、Node.js **24.16 或更新的受支持版本**、npm。当前使用预编译 Electron，不需要 Rust 或 C++ 编译工具。主线为 `main`；已有该工作区无需重新下载项目。

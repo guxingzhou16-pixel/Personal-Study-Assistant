@@ -1,0 +1,144 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>晴岛 · 三入口导航设计</title>
+    <link rel="stylesheet" href="preview.css" />
+    <script src="preview.js" defer></script>
+  </head>
+  <body>
+    <div class="preview-bar">
+      <span>布局概念演示 · 全部为示例数据</span
+      ><label><input id="sample-data" type="checkbox" /> 显示已有记录</label>
+    </div>
+    <header>
+      <div class="brand-tools">
+        <button class="brand" data-page="home" aria-label="拾知，返回学习首页">
+          <span class="sun">☼</span><span>拾知<small>STUDY COMPANION</small></span></button
+        ><button class="settings" data-page="settings" aria-label="设置" title="设置">⚙</button>
+      </div>
+      <nav aria-label="主导航">
+        <button data-page="home" aria-current="page">学习首页</button
+        ><button data-page="library">资料库</button><button data-page="chat">学习助手</button>
+      </nav>
+      <span class="avatar" role="img" aria-label="本地昵称：小知">知</span>
+    </header>
+    <main>
+      <section id="home" class="page">
+        <details class="guide">
+          <summary>第一次使用：用一份示例开始学习</summary>
+          <p>需要时再展开，从导入资料、选择模型和第一次提问开始。</p>
+          <p>此页只演示布局，真实导入与模型配置请在桌面版操作。</p>
+        </details>
+        <section class="welcome">
+          <div>
+            <p class="eyebrow">YOUR OWN LITTLE LEARNING ISLAND</p>
+            <h1>今天，也长出<br />一点新想法<span>✳</span></h1>
+            <p>小知，欢迎回来。</p>
+            <p>从感兴趣的一页开始，就很好。</p>
+            <button class="primary" data-page="library">打开我的资料库 →</button>
+          </div>
+          <img src="assets/sunny-isle-plant.svg" alt="" /><span class="sticker"
+            >保持好奇<small>STAY CURIOUS :)</small></span
+          >
+        </section>
+        <section class="today">
+          <strong>今天的小任务</strong><span>还没有安排今日任务</span
+          ><button class="text" data-page="planning">查看全部今日任务 →</button>
+        </section>
+        <div class="columns">
+          <div>
+            <div class="section-heading">
+              <h2>还想接着读</h2>
+              <button class="text" data-page="library">查看资料库 →</button>
+            </div>
+            <div class="reading">
+              <span>PDF · 示例资料</span>
+              <h3>从一个具体问题开始阅读</h3>
+              <p>阅读与记录，慢慢连在一起。</p>
+              <button class="text" data-page="library">继续阅读 ↗</button>
+            </div>
+            <section class="summary-card" aria-labelledby="route-heading">
+              <h2 id="route-heading">✳ 学习路线</h2>
+              <div id="route-summary"><p>还没有学习路线</p></div>
+              <a href="#agent" data-page="agent">查看完整学习路线 →</a>
+            </section>
+            <section class="summary-card" aria-labelledby="notes-heading">
+              <h2 id="notes-heading">▤ 学习笔记</h2>
+              <div id="notes-summary"><p>还没有学习笔记</p></div>
+              <a href="#notes" data-page="notes">查看完整学习笔记 →</a>
+            </section>
+          </div>
+          <aside>
+            <section class="calendar">
+              <div class="section-heading">
+                <h2>学习日历</h2>
+                <span>10 月 · 示例</span>
+              </div>
+              <div class="week">
+                <span>一</span><span>二</span><span>三</span><span>四</span><span>五</span
+                ><span>六</span><span>日</span>
+              </div>
+              <div class="days" id="days"></div>
+              <p>签到与学习时长分别记录</p>
+              <button class="primary" id="check-in">今天签到 · 示例</button>
+            </section>
+            <section class="timer">
+              <h2>今天的学习时间</h2>
+              <strong>00:00:00</strong>
+              <p>手动累计 · 示例状态</p>
+              <button id="timer-button">开始计时 · 示例</button>
+            </section>
+          </aside>
+        </div>
+      </section>
+      <section id="settings" class="page" hidden>
+        <div class="page-title">
+          <p class="eyebrow">YOUR OWN PACE</p>
+          <h1>让助手更懂你的节奏</h1>
+          <p>从一个合适的目标，和你习惯的学习方式开始。</p>
+        </div>
+        <div class="section-heading">
+          <h2>学习工具</h2>
+          <span>按需要使用</span>
+        </div>
+        <div class="tool-grid">
+          <button data-page="focus">
+            <strong>◷ 专注时光</strong><small>番茄钟、历史与复盘</small><span>↗</span></button
+          ><button data-page="planning">
+            <strong>◎ 学习计划</strong><small>学习项目与每日任务</small><span>↗</span></button
+          ><button data-page="reviews">
+            <strong>▱ 轻量复习</strong><small>回看作答与未解疑问</small><span>↗</span></button
+          ><button data-page="memories">
+            <strong>✧ 长期记忆</strong><small>查看与管理学习记忆</small><span>↗</span>
+          </button>
+        </div>
+        <div class="review">
+          <strong>待复习与疑问</strong>
+          <p>还没有保存作答与复习安排 · 示例空态</p>
+          <button class="text" data-page="reviews">打开轻量复习 →</button>
+        </div>
+        <section class="preferences">
+          <h2>学习偏好与模型</h2>
+          <p>正式软件继续保留昵称、目标、回应风格、主题、模型配置与密钥管理。</p>
+          <div class="preference-row">
+            <span>学习偏好</span><span>模型连接</span><span>能力检查</span><span>本地检索模型</span
+            ><span>软件更新</span><span>备份与恢复</span>
+          </div>
+          <small>这些标签为布局说明，此演示不保存数据或请求模型。</small>
+        </section>
+      </section>
+      <section id="detail" class="page" hidden>
+        <button id="back" class="text">← 返回学习首页</button>
+        <div class="page-title">
+          <p class="eyebrow">A LITTLE MORE DETAIL</p>
+          <h1 id="detail-title"></h1>
+          <p id="detail-description"></p>
+        </div>
+        <div class="detail-example" id="detail-example"></div>
+      </section>
+    </main>
+    <footer><span>◉ 示例学习空间</span><span>晴岛 · 导航精简设计 / 2026-10-22</span></footer>
+  </body>
+</html>

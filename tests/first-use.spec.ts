@@ -27,6 +27,8 @@ test('a new user imports the public example, checks each capability and complete
   });
   try {
     const page = await app.firstWindow();
+    await expect(page.locator('.first-use-guide')).not.toHaveAttribute('open');
+    await page.locator('.first-use-guide summary').click();
     await page.getByRole('button', { name: '导入学习示例', exact: true }).click();
     await expect(page.getByRole('button', { name: '先阅读示例', exact: true })).toBeVisible();
     await page.getByRole('button', { name: '前往模型配置与检查', exact: true }).click();

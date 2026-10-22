@@ -1,0 +1,50 @@
+.learning-tools {
+  margin-bottom: 28px;
+}
+.learning-tool-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+.learning-tool-grid > button {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  min-width: 0;
+  min-height: 80px;
+  padding: 16px 18px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: var(--surface);
+  color: var(--ink);
+  text-align: left;
+}
+.learning-tool-grid > button:hover {
+  border-color: var(--accent);
+  background: var(--mint-soft);
+}
+.learning-tool-grid > button > span {
+  flex: 1;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.learning-tool-grid strong,
+.learning-tool-grid small {
+  display: block;
+}
+.learning-tool-grid strong {
+  font-size: 14px;
+}
+.learning-tool-grid small {
+  margin-top: 5px;
+  color: var(--muted);
+  font-size: 12px;
+}
+.learning-tools .review-due {
+  margin-top: 14px;
+}
+@media (max-width: 560px) {
+  .learning-tool-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

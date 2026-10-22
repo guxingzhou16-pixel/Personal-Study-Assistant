@@ -1,0 +1,13 @@
+{
+  "schemaVersion": 3,
+  "designs": [
+    {
+      "id": "shizhi.sunny-navigation.v1",
+      "name": "晴岛三入口导航与首页摘要",
+      "manifest": "design.json",
+      "demo": "index.html",
+      "handoff": "HANDOFF.md",
+      "status": "implemented"
+    }
+  ]
+}

@@ -1,3 +1,4 @@
+import { openPage } from './helpers/navigation';
 import { test, expect, _electron as electron } from '@playwright/test';
 import { randomUUID, createHash } from 'node:crypto';
 import { mkdtempSync, mkdirSync, writeFileSync } from 'node:fs';
@@ -286,7 +287,7 @@ test('a citation result arriving after explicit navigation cannot reopen the rea
         ),
       )
       .toBe('function');
-    await page.getByRole('button', { name: '学习计划', exact: true }).click();
+    await openPage(page, '学习计划');
     await expect(page.locator('.planning-page')).toBeVisible();
     await app.evaluate(() =>
       (globalThis as unknown as { releaseCitation: () => void }).releaseCitation(),
@@ -318,7 +319,7 @@ test('quiz review conflicts can reload the latest revision without losing or sil
     await expect(
       chat.getByText('第 1 题的作答与安排已保存；没有评分或掌握判断。', { exact: true }),
     ).toBeVisible();
-    await page.getByRole('button', { name: '轻量复习', exact: true }).click();
+    await openPage(page, '轻量复习');
     await page.locator('.review-list-item').first().click();
     await page.getByRole('button', { name: '开始这次回忆', exact: true }).click();
     await page.getByRole('textbox', { name: '这次的回忆与作答', exact: true }).fill('第二份作答');

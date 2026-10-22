@@ -37,7 +37,8 @@ npx playwright test tests/app-updates.spec.ts tests/desktop.spec.ts tests/motion
 - `interface-wiring.test.ts`：93 个桥接方法对应 87 个固定请求和 6 个可移除事件，新增版本读取、检查和固定发布页打开三项。
 - `app-updates.spec.ts`：真实窗口中更新说明作为纯文本显示、固定升级目标、未知目标拒绝、失败重试、切页缓存与最小窗口可达性。主进程模拟 GitHub／浏览器调用，不下载或执行安装包。
 - `desktop.spec.ts`：保留导航、设置、系统加密与模型配置流程；只模拟固定官方更新接口，其他模型检测仍走原本的本机测试服务，避免更新联网错误干扰设置断言。
-- `motion.spec.ts`：普通／减少动态效果、换行导航选中位置、同页不重复入场、真实操作与阅读文字层；修改选文、引用或草稿时再选 `reading-workspace.spec.ts` 等对应流程，不以离线演示代替桌面验收。
+- `motion.spec.ts`：普通／减少动态效果、三个主入口选中位置、设置内隐藏胶囊、同页不重复入场、真实操作与阅读文字层；修改选文、引用或草稿时再选 `reading-workspace.spec.ts` 等对应流程，不以离线演示代替桌面验收。
+- `navigation.spec.ts`：三入口与左右工具位置、默认折叠引导、摘要空态／保存／错误／刷新、脏稿保护和备份暂停／迟到结果；`helpers/navigation.ts`通过首页摘要或设置进入二级页面，保留原业务断言。
 
 ## 独立门禁
 

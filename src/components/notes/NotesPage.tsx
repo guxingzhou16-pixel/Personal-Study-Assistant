@@ -43,6 +43,7 @@ export function NotesPage({
   onOpenCitation,
   presetSelection,
   presetDraft,
+  presetNote,
 }: {
   visible: boolean;
   presetSource: { id: string | null; sequence: number } | null;
@@ -52,6 +53,7 @@ export function NotesPage({
   onOpenCitation: (turnId: string, number: number) => Promise<void>;
   presetSelection?: { selection: ReadingSelection; sequence: number } | null;
   presetDraft?: { draft: NoteDraft; sequence: number } | null;
+  presetNote?: { id: string; sequence: number } | null;
 }) {
   const [notes, setNotes] = useState<NoteSummary[]>([]);
   const [sources, setSources] = useState<Source[]>([]);
@@ -70,6 +72,7 @@ export function NotesPage({
   const lastPreset = useRef(0);
   const lastSelection = useRef(0);
   const lastDraft = useRef(0);
+  const lastNote = useRef(0);
   const dirty = editing && !sameNoteDraft(draft, current ?? emptyNoteDraft());
 
   useEffect(() => {
@@ -136,6 +139,12 @@ export function NotesPage({
     lastDraft.current = presetDraft.sequence;
     requestAction({ type: 'draft', draft: presetDraft.draft });
   }, [visible, presetDraft, loading, busy]);
+  useEffect(() => {
+    if (!visible || !presetNote || loading || busy || presetNote.sequence === lastNote.current)
+      return;
+    lastNote.current = presetNote.sequence;
+    if (presetNote.id !== current?.id) requestAction({ type: 'open', id: presetNote.id });
+  }, [visible, presetNote, loading, busy]);
 
   useEffect(() => {
     const dialog = confirmation.current;

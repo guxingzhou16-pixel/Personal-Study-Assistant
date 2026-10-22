@@ -9,6 +9,7 @@
 | 2026-10-17 / 第一轮 | 01 纸间、02 深潜、03 晴岛                          | [打开三套设计总览](2026-10-17-three-directions/index.html) | [使用说明与档案接口](2026-10-17-three-directions/README.md) |
 | 2026-10-17 / 第二轮 | 保留晴岛排版，新增玄墨、赤陶、蓝调；原晴岛单独对照 | [打开本轮总览](2026-10-17-island-remix/index.html)         | [档案与本地 GitHub 参考](2026-10-17-island-remix/README.md) |
 | 2026-10-21 / 动效   | 晴岛全功能动效，12 组示例、半速与减少动态效果      | [打开动效设计室](2026-10-21-sunny-motion/index.html)       | [规范、录像与交接](2026-10-21-sunny-motion/README.md)       |
+| 2026-10-22 / 导航   | 三个主入口、首页路线／笔记摘要、设置学习工具       | [打开布局预览](2026-10-22-sunny-navigation/index.html)     | [规范与交接](2026-10-22-sunny-navigation/README.md)         |
 
 双击对应的 `index.html` 即可在浏览器打开；无需 npm、安装依赖、模型或应用数据。也可以在本目录运行 `python -m http.server 4317 --bind 127.0.0.1`，访问 `http://127.0.0.1:4317/2026-10-17-island-remix/` 或第一轮的对应目录。
 

@@ -1,3 +1,4 @@
+import { openPage } from './helpers/navigation';
 import { test, expect, _electron as electron, type ElectronApplication } from '@playwright/test';
 import { randomUUID } from 'node:crypto';
 import { mkdtempSync, mkdirSync, writeFileSync, readFileSync } from 'node:fs';
@@ -52,10 +53,11 @@ test('saved recall and manual dates survive restart, remain separate from master
       page.getByText('第 1 题的作答与安排已保存；没有评分或掌握判断。', { exact: true }),
     ).toBeVisible();
     await page.getByRole('button', { name: '学习首页', exact: true }).click();
+    await openPage(page, '设置');
     await expect(
       page.getByText('1 项到期安排或未解决疑问；已保存 1 份作答。', { exact: true }),
     ).toBeVisible();
-    await page.getByRole('button', { name: '打开轻量复习', exact: true }).click();
+    await openPage(page, '打开轻量复习');
     await page.locator('.review-list-item').first().click();
     await expect(page.locator('.reviews-page h3')).toHaveCount(0);
     await page.getByRole('button', { name: '开始这次回忆', exact: true }).click();
@@ -90,7 +92,7 @@ test('saved recall and manual dates survive restart, remain separate from master
     await app!.close();
     app = undefined;
     page = await launch();
-    await page.getByRole('button', { name: '轻量复习', exact: true }).click();
+    await openPage(page, '轻量复习');
     await page.locator('.review-list-item').first().click();
     await page.getByRole('button', { name: '查看上次保存的作答', exact: true }).click();
     await expect(

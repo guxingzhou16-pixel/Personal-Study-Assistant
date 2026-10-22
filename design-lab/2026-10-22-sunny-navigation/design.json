@@ -1,0 +1,115 @@
+{
+  "$schema": "./handoff.schema.json",
+  "schemaVersion": 3,
+  "designId": "shizhi.sunny-navigation.v1",
+  "name": "晴岛三入口导航与首页摘要",
+  "baseDesignId": "shizhi.sunny-isle.v1",
+  "date": "2026-10-22",
+  "status": "implemented",
+  "pathBase": "repository-root",
+  "runtime": "electron-react-typescript",
+  "baseline": "cfc25970e615194a038c31d4373c447479170d25",
+  "layout": {
+    "topLeft": "拾知品牌、独立设置齿轮",
+    "primary": ["学习首页", "资料库", "学习助手"],
+    "topRight": "本地昵称首字头像，无账号行为",
+    "homeBelowReadings": ["学习路线摘要", "学习笔记摘要"],
+    "settingsTools": ["专注时光", "学习计划", "轻量复习", "长期记忆"],
+    "secondaryParents": {
+      "notes": "home",
+      "agent": "home",
+      "focus": "settings",
+      "planning": "settings",
+      "reviews": "settings",
+      "memories": "settings"
+    },
+    "firstUseGuideDefault": "collapsed",
+    "summaryDefault": "expanded"
+  },
+  "states": [
+    {
+      "name": "empty",
+      "behavior": "分别显示还没有学习路线和还没有学习笔记，保留详情链接"
+    },
+    {
+      "name": "saved",
+      "behavior": "最新路线目标、预算、真实状态和时间；最新笔记标题、资料、时间和数量"
+    },
+    {
+      "name": "loading",
+      "behavior": "显示正在读取，不提前显示零记录"
+    },
+    {
+      "name": "error",
+      "behavior": "两个来源分别显示错误和重试，不把失败当空记录"
+    },
+    {
+      "name": "backup-busy",
+      "behavior": "暂停摘要读取，旧结果失效，空闲后刷新"
+    }
+  ],
+  "contracts": {
+    "reads": ["listNotes", "listLearningDrafts"],
+    "refresh": [
+      "home mount",
+      "window focus",
+      "document visible",
+      "retry",
+      "backup idle",
+      "route terminal event"
+    ],
+    "internalChanges": [
+      "SettingsPage.onOpenTool",
+      "SettingsPage.paused",
+      "NotesPage.presetNote: { id, sequence }"
+    ],
+    "unchanged": [
+      "IPC",
+      "database versions",
+      "model protocols",
+      "page mounting policy",
+      "draft confirmation",
+      "reading coordinates"
+    ],
+    "newDependencies": false,
+    "newPersistentPreferences": false,
+    "reducedMotion": "复用现有系统偏好、原生折叠与动效中断，不增加循环动画"
+  },
+  "implementation": [
+    "src/App.tsx",
+    "src/components/home/HomeLearningSummary.tsx",
+    "src/components/home/FirstUseGuide.tsx",
+    "src/components/home/ReviewDue.tsx",
+    "src/components/home/HomeStudy.css",
+    "src/components/settings/LearningTools.tsx",
+    "src/components/settings/LearningTools.css",
+    "src/components/settings/SettingsPage.tsx",
+    "src/components/notes/NotesPage.tsx",
+    "src/styles.css"
+  ],
+  "documents": ["docs/design/SUNNY_NAVIGATION.md", "docs/handoffs/2026-10-22-sunny-navigation.md"],
+  "preview": {
+    "data": "example-only",
+    "entry": "index.html",
+    "styles": "preview.css",
+    "script": "preview.js",
+    "asset": "assets/sunny-isle-plant.svg",
+    "assetSource": "src/assets/sunny-isle-plant.svg",
+    "assetSha256": "234e52e63018550e181c7c1af31792abc627d53c59c497d6dab8551094531828",
+    "screenshots": [
+      "previews/01-home-empty.png",
+      "previews/02-home-records.png",
+      "previews/03-settings.png",
+      "previews/04-home-900.png"
+    ],
+    "network": "none",
+    "electronBridge": false
+  },
+  "verification": {
+    "report": "docs/handoffs/2026-10-22-sunny-navigation.md",
+    "desktopSpec": "tests/navigation.spec.ts",
+    "previewReport": "design-lab/2026-10-22-sunny-navigation/validation.json",
+    "targetSizes": ["1280x900", "900x640"],
+    "limitations": ["no real model evaluation", "no installer or release", "no remote CI"]
+  }
+}

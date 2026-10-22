@@ -21,8 +21,8 @@
     "video": "design-lab/2026-10-21-sunny-motion/previews/motion-overview.webm"
   },
   "screenshots": [
-    "docs/design/assets/sunny-isle-home.png",
-    "docs/design/assets/sunny-isle-chat-900.png"
+    "design-lab/2026-10-22-sunny-navigation/previews/05-desktop-home.png",
+    "design-lab/2026-10-22-sunny-navigation/previews/06-desktop-settings.png"
   ],
   "runtime": "electron-react-typescript",
   "implementation": {
@@ -31,14 +31,23 @@
     "styles": "src/styles.css",
     "homeStyles": "src/styles/study-home.css",
     "styleEntry": "src/main.tsx",
-    "recentReadings": "src/components/RecentReadings.tsx",
-    "studyCalendar": "src/components/StudyCalendar.tsx",
-    "illustration": "src/assets/sunny-isle-plant.svg"
+    "recentReadings": "src/components/home/RecentReadings.tsx",
+    "studyCalendar": "src/components/home/StudyCalendar.tsx",
+    "illustration": "src/assets/sunny-isle-plant.svg",
+    "homeSummary": "src/components/home/HomeLearningSummary.tsx",
+    "learningTools": "src/components/settings/LearningTools.tsx"
   },
   "constraints": [
     "正式界面使用真实资料和学习记录，历史demo继续使用示例数据",
     "保留现有聊天常驻、原页阅读、引用验证、设置、密钥与计时边界",
-    "本次不新增主题选择器、同屏助手、笔记、计划或番茄钟",
+    "保留当前已实现的主题、阅读侧栏、笔记、路线、复习、计划、专注与记忆；旧概念功能状态仅作历史快照",
     "实际验证以handoff记录为准；selected不表示历史demo通过正式功能验收"
-  ]
+  ],
+  "navigation": {
+    "id": "shizhi.sunny-navigation.v1",
+    "manifest": "design-lab/2026-10-22-sunny-navigation/design.json",
+    "demo": "design-lab/2026-10-22-sunny-navigation/index.html",
+    "designDoc": "docs/design/SUNNY_NAVIGATION.md",
+    "handoff": "docs/handoffs/2026-10-22-sunny-navigation.md"
+  }
 }

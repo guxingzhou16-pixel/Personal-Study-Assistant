@@ -1,3 +1,4 @@
+import { openPage } from './helpers/navigation';
 import { randomUUID } from 'node:crypto';
 import {
   test,
@@ -42,7 +43,7 @@ test('connects import, reading, cited question, note, feedback, route, confirmed
     return page;
   }
   async function nav(page: Page, name: string) {
-    await page.getByRole('button', { name, exact: true }).click();
+    await openPage(page, name);
   }
   async function choose(path: string) {
     await app!.evaluate(({ dialog }, path) => {

@@ -1,3 +1,4 @@
+import { openPage } from './helpers/navigation';
 import { randomUUID } from 'node:crypto';
 import { test, expect, _electron as electron, type ElectronApplication } from '@playwright/test';
 import { mkdtempSync, mkdirSync, writeFileSync } from 'node:fs';
@@ -47,7 +48,7 @@ test('completes a real five minute focus only after durable elapsed time without
         }),
       saved,
     );
-    await page.getByRole('button', { name: '专注时光', exact: true }).click();
+    await openPage(page, '专注时光');
     await page
       .getByRole('checkbox', { name: '计满后提醒休息（仅本次运行，应用内提示）', exact: true })
       .check();

@@ -1,3 +1,4 @@
+import { openPage } from './helpers/navigation';
 import {
   test,
   expect,
@@ -43,7 +44,7 @@ async function launch() {
   return application.firstWindow();
 }
 async function notesPage(page: Page) {
-  await page.getByRole('button', { name: '学习笔记', exact: true }).click();
+  await openPage(page, '学习笔记');
   await expect(page.getByRole('heading', { name: '学习笔记', exact: true })).toBeVisible();
 }
 async function fillNote(page: Page, title = '事务笔记') {

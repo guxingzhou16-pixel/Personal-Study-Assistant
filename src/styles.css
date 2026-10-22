@@ -991,7 +991,7 @@ button:disabled {
   flex: 0 0 auto;
   min-height: 88px;
   display: grid;
-  grid-template-columns: auto minmax(0, 1fr) auto;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
   gap: 24px;
   align-items: center;
   padding: 16px max(32px, calc((100vw - var(--content-width)) / 2));
@@ -1023,6 +1023,27 @@ button:disabled {
   color: var(--ink);
   border-radius: var(--radius-control);
 }
+.brand-tools {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+.settings-button {
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  color: var(--muted);
+  background: transparent;
+}
+.settings-button:hover,
+.settings-button.selected {
+  color: var(--accent);
+  background: var(--mint);
+}
 .brand-mark {
   width: 38px;
   height: 38px;
@@ -1048,11 +1069,9 @@ button:disabled {
 }
 .app-nav {
   display: flex;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
   justify-content: center;
   min-width: 0;
-  max-height: min(156px, 30dvh);
-  overflow-y: auto;
   gap: 5px;
   padding: 5px;
   border: 1px solid var(--line);
@@ -1075,21 +1094,6 @@ button:disabled {
 .app-nav .nav-item:focus-visible {
   outline-offset: -3px;
 }
-.nav-dot {
-  width: 5px;
-  height: 5px;
-  flex: 0 0 auto;
-  border-radius: 50%;
-  background: var(--accent);
-}
-.nav-divider {
-  width: 1px;
-  height: 28px;
-  flex: 0 0 auto;
-  align-self: center;
-  margin-inline: 3px;
-  background: var(--line);
-}
 .nav-item:hover {
   color: var(--accent);
   background: #e8edde;
@@ -1102,33 +1106,8 @@ button:disabled {
 }
 .header-tools {
   display: flex;
-  flex-direction: column;
   align-items: flex-end;
   justify-content: flex-end;
-  gap: 4px;
-}
-.sidebar-version {
-  display: flex;
-  gap: 6px;
-  color: var(--muted);
-  font-size: 9px;
-  line-height: 1.4;
-  white-space: nowrap;
-}
-.profile-button {
-  display: flex;
-  align-items: center;
-  gap: 9px;
-  min-height: 44px;
-  padding: 5px 9px;
-  background: transparent;
-  border-radius: 24px;
-  color: var(--muted);
-}
-.profile-button:hover,
-.profile-button.selected {
-  background: var(--mint);
-  color: var(--accent);
 }
 .profile-avatar {
   display: grid;
@@ -1140,6 +1119,20 @@ button:disabled {
   height: 32px;
   font-size: 13px;
   font-weight: 600;
+}
+.section-path {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  max-width: var(--content-width);
+  margin: 0 auto;
+  padding: 18px 35px 0;
+  color: var(--muted);
+  font-size: 12px;
+}
+.section-path .text-button {
+  min-height: 40px;
 }
 .main-shell {
   flex: 1;
@@ -1743,9 +1736,6 @@ select:hover {
   }
 }
 @media (max-width: 1100px) {
-  .sidebar-version > span:first-child {
-    display: none;
-  }
   .app-header {
     padding-inline: 28px;
     gap: 16px;
@@ -1806,12 +1796,6 @@ select:hover {
   .nav-item svg {
     display: none;
   }
-  .profile-button {
-    padding: 5px;
-  }
-  .profile-button > svg {
-    display: none;
-  }
   .page {
     padding: 24px;
   }
@@ -1845,8 +1829,17 @@ select:hover {
 }
 @media (max-width: 560px) {
   .app-header {
+    grid-template-columns: minmax(0, 1fr) auto;
     gap: 8px;
     padding-inline: 14px;
+  }
+  .app-nav {
+    grid-column: 1 / -1;
+    grid-row: 2;
+  }
+  .header-tools {
+    grid-column: 2;
+    grid-row: 1;
   }
   .brand-mark {
     display: none;

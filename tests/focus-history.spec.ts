@@ -1,3 +1,4 @@
+import { openPage } from './helpers/navigation';
 import {
   test,
   expect,
@@ -84,10 +85,7 @@ async function launch(): Promise<Page> {
 }
 
 async function nav(page: Page, name: string) {
-  await page
-    .getByRole('navigation', { name: '主导航' })
-    .getByRole('button', { name, exact: true })
-    .click();
+  await openPage(page, name);
 }
 
 async function openOldReview(page: Page) {

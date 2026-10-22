@@ -1,3 +1,4 @@
+import { openPage } from './helpers/navigation';
 import { randomUUID } from 'node:crypto';
 import { test, expect, _electron as electron } from '@playwright/test';
 import { mkdtempSync, mkdirSync, writeFileSync } from 'node:fs';
@@ -79,7 +80,7 @@ test('records actual theme, keyboard, native window, zoom and visible text contr
         await app.evaluate(({ BrowserWindow }) =>
           BrowserWindow.getAllWindows()[0].setContentSize(1360, 900),
         );
-        await page.getByRole('button', { name: pageName, exact: true }).click();
+        await openPage(page, pageName);
         await app.evaluate(({ BrowserWindow }) =>
           BrowserWindow.getAllWindows()[0].setContentSize(900, 640),
         );
@@ -319,17 +320,7 @@ test('all navigation remains keyboard and mouse accessible across themes and 100
           window.setContentSize(900, 640);
           window.webContents.setZoomFactor(zoom);
         }, zoom);
-        for (const name of [
-          '学习首页',
-          '资料库',
-          '学习助手',
-          '学习笔记',
-          '学习路线',
-          '长期记忆',
-          '学习计划',
-          '专注时光',
-          '设置',
-        ]) {
+        for (const name of ['学习首页', '资料库', '学习助手', '设置']) {
           const button = page.getByRole('button', { name, exact: true });
           await button.focus();
           await expect(button).toBeInViewport({ ratio: 1 });

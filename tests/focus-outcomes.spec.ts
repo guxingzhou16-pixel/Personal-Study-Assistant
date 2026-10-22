@@ -1,3 +1,4 @@
+import { openPage } from './helpers/navigation';
 import { test, expect, _electron as electron } from '@playwright/test';
 import { mkdtempSync } from 'node:fs';
 import { tmpdir } from 'node:os';
@@ -14,11 +15,7 @@ test('focus outcomes become editable drafts, cancellation writes nothing, and ex
   });
   try {
     const page = await app.firstWindow();
-    const nav = (name: string) =>
-      page
-        .getByRole('navigation', { name: '主导航' })
-        .getByRole('button', { name, exact: true })
-        .click();
+    const nav = (name: string) => openPage(page, name);
     await nav('学习笔记');
     await page.getByRole('button', { name: '新建笔记', exact: true }).click();
     await page.getByLabel('笔记标题', { exact: true }).fill('不能丢的原草稿');

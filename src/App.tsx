@@ -2,6 +2,7 @@ import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { version as appVersion } from '../package.json';
 import {
   ArrowRight,
+  ArrowLeft,
   BookOpen,
   CircleHelp,
   FolderOpen,
@@ -9,13 +10,8 @@ import {
   LoaderCircle,
   Settings as SettingsIcon,
   ShieldCheck,
-  Sparkles,
   Sun,
-  Target,
-  Timer,
-  NotebookPen,
   MessageCircle,
-  Brain,
 } from 'lucide-react';
 import { SettingsPage } from './components/settings/SettingsPage';
 import { LibraryPage } from './components/library/LibraryPage';
@@ -23,10 +19,9 @@ import { ReadingPage } from './components/reader/ReadingPage';
 import './components/reader/ReadingWorkspace.css';
 import { RecentReadings } from './components/home/RecentReadings';
 import { TodayTasks } from './components/home/TodayTasks';
-import { HomeStudyFlow } from './components/home/HomeStudyFlow';
+import { HomeLearningSummary } from './components/home/HomeLearningSummary';
 import { FirstUseGuide } from './components/home/FirstUseGuide';
 import { ReviewsPage } from './components/reviews/ReviewsPage';
-import { ReviewDue } from './components/home/ReviewDue';
 import { StudyCalendar } from './components/home/StudyCalendar';
 import { ChatPage } from './components/chat/ChatPage';
 import { NotesPage } from './components/notes/NotesPage';
@@ -115,6 +110,7 @@ export default function App() {
   const [noteSource, setNoteSource] = useState<{ id: string | null; sequence: number } | null>(
     null,
   );
+  const [noteTarget, setNoteTarget] = useState<{ id: string; sequence: number } | null>(null);
   const [planningTarget, setPlanningTarget] = useState<PlanningTarget | null>(null);
   const [notePreset, setNotePreset] = useState<{ draft: NoteDraft; sequence: number } | null>(null);
   const [routeTarget, setRouteTarget] = useState<{ id: string; sequence: number } | null>(null);
@@ -316,8 +312,16 @@ export default function App() {
     setRouteTarget((previous) => ({ id, sequence: (previous?.sequence ?? 0) + 1 }));
     navigate('agent');
   }
+  function openSavedNote(id: string | null) {
+    if (id) setNoteTarget((previous) => ({ id, sequence: (previous?.sequence ?? 0) + 1 }));
+    navigate('notes');
+  }
 
   const settings = boot?.settings ?? defaultSettings;
+  const homeDetail = page === 'notes' || page === 'agent';
+  const settingsSelected = ['settings', 'planning', 'focus', 'reviews', 'memories'].includes(page);
+  const primaryPage = homeDetail ? 'home' : page;
+  const backupBusy = Boolean(backup.state && backup.state.operation !== 'idle');
   const date = new Intl.DateTimeFormat('zh-CN', {
     month: 'long',
     day: 'numeric',
@@ -335,74 +339,56 @@ export default function App() {
         跳到主要内容
       </a>
       <header className="app-header">
-        <button className="brand" onClick={() => navigate('home')} aria-label="拾知，返回学习首页">
-          <span className="brand-mark" aria-hidden="true">
-            <Sun size={24} strokeWidth={1.5} />
-          </span>
-          <span className="brand-name">
-            <strong>拾知</strong>
-            <small>STUDY COMPANION</small>
-          </span>
-        </button>
+        <div className="brand-tools">
+          <button
+            className="brand"
+            onClick={() => navigate('home')}
+            aria-label="拾知，返回学习首页"
+          >
+            <span className="brand-mark" aria-hidden="true">
+              <Sun size={24} strokeWidth={1.5} />
+            </span>
+            <span className="brand-name">
+              <strong>拾知</strong>
+              <small>STUDY COMPANION</small>
+            </span>
+          </button>
+          <button
+            className={`settings-button ${settingsSelected ? 'selected' : ''}`}
+            onClick={() => navigate('settings')}
+            aria-current={settingsSelected ? 'page' : undefined}
+            aria-label="设置"
+            title="设置"
+          >
+            <SettingsIcon size={19} aria-hidden="true" />
+          </button>
+        </div>
         <nav className="app-nav" aria-label="主导航">
           <span className="nav-indicator" aria-hidden="true" />
           {[
             { id: 'home' as const, icon: Home },
             { id: 'library' as const, icon: FolderOpen },
             { id: 'chat' as const, icon: MessageCircle },
-            { id: 'notes' as const, icon: NotebookPen },
-            { id: 'agent' as const, icon: Sparkles },
-            { id: 'memories' as const, icon: Brain },
-            { id: 'reviews' as const, icon: BookOpen },
           ].map(({ id, icon: Icon }) => (
             <button
               key={id}
-              className={`nav-item ${page === id ? 'selected' : ''}`}
-              aria-current={page === id ? 'page' : undefined}
+              className={`nav-item ${primaryPage === id ? 'selected' : ''}`}
+              aria-current={primaryPage === id ? 'page' : undefined}
               onClick={() => navigate(id)}
             >
               <Icon size={18} />
               {pageLabels[id]}
-              {page === id && <span className="nav-dot" />}
             </button>
           ))}
-          <div className="nav-divider" />
-          <button
-            className={`nav-item ${page === 'planning' ? 'selected' : ''}`}
-            aria-current={page === 'planning' ? 'page' : undefined}
-            onClick={() => navigate('planning')}
-          >
-            <Target size={18} />
-            {pageLabels.planning}
-            {page === 'planning' && <span className="nav-dot" />}
-          </button>
-          <button
-            className={`nav-item ${page === 'focus' ? 'selected' : ''}`}
-            aria-current={page === 'focus' ? 'page' : undefined}
-            onClick={() => navigate('focus')}
-          >
-            <Timer size={18} />
-            {pageLabels.focus}
-            {page === 'focus' && <span className="nav-dot" />}
-          </button>
         </nav>
         <div className="header-tools">
-          <button
-            className={`profile-button ${page === 'settings' ? 'selected' : ''}`}
-            onClick={() => navigate('settings')}
-            aria-current={page === 'settings' ? 'page' : undefined}
-            aria-label="设置"
-            title="设置"
+          <span
+            className="profile-avatar"
+            role="img"
+            aria-label={`本地昵称：${settings.displayName.trim() || '拾知'}`}
           >
-            <span className="profile-avatar" aria-hidden="true">
-              {Array.from(settings.displayName.trim())[0] ?? '知'}
-            </span>
-            <SettingsIcon size={18} />
-          </button>
-          <div className="sidebar-version">
-            <span>STUDY COMPANION</span>
-            <span>v{appVersion}</span>
-          </div>
+            {Array.from(settings.displayName.trim())[0] ?? '知'}
+          </span>
         </div>
       </header>
       <div className="main-shell">
@@ -434,6 +420,22 @@ export default function App() {
               </button>
             </div>
           )}
+          {boot &&
+            !failure &&
+            !sourceId &&
+            (homeDetail || (settingsSelected && page !== 'settings')) && (
+              <div className="section-path">
+                <button
+                  className="text-button"
+                  onClick={() => navigate(homeDetail ? 'home' : 'settings')}
+                >
+                  <ArrowLeft size={15} aria-hidden="true" />
+                  {homeDetail ? '返回学习首页' : '返回设置'}
+                </button>
+                <span aria-hidden="true">/</span>
+                <span>{pageLabels[page]}</span>
+              </div>
+            )}
           {boot && !failure && page === 'home' && (
             <div className="page home-page" data-motion="page">
               <FirstUseGuide
@@ -486,7 +488,7 @@ export default function App() {
               </section>
               <TodayTasks
                 refreshVersion={planningVersion}
-                paused={Boolean(backup.state && backup.state.operation !== 'idle')}
+                paused={backupBusy}
                 onOpenDay={openPlanningDay}
                 onOpenTask={openTask}
                 onFocusTask={focusTask}
@@ -503,14 +505,17 @@ export default function App() {
                     </button>
                   </div>
                   <RecentReadings onOpen={openSource} />
+                  <HomeLearningSummary
+                    paused={backupBusy}
+                    onOpenRoute={(id) => (id ? openLearningRoute(id) : navigate('agent'))}
+                    onOpenNote={openSavedNote}
+                  />
                 </section>
                 <StudyCalendar
                   dailyGoalMinutes={settings.dailyGoalMinutes}
                   encouragement={encouragement}
                 />
               </div>
-              <HomeStudyFlow settings={settings} onNavigate={navigate} />
-              <ReviewDue onOpen={() => navigate('reviews')} />
             </div>
           )}
           {boot && !failure && page === 'library' && !sourceId && (
@@ -579,7 +584,7 @@ export default function App() {
             </div>
           )}
           {boot && !failure && page === 'settings' && (
-            <SettingsPage boot={boot} onSaved={onSaved} />
+            <SettingsPage boot={boot} onSaved={onSaved} onOpenTool={navigate} paused={backupBusy} />
           )}
           {boot && !failure && (
             <div hidden={page !== 'settings'} className="page settings-page backup-settings">
@@ -608,6 +613,7 @@ export default function App() {
               <NotesPage
                 visible={page === 'notes' || Boolean(sourceId && readerPanel === 'notes')}
                 presetSource={noteSource}
+                presetNote={noteTarget}
                 presetSelection={selectionNote}
                 presetDraft={notePreset}
                 onOpenSource={openNoteSource}
@@ -679,7 +685,9 @@ export default function App() {
             <ShieldCheck size={14} aria-hidden="true" />
             {isDesktop ? '本地学习空间' : '界面预览 · 本地保存需启动桌面版'}
           </span>
-          <span className="footer-date">{date}</span>
+          <span className="footer-date">
+            <span>v{appVersion}</span> · {date}
+          </span>
         </footer>
       </div>
     </div>

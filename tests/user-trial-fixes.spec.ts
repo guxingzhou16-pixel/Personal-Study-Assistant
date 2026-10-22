@@ -1,3 +1,4 @@
+import { openPage } from './helpers/navigation';
 import {
   test,
   expect,
@@ -174,7 +175,7 @@ test('review-page conflicts reload the newest saved response while preserving th
     await expect(
       chat.getByText('第 1 题的作答与安排已保存；没有评分或掌握判断。', { exact: true }),
     ).toBeVisible();
-    await page.getByRole('button', { name: '轻量复习', exact: true }).click();
+    await openPage(page, '轻量复习');
     await page.locator('.review-list-item').first().click();
     await page.getByRole('button', { name: '学习助手', exact: true }).click();
     await answer.fill('第二份作答');
@@ -182,7 +183,7 @@ test('review-page conflicts reload the newest saved response while preserving th
     await expect(
       chat.getByText('第 1 题的作答与安排已保存；没有评分或掌握判断。', { exact: true }),
     ).toBeVisible();
-    await page.getByRole('button', { name: '轻量复习', exact: true }).click();
+    await openPage(page, '轻量复习');
     const review = page.getByRole('region', { name: '轻量复习', exact: true });
     await review.getByRole('button', { name: '开始这次回忆', exact: true }).click();
     const draft = review.getByRole('textbox', { name: '这次的回忆与作答', exact: true });
@@ -246,7 +247,7 @@ test('route task order is identical on home, planning, edit and restart', async 
   const ordered = (page: Page) => page.locator('.planning-task-list .planning-list-item strong');
   try {
     await expect(page.locator('.today-task-list strong')).toHaveText(titles);
-    await page.getByRole('button', { name: '学习计划', exact: true }).click();
+    await openPage(page, '学习计划');
     await expect(ordered(page)).toHaveText(titles);
     await page
       .locator('.planning-task-list .planning-list-item')
@@ -257,7 +258,7 @@ test('route task order is identical on home, planning, edit and restart', async 
     await expect(ordered(page)).toHaveText([titles[0], `${titles[1]}（编辑）`]);
     await app.close();
     ({ app, page } = await launch(root));
-    await page.getByRole('button', { name: '学习计划', exact: true }).click();
+    await openPage(page, '学习计划');
     await expect(ordered(page)).toHaveText([titles[0], `${titles[1]}（编辑）`]);
   } finally {
     await app.close();
@@ -269,7 +270,7 @@ test('a valid edited route needs one preview action and still requires an explic
   const { app, page } = await launch(root);
   const day = localDayKey(new Date());
   try {
-    await page.getByRole('button', { name: '学习路线', exact: true }).click();
+    await openPage(page, '学习路线');
     const route = page.getByRole('region', { name: '结构化学习路线', exact: true });
     await route.getByRole('checkbox', { name: '选择步骤 1 生成任务', exact: true }).check();
     await route.getByRole('checkbox', { name: '选择步骤 2 生成任务', exact: true }).check();

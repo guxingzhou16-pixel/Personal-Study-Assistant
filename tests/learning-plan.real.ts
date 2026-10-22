@@ -1,3 +1,4 @@
+import { openPage } from './helpers/navigation';
 import { test, expect, _electron as electron } from '@playwright/test';
 import { createHash } from 'node:crypto';
 import { cpSync, mkdirSync, mkdtempSync, writeFileSync } from 'node:fs';
@@ -105,7 +106,7 @@ test('one real local structured route keeps exact evidence and original output f
         Promise.all(citations.map((number) => window.studyCompanion!.resolveCitation(id, number))),
       { id: turn.id, citations },
     );
-    await page.getByRole('button', { name: '学习路线', exact: true }).click();
+    await openPage(page, '学习路线');
     await expect(page.getByRole('region', { name: '结构化学习路线', exact: true })).toBeVisible();
     await page.screenshot({ path: join(output, 'route.png') });
   } finally {

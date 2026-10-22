@@ -1,3 +1,4 @@
+import { openPage } from './helpers/navigation';
 import { test, expect, _electron as electron } from '@playwright/test';
 import { mkdtempSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
@@ -10,7 +11,7 @@ declare global {
   }
 }
 
-test('navigation indicator follows the selected button when all learning entries wrap', async () => {
+test('navigation indicator follows the three primary destinations and hides in settings', async () => {
   const directory = mkdtempSync(join(tmpdir(), 'study-motion-navigation-'));
   const { ELECTRON_RUN_AS_NODE: _ignored, ...env } = process.env;
   const app = await electron.launch({
@@ -26,7 +27,7 @@ test('navigation indicator follows the selected button when all learning entries
       ratio: 1,
     });
     await expect(page.getByRole('textbox', { name: '输入学习问题' })).toBeInViewport({ ratio: 1 });
-    await page.getByRole('button', { name: '学习计划', exact: true }).click();
+    await openPage(page, '资料库');
     await expect
       .poll(async () => {
         const indicator = await page.locator('.nav-indicator').boundingBox();
@@ -40,6 +41,12 @@ test('navigation indicator follows the selected button when all learning entries
         );
       })
       .toBe(true);
+    await openPage(page, '学习计划');
+    await expect(page.locator('.nav-indicator')).toHaveCSS('opacity', '0');
+    await expect(page.getByRole('button', { name: '设置', exact: true })).toHaveAttribute(
+      'aria-current',
+      'page',
+    );
   } finally {
     await app.close();
   }

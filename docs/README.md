@@ -24,6 +24,7 @@
 - 用户体验维护：[试用报告](testing/user-trial-2026-10-16.md) → [优化交接](testing/user-trial-fixes-2026-10-16.md)。
 - 目录与架构维护：[2026-10-21 整理范围、验证和开发监听修复](testing/structure-maintenance-2026-10-21.md)。
 - 正式界面维护：[晴岛设计规范](design/SUNNY_ISLE.md)、[动效规范](design/SUNNY_MOTION.md)；[晴岛交接](handoffs/2026-10-18-sunny-isle.md)与[动效交接](handoffs/2026-10-21-sunny-motion.md)记录各自历史范围，离线设计演示不代表正式功能或本轮验收结果。
+- 导航与首页摘要：[设计规范](design/SUNNY_NAVIGATION.md)、[2026-10-22交接](handoffs/2026-10-22-sunny-navigation.md)，记录三个主入口、设置学习工具与实际验证。
 - 发布规则：[首版发布计划](releases/v1-release-plan.md)、[签名政策](releases/code-signing-policy.md)。
 - 许可材料：[第三方说明](third-party-licenses.md)及 `releases/` 中的具体分发政策。
 

@@ -59,7 +59,7 @@ test('desktop navigation, persistent preferences, encrypted keys and model check
     await page.keyboard.press('Tab');
     await expect(page.getByRole('link', { name: '跳到主要内容' })).toBeFocused();
     await page.keyboard.press('Enter');
-    await expect(page.getByRole('button', { name: '学习笔记', exact: true })).toBeEnabled();
+    await expect(page.getByRole('link', { name: '查看完整学习笔记', exact: true })).toBeVisible();
     await page.getByRole('button', { name: '打开我的资料库' }).click();
     await expect(page.getByRole('heading', { name: '我的资料库' })).toBeVisible();
     await expect(page.getByRole('button', { name: '导入资料', exact: true })).toBeEnabled();

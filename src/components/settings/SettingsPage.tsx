@@ -16,14 +16,17 @@ import { themeOptions } from '../../lib/themes';
 import { EmbeddingSettings } from './EmbeddingSettings';
 import { ModelHealthPanel } from './ModelHealthPanel';
 import { AppUpdatesPanel } from './AppUpdatesPanel';
+import { LearningTools, type LearningTool } from './LearningTools';
 import '../home/FirstUseGuide.css';
 
 interface Props {
   boot: Bootstrap;
   onSaved: (settings: Settings, keyStored: boolean) => void;
+  onOpenTool: (page: LearningTool) => void;
+  paused: boolean;
 }
 
-export function SettingsPage({ boot, onSaved }: Props) {
+export function SettingsPage({ boot, onSaved, onOpenTool, paused }: Props) {
   const [draft, setDraft] = useState<Settings>(structuredClone(boot.settings));
   const [apiKey, setApiKey] = useState('');
   const [hasKey, setHasKey] = useState(boot.hasApiKey);
@@ -146,6 +149,7 @@ export function SettingsPage({ boot, onSaved }: Props) {
         </div>
         <span className="version-label">设置</span>
       </div>
+      <LearningTools onOpen={onOpenTool} paused={paused} />
       <form
         onSubmit={(event) => {
           event.preventDefault();

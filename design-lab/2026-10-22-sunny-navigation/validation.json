@@ -1,0 +1,431 @@
+{
+  "date": "2026-10-22",
+  "scope": "offline-layout-preview",
+  "fileUrl": true,
+  "checks": [
+    {
+      "page": "home",
+      "width": 1280,
+      "height": 900,
+      "reducedMotion": "no-preference",
+      "overflow": false
+    },
+    {
+      "page": "settings",
+      "width": 1280,
+      "height": 900,
+      "reducedMotion": "no-preference",
+      "overflow": false
+    },
+    {
+      "page": "library",
+      "width": 1280,
+      "height": 900,
+      "reducedMotion": "no-preference",
+      "overflow": false
+    },
+    {
+      "page": "chat",
+      "width": 1280,
+      "height": 900,
+      "reducedMotion": "no-preference",
+      "overflow": false
+    },
+    {
+      "page": "agent",
+      "width": 1280,
+      "height": 900,
+      "reducedMotion": "no-preference",
+      "overflow": false
+    },
+    {
+      "page": "notes",
+      "width": 1280,
+      "height": 900,
+      "reducedMotion": "no-preference",
+      "overflow": false
+    },
+    {
+      "page": "focus",
+      "width": 1280,
+      "height": 900,
+      "reducedMotion": "no-preference",
+      "overflow": false
+    },
+    {
+      "page": "planning",
+      "width": 1280,
+      "height": 900,
+      "reducedMotion": "no-preference",
+      "overflow": false
+    },
+    {
+      "page": "reviews",
+      "width": 1280,
+      "height": 900,
+      "reducedMotion": "no-preference",
+      "overflow": false
+    },
+    {
+      "page": "memories",
+      "width": 1280,
+      "height": 900,
+      "reducedMotion": "no-preference",
+      "overflow": false
+    },
+    {
+      "page": "home",
+      "width": 900,
+      "height": 640,
+      "reducedMotion": "no-preference",
+      "overflow": false
+    },
+    {
+      "page": "settings",
+      "width": 900,
+      "height": 640,
+      "reducedMotion": "no-preference",
+      "overflow": false
+    },
+    {
+      "page": "library",
+      "width": 900,
+      "height": 640,
+      "reducedMotion": "no-preference",
+      "overflow": false
+    },
+    {
+      "page": "chat",
+      "width": 900,
+      "height": 640,
+      "reducedMotion": "no-preference",
+      "overflow": false
+    },
+    {
+      "page": "agent",
+      "width": 900,
+      "height": 640,
+      "reducedMotion": "no-preference",
+      "overflow": false
+    },
+    {
+      "page": "notes",
+      "width": 900,
+      "height": 640,
+      "reducedMotion": "no-preference",
+      "overflow": false
+    },
+    {
+      "page": "focus",
+      "width": 900,
+      "height": 640,
+      "reducedMotion": "no-preference",
+      "overflow": false
+    },
+    {
+      "page": "planning",
+      "width": 900,
+      "height": 640,
+      "reducedMotion": "no-preference",
+      "overflow": false
+    },
+    {
+      "page": "reviews",
+      "width": 900,
+      "height": 640,
+      "reducedMotion": "no-preference",
+      "overflow": false
+    },
+    {
+      "page": "memories",
+      "width": 900,
+      "height": 640,
+      "reducedMotion": "no-preference",
+      "overflow": false
+    },
+    {
+      "page": "home",
+      "width": 390,
+      "height": 844,
+      "reducedMotion": "no-preference",
+      "overflow": false
+    },
+    {
+      "page": "settings",
+      "width": 390,
+      "height": 844,
+      "reducedMotion": "no-preference",
+      "overflow": false
+    },
+    {
+      "page": "library",
+      "width": 390,
+      "height": 844,
+      "reducedMotion": "no-preference",
+      "overflow": false
+    },
+    {
+      "page": "chat",
+      "width": 390,
+      "height": 844,
+      "reducedMotion": "no-preference",
+      "overflow": false
+    },
+    {
+      "page": "agent",
+      "width": 390,
+      "height": 844,
+      "reducedMotion": "no-preference",
+      "overflow": false
+    },
+    {
+      "page": "notes",
+      "width": 390,
+      "height": 844,
+      "reducedMotion": "no-preference",
+      "overflow": false
+    },
+    {
+      "page": "focus",
+      "width": 390,
+      "height": 844,
+      "reducedMotion": "no-preference",
+      "overflow": false
+    },
+    {
+      "page": "planning",
+      "width": 390,
+      "height": 844,
+      "reducedMotion": "no-preference",
+      "overflow": false
+    },
+    {
+      "page": "reviews",
+      "width": 390,
+      "height": 844,
+      "reducedMotion": "no-preference",
+      "overflow": false
+    },
+    {
+      "page": "memories",
+      "width": 390,
+      "height": 844,
+      "reducedMotion": "no-preference",
+      "overflow": false
+    },
+    {
+      "page": "home",
+      "width": 1280,
+      "height": 900,
+      "reducedMotion": "reduce",
+      "overflow": false
+    },
+    {
+      "page": "settings",
+      "width": 1280,
+      "height": 900,
+      "reducedMotion": "reduce",
+      "overflow": false
+    },
+    {
+      "page": "library",
+      "width": 1280,
+      "height": 900,
+      "reducedMotion": "reduce",
+      "overflow": false
+    },
+    {
+      "page": "chat",
+      "width": 1280,
+      "height": 900,
+      "reducedMotion": "reduce",
+      "overflow": false
+    },
+    {
+      "page": "agent",
+      "width": 1280,
+      "height": 900,
+      "reducedMotion": "reduce",
+      "overflow": false
+    },
+    {
+      "page": "notes",
+      "width": 1280,
+      "height": 900,
+      "reducedMotion": "reduce",
+      "overflow": false
+    },
+    {
+      "page": "focus",
+      "width": 1280,
+      "height": 900,
+      "reducedMotion": "reduce",
+      "overflow": false
+    },
+    {
+      "page": "planning",
+      "width": 1280,
+      "height": 900,
+      "reducedMotion": "reduce",
+      "overflow": false
+    },
+    {
+      "page": "reviews",
+      "width": 1280,
+      "height": 900,
+      "reducedMotion": "reduce",
+      "overflow": false
+    },
+    {
+      "page": "memories",
+      "width": 1280,
+      "height": 900,
+      "reducedMotion": "reduce",
+      "overflow": false
+    },
+    {
+      "page": "home",
+      "width": 900,
+      "height": 640,
+      "reducedMotion": "reduce",
+      "overflow": false
+    },
+    {
+      "page": "settings",
+      "width": 900,
+      "height": 640,
+      "reducedMotion": "reduce",
+      "overflow": false
+    },
+    {
+      "page": "library",
+      "width": 900,
+      "height": 640,
+      "reducedMotion": "reduce",
+      "overflow": false
+    },
+    {
+      "page": "chat",
+      "width": 900,
+      "height": 640,
+      "reducedMotion": "reduce",
+      "overflow": false
+    },
+    {
+      "page": "agent",
+      "width": 900,
+      "height": 640,
+      "reducedMotion": "reduce",
+      "overflow": false
+    },
+    {
+      "page": "notes",
+      "width": 900,
+      "height": 640,
+      "reducedMotion": "reduce",
+      "overflow": false
+    },
+    {
+      "page": "focus",
+      "width": 900,
+      "height": 640,
+      "reducedMotion": "reduce",
+      "overflow": false
+    },
+    {
+      "page": "planning",
+      "width": 900,
+      "height": 640,
+      "reducedMotion": "reduce",
+      "overflow": false
+    },
+    {
+      "page": "reviews",
+      "width": 900,
+      "height": 640,
+      "reducedMotion": "reduce",
+      "overflow": false
+    },
+    {
+      "page": "memories",
+      "width": 900,
+      "height": 640,
+      "reducedMotion": "reduce",
+      "overflow": false
+    },
+    {
+      "page": "home",
+      "width": 390,
+      "height": 844,
+      "reducedMotion": "reduce",
+      "overflow": false
+    },
+    {
+      "page": "settings",
+      "width": 390,
+      "height": 844,
+      "reducedMotion": "reduce",
+      "overflow": false
+    },
+    {
+      "page": "library",
+      "width": 390,
+      "height": 844,
+      "reducedMotion": "reduce",
+      "overflow": false
+    },
+    {
+      "page": "chat",
+      "width": 390,
+      "height": 844,
+      "reducedMotion": "reduce",
+      "overflow": false
+    },
+    {
+      "page": "agent",
+      "width": 390,
+      "height": 844,
+      "reducedMotion": "reduce",
+      "overflow": false
+    },
+    {
+      "page": "notes",
+      "width": 390,
+      "height": 844,
+      "reducedMotion": "reduce",
+      "overflow": false
+    },
+    {
+      "page": "focus",
+      "width": 390,
+      "height": 844,
+      "reducedMotion": "reduce",
+      "overflow": false
+    },
+    {
+      "page": "planning",
+      "width": 390,
+      "height": 844,
+      "reducedMotion": "reduce",
+      "overflow": false
+    },
+    {
+      "page": "reviews",
+      "width": 390,
+      "height": 844,
+      "reducedMotion": "reduce",
+      "overflow": false
+    },
+    {
+      "page": "memories",
+      "width": 390,
+      "height": 844,
+      "reducedMotion": "reduce",
+      "overflow": false
+    }
+  ],
+  "javascriptErrors": [],
+  "networkRequests": [],
+  "links": true,
+  "sampleDataToggle": true
+}
