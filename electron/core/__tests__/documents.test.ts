@@ -126,8 +126,7 @@ it('rejects ambiguous legacy Markdown selections when an image alt duplicates vi
   const id = createHash('sha256').update(original).digest('hex');
   const parsed = parseMarkdown(utf8(original));
   expect(parsed.segments[0].text).toContain('主动回忆\t独立回答');
-  const legacyText =
-    '图片同文\n| 方法 | 行动 |\n|---|---|\n| 主动回忆主动回忆 | 独立回答 |\n';
+  const legacyText = '图片同文\n| 方法 | 行动 |\n|---|---|\n| 主动回忆主动回忆 | 独立回答 |\n';
   storage.addSource({
     id,
     name: '旧版图片资料.md',
@@ -140,9 +139,9 @@ it('rejects ambiguous legacy Markdown selections when an image alt duplicates vi
   writeFileSync(join(sources, `${id}.md`), original);
   const before = storage.getSegment(id, 'md-line-1');
 
-  await expect(
-    documents.selection(id, 'md-line-1', '主动回忆\t独立回答'),
-  ).rejects.toMatchObject({ code: 'citation' });
+  await expect(documents.selection(id, 'md-line-1', '主动回忆\t独立回答')).rejects.toMatchObject({
+    code: 'citation',
+  });
   expect(storage.getSegment(id, 'md-line-1')).toEqual(before);
 });
 

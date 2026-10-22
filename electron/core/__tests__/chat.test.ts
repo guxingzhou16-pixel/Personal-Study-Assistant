@@ -183,9 +183,7 @@ it('rejects NUL in a user question before storing a turn or using the model', ()
   const chat = new ChatService(storage, { load: () => undefined }, () => {}, transport);
   const conversation = storage.chat.create();
   try {
-    expect(() =>
-      chat.send({ conversationId: conversation.id, question: '问题\0内容' }),
-    ).toThrow();
+    expect(() => chat.send({ conversationId: conversation.id, question: '问题\0内容' })).toThrow();
     expect(storage.chat.get(conversation.id).turns).toHaveLength(0);
     expect(transport).not.toHaveBeenCalled();
   } finally {
@@ -206,7 +204,9 @@ it.each(['ollama', 'openai'] as const)(
       provider === 'ollama'
         ? JSON.stringify({ message: { content }, done }) + '\n'
         : 'data: ' +
-          JSON.stringify({ choices: [{ delta: { content }, finish_reason: done ? 'stop' : null }] }) +
+          JSON.stringify({
+            choices: [{ delta: { content }, finish_reason: done ? 'stop' : null }],
+          }) +
           '\n\n';
     const request = vi
       .spyOn(globalThis, 'fetch')
