@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { BookOpen, FolderOpen } from 'lucide-react';
+import { ArrowUpRight, BookOpen, FolderOpen } from 'lucide-react';
 import { desktop, errorMessage, isDesktop } from '../../lib/desktop';
 import type { Source } from '../../lib/types';
 
@@ -38,10 +38,26 @@ export function RecentReadings({ onOpen }: { onOpen: (id: string) => void }) {
     );
   return (
     <div className="recent-list">
-      {sources.map((source) => (
-        <button className="recent-document" key={source.id} onClick={() => onOpen(source.id)}>
-          <BookOpen size={19} />
-          <span>
+      {sources.map((source, index) => (
+        <button
+          type="button"
+          className={`recent-document ${index === 0 ? 'recent-feature' : 'recent-row'}`}
+          key={source.id}
+          onClick={() => onOpen(source.id)}
+        >
+          {index === 0 ? (
+            <span className="recent-cover" aria-hidden="true">
+              <BookOpen size={22} strokeWidth={1.4} />
+              <strong>{source.kind === 'pdf' ? 'PDF' : 'MD'}</strong>
+              <span>继续探索</span>
+            </span>
+          ) : (
+            <span className="recent-file-icon" aria-hidden="true">
+              <BookOpen size={21} strokeWidth={1.5} />
+            </span>
+          )}
+          <span className="recent-document-copy">
+            <span className="recent-format">{source.kind === 'pdf' ? 'PDF' : 'Markdown'}</span>
             <strong>{source.name}</strong>
             <small>
               {source.kind === 'pdf'
@@ -49,8 +65,14 @@ export function RecentReadings({ onOpen }: { onOpen: (id: string) => void }) {
                 : (source.outline.find((entry) => entry.anchor === source.position.anchor)?.title ??
                   'Markdown')}
             </small>
+            {index === 0 && (
+              <span className="recent-continue">
+                <ArrowUpRight size={19} aria-hidden="true" />
+                继续阅读
+              </span>
+            )}
           </span>
-          <span>继续读</span>
+          {index > 0 && <ArrowUpRight size={20} className="recent-row-arrow" aria-hidden="true" />}
         </button>
       ))}
     </div>

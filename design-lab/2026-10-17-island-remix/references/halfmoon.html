@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="zh-CN" data-bs-theme="dark">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Halfmoon 本地组件参考 · 拾知</title>
+    <link rel="stylesheet" href="assets/halfmoon/halfmoon.min.css" />
+    <link rel="stylesheet" href="assets/showcase.css" />
+    <script src="assets/showcase.js" defer></script>
+  </head>
+  <body class="component-page halfmoon-page">
+    <main class="component-shell">
+      <header class="reference-heading">
+        <a class="back-link" href="index.html">← 返回开源参考台</a>
+        <p class="eyebrow">HALFMOON / ORIGINAL CSS COMPONENTS</p>
+        <div class="heading-row">
+          <div>
+            <h1>清楚，安静，有层次。</h1>
+            <p class="lede">
+              上游暗色组件的本地展示，保留默认的蓝色主按钮。玄墨设计另用黑白灰配色。
+            </p>
+          </div>
+          <button class="btn btn-secondary" type="button" data-theme-toggle>切换为浅色</button>
+        </div>
+      </header>
+      <div class="component-layout">
+        <section aria-labelledby="halfmoon-components">
+          <h2 id="halfmoon-components" class="h5 mb-3">界面组件</h2>
+          <article class="card">
+            <div class="card-body">
+              <p class="text-body-secondary small">示例资料 / USER INTERFACE</p>
+              <h3 class="card-title h4">让阅读留在视线中央</h3>
+              <p class="card-text">资料的标题、原文和来源需要容易辨认，工具只在需要时出现。</p>
+              <label class="form-label" for="halfmoon-search">筛选右侧阅读片段</label
+              ><input
+                class="form-control"
+                id="halfmoon-search"
+                type="search"
+                placeholder="试试输入：证据"
+                data-snippet-search
+              />
+              <div class="button-row">
+                <button class="btn btn-primary" type="button" data-bookmark aria-pressed="false">
+                  收藏这个片段</button
+                ><button class="btn btn-outline-secondary" type="button" data-clear-search>
+                  清空筛选
+                </button>
+              </div>
+              <p class="action-status" data-action-status role="status">收藏只保留在当前页面。</p>
+            </div>
+          </article>
+          <details class="native-details">
+            <summary>为什么参考 Halfmoon？</summary>
+            <p>
+              暗色背景、内容表面、边框、弱化文字之间仍有清晰层级。这里只用原库 CSS，未引入 Bootstrap
+              脚本。
+            </p>
+          </details>
+        </section>
+        <section class="reading-demo" aria-labelledby="halfmoon-reading">
+          <div class="reading-heading">
+            <h2 id="halfmoon-reading" class="h5">阅读片段</h2>
+            <span class="badge text-bg-secondary">示例内容</span>
+          </div>
+          <article class="snippet" data-snippet>
+            <p class="source-line">01 / 阅读与注意力</p>
+            <h3>好的界面知道何时退后。</h3>
+            <p>阅读时，留白不是空缺。它帮助眼睛辨认段落，也给理解留下停顿。</p>
+            <blockquote>先让内容可读，再让工具可见。</blockquote>
+          </article>
+          <article class="snippet" data-snippet>
+            <p class="source-line">02 / 检索与证据</p>
+            <h3>回答需要可以回到的来源。</h3>
+            <p>找到证据之后，再组织回答。保留原文和位置，才能继续求证。</p>
+          </article>
+          <p data-search-empty hidden>没有匹配的示例片段。</p>
+        </section>
+      </div>
+      <footer class="reference-footer">
+        <p>
+          <a href="https://github.com/halfmoonui/halfmoon">Halfmoon 源码 ↗</a> ·
+          <a href="assets/halfmoon/LICENSE">MIT 许可证</a>
+        </p>
+        <p>静态 CSS 参考；不代表原项目完整应用已部署。</p>
+      </footer>
+    </main>
+  </body>
+</html>

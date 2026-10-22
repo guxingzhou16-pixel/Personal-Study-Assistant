@@ -1,0 +1,36 @@
+{
+  "schemaVersion": 1,
+  "pathBase": "repository-root",
+  "designId": "shizhi.sunny-isle.v1",
+  "name": "03 晴岛原版 / Sunny Isle",
+  "selectedOn": "2026-10-18",
+  "status": "selected",
+  "implementationStatus": "implemented",
+  "selection": "用户明确选择第一轮03晴岛原版替换正式桌面UI；第二轮风格仅保留参考",
+  "originalDemo": "design-lab/2026-10-17-three-directions/03-island/index.html",
+  "originalSpec": "design-lab/2026-10-17-three-directions/03-island/design.json",
+  "originalSpecStatus": "historical-concept-snapshot",
+  "designDoc": "docs/design/SUNNY_ISLE.md",
+  "handoff": "docs/handoffs/2026-10-18-sunny-isle.md",
+  "screenshots": [
+    "docs/design/assets/sunny-isle-home.png",
+    "docs/design/assets/sunny-isle-chat-900.png"
+  ],
+  "runtime": "electron-react-typescript",
+  "implementation": {
+    "shell": "src/App.tsx",
+    "tokens": "src/styles/tokens.css",
+    "styles": "src/styles.css",
+    "homeStyles": "src/styles/study-home.css",
+    "styleEntry": "src/main.tsx",
+    "recentReadings": "src/components/RecentReadings.tsx",
+    "studyCalendar": "src/components/StudyCalendar.tsx",
+    "illustration": "src/assets/sunny-isle-plant.svg"
+  },
+  "constraints": [
+    "正式界面使用真实资料和学习记录，历史demo继续使用示例数据",
+    "保留现有聊天常驻、原页阅读、引用验证、设置、密钥与计时边界",
+    "本次不新增主题选择器、同屏助手、笔记、计划或番茄钟",
+    "实际验证以handoff记录为准；selected不表示历史demo通过正式功能验收"
+  ]
+}

@@ -1,0 +1,129 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "拾知静态 UI 设计档案接口 v1",
+  "description": "供其他 AI 读取的设计交接数据。不是运行时应用 API。设计资产路径相对于 design.json；productIntegration.file 为仓库相对路径。",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "$schema",
+    "schemaVersion",
+    "id",
+    "name",
+    "createdOn",
+    "status",
+    "runtime",
+    "sampleDataOnly",
+    "entry",
+    "preview",
+    "readerPreview",
+    "handoff",
+    "sourceFiles",
+    "intent",
+    "references",
+    "tokens",
+    "layout",
+    "interactions",
+    "productIntegration",
+    "validationReport",
+    "limitations"
+  ],
+  "properties": {
+    "$schema": { "const": "../handoff.schema.json" },
+    "schemaVersion": { "const": 1 },
+    "id": { "type": "string", "pattern": "^shizhi\\.[a-z-]+\\.v[0-9]+$" },
+    "name": { "type": "string", "minLength": 1 },
+    "createdOn": { "type": "string", "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$" },
+    "status": { "const": "concept" },
+    "runtime": { "const": "static-html" },
+    "sampleDataOnly": { "const": true },
+    "entry": { "type": "string" },
+    "preview": { "type": "string" },
+    "readerPreview": { "type": "string" },
+    "handoff": { "type": "string" },
+    "sourceFiles": { "type": "array", "minItems": 1, "items": { "type": "string" } },
+    "intent": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["audience", "tone", "memorableDetail"],
+      "properties": {
+        "audience": { "type": "string" },
+        "tone": { "type": "string" },
+        "memorableDetail": { "type": "string" }
+      }
+    },
+    "references": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["title", "url", "appliedTo"],
+        "properties": {
+          "title": { "type": "string" },
+          "url": { "type": "string", "pattern": "^https://" },
+          "appliedTo": { "type": "string" }
+        }
+      }
+    },
+    "tokens": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["colors", "typography", "spacingPx", "radiusPx"],
+      "properties": {
+        "colors": {
+          "type": "object",
+          "minProperties": 7,
+          "additionalProperties": { "type": "string", "pattern": "^#[a-fA-F0-9]{6}$" }
+        },
+        "typography": {
+          "type": "object",
+          "required": ["body", "heading", "readingBodyPx", "note"],
+          "properties": {
+            "body": { "type": "string" },
+            "heading": { "type": "string" },
+            "readingBodyPx": { "type": "number" },
+            "note": { "type": "string" }
+          }
+        },
+        "spacingPx": { "type": "array", "items": { "type": "number" } },
+        "radiusPx": { "type": "array", "items": { "type": "number" } }
+      }
+    },
+    "layout": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["navigation", "home", "library", "reader", "breakpoints"],
+      "properties": {
+        "navigation": { "type": "string" },
+        "home": { "type": "string" },
+        "library": { "type": "string" },
+        "reader": { "type": "string" },
+        "breakpoints": { "type": "array", "items": { "type": "string" } }
+      }
+    },
+    "interactions": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["workingDemo", "placeholder", "futureConcept"],
+      "properties": {
+        "workingDemo": { "type": "array", "items": { "type": "string" } },
+        "placeholder": { "type": "array", "items": { "type": "string" } },
+        "futureConcept": { "type": "array", "items": { "type": "string" } }
+      }
+    },
+    "productIntegration": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["file", "role"],
+        "properties": {
+          "file": { "type": "string" },
+          "role": { "type": "string" }
+        }
+      }
+    },
+    "validationReport": { "type": "string" },
+    "limitations": { "type": "array", "minItems": 1, "items": { "type": "string" } }
+  }
+}

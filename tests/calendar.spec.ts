@@ -3,7 +3,7 @@ import { mkdtempSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 
-test('monthly calendar, persistent check-in and real study time in a 4:5 layout', async () => {
+test('sunny island layout keeps the monthly calendar, check-in and real study time', async () => {
   const dataDir = mkdtempSync(join(tmpdir(), 'study-calendar-e2e-'));
   const { ELECTRON_RUN_AS_NODE: _ignored, ...taskEnv } = process.env;
   let application: ElectronApplication | undefined;
@@ -20,19 +20,41 @@ test('monthly calendar, persistent check-in and real study time in a 4:5 layout'
     const title = `${now.getFullYear()}年${now.getMonth() + 1}月学习日历`;
     await expect(page.getByRole('table', { name: title })).toBeVisible();
     await expect(page.getByTestId('study-duration')).toHaveText('00:00:00');
+    await expect
+      .poll(() =>
+        page
+          .locator('.plant-illustration')
+          .evaluate((image: HTMLImageElement) => image.naturalWidth),
+      )
+      .toBeGreaterThan(0);
     await page.getByRole('button', { name: '上个月', exact: true }).click();
     await expect(page.getByRole('table')).not.toHaveAccessibleName(title);
     await page.getByRole('button', { name: '本月', exact: true }).click();
     await expect(page.getByRole('table', { name: title })).toBeVisible();
-    const ratios = await page.evaluate(() => {
-      return ['.home-columns', '.daily-actions'].map((selector) => {
-        const children = document.querySelector(selector)!.children;
-        return (
-          children[0].getBoundingClientRect().width / children[1].getBoundingClientRect().width
-        );
-      });
+    const layout = await page.evaluate(() => {
+      const columns = document.querySelector('.home-columns')!.children;
+      const left = columns[0].getBoundingClientRect();
+      const right = columns[1].getBoundingClientRect();
+      const calendar = document.querySelector('.calendar-panel')!.getBoundingClientRect();
+      const timer = document.querySelector('.study-time-panel')!.getBoundingClientRect();
+      return {
+        leftWidth: left.width,
+        rightWidth: right.width,
+        calendarBottom: calendar.bottom,
+        calendarLeft: calendar.left,
+        calendarWidth: calendar.width,
+        timerTop: timer.top,
+        timerLeft: timer.left,
+        timerWidth: timer.width,
+      };
     });
-    for (const ratio of ratios) expect(ratio).toBeCloseTo(4 / 5, 2);
+    expect(layout.leftWidth).toBeGreaterThan(layout.rightWidth);
+    expect(layout.timerTop).toBeGreaterThan(layout.calendarBottom);
+    expect(layout.timerLeft).toBeCloseTo(layout.calendarLeft, 1);
+    expect(layout.timerWidth).toBeCloseTo(layout.calendarWidth, 1);
+    await expect(
+      page.locator('.calendar-panel').getByRole('button', { name: '今日签到', exact: true }),
+    ).toBeVisible();
     await page.getByRole('button', { name: '今日签到', exact: true }).click();
     await expect(page.getByRole('button', { name: '今日已签到', exact: true })).toBeDisabled();
     await expect(page.locator('.calendar-day[aria-current="date"]')).toHaveClass(/is-signed/);
@@ -56,6 +78,19 @@ test('monthly calendar, persistent check-in and real study time in a 4:5 layout'
     expect(
       await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth),
     ).toBe(true);
+    const minimumLayout = await page.evaluate(() => {
+      const columns = document.querySelector('.home-columns')!.children;
+      const calendar = document.querySelector('.calendar-panel')!.getBoundingClientRect();
+      const timer = document.querySelector('.study-time-panel')!.getBoundingClientRect();
+      return {
+        leftWidth: columns[0].getBoundingClientRect().width,
+        rightWidth: columns[1].getBoundingClientRect().width,
+        calendarBottom: calendar.bottom,
+        timerTop: timer.top,
+      };
+    });
+    expect(minimumLayout.leftWidth).toBeGreaterThan(minimumLayout.rightWidth);
+    expect(minimumLayout.timerTop).toBeGreaterThan(minimumLayout.calendarBottom);
     await page
       .locator('.daily-section')
       .screenshot({ path: 'artifacts/calendar-minimum-width.png' });

@@ -1,0 +1,107 @@
+{
+  "$schema": "../handoff.schema.json",
+  "schemaVersion": 1,
+  "id": "shizhi.paper-room.v1",
+  "name": "纸间 / Paper Room",
+  "createdOn": "2026-10-17",
+  "status": "concept",
+  "runtime": "static-html",
+  "sampleDataOnly": true,
+  "entry": "index.html",
+  "preview": "../previews/01-paper-home.png",
+  "readerPreview": "../previews/01-paper-reader.png",
+  "handoff": "HANDOFF.md",
+  "sourceFiles": ["index.html", "../shared/demo.css", "../shared/demo.js"],
+  "intent": {
+    "audience": "以长时间阅读和反复核对资料为主的个人学习者",
+    "tone": "安静、温暖、编辑式、有纸张的秩序感",
+    "memorableDetail": "宋体类标题、微斜书封、十月拾柒的日期印记；用分隔线而非重复卡片建立层级"
+  },
+  "references": [
+    {
+      "title": "Readwise Reader",
+      "url": "https://readwise.io/read",
+      "appliedTo": "阅读优先、资料列表和从原文继续的路径；纸张配色与日期印记为原创"
+    }
+  ],
+  "tokens": {
+    "colors": {
+      "--bg": "#f7f5ef",
+      "--surface": "#fdfbf7",
+      "--sidebar": "#eeece4",
+      "--ink": "#343a31",
+      "--muted": "#72766b",
+      "--line": "#dfdfd4",
+      "--accent": "#53674b",
+      "--accent-ink": "#fffdf4",
+      "--tint": "#e9eddf",
+      "paperCard": "#ebeade",
+      "marginNote": "#b6a785"
+    },
+    "typography": {
+      "body": "Segoe UI / Microsoft YaHei UI / Microsoft YaHei / sans-serif",
+      "heading": "Noto Serif SC / Source Han Serif SC / Songti SC / SimSun / serif",
+      "readingBodyPx": 14,
+      "note": "标题在 1440px 下约 40px；数据与辅助英文保留无衬线。所有字体均使用本机回退，未打包字体。"
+    },
+    "spacingPx": [8, 12, 16, 24, 28, 37, 40],
+    "radiusPx": [2, 5, 7, 16]
+  },
+  "layout": {
+    "navigation": "204px 固定侧栏，品牌、搜索、三个主入口、学习主题、底部个人入口",
+    "home": "标题 + 日期印记；下方主阅读区与 224px 周历/计时栏；开放式资料列表",
+    "library": "搜索与格式筛选；宽屏三列书封卡片",
+    "reader": "目录 + 纸面正文；宽屏附加 292px 可收起示例助手；900px 下按需侧浮层",
+    "breakpoints": [
+      ">=1600px 增加留白与书封尺寸",
+      "<1240px 助手改为浮层",
+      "900x640 保持可滚动桌面布局",
+      "<760px 侧栏仅保留图标，首页单列",
+      "<=430px 资料库单列"
+    ]
+  },
+  "interactions": {
+    "workingDemo": [
+      "切页与三套风格互链",
+      "资料搜索/格式/主题筛选",
+      "第一份资料阅读和目录定位",
+      "护眼底色",
+      "示例引用定位",
+      "签到与手动计时，刷新重置",
+      "助手展开/收起、问答提交范围提示",
+      "/ 搜索快捷键"
+    ],
+    "placeholder": [
+      "添加资料弹窗",
+      "个人设置弹窗",
+      "另外两份资料的阅读入口",
+      "示例回答，无模型调用"
+    ],
+    "futureConcept": ["阅读与助手同屏、引用高亮的视觉提议，尚未接入正式软件"]
+  },
+  "productIntegration": [
+    { "file": "src/App.tsx", "role": "侧栏、面包屑、页面框架；保留启动和切页逻辑" },
+    { "file": "src/components/RecentReadings.tsx", "role": "真实最近阅读替换示例书封与阅读进度" },
+    {
+      "file": "src/components/StudyCalendar.tsx",
+      "role": "周历视觉借鉴；保留真实月历、签到与计时语义"
+    },
+    {
+      "file": "src/components/ReadingPage.tsx",
+      "role": "排版和目录布局；PDF 正式接入仍保留 PDF.js 原页"
+    },
+    {
+      "file": "src/components/ChatPage.tsx",
+      "role": "助手外观；保留远程确认、停止、revision 与检索预览"
+    },
+    { "file": "src/styles.css", "role": "选定方向后迁移视觉 token，不复制示例数据或整份静态 HTML" }
+  ],
+  "validationReport": "../VALIDATION.md",
+  "limitations": [
+    "非正式主题；不读取/保存应用数据",
+    "阅读正文为原创合成 HTML，不是 PDF 渲染",
+    "微小辅助文字仍需正式开发时按缩放和对比度细化",
+    "系统宋体类字体在不同设备会有差异",
+    "未验证 Electron 或模型"
+  ]
+}

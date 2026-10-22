@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Neo-Brutalism CSS 本地组件参考 · 拾知</title>
+    <link rel="stylesheet" href="assets/neo-brutalism-css/styles/main.css" />
+    <link rel="stylesheet" href="assets/showcase.css" />
+    <script src="assets/showcase.js" defer></script>
+  </head>
+  <body class="component-page neo-page">
+    <main class="component-shell">
+      <header class="reference-heading">
+        <a class="back-link" href="index.html">← 返回开源参考台</a>
+        <p class="eyebrow">NEO-BRUTALISM CSS / ORIGINAL CSS COMPONENTS</p>
+        <h1>有形状，也有主张。</h1>
+        <p class="lede">
+          原库的描边、硬阴影与彩色标签。蓝调设计借鉴这些材料，另行采用钴蓝与奶油黄。
+        </p>
+      </header>
+      <div class="component-layout">
+        <section aria-labelledby="neo-components">
+          <h2 id="neo-components">界面组件</h2>
+          <article class="neo-card">
+            <span class="neo-bubble">示例资料</span>
+            <h3>让阅读留在视线中央</h3>
+            <p>资料的标题、原文和来源需要容易辨认，工具只在需要时出现。</p>
+            <label class="reference-label" for="neo-search">筛选右侧阅读片段</label
+            ><input
+              class="reference-input"
+              id="neo-search"
+              type="search"
+              placeholder="试试输入：证据"
+              data-snippet-search
+            />
+            <div class="button-row">
+              <button class="neo-btn" type="button" data-bookmark aria-pressed="false">
+                收藏这个片段</button
+              ><button class="neo-btn neo-btn-secondary" type="button" data-clear-search>
+                清空筛选
+              </button>
+            </div>
+            <p class="action-status" data-action-status role="status">收藏只保留在当前页面。</p>
+          </article>
+          <details class="native-details">
+            <summary>为什么参考 Neo-Brutalism？</summary>
+            <p>
+              厚边框、偏移阴影和标签色块让按钮与卡片轮廓直接可辨。阅读正文仍需要克制。此页不加载上游示例的远程字体和占位图片。
+            </p>
+          </details>
+        </section>
+        <section class="reading-demo" aria-labelledby="neo-reading">
+          <div class="reading-heading">
+            <h2 id="neo-reading">阅读片段</h2>
+            <span class="neo-bubble">示例内容</span>
+          </div>
+          <article class="snippet" data-snippet>
+            <p class="source-line">01 / 阅读与注意力</p>
+            <h3>好的界面知道何时退后。</h3>
+            <p>阅读时，留白不是空缺。它帮助眼睛辨认段落，也给理解留下停顿。</p>
+            <blockquote>先让内容可读，再让工具可见。</blockquote>
+          </article>
+          <article class="snippet" data-snippet>
+            <p class="source-line">02 / 检索与证据</p>
+            <h3>回答需要可以回到的来源。</h3>
+            <p>找到证据之后，再组织回答。保留原文和位置，才能继续求证。</p>
+          </article>
+          <p data-search-empty hidden>没有匹配的示例片段。</p>
+        </section>
+      </div>
+      <footer class="reference-footer">
+        <p>
+          <a href="https://github.com/quak-smauga/Neo-brutalism-CSS">Neo-Brutalism CSS 源码 ↗</a> ·
+          <a href="assets/neo-brutalism-css/LICENSE">MIT 许可证</a>
+        </p>
+        <p>静态 CSS 参考；不代表原项目完整应用已部署。</p>
+      </footer>
+    </main>
+  </body>
+</html>

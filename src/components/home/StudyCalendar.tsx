@@ -8,6 +8,7 @@ import {
   LoaderCircle,
   Pause,
   Play,
+  Sun,
 } from 'lucide-react';
 import { adjacentMonth, localDayKey, monthDays } from '../../lib/calendar';
 import { desktop, errorMessage, isDesktop } from '../../lib/desktop';
@@ -189,10 +190,11 @@ export function StudyCalendar({
           </span>
           <span className="month-check-ins">本月已签到 {overview ? signed.size : '—'} 天</span>
         </div>
-      </div>
-      <div className="daily-actions">
         <div className="check-in-panel">
-          <span className="daily-label">每日签到</span>
+          <span className="check-in-copy">
+            <span className="daily-label">每日签到</span>
+            <span className="daily-hint">给今天留个脚印</span>
+          </span>
           <button
             type="button"
             className={`check-in-button ${overview?.today.checkedIn ? 'checked-in' : ''}`}
@@ -202,33 +204,32 @@ export function StudyCalendar({
             {busy ? <LoaderCircle size={17} className="spin" /> : <Check size={17} />}
             {overview?.today.checkedIn ? '今日已签到' : '今日签到'}
           </button>
-          <span className="daily-hint">每天留下一点进步</span>
         </div>
-        <div className="study-time-panel" aria-label="今日学习时间">
-          <span className="daily-label">
-            今日学习时间
-            {overview?.running && <span className="timer-running" aria-label="计时中" />}
-          </span>
-          <strong className="study-duration" data-testid="study-duration">
-            {overview
-              ? duration(overview.today.studySeconds)
-              : isDesktop
-                ? '— — : — —'
-                : '00:00:00'}
-          </strong>
-          <div className="study-time-controls">
-            <span className="daily-hint">目标 {dailyGoalMinutes} 分钟</span>
-            <button
-              type="button"
-              className="text-button"
-              disabled={!overview || busy}
-              onClick={() => void action('timer')}
-            >
-              {overview?.running ? <Pause size={12} /> : <Play size={12} />}
-              {overview?.running ? '暂停计时' : '开始学习'}
-            </button>
-          </div>
+      </div>
+      <div className="study-time-panel" aria-label="今日学习时间">
+        <span className="daily-label">
+          <Sun size={18} aria-hidden="true" />
+          今日学习时间
+          {overview?.running && <span className="timer-running" aria-label="计时中" />}
+        </span>
+        <strong className="study-duration" data-testid="study-duration">
+          {overview ? duration(overview.today.studySeconds) : isDesktop ? '— — : — —' : '00:00:00'}
+        </strong>
+        <span className="daily-hint">给眼前的这一页，一点完整的时间。</span>
+        <div className="study-time-controls">
+          <button
+            type="button"
+            className="study-timer-button"
+            disabled={!overview || busy}
+            onClick={() => void action('timer')}
+          >
+            {overview?.running ? <Pause size={15} /> : <Play size={15} />}
+            {overview?.running ? '暂停计时' : '开始学习'}
+          </button>
         </div>
+        <span className="daily-hint study-time-goal">
+          每日目标 {dailyGoalMinutes} 分钟 · 累计计时
+        </span>
       </div>
       {error && (
         <div className="study-error" role="alert">
