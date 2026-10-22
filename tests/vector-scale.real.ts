@@ -310,7 +310,7 @@ test('real CPU vectors scale to 300 synthetic sources with persistent reuse and 
         };
       });
       const page = await app.firstWindow();
-      await expect(page.getByRole('heading', { name: '开始今天的小进步' })).toBeVisible();
+      await expect(page.getByRole('heading', { name: /今天，也长出\s*一点新想法/ })).toBeVisible();
       return { app, page };
     };
     let running = await launch();

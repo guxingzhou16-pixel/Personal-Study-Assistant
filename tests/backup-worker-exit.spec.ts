@@ -31,7 +31,7 @@ test('reports a real utility process crash before its result as failure', async 
   });
   try {
     const page = await app.firstWindow();
-    await expect(page.getByRole('heading', { name: '开始今天的小进步' })).toBeVisible();
+    await expect(page.getByRole('heading', { name: /今天，也长出\s*一点新想法/ })).toBeVisible();
     const actual = await app.evaluate(
       async ({ utilityProcess }, { runnerPath, workerPath }) => {
         const { BackupRunner } = process.getBuiltinModule('module').createRequire(runnerPath)(

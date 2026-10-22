@@ -77,7 +77,9 @@ async function launch(): Promise<Page> {
   const { ELECTRON_RUN_AS_NODE: _ignored, ...env } = process.env;
   app = await electron.launch({ args: ['.'], env: { ...env, STUDY_COMPANION_DATA_DIR: root } });
   const page = await app.firstWindow();
-  await expect(page.getByRole('heading', { name: '开始今天的小进步', exact: true })).toBeVisible();
+  await expect(
+    page.getByRole('heading', { name: /今天，也长出\s*一点新想法/, exact: true }),
+  ).toBeVisible();
   return page;
 }
 

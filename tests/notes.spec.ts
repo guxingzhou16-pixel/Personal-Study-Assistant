@@ -80,7 +80,7 @@ test('migrates a v4 desktop database and restores saved notes, old evidence and 
   page.on('request', (request) => {
     if (/^https?:/.test(request.url())) networkRequests.push(request.url());
   });
-  await expect(page.getByRole('heading', { name: '迁移验收，开始今天的小进步' })).toBeVisible();
+  await expect(page.getByText('迁移验收，欢迎回来。', { exact: true })).toBeVisible();
   await page.getByRole('button', { name: '今日签到', exact: true }).click();
   const activity = await page.evaluate(() => {
     const now = new Date();

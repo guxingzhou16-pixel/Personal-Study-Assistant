@@ -46,7 +46,7 @@ test('a new user imports the public example, checks each capability and complete
     await expect(page.getByText(/未通过实际嵌入推理/)).toBeVisible();
     await page.getByRole('button', { name: '学习首页', exact: true }).click();
     await page.getByText('第一次使用：用一份示例开始学习', { exact: true }).click();
-    await page.getByRole('button', { name: '导入学习示例', exact: true }).click();
+    await page.getByRole('button', { name: '核对／重新导入示例', exact: true }).click();
     await page.getByRole('button', { name: '用示例准备第一次提问', exact: true }).click();
     await expect(page.getByRole('textbox', { name: '输入学习问题' })).toHaveValue(
       '为什么需要用自己的话复述，并核对原文？',

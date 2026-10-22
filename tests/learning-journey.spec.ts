@@ -38,7 +38,7 @@ test('connects import, reading, cited question, note, feedback, route, confirmed
     const { ELECTRON_RUN_AS_NODE: _ignored, ...env } = process.env;
     app = await electron.launch({ args: ['.'], env: { ...env, STUDY_COMPANION_DATA_DIR: data } });
     const page = await app.firstWindow();
-    await expect(page.getByRole('heading', { name: /开始今天的小进步/ })).toBeVisible();
+    await expect(page.getByRole('heading', { name: /今天，也长出\s*一点新想法/ })).toBeVisible();
     return page;
   }
   async function nav(page: Page, name: string) {
@@ -85,13 +85,17 @@ test('connects import, reading, cited question, note, feedback, route, confirmed
     }, endpoint);
     await page.reload();
     await page.evaluate(() => {
-      const label = document.querySelector('.topbar > div > span')!;
-      const pages = [label.textContent!];
+      const header = document.querySelector('.app-header')!;
+      const currentPage = () => {
+        const button = header.querySelector('[aria-current="page"]');
+        return button?.getAttribute('aria-label') ?? button?.textContent?.trim() ?? '';
+      };
+      const pages = [currentPage()];
       (window as unknown as { journeyPages: string[] }).journeyPages = pages;
       new MutationObserver(() => {
-        const name = label.textContent!;
+        const name = currentPage();
         if (name !== pages.at(-1)) pages.push(name);
-      }).observe(label, { childList: true, subtree: true, characterData: true });
+      }).observe(header, { attributes: true, subtree: true, attributeFilter: ['aria-current'] });
     });
     await choose(original);
     await nav(page, '资料库');

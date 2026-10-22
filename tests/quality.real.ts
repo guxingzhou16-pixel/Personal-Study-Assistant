@@ -94,7 +94,7 @@ test('audits real local Ollama generation on synthetic evidence without any paid
     expect(await app.evaluate(({ app }) => app.isPackaged)).toBe(false);
     expect(await app.evaluate(({ app }) => app.getPath('userData'))).toBe(root);
     const page = await app.firstWindow();
-    await expect(page.getByRole('heading', { name: '开始今天的小进步' })).toBeVisible();
+    await expect(page.getByRole('heading', { name: /今天，也长出\s*一点新想法/ })).toBeVisible();
     for (const kind of ['rag', 'feedback', 'route', 'cards', 'quiz', 'empty'] as const) {
       const start = Date.now();
       const prepared = await page.evaluate(
@@ -248,7 +248,7 @@ test('audits ordinary chat in each response style and an actually retrieved prom
     expect(await app.evaluate(({ app }) => app.isPackaged)).toBe(false);
     expect(await app.evaluate(({ app }) => app.getPath('userData'))).toBe(root);
     const page = await app.firstWindow();
-    await expect(page.getByRole('heading', { name: '开始今天的小进步' })).toBeVisible();
+    await expect(page.getByRole('heading', { name: /今天，也长出\s*一点新想法/ })).toBeVisible();
     for (const style of ['gentle', 'game', 'coach', 'injection'] as const) {
       const start = Date.now();
       const prepared = await page.evaluate(

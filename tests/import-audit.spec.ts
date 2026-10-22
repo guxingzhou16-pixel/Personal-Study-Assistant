@@ -21,7 +21,7 @@ test('records the actual independent parser report for generated Markdown, text 
   });
   try {
     const page = await app.firstWindow();
-    await expect(page.getByRole('heading', { name: '开始今天的小进步' })).toBeVisible();
+    await expect(page.getByRole('heading', { name: /今天，也长出\s*一点新想法/ })).toBeVisible();
     await app.evaluate(
       ({ dialog }, paths) => {
         dialog.showOpenDialog = async () => ({ canceled: false, filePaths: paths });

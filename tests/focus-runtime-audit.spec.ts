@@ -17,7 +17,7 @@ async function launch(root: string) {
 }
 async function task(app: ElectronApplication) {
   const page = await app.firstWindow();
-  await expect(page.getByRole('heading', { name: '开始今天的小进步' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: /今天，也长出\s*一点新想法/ })).toBeVisible();
   const saved = await page.evaluate(() =>
     window.studyCompanion!.saveDailyTask({
       id: null,
@@ -119,7 +119,7 @@ test('interrupts on renderer reload, clean exit, force kill, injected suspend an
       )
       .toBeGreaterThan(1000);
     await page.reload();
-    await expect(page.getByRole('heading', { name: '开始今天的小进步' })).toBeVisible();
+    await expect(page.getByRole('heading', { name: /今天，也长出\s*一点新想法/ })).toBeVisible();
     let ended = (await page.evaluate(() => window.studyCompanion!.focusOverview())).recent[0];
     expect(ended.reason).toBe('renderer-reload');
     expect(ended.status).toBe('interrupted');
@@ -128,7 +128,7 @@ test('interrupts on renderer reload, clean exit, force kill, injected suspend an
     await app.close();
     app = await launch(root);
     page = await app.firstWindow();
-    await expect(page.getByRole('heading', { name: '开始今天的小进步' })).toBeVisible();
+    await expect(page.getByRole('heading', { name: /今天，也长出\s*一点新想法/ })).toBeVisible();
     ended = (await page.evaluate(() => window.studyCompanion!.focusOverview())).recent[0];
     expect(ended.reason).toBe('app-exit');
     results.push({ cause: 'actual normal exit and restart', ended });
@@ -149,7 +149,7 @@ test('interrupts on renderer reload, clean exit, force kill, injected suspend an
     await app.close().catch(() => {});
     app = await launch(root);
     page = await app.firstWindow();
-    await expect(page.getByRole('heading', { name: '开始今天的小进步' })).toBeVisible();
+    await expect(page.getByRole('heading', { name: /今天，也长出\s*一点新想法/ })).toBeVisible();
     ended = (await page.evaluate(() => window.studyCompanion!.focusOverview())).recent[0];
     expect(ended.reason).toBe('app-restart');
     expect(ended.status).toBe('interrupted');

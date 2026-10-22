@@ -22,7 +22,7 @@ test('records actual theme, keyboard, native window, zoom and visible text contr
   const records: unknown[] = [];
   try {
     const page = await app.firstWindow();
-    await expect(page.getByRole('heading', { name: '开始今天的小进步' })).toBeVisible();
+    await expect(page.getByRole('heading', { name: /今天，也长出\s*一点新想法/ })).toBeVisible();
     const themes = [
       ['modern', '清爽现代'],
       ['study', '安静书房'],
@@ -142,16 +142,16 @@ test('records actual theme, keyboard, native window, zoom and visible text contr
               low: contrast < threshold,
             });
           }
-          const settings = Array.from(
-            document.querySelectorAll<HTMLButtonElement>('.sidebar button'),
-          ).find((b) => b.textContent?.trim() === '设置')!;
+          const settings = document.querySelector<HTMLButtonElement>(
+            '.app-header [aria-label="设置"]',
+          )!;
           const rect = settings.getBoundingClientRect();
-          const side = document.querySelector('.sidebar')!;
+          const side = document.querySelector('.app-nav')!;
           return {
             viewport: { width: innerWidth, height: innerHeight },
             horizontalOverflow: document.documentElement.scrollWidth - innerWidth,
             settingsRect: { top: rect.top, bottom: rect.bottom },
-            sidebarOverflow: {
+            navigationOverflow: {
               scrollHeight: side.scrollHeight,
               clientHeight: side.clientHeight,
               overflowY: getComputedStyle(side).overflowY,
@@ -214,23 +214,21 @@ test('settings navigation stays visible and usable at the declared native minimu
   });
   try {
     const page = await app.firstWindow();
-    await expect(page.getByRole('heading', { name: '开始今天的小进步' })).toBeVisible();
+    await expect(page.getByRole('heading', { name: /今天，也长出\s*一点新想法/ })).toBeVisible();
     await app.evaluate(({ BrowserWindow }) =>
       BrowserWindow.getAllWindows()[0].setContentSize(900, 640),
     );
     const button = page.getByRole('button', { name: '设置', exact: true });
     await button.focus();
     const evidence = await page.evaluate(() => {
-      const b = Array.from(document.querySelectorAll('.sidebar button')).find(
-        (b) => b.textContent?.trim() === '设置',
-      )!;
+      const b = document.querySelector('.app-header [aria-label="设置"]')!;
       const r = b.getBoundingClientRect();
       return {
         width: innerWidth,
         height: innerHeight,
         top: r.top,
         bottom: r.bottom,
-        sidebarScrollHeight: document.querySelector('.sidebar')!.scrollHeight,
+        navigationScrollHeight: document.querySelector('.app-nav')!.scrollHeight,
       };
     });
     writeFileSync(
@@ -254,7 +252,7 @@ test('modern theme keeps the learning goal unit readable at normal text contrast
   });
   try {
     const page = await app.firstWindow();
-    await expect(page.getByRole('heading', { name: '开始今天的小进步' })).toBeVisible();
+    await expect(page.getByRole('heading', { name: /今天，也长出\s*一点新想法/ })).toBeVisible();
     await page.getByRole('button', { name: '设置', exact: true }).click();
     const evidence = await page
       .locator('.label-detail')
@@ -305,7 +303,7 @@ test('all navigation remains keyboard and mouse accessible across themes and 100
   });
   try {
     const page = await app.firstWindow();
-    await expect(page.getByRole('heading', { name: '开始今天的小进步' })).toBeVisible();
+    await expect(page.getByRole('heading', { name: /今天，也长出\s*一点新想法/ })).toBeVisible();
     for (const theme of ['modern', 'study', 'playful'] as const) {
       await page.evaluate(async (theme) => {
         const { settings } = await window.studyCompanion!.bootstrap();

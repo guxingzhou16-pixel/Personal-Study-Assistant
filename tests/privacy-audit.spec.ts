@@ -99,7 +99,7 @@ test('enforces remote memory scope, current preview consent and one request agai
   const outcomes: unknown[] = [];
   try {
     const page = await app.firstWindow();
-    await expect(page.getByRole('heading', { name: /开始今天的小进步/ })).toBeVisible();
+    await expect(page.getByRole('heading', { name: /今天，也长出\s*一点新想法/ })).toBeVisible();
     // Only this test process maps the fake HTTPS provider to a loopback protocol server.
     // This verifies application privacy gates and real SSE handling, not TLS or a cloud service.
     await app.evaluate(

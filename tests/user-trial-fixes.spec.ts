@@ -146,11 +146,11 @@ test('home scrolling stays in the content pane at normal and minimum window size
       await expect
         .poll(() => page.evaluate(() => document.documentElement.scrollHeight - window.innerHeight))
         .toBeLessThanOrEqual(1);
-      const before = await page.locator('.topbar').boundingBox();
+      const before = await page.locator('.app-header').boundingBox();
       await page.locator('main').evaluate((element) => {
         element.scrollTop = 600;
       });
-      expect(await page.locator('.topbar').boundingBox()).toEqual(before);
+      expect(await page.locator('.app-header').boundingBox()).toEqual(before);
       expect(await page.evaluate(() => window.scrollY)).toBe(0);
       if (size[0] === 900)
         await page.screenshot({ path: test.info().outputPath('home-minimum-single-scroll.png') });

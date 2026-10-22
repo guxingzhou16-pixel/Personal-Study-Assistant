@@ -58,7 +58,7 @@ test('runs feedback, route, explicit memory/task proposals and route deletion th
   });
   try {
     const page = await app.firstWindow();
-    await expect(page.getByRole('heading', { name: '开始今天的小进步' })).toBeVisible();
+    await expect(page.getByRole('heading', { name: /今天，也长出\s*一点新想法/ })).toBeVisible();
     await page.getByRole('button', { name: '学习笔记', exact: true }).click();
     await page
       .getByRole('complementary', { name: '笔记列表' })
@@ -228,7 +228,7 @@ test('renders strict three cards and quizzes, keeps personal answers out of stor
   });
   try {
     const page = await app.firstWindow();
-    await expect(page.getByRole('heading', { name: '开始今天的小进步' })).toBeVisible();
+    await expect(page.getByRole('heading', { name: /今天，也长出\s*一点新想法/ })).toBeVisible();
     const conversation = await page.evaluate(() => window.studyCompanion!.createConversation());
     for (const kind of ['cards', 'quiz'] as const) {
       await page.evaluate(

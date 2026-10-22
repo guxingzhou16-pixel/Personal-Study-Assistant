@@ -116,7 +116,7 @@ for (const kind of ['feedback-regression', 'injection-regression', 'hybrid-gener
       expect(await app.evaluate(({ app }) => app.isPackaged)).toBe(false);
       expect(await app.evaluate(({ app }) => app.getPath('userData'))).toBe(root);
       const page = await app.firstWindow();
-      await expect(page.getByRole('heading', { name: '开始今天的小进步' })).toBeVisible();
+      await expect(page.getByRole('heading', { name: /今天，也长出\s*一点新想法/ })).toBeVisible();
       const prepared = await page.evaluate(
         async ({ kind, sourceId, note, signature }) => {
           const api = window.studyCompanion!;

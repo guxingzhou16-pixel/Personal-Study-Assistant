@@ -24,7 +24,7 @@ test('explicit health probes run actual localhost generation and pinned CPU infe
   });
   try {
     const page = await app.firstWindow();
-    await expect(page.getByRole('heading', { name: '开始今天的小进步' })).toBeVisible();
+    await expect(page.getByRole('heading', { name: /今天，也长出\s*一点新想法/ })).toBeVisible();
     const result = await page.evaluate(async () => {
       const api = window.studyCompanion!;
       const generation = await api.probeGeneration('ollama|http://127.0.0.1:11434|qwen3.5:9b');

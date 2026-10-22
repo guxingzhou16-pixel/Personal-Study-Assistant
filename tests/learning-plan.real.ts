@@ -59,7 +59,7 @@ test('one real local structured route keeps exact evidence and original output f
   });
   try {
     const page = await app.firstWindow();
-    await expect(page.getByRole('heading', { name: '开始今天的小进步' })).toBeVisible();
+    await expect(page.getByRole('heading', { name: /今天，也长出\s*一点新想法/ })).toBeVisible();
     const preview = await page.evaluate(
       (sourceId) =>
         window.studyCompanion!.prepareLearningDraft({

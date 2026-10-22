@@ -22,7 +22,9 @@ test('navigation indicator follows the selected button when all learning entries
     await page.setViewportSize({ width: 900, height: 640 });
     await page.emulateMedia({ reducedMotion: 'reduce' });
     await page.getByRole('button', { name: '学习助手', exact: true }).click();
-    await expect(page.getByRole('heading', { name: '从一个具体的问题开始' })).toBeInViewport({ ratio: 1 });
+    await expect(page.getByRole('heading', { name: '从一个具体的问题开始' })).toBeInViewport({
+      ratio: 1,
+    });
     await expect(page.getByRole('textbox', { name: '输入学习问题' })).toBeInViewport({ ratio: 1 });
     await page.getByRole('button', { name: '学习计划', exact: true }).click();
     await expect
