@@ -104,7 +104,9 @@ var SunnyMotion = (() => {
       const previous = indicator.getBoundingClientRect();
       cancel(indicator);
       indicator.style.left = `${selected.offsetLeft}px`;
+      indicator.style.top = `${selected.offsetTop}px`;
       indicator.style.width = `${selected.offsetWidth}px`;
+      indicator.style.height = `${selected.offsetHeight}px`;
       indicator.style.opacity = "1";
       const next = indicator.getBoundingClientRect();
       if (positioned && next.width > 0) {
@@ -112,7 +114,7 @@ var SunnyMotion = (() => {
           indicator,
           [
             {
-              transform: `translateX(${previous.left - next.left}px) scaleX(${previous.width / next.width})`
+              transform: `translate(${previous.left - next.left}px, ${previous.top - next.top}px) scaleX(${previous.width / next.width})`
             },
             { transform: "none" }
           ],

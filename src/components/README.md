@@ -14,12 +14,16 @@
 | `planning/` | 项目与任务编辑                     |
 | `focus/`    | 专注、历史与复盘                   |
 | `reviews/`  | 保存作答与轻量复习                 |
-| `settings/` | 偏好、模型配置和能力检查           |
+| `settings/` | 偏好、模型配置、能力检查和软件更新 |
 | `backup/`   | 备份与恢复界面                     |
 | `shared/`   | 多个功能共同使用的展示组件         |
 
 入口由 `src/App.tsx` 直接引用，不添加只为转发的 barrel 文件。专用 CSS 与组件同目录；基础和未拆出的既有样式仍在 `src/styles.css`，主题在 `src/themes.css`。
 
 分组不改变组件挂载策略和状态生命周期。跨功能复用可以直接引用已有组件，例如笔记和路线使用 `chat/ModelAnswer`；不要为目录整齐复制一份实现。
+
+`settings/AppUpdatesPanel.tsx` 与同目录 CSS 展示当前版本、发布说明及手动升级入口，所有联网和浏览器目标由主进程核对，说明保持纯文本。更新相关契约位于 `src/lib/types.ts`，不要在组件中添加任意 URL 打开或安装程序执行能力。
+
+晴岛动效共享 `src/lib/motion.ts` 与 `src/styles/motion.css`，通过 `data-motion` 声明语义状态，保留当前学习功能、隐藏页面草稿、异步导航及 PDF 文字层。持续计时、进度和流式文本不能作为重复播放触发器；遵守减少动态效果设置。`design-lab/` 仅为离线示例，不导入其演示脚本／样式，不将示例数据写入正式界面。
 
 完整调用关系见[前端地图](../../docs/CODEMAPS/frontend.md)。

@@ -41,11 +41,11 @@
 
 ## 3. 当前状态与接手入口
 
-本节核对日期：**2026-10-21**。当前软件为 Electron 桌面应用，首版 0.1.1 未签名预览已交付；发布对象与证据见 [最终交付回执](docs/testing/github-preview-release-2026-10-15.md)。维护工作区包含后续未提交修复，未更新发行附件，先检查 Git 状态再判断当前版本。
+本节核对日期：**2026-10-22**。当前软件为 Electron 桌面应用，首版 0.1.1 未签名预览已交付；发布对象与证据见 [最终交付回执](docs/testing/github-preview-release-2026-10-15.md)。后续修复、目录整理、晴岛界面／动效与设置更新入口已整合，未更新发行附件，先检查 Git 状态再判断当前版本。最新范围与验证见[更新与分支整合交接](docs/testing/updates-integration-2026-10-22.md)。
 
 - 当前数据：主库 v13、活动库 v1、派生索引 v2；备份 format 1 支持真实 12/1 和 13/1。
 - 日常阅读：根目录 README → [文档索引](docs/README.md) → [架构地图](docs/CODEMAPS/architecture.md)。
-- 最新源码交接：[全局审查修复](docs/testing/full-code-review-fixes-2026-10-16.md)、[试用反馈优化](docs/testing/user-trial-fixes-2026-10-16.md)。自检记录不等于当前改动已经独立验收。
+- 历史源码交接：[全局审查修复](docs/testing/full-code-review-fixes-2026-10-16.md)、[试用反馈优化](docs/testing/user-trial-fixes-2026-10-16.md)。当前独立审查及实际回归按最新整合报告解释，不借历史成绩覆盖未验证范围。
 - 原 3.1～3.44 和完整接手快照保留在 [2026-10-21 归档](docs/archive/AGENTS-history-2026-10-21.md)。旧 pending、包、测试次数和授权均按原日期／对象解释，不覆盖本轮明确要求。
 
 ## 4. 产品范围与功能要求
@@ -73,7 +73,7 @@
 
 ### 4.3 学习 Agent、笔记和记忆
 
-新生成的路线learning_request.format为steps-v1（旧JSON无该字段仍读旧Markdown）；ChatService完成前共用learning-plan严格校验2～8步、行动/预期作品/实际引用及总预算，失败status=error且保留原答，不改写/重试/建任务。用户编辑只在窗口保留，所选确认内容进入任务。多步骤复用TaskProposalService同一UUID缓存与PlanningStorage事务，一次确认只收ID，事务内复核来源revision/status/用途及项目快照，整批成功才消费ID，失败回滚、取消零写入。新增prepareTaskBatch/confirmTaskBatch，discard沿用原接口；当前桥接90方法/84请求/6事件。多行JSON编号用结构校验，不能用普通Markdown的编号缺失判断；文字未知编号仍拒绝，编号有效不证明支持关系。
+新生成的路线learning_request.format为steps-v1（旧JSON无该字段仍读旧Markdown）；ChatService完成前共用learning-plan严格校验2～8步、行动/预期作品/实际引用及总预算，失败status=error且保留原答，不改写/重试/建任务。用户编辑只在窗口保留，所选确认内容进入任务。多步骤复用TaskProposalService同一UUID缓存与PlanningStorage事务，一次确认只收ID，事务内复核来源revision/status/用途及项目快照，整批成功才消费ID，失败回滚、取消零写入。新增prepareTaskBatch/confirmTaskBatch，discard沿用原接口；当前桥接93方法/87请求/6事件。多行JSON编号用结构校验，不能用普通Markdown的编号缺失判断；文字未知编号仍拒绝，编号有效不证明支持关系。
 
 - Agent 是有边界的步骤流程，不是无限循环、自行执行任意系统操作的通用助手。
 - 工具范围为资料检索、学习步骤草稿、笔记反馈、任务建议与记忆提议。
@@ -476,3 +476,14 @@ README 保存完整产品简介、运行说明、执行规划及“最近交付�
 - 改布局要核对900×640、真实长文本、所有导航入口、键盘focus/hidden和减少动画偏好，不以原6条UI成绩代替本轮合并验证。
 
 - 动效规范见`docs/design/SUNNY_MOTION.md`，正式入口`src/lib/motion.ts`与`src/styles/motion.css`；不得影响PDF坐标、实际操作、hidden/焦点及系统减少动画偏好。
+
+## 21. 软件更新与合并维护约定（2026-10-22）
+
+- 设置的`AppUpdatesPanel`调用`getAppVersion()`、`checkAppUpdate(force?: boolean)`及`openAppUpdate('latest' | 'history')`；三项均为固定IPC，继续验证主窗口／主frame、来源URL与备份busy。不能提供任意URL、下载安装器或系统命令入口。
+- `electron/core/app-updates.ts`仅匿名请求本项目GitHub发布API，最多30条含preview，15秒／512KiB上限，成功缓存5分钟并合并并发；只接收已上传且地址／版本匹配的Windows x64 NSIS附件。说明为有界纯文本，不渲染HTML或远程图片。
+- 版本按实际安装包应用版本比较，保留历史`v0.1.1-preview.1`对应`0.1.1`的兼容；开发同号不能宣称源码等于发行包。后续发布必须同时递增`package.json`／锁文件版本，匹配标签核心版本与`StudyCompanion-版本-win-x64-setup.exe`，不要只重命名标签模拟升级。
+- 新检查仍受备份busy入口保护；已经开始的纯发布元数据请求不计入学习文件操作锁，不阻塞本来空闲的备份。其他业务请求继续计数与互斥，不能借此放宽资料、模型、恢复或数据库操作。
+- 升级只在用户点击后打开主进程构造的官方发布页，手动保存／退出／安装。当前未签名发行说明保留；源码合入main不等于发布新安装包。
+- 旧Markdown兼容选区用同源AST范围及确切原始文本证明偏移，不使用全局`indexOf`猜位置；无法证明则拒绝。含图片／HTML的旧节保守停止兼容映射，直接原文匹配与持久段落不变。聊天问题与流片段写入前拒绝NUL，异常片段之前的正常内容仍可读回。
+- 合并保留当前九项学习导航、三主题、阅读侧栏与草稿；小窗口导航可换行，动效选中背景跟随实际按钮的横纵位置。空会话保持提示顶部，只有实际轮次才跟随输出到底。
+- 独立验收／修复历史分支若补丁已纳入，应在交接说明其对应关系；保留引用，不强行用旧快照覆盖当前源码来清空`--no-merged`列表。

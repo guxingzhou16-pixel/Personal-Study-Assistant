@@ -23,6 +23,22 @@ npx playwright test tests/reading-workspace.spec.ts
 
 `npm test -- --testTimeout=30000` 执行当前全部核心规格；`npm run test:e2e` 先构建再跑常规桌面套件，包含较耗时的真实专注场景，阶段验收或确有需要时使用。
 
+## 软件更新与动效检查清单
+
+按本次改动选择目标；本节列验证入口，不代表已经执行或通过：
+
+```powershell
+npm test -- electron/core/__tests__/app-updates.test.ts electron/core/__tests__/interface-wiring.test.ts
+npm run desktop:build
+npx playwright test tests/app-updates.spec.ts tests/desktop.spec.ts tests/motion.spec.ts
+```
+
+- `app-updates.test.ts`：实际安装包 SemVer、历史预览标签、本地开发同版本、草稿／缺少 x64 附件、恶意地址、响应限制／超时／HTTP 错误，以及成功缓存、并发和失败恢复。
+- `interface-wiring.test.ts`：93 个桥接方法对应 87 个固定请求和 6 个可移除事件，新增版本读取、检查和固定发布页打开三项。
+- `app-updates.spec.ts`：真实窗口中更新说明作为纯文本显示、固定升级目标、未知目标拒绝、失败重试、切页缓存与最小窗口可达性。主进程模拟 GitHub／浏览器调用，不下载或执行安装包。
+- `desktop.spec.ts`：保留导航、设置、系统加密与模型配置流程；只模拟固定官方更新接口，其他模型检测仍走原本的本机测试服务，避免更新联网错误干扰设置断言。
+- `motion.spec.ts`：普通／减少动态效果、换行导航选中位置、同页不重复入场、真实操作与阅读文字层；修改选文、引用或草稿时再选 `reading-workspace.spec.ts` 等对应流程，不以离线演示代替桌面验收。
+
 ## 独立门禁
 
 - `npm run test:embedding`：已有固定评测权重时执行真实 CPU 门禁。

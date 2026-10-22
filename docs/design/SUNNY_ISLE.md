@@ -6,6 +6,8 @@
 
 2026-10-21 同一晴岛基线增加全功能动效，详见[动效设计与维护规范](SUNNY_MOTION.md)及[实施交接](../handoffs/2026-10-21-sunny-motion.md)。本文件继续负责静态外观，动效扩展不改变配色或产品能力。
 
+2026-10-22 已与完整学习主线整合，当前保留九项真实导航、笔记／任务／复习／阅读侧栏与三主题；下表中的规划入口及旧截图仅描述2026-10-18对象，不代表当前能力范围。当前实现与验证见[整合交接](../testing/updates-integration-2026-10-22.md)。
+
 ## 正式窗口快照
 
 以下来自隔离测试数据目录的真实 Electron 窗口。首页保留真实空态；截图不代表软件预置学习资料或进度。后续视觉变更需同步更新这些快照与选定档案。
@@ -93,17 +95,17 @@
 
 ## 文件地图与更换方式
 
-| 文件                                                                           | 维护职责                                           |
-| ------------------------------------------------------------------------------ | -------------------------------------------------- |
-| [`src/styles/tokens.css`](../../src/styles/tokens.css)                         | 语义色、字体、圆角与内容上限                       |
-| [`src/styles.css`](../../src/styles.css)                                       | 全局壳、顶部导航、欢迎区、通用控件与各业务页面样式 |
-| [`src/styles/study-home.css`](../../src/styles/study-home.css)                 | 真实最近阅读、月历、签到、计时的首页样式           |
-| [`src/App.tsx`](../../src/App.tsx)                                             | 顶部导航、首页布局、页面切换及聊天常驻边界         |
-| [`src/components/RecentReadings.tsx`](../../src/components/RecentReadings.tsx) | 从真实资料生成首页继续阅读卡与列表                 |
-| [`src/components/StudyCalendar.tsx`](../../src/components/StudyCalendar.tsx)   | 完整月历、签到与手动计时组件                       |
-| [`src/assets/sunny-isle-plant.svg`](../../src/assets/sunny-isle-plant.svg)     | 只用于欢迎区的叠书植物装饰                         |
-| [`src/main.tsx`](../../src/main.tsx)                                           | 全局和首页样式载入入口                             |
-| [`design-lab/selected-design.json`](../../design-lab/selected-design.json)     | 给其他 AI 的选定方案与正式文件入口                 |
+| 文件                                                                                     | 维护职责                                           |
+| ---------------------------------------------------------------------------------------- | -------------------------------------------------- |
+| [`src/styles/tokens.css`](../../src/styles/tokens.css)                                   | 语义色、字体、圆角与内容上限                       |
+| [`src/styles.css`](../../src/styles.css)                                                 | 全局壳、顶部导航、欢迎区、通用控件与各业务页面样式 |
+| [`src/styles/study-home.css`](../../src/styles/study-home.css)                           | 真实最近阅读、月历、签到、计时的首页样式           |
+| [`src/App.tsx`](../../src/App.tsx)                                                       | 顶部导航、首页布局、页面切换及聊天常驻边界         |
+| [`src/components/home/RecentReadings.tsx`](../../src/components/home/RecentReadings.tsx) | 从真实资料生成首页继续阅读卡与列表                 |
+| [`src/components/home/StudyCalendar.tsx`](../../src/components/home/StudyCalendar.tsx)   | 完整月历、签到与手动计时组件                       |
+| [`src/assets/sunny-isle-plant.svg`](../../src/assets/sunny-isle-plant.svg)               | 只用于欢迎区的叠书植物装饰                         |
+| [`src/main.tsx`](../../src/main.tsx)                                                     | 全局和首页样式载入入口                             |
+| [`design-lab/selected-design.json`](../../design-lab/selected-design.json)               | 给其他 AI 的选定方案与正式文件入口                 |
 
 后续更换配色先调整 token，在真实空态和长文本下确认对比、焦点及错误状态。更换排版再调整 App 的结构和对应 CSS；不要因审美改动更换数据接口、数据库或组件生命周期。替换插画保持本地资源和装饰语义即可。
 

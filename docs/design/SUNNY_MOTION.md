@@ -57,6 +57,6 @@
 
 执行 `node scripts/build-motion-demo.mjs`，生成演示使用的经典脚本 IIFE 与 CSS 副本，源码 SHA-256 写入 `assets/sources.json`。双击 HTML 可用，不需要本地服务器，不加载远程字体、图片、模型或账号。
 
-演示中的导入、聊天、下载等只模拟状态；真实软件的这些行为继续由原有业务接口驱动。半速开关仅用于本页预览，不进入正式设置或数据库。修改正式动效后必须重新生成副本、重录演示，并检查摘要一致。
+演示中的导入、聊天、下载等只模拟状态；真实软件的这些行为继续由原有业务接口驱动。半速开关仅用于本页预览，不进入正式设置或数据库。修改正式动效后重新生成副本并检查摘要一致；若演示场景或视觉行为改变，再更新对应录像。2026-10-22 为完整导航修正横纵定位，已同步生成副本；现存预览图／录像仍绑定2026-10-21的演示对象，当前软件验证见[整合交接](../testing/updates-integration-2026-10-22.md)。
 
 参考 Apple 的 [连贯过渡](https://developer.apple.com/videos/play/wwdc2024/10145/)、[自然弹性](https://developer.apple.com/videos/play/wwdc2023/10158/)、[可中断响应](https://developer.apple.com/videos/play/wwdc2018/803/)，使用原生 CSS／WAAPI 实现适合桌面学习软件的轻量版本，没有复制 Apple 系统实现或设计资产。

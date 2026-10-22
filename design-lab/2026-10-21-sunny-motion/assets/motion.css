@@ -41,8 +41,6 @@ button:enabled:active {
 }
 .nav-indicator {
   position: absolute;
-  top: 5px;
-  bottom: 5px;
   border-radius: 23px;
   background: var(--surface);
   box-shadow: 0 2px 5px #34462c08;
