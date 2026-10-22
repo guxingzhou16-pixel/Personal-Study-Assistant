@@ -261,13 +261,15 @@ function registerHandlers(
           ok: false,
           error: { code: 'backupBusy', message: '正在处理备份或恢复，请等待完成或取消后再操作。' },
         };
-      runningOperations++;
+      // Public release metadata does not read or change learning files or databases.
+      const learningOperation = channel !== 'study:check-app-update';
+      if (learningOperation) runningOperations++;
       try {
         return { ok: true, value: await work(...args) };
       } catch (error) {
         return { ok: false, error: failure(error) };
       } finally {
-        runningOperations--;
+        if (learningOperation) runningOperations--;
       }
     });
   }
