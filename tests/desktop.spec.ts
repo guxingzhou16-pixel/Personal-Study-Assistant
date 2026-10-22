@@ -8,6 +8,20 @@ import { randomUUID } from 'node:crypto';
 
 const packageVersion: string = JSON.parse(readFileSync('package.json', 'utf8')).version;
 
+async function mockAppUpdates(application: ElectronApplication) {
+  await application.evaluate(({ net }) => {
+    const originalFetch = net.fetch.bind(net);
+    net.fetch = async (input, options) => {
+      if (
+        String(input) ===
+        'https://api.github.com/repos/guxingzhou16-pixel/Personal-Study-Assistant/releases?per_page=30'
+      )
+        return new Response('[]', { headers: { 'content-type': 'application/json' } });
+      return originalFetch(input, options);
+    };
+  });
+}
+
 test('desktop navigation, persistent preferences, encrypted keys and model checks', async () => {
   const dataDir = mkdtempSync(join(tmpdir(), 'study-desktop-'));
   const fakeKey = 'e2e-fake-key-never-a-real-secret';
@@ -35,6 +49,7 @@ test('desktop navigation, persistent preferences, encrypted keys and model check
       args: ['.'],
       env: { ...taskEnv, STUDY_COMPANION_DATA_DIR: dataDir },
     });
+    await mockAppUpdates(application);
     return application.firstWindow();
   }
   try {
@@ -97,6 +112,9 @@ test('desktop navigation, persistent preferences, encrypted keys and model check
     expect(isolation.node).toBe('undefined');
     expect(isolation.bridge).toEqual([
       'bootstrap',
+      'getAppVersion',
+      'checkAppUpdate',
+      'openAppUpdate',
       'saveSettings',
       'storeApiKey',
       'removeApiKey',
@@ -231,6 +249,7 @@ test('development window can call the same isolated desktop API', async () => {
         STUDY_COMPANION_DEV_URL: 'http://127.0.0.1:1420',
       },
     });
+    await mockAppUpdates(application);
     const page = await application.firstWindow();
     await expect(page.getByRole('heading', { name: /今天，也长出\s*一点新想法/ })).toBeVisible();
     await page.getByRole('button', { name: '设置', exact: true }).click();

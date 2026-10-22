@@ -534,6 +534,9 @@ export interface BackupState {
 }
 export interface DesktopApi {
   bootstrap(): Promise<Bootstrap>;
+  getAppVersion(): Promise<AppVersionInfo>;
+  checkAppUpdate(force?: boolean): Promise<AppUpdateReport>;
+  openAppUpdate(target: 'latest' | 'history'): Promise<void>;
   saveSettings(settings: Settings): Promise<Settings>;
   storeApiKey(baseUrl: string, key: string): Promise<void>;
   removeApiKey(baseUrl: string): Promise<void>;

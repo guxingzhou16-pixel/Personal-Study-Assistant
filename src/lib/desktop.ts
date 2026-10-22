@@ -8,6 +8,9 @@ function api(): DesktopApi {
 }
 export const desktop: DesktopApi = {
   bootstrap: () => api().bootstrap(),
+  getAppVersion: () => api().getAppVersion(),
+  checkAppUpdate: (force) => api().checkAppUpdate(force),
+  openAppUpdate: (target) => api().openAppUpdate(target),
   saveSettings: (settings) => api().saveSettings(settings),
   storeApiKey: (baseUrl, key) => api().storeApiKey(baseUrl, key),
   removeApiKey: (baseUrl) => api().removeApiKey(baseUrl),

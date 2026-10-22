@@ -8,6 +8,7 @@ import {
   net,
   powerMonitor,
   safeStorage,
+  shell,
   utilityProcess,
 } from 'electron';
 import { mkdirSync, writeFileSync } from 'node:fs';
@@ -15,6 +16,7 @@ import { basename, join, resolve } from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { Credentials } from './core/credentials';
 import { AppError, failure } from './core/errors';
+import { AppUpdates } from './core/app-updates';
 import { checkConnection } from './core/models';
 import { probeGeneration } from './core/model-health';
 import { studyExample } from '../src/lib/study-example';
@@ -110,6 +112,11 @@ function registerHandlers(
   location: LearningLocation,
   backupRunner: BackupRunner,
 ) {
+  const updates = new AppUpdates(
+    { version: app.getVersion(), packaged: app.isPackaged },
+    (url, options) => net.fetch(url, options),
+    (url) => shell.openExternal(url),
+  );
   const files = new Documents(
     database,
     join(location.directory, 'sources'),
@@ -270,6 +277,16 @@ function registerHandlers(
   handle('study:confirm-restore', (id) => backupService.confirm(id));
   handle('study:discard-restore', (id) => backupService.discard(id));
   handle('study:cancel-backup', () => backupService.cancel());
+  handle('study:get-app-version', () => updates.info());
+  handle('study:check-app-update', (force = false) => {
+    if (typeof force !== 'boolean') throw new AppError('updateInput', '检查更新参数无效。');
+    return updates.check(force);
+  });
+  handle('study:open-app-update', (target) => {
+    if (target !== 'latest' && target !== 'history')
+      throw new AppError('updateInput', '更新页面参数无效。');
+    return updates.open(target);
+  });
   handle('study:bootstrap', () => {
     const settings = database.loadSettings();
     return {

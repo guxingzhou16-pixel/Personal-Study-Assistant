@@ -82,5 +82,5 @@ it('connects every shared desktop method to preload and exactly one IPC handler 
     methods: typeNames.length,
     requests: requests.length,
     events: subscriptions.length,
-  }).toEqual({ methods: 90, requests: 84, events: 6 });
+  }).toEqual({ methods: 93, requests: 87, events: 6 });
 });

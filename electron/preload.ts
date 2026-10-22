@@ -1,5 +1,7 @@
 import { contextBridge, ipcRenderer } from 'electron';
 import type {
+  AppVersionInfo,
+  AppUpdateReport,
   Bootstrap,
   ConnectionReport,
   DesktopApi,
@@ -52,6 +54,9 @@ async function call<T>(channel: string, ...args: unknown[]): Promise<T> {
 
 const api: DesktopApi = {
   bootstrap: () => call<Bootstrap>('study:bootstrap'),
+  getAppVersion: () => call<AppVersionInfo>('study:get-app-version'),
+  checkAppUpdate: (force) => call<AppUpdateReport>('study:check-app-update', force),
+  openAppUpdate: (target) => call<void>('study:open-app-update', target),
   saveSettings: (settings: Settings) => call<Settings>('study:save-settings', settings),
   storeApiKey: (baseUrl: string, key: string) => call<void>('study:store-key', baseUrl, key),
   removeApiKey: (baseUrl: string) => call<void>('study:remove-key', baseUrl),
