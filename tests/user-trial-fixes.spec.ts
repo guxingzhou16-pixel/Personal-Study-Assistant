@@ -37,6 +37,7 @@ const routePlan = {
 function fixture({ empty = false, tasks = false } = {}) {
   const root = mkdtempSync(join(tmpdir(), 'study-user-trial-fix-'));
   const path = join(root, 'study-companion.sqlite3');
+  const routeId = randomUUID();
   if (!empty) createLegacyDatabase(path, 11);
   mkdirSync(join(root, 'sources'));
   if (!empty) writeFileSync(join(root, 'sources', `${fixtureSourceId}.md`), fixtureText);
@@ -58,7 +59,7 @@ function fixture({ empty = false, tasks = false } = {}) {
     );
     const conversation = store.chat.findLearningConversation()!;
     const route = fixtureTurn(conversation.id, {
-      id: randomUUID(),
+      id: routeId,
       learningRequest: {
         goal: '试用路线',
         query: '事务',
@@ -89,7 +90,7 @@ function fixture({ empty = false, tasks = false } = {}) {
     }
   }
   store.close();
-  return { root, path };
+  return { root, path, routeId };
 }
 async function launch(root: string) {
   const { ELECTRON_RUN_AS_NODE: _node, STUDY_COMPANION_DEV_URL: _dev, ...env } = process.env;
@@ -102,10 +103,17 @@ async function launch(root: string) {
   return { app, page };
 }
 
-test('the first-use guide starts in the first screen and restores the imported example after settings', async () => {
+test('the first-use guide starts collapsed, expands on request and restores the imported example after settings', async () => {
   const { root } = fixture({ empty: true });
   const { app, page } = await launch(root);
   try {
+    const guide = page.locator('.first-use-guide');
+    const summary = guide.locator('summary');
+    await expect(guide).not.toHaveAttribute('open');
+    await expect(summary).toBeInViewport();
+    await expect(page.getByRole('button', { name: '导入学习示例', exact: true })).toHaveCount(0);
+    await summary.click();
+    await expect(guide).toHaveAttribute('open');
     await expect(page.getByRole('button', { name: '导入学习示例', exact: true })).toBeInViewport();
     await page.getByRole('button', { name: '导入学习示例', exact: true }).click();
     await expect(
@@ -113,6 +121,8 @@ test('the first-use guide starts in the first screen and restores the imported e
     ).toBeEnabled();
     await page.getByRole('button', { name: '前往模型配置与检查', exact: true }).click();
     await page.getByRole('button', { name: '学习首页', exact: true }).click();
+    await expect(guide).not.toHaveAttribute('open');
+    await summary.click();
     await expect(
       page.getByRole('button', { name: '用示例准备第一次提问', exact: true }),
     ).toBeEnabled();
@@ -144,6 +154,14 @@ test('home scrolling stays in the content pane at normal and minimum window size
         size,
       );
       await expect(page.locator('.daily-section .sr-only[role=status]')).toHaveCount(1);
+      // Entrance transforms can temporarily hide overflow by providing containing blocks.
+      await expect
+        .poll(() =>
+          page
+            .locator('.home-page')
+            .evaluate((element) => element.getAnimations({ subtree: true }).length),
+        )
+        .toBe(0);
       await expect
         .poll(() => page.evaluate(() => document.documentElement.scrollHeight - window.innerHeight))
         .toBeLessThanOrEqual(1);
@@ -151,6 +169,9 @@ test('home scrolling stays in the content pane at normal and minimum window size
       await page.locator('main').evaluate((element) => {
         element.scrollTop = 600;
       });
+      await expect
+        .poll(() => page.locator('main').evaluate((element) => element.scrollTop))
+        .toBeGreaterThan(0);
       expect(await page.locator('.app-header').boundingBox()).toEqual(before);
       expect(await page.evaluate(() => window.scrollY)).toBe(0);
       if (size[0] === 900)
@@ -266,12 +287,14 @@ test('route task order is identical on home, planning, edit and restart', async 
 });
 
 test('a valid edited route needs one preview action and still requires an explicit final write confirmation', async () => {
-  const { root } = fixture();
+  const { root, routeId } = fixture();
   const { app, page } = await launch(root);
   const day = localDayKey(new Date());
   try {
     await openPage(page, '学习路线');
+    await page.getByRole('combobox', { name: '选择草稿', exact: true }).selectOption(routeId);
     const route = page.getByRole('region', { name: '结构化学习路线', exact: true });
+    await expect(route).toBeVisible();
     await route.getByRole('checkbox', { name: '选择步骤 1 生成任务', exact: true }).check();
     await route.getByRole('checkbox', { name: '选择步骤 2 生成任务', exact: true }).check();
     const preview = route.getByRole('button', { name: '预览所选步骤任务', exact: true });

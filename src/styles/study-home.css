@@ -186,6 +186,7 @@
 }
 
 .daily-section {
+  position: relative;
   min-width: 0;
 }
 
