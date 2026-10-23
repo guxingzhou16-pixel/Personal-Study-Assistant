@@ -17,13 +17,13 @@
 
 ## 交付与审查
 
-- 0.1.2维护预览准备：[发行说明](releases/0.1.2-preview.md)，最终验证与发布结果另行记录。
+- 最新0.1.2维护预览：[发行说明](releases/0.1.2-preview.md) · [最终安装、CI与公开下载交付](testing/github-preview-release-2026-10-23.md)。
 
-- 当前本地主线与更新量：[首版发布以来的更新统计及最新导航合并](testing/main-update-summary-2026-10-22.md)。
+- 截至2026-10-22的主线与更新量：[首版发布以来的更新统计及最新导航合并](testing/main-update-summary-2026-10-22.md)。
 - 最新主线整合：[设置更新入口、分支合并与相关回归](testing/updates-integration-2026-10-22.md)。
 - 最新独立复验：[2026-10-22 测试与代码规范审查](testing/latest-code-review-2026-10-22.md)。
 
-- 当前已发布首版：[最终交付回执](testing/github-preview-release-2026-10-15.md)。
+- 首次0.1.1发布：[最终交付回执](testing/github-preview-release-2026-10-15.md)。
 - 后续源码维护：[全局审查](testing/full-code-review-2026-10-16.md) → [修复交接](testing/full-code-review-fixes-2026-10-16.md)。
 - 用户体验维护：[试用报告](testing/user-trial-2026-10-16.md) → [优化交接](testing/user-trial-fixes-2026-10-16.md)。
 - 目录与架构维护：[2026-10-21 整理范围、验证和开发监听修复](testing/structure-maintenance-2026-10-21.md)。

@@ -13,15 +13,15 @@
 
 ## 功能实现与验收状态
 
-正在准备 **0.1.2 维护预览版**，包含上述已整合更新；[发行说明](docs/releases/0.1.2-preview.md)。实际发布与安装验证结果将在交付回执中另行记录。
+最新 **0.1.2 未签名 Windows x64 预览版已发布**：[下载页面](https://github.com/guxingzhou16-pixel/Personal-Study-Assistant/releases/tag/v0.1.2-preview.1) · [发行说明](docs/releases/0.1.2-preview.md) · [最终交付回执](docs/testing/github-preview-release-2026-10-23.md)。源码固定 `4471f34`；434项核心、59条桌面流程、最终包安装/升级/重开/卸载数据保护及三个附件匿名完整下载摘要核对通过。
 
 首版 **0.1.1 未签名 Windows x64 预览版已公开交付**：[下载页面](https://github.com/guxingzhou16-pixel/Personal-Study-Assistant/releases/tag/v0.1.1-preview.1)。交付对象为 `f84285f`，安装与下载证据见[最终交付回执](docs/testing/github-preview-release-2026-10-15.md)。
 
-2026-10-22 已整合审查修复、体验优化、目录整理、晴岛界面与动效，并新增设置中的软件更新入口。当前源码与上述已发布安装包不同，尚未重新打包发布。合并对象、验证及发布边界见[本轮交接](docs/testing/updates-integration-2026-10-22.md)；历史修复细节保留在[全局修复交接](docs/testing/full-code-review-fixes-2026-10-16.md)与[试用优化交接](docs/testing/user-trial-fixes-2026-10-16.md)。
+2026-10-22 已整合审查修复、体验优化、目录整理、晴岛界面与动效，并新增设置中的软件更新入口。这些首版之后的更新现已随0.1.2发布。合并对象、验证及发布边界见[本轮交接](docs/testing/updates-integration-2026-10-22.md)；历史修复细节保留在[全局修复交接](docs/testing/full-code-review-fixes-2026-10-16.md)与[试用优化交接](docs/testing/user-trial-fixes-2026-10-16.md)。
 
 2026-10-22 对 `cfc2597` 的[独立测试与规范审查](docs/testing/latest-code-review-2026-10-22.md)：434项核心、55条普通桌面、1条真实BGE门禁、20项打包规则及类型／构建／格式检查通过；未确认新增可复现缺陷。真实聊天语义、新安装包链及远端CI未在本轮验收，保留既有构建体积提示。
 
-本次已将最新导航分支 `3f341d6` 快进合入本地 `main`，补验构建、接口连接及14条相关桌面流程。首版发布以来的提交、文件与功能分类统计见[主线更新汇总](docs/testing/main-update-summary-2026-10-22.md)；旧独立审查仍绑定上述 `cfc2597`，安装包尚未更新。
+2026-10-22已将最新导航分支 `3f341d6` 快进合入 `main`，补验构建、接口连接及14条相关桌面流程。首版发布以来的提交、文件与功能分类统计见[主线更新汇总](docs/testing/main-update-summary-2026-10-22.md)；旧独立审查仍绑定上述 `cfc2597`；本次0.1.2的独立构建、CI和实际安装范围另见最终交付回执。
 
 | 能力     | 当前范围                                                    |
 | -------- | ----------------------------------------------------------- |
@@ -47,7 +47,7 @@
 
 动效约定见 [SUNNY_MOTION](docs/design/SUNNY_MOTION.md)，支持系统减少动画偏好；正式界面不运行设计实验脚本。
 
-2026-10-22 导航整理：顶部只保留学习首页、资料库、学习助手；设置移至左上品牌旁，右侧仅头像。首页最近阅读下方显示路线／笔记摘要，无记录时明确提示；首次使用引导默认收起。专注、计划、复习和记忆从设置的学习工具进入。[设计规范](docs/design/SUNNY_NAVIGATION.md) · [实施交接与验证](docs/handoffs/2026-10-22-sunny-navigation.md) · [独立布局预览](design-lab/2026-10-22-sunny-navigation/index.html)。原分支构建与30项相关桌面规格通过，模型使用模拟服务；该分支现已合入本地 main，安装包尚未更新。
+2026-10-22 导航整理：顶部只保留学习首页、资料库、学习助手；设置移至左上品牌旁，右侧仅头像。首页最近阅读下方显示路线／笔记摘要，无记录时明确提示；首次使用引导默认收起。专注、计划、复习和记忆从设置的学习工具进入。[设计规范](docs/design/SUNNY_NAVIGATION.md) · [实施交接与验证](docs/handoffs/2026-10-22-sunny-navigation.md) · [独立布局预览](design-lab/2026-10-22-sunny-navigation/index.html)。原分支构建与30项相关桌面规格通过，模型使用模拟服务；该分支已合入 main，并包含于0.1.2安装包。
 
 ## 本地运行
 
